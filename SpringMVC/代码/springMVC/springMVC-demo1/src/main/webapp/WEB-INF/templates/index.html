@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+</head>
+<body>
+<h1>首页</h1>
+<!--这里我们要实现一个目标：访问目标页面。
+但我们这里写的路径是不对的！以/开头的路径叫做绝对路径，而绝对路径又分为浏览器解析的和服务器解析的。
+浏览器解析的：比如说超链接的绝对路径，这个时候的/表示的是从localhost:8080下访问。所以说少一个上下文路径
+
+怎么处理？
+咱们可以在这里用相对路径，但是相对路径不太好使，但如果就要用绝对路径，就需要把上下文路径加上。
+这里的上下文路径就是我们在配置tomcat的时候Deployment下面有个Application context，就是上下文路径。所以说我们只要把它加上就可以了。
+但是由于上下文路径是可以改的，那我们在这就不能写死。所以这里就可以来使用thymeleaf：
+1.在html标签中，必须得有我们的thymeleaf的一个命名空间：xmlns:th="http://www.thymeleaf.org，有了之后我们就可以来使用thymeleaf的语法了
+<a href="/target">访问目标页面target.html</a>
+做法：加上th：此时就可以使用thymeleaf的语法了
+语法：@{}，把路径放进去，这个时候当它检测到里面所使用的是绝对路径的时候，它就会自动去帮助我们去添加上下文路径-->
+<a th:href="@{/target}">访问目标页面target.html</a>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+</head>
+<body>
+<h1>首页</h1>
+<a th:href="@{/testRequestMapping}">测试RequestMapping注解的value属性--->/test</a><br>
+<a th:href="@{/testGetMapping}">测试GetMapping注解的value属性--->GET</a><br>
+<form th:action="@{/testGetMapping}" method="post">
+    <!-- submit按钮有默认的属性值：提交
+    此时会发现，post请求也是可以匹配的，意思就是说，如果没有给method属性赋值，则任意的请求方式都是可以的
+    -->
+    <input type="submit" value="测试RequestMapping注解的method属性--->POST">
+</form>
+
+<form th:action="@{/testPut}" method="put">
+    <input type="submit" value="测试form表单是否能够发送put或delete请求方式">
+</form>
+
+<!--拼接请求参数-->
+<!--虽然添加?是可以的，但是如果使用 ? 进行链接，问号的地方会报错，但是是没有任何问题的
+如果不想看见报错，可以使用另一种方式去写：加一个(username=admin),如果中间要加其他参数，就用逗号分隔开！
+当thymeleaf进行解析后，就会自动转化成?进行传参的形式。
+并且admin是个字符串，就必须要放到单引号里。
+-->
+<a th:href="@{/testParamsAndHeaders?username='admin'&password=123456}">测试RequestMapping注解的params属性1</a>
+<a th:href="@{/testParamsAndHeaders(username='admin', password=123456)}">测试RequestMapping注解的params属性2</a>
+<br>
+<a th:href="@{/a1a/testAnt}">测试@RequestMapping可以匹配ant风格的路径--->使用**</a><br>
+<a th:href="@{/testPath/1/admin}">测试@RequestMapping可支持路径中的占位符</a><br>
+<a th:href="@{/testServletAPI}">测试testServletAPI</a><br>
+</body>
+</html>

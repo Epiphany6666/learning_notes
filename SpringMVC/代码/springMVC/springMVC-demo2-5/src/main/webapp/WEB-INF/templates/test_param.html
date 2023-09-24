@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>测试请求参数</title>
+</head>
+<body>
+<!--
+我们要访问这个页面是不能直接访问的，我们必须通过服务器访问，必须要通过thymeleaf的一个渲染。
+所以说我们需要在控制器中来写一个能够跳转到这个页面的一个请求映射
+-->
+<h1>测试请求参数</h1>
+<a th:href="@{/testServletAPI(username='admin',password=123456)}">测试使用servletAPI获取请求参数</a><br>
+<a th:href="@{/testParam(username='admin',password=123456)}">测试使用控制器的形参获取请求参数</a><br>
+
+<!--创建表单时，就不需要在action里面传输请求参数了，因为表单中是靠表单提交后，将表单的name和value进行拼接，拼接到服务器-->
+<!--PS:这里请求方式是get，因为只有get才会将请求方式拼接在地址后面-->
+<form th:action="@{/testParam}" method="get">
+    用户名：<input type="text" name="user_name"><br>
+    密码<input type="password" name="password"><br>
+    爱好：<input type="checkbox" name="hobby" value="a">a<br>
+    <label><input type="checkbox" name="hobby" value="b">b<br></label>
+    <label><input type="checkbox" name="hobby" value="c">c<br></label>
+    <label><input type="submit" value="测试使用控制器的形参获取请求参数"></label>
+</form>
+
+<form th:action="@{/testBean}" method="get">
+    用户名：<input type="text" name="username"><br>
+    密码：<input type="password" name="password"><br>
+    性别：<input type="radio" name="sex" value="男">男<input type="radio" name="sex" value="女">女<br>
+    年龄：<input type="text" name="age"><br>
+    邮箱：<input type="text" name="email"><br>
+    <input type="submit" value="使用实体类接收请求参数">
+</form>
+</body>
+</html>
