@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+
+    <!--引入properties文件，此时就可以${属性名}的方式访问属性值-->
+    <properties resource="jdbc.properties" />
+
+    <typeAliases>
+        <!--
+        用的少
+        typeAlias：设置某个具体的类型的别名
+        属性：
+               type：需要设置别名的类型的全类名
+               alias：可写可不写。
+                      设置此类型的别名，若不设置此属性，该类型拥有默认的别名，即类名且不区分大小。
+                      但建议也要见名识义，建议使用类名。
+
+        若设置此属性，此时该类型的别名只能使用alias所设置的值
+        如果不设置，则会有默认的别名，而这个别名是它的类名，且不区分大小写
+        -->
+
+        <!--<typeAlias type="com.atguigu.mybatis.bean.User"></typeAlias>-->
+        <!--<typeAlias type="com.atguigu.mybatis.bean.User" alias="abc">
+        </typeAlias>-->
+        <!--以包为单位，设置改包下所有的类型都拥有默认的别名，即类名且不区分大小写，这种方式用的多-->
+        <package name="com.atguigu.mybatis.pojo"/>
+    </typeAliases>
+
+
+    <!--
+    environments：设置多个连接数据库的环境
+
+    一个工程用的一定是一个统一的数据库环境，计算这里配置了两个环境，我们用的也只是其中的一个
+    我们只需要把某一个环境的id放到default中，来表示来默认使用某一个环境
+
+    属性：
+        default：设置默认使用的环境的id
+    -->
+    <environments default="mysql_test">
+        <!--
+        environment：设置具体的连接数据库的环境信息
+        属性：
+            id：表示连接数据库环境的唯一标识，可通过environments标签中的default设置某一个环境的id，表示默认使用的环境
+            唯一要注意的就是它不能重复
+        -->
+        <environment id="mysql_test">
+            <!--
+            transactionManager：设置事务管理方式
+            属性：
+                type：设置事务管理方式，type="JDBC|MANAGED"
+                type="JDBC"：设置当前环境的事务管理都必须手动处理
+                             表示当前环境中，执行SQL时，使用的是JDBC中原生的事务管理方式（如果要实现提交，就是commit，如果要实现回滚，那就是rollback，即事务的提交回滚需要手动来处理）
+
+                type="MANAGED"：设置事务被管理，谁能管理就让谁管理。
+                                例如spring中的AOP，AOP里的重要应用就是声明事务，当MyBatis和spring进行整合之后，我们可以通过spring中的声明事务来管理MyBatis的事务
+            -->
+            <transactionManager type="JDBC"/>
+            <!--
+            dataSource：设置数据源
+            属性：
+                type：设置数据源的类型，type="POOLED|UNPOOLED|JNDI"
+                type="POOLED"：使用数据库连接池，即会将创建的连接进行缓存，下次使用可以从 缓存中直接获取，不需要重新创建
+                type="UNPOOLED"：不使用数据库连接池，即每次使用连接都需要重新创建
+                type="JNDI"：调用上下文中的数据源
+
+                spring里的数据源就是一个对象，我们可以让spring来管理数据源。MyBatis再来使用spring管理的数据源
+            -->
+            <dataSource type="POOLED">
+                <!--设置驱动类的全类名-->
+                <property name="driver" value="${jdbc.driver}"/>
+                <!--设置连接数据库的连接地址-->
+                <property name="url" value="${jdbc.url}"/>
+                <!--设置连接数据库的用户名-->
+                <property name="username" value="${jdbc.username}"/>
+                <!--设置连接数据库的密码-->
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <!--引入映射文件-->
+    <mappers>
+<!--        <mapper resource="UserMapper.xml"/>-->
+        <!--
+        以包为单位，将包下所有的映射文件引入核心配置文件
+        注意：此方式必须保证
+             1.mapper接口和mapper映射文件必须在相同的包下
+             2.mapper接口要和映射文件一致
+        -->
+        <package name="com.atguigu.mybatis.mapper"/>
+    </mappers>
+</configuration>
