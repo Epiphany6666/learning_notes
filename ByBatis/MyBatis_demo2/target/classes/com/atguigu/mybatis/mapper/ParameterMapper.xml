@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.mybatis.mapper.ParameterMapper">
+    <select id="getAllUser" resultType="user">
+        select * from t_user
+    </select>
+
+    <select id="getUserByUsername" resultType="user">
+        <!--select * from t_user where username = #{username}-->
+        <!--如果是通过${}的话，单引号需要手动加！-->
+        select * from t_user where username = '${username}'
+    </select>
+
+    <!--User checkLogin(String username, String password)-->
+    <select id="checkLogin" resultType="user">
+        <!--select * from t_user where username = #{arg0} and password = #{arg1}-->
+        <!--不一定要用配套的：select * from t_user where username = #{arg0} and password = #{param2}-->
+        select * from t_user where username = '${arg0}' and password = '${param2}'
+    </select>
+
+    <!--User getUserByMap(Map<String, Object> map);-->
+    <select id="checkLoginByMap" resultType="user">
+        select * from t_user where username = '${username}' and password = '${password}'
+    </select>
+
+    <!--int insertUser(User user);-->
+    <insert id="insertUser">
+        <!--
+        直接通过属性名来访问属性值即可
+        我们最终访问的属性看的是get跟set方法，跟成员变量关系不大
+        如果是取值，就去找get
+        如果是赋值，就去找set
+        get与set方法去掉get和set，把剩余部分首字母变为小写的结果就是当前的属性名
+        eg：spring中的<bean>标签中有个<property>标签，对应的是get跟set方法
+        -->
+        insert into t_user values(null, #{username}, #{password}, #{age}, #{sex}, #{email})
+    </insert>
+
+    <!--User checkLoginByParam(@Param("username") String username, @Param("password") String password);-->
+    <select id="checkLoginByParam" resultType="User">
+        select * from t_user where username = '${username}' and password = '${password}'
+    </select>
+</mapper>

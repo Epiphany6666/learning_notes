@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.mybatis.mapper.SelectMapper">
+
+    <!--User getUserById(@Param("id") Integer id);-->
+    <select id="getUserById" resultType="User">
+        select * from t_user where id = #{id}
+    </select>
+
+    <!--List<User> getAllUer();-->
+    <select id="getAllUser" resultType="User">
+        select * from t_user
+    </select>
+
+    <!--Integer getCount();
+
+    count(**)和count(1)的区别：
+    从查询的结果来说，count(*)和count(1) 查询的结果是一样的。
+    而count（字段）查出来的结果是不一样的，因为某个字段为null，那这条记录不会被算到总记入数中。
+
+    resultType中：查询结果是什么，我们就需要在里面写什么，这里写Integer和小写的Integer，int，Int发现都是可以的！
+    这些都是类型别名，是MyBatis默认设置的类型别名.
+    Java.lang.Integer->int,integer
+    int->_int,_integer
+    -->
+    <select id="getCount" resultType="_Integer">
+        select count(*) from t_user
+    </select>
+
+    <!--Map<String, Object> getUserByIdToMap(@Param("id") Integer id);-->
+    <select id="getUserByIdToMap" resultType="map">
+        select * from t_user where id = #{id}
+    </select>
+
+    <!--Map<String, Object> getAllUsrToMap();-->
+    <select id="getAllUserToMap" resultType="Map">
+        select * from t_user
+    </select>
+</mapper>
