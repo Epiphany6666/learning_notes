@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.mybatis.mapper.EmpMapper">
+
+    <resultMap id="empResultMap" type="Emp">
+        <!--
+        这里面有id属性，专门来设置主键的映射关系
+        result：来设置普通字段的映射关系。
+        property：属性名
+        column：字段名
+        属性名和字段名一样也必须全部设置！
+
+        association：处理多对一的映射关系
+        collection：处理一对多的映射关系
+        -->
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+    </resultMap>
+
+    <!--List<Emp> getAllEmp();-->
+    <!--resultMap里面写的是某一个resultMap的id
+        因为是自定义映射，所以一定要设置字段和属性的映射关系-->
+    <select id="getAllEmp" resultMap="empResultMap">
+        select * from t_emp
+    </select>
+    <!--想让这个sql失效，直接让id与方法名不一样即可-->
+    <select id="getAllEmpOld" resultType="emp">
+        <!--select id, emp_name as empName, age, sex, email from t_emp-->
+        select * from t_emp
+    </select>
+
+    <!--由于底下sql查出来的就是员工信息，只不过员工里面的一个属性跟我们所查询出来的字段无法映射，所以这里type写的是Emp-->
+    <resultMap id="empAndDeptResultMapOne" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <result property="dept.did" column="did"></result>
+        <result property="dept.deptName" column="dept_name"></result>
+    </resultMap>
+
+    <resultMap id="empAndDeptResultMapTwo" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <!--
+        association：处理多对一的映射关系
+        property：需要处理多对一的映射关系的属性名
+        javaType里写的是属性的类型，此时就可以通过反射来获取当前类型的属性
+        -->
+        <association property="dept" javaType="Dept">
+            <!--这里赋值完后，就会得到一个dept对象，然后再把这个dept对象赋值给dept属性-->
+            <id property="did" column="did"></id>
+            <result property="deptName" column="dept_name"></result>
+        </association>
+    </resultMap>
+    <!--Emp getEmpAndDept(@Param("eid") Integer edi);-->
+    <select id="getEmpAndDept" resultMap="empAndDeptResultMapTwo">
+        select * from t_emp e left outer join t_dept d on e.eid = d.did where e.eid = #{eid}
+    </select>
+
+    <resultMap id="empAndDeptByStepResultMap" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <!--
+        property：我们要操作的属性
+        select：这个sql语句的唯一标识（namespace.SQLId或mapper接口全类名.方法名）！
+        column：设置的是分步查询的条件，这里写的就是员工所对应的did
+
+        fetchType：开启延迟加载之后。如果有些属性不需要延迟加载，此时可以通过fetchType属性手动控制延迟加载的效果
+                   延迟或立即加载lazy/eager。
+                   但是如果没有开启延迟加载，这两个属性都是一样的效果，都是立即加载！
+        -->
+        <association property="dept"
+                     select="com.atguigu.mybatis.mapper.DeptMapper.getEmpAndDeptByStepTwo"
+                     column="did"
+                     fetchType="eager"></association>
+    </resultMap>
+
+    <!--Emp getEmpAndDeptByStepOne(@Param("eid") Integer eid);-->
+    <select id="getEmpAndDeptByStepOne" resultMap="empAndDeptByStepResultMap">
+        select * from t_emp where eid = #{eid}
+    </select>
+
+    <!--Emp getDeptAndEmpByStepTwo(@Param("eid") Integer eid);-->
+    <select id="getDeptAndEmpByStepTwo" resultType="Emp">
+        select * from t_emp where did = #{did}
+    </select>
+</mapper>
