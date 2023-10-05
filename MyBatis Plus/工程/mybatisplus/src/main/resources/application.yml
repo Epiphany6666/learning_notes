@@ -1,0 +1,15 @@
+spring:
+  # 配置数据源信息
+  datasource:
+    # 配置数据源类型
+    type: com.zaxxer.hikari.HikariDataSource
+    # 配置链接数据库的各个信息
+    driver-class-name: com.mysql.jdbc.Driver
+    # characterEncoding：连接、操作数据库时的编码格式
+    # 8版本中还需要添加上时区
+    url: jdbc:mysql://localhost:3306/mybatis_plus?characterEncoding=utf-8&userSSL=false
+    username: root
+    password: 123456
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
