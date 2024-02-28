@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Created-By: IntelliJ IDEA
-Built-By: Epiphany
-Build-Jdk: Oracle OpenJDK version 17
-Implementation-Title: spring-demo2-2
-Implementation-Version: 0.0.1-SNAPSHOT
-Implementation-Vendor-Id: com.atguigu.mvc
-Main-Class: ${start-class}
-
