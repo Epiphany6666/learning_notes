@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promise_链式调用</title>
+</head>
+
+<body>
+  <form>
+    <span>省份：</span>
+    <select>
+      <option class="province"></option>
+    </select>
+    <span>城市：</span>
+    <select>
+      <option class="city"></option>
+    </select>
+    <span>地区：</span>
+    <select>
+      <option class="area"></option>
+    </select>
+  </form>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    /**
+     * 目标：掌握Promise的链式调用
+     * 需求：把省市的嵌套结构，改成链式调用的线性结构
+    */
+    // const p = new Promise((resolve, reject) => {
+    //   const xhr = new XMLHttpRequest()
+    //   xhr.open('GET', 'http://hmajax.itheima.net/api/province')
+    //   xhr.addEventListener('loadend', () => {
+    //     // console.log(JSON.parse(xhr.response))
+    //     const data = JSON.parse(xhr.response)
+    //     resolve(data.list[0])
+    //   })
+    //   xhr.send()
+    // })
+
+    // const p2 = p.then(result => {
+    //   // console.log(result)
+    //   return new Promise((resolve, reject) => {
+    //     const pname = result
+    //     const qObj = {
+    //       pname
+    //     }
+    //     // console.log(qObj);
+    //     const paramsObj = new URLSearchParams(qObj)
+    //     const xhr = new XMLHttpRequest()
+    //     console.log(paramsObj.toString());
+    //     xhr.open('GET', `http://hmajax.itheima.net/api/city?${paramsObj.toString()}`)
+    //     xhr.addEventListener('loadend', () => {
+    //       resolve(JSON.parse(xhr.response).list[0])
+    //       console.log(JSON.parse(xhr.response).list[0]);
+    //     })
+    //     xhr.send()
+    //   })
+    // })
+
+    const p = new Promise((resolve, reject) => {
+      axios({ url: 'http://hmajax.itheima.net/api/province' }).then(result => {
+        console.log(result);
+        const pname = result.data.list[0]
+        document.querySelector('.province').innerHTML = pname
+        resolve(pname)
+      })
+    })
+
+    const p2 = p.then(result => {
+      pname = result
+      axios({ url: 'http://hmajax.itheima.net/api/city', params: { pname } }).then(result => {
+        const cname = result.data.list[0]
+        document.querySelector('.city').innerHTML = cname
+        return new Promise((resolve, reject) => {
+          resolve({pname, cname})
+        })
+      })
+    })
+  </script>
+</body>
+
+</html>

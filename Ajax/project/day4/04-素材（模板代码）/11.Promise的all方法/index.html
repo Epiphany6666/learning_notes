@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promise的all方法</title>
+</head>
+
+<body>
+  <ul class="my-ul"></ul>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    /**
+     * 目标：掌握Promise的all方法作用，和使用场景
+     * 业务：当我需要同一时间显示多个请求的结果时，就要把多请求合并
+     * 例如：默认显示"北京", "上海", "广州", "深圳"的天气在首页查看
+     * code：
+     * 北京-110100
+     * 上海-310100
+     * 广州-440100
+     * 深圳-440300
+    */
+
+    const p1 = axios({url: 'http://hmajax.itheima.net/api/weather', params: {city: '110100'}})
+    const p2 = axios({url: 'http://hmajax.itheima.net/api/weather', params: {city: '310100'}})
+    const p3 = axios({url: 'http://hmajax.itheima.net/api/weather', params: {city: '440100'}})
+    const p4 = axios({url: 'http://hmajax.itheima.net/api/weather', params: {city: '440300'}})
+    const p = Promise.all([p1, p2, p3, p4])
+    p.then(result => {
+      console.log(result);
+      document.querySelector('.my-ul').innerHTML = result.map(item => `<li>${item.data.data.area} ---- ${item.data.data.weather}</li>`).join('')
+    }).catch(error => {
+      console.dir()
+    })
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>认识Promise状态</title>
+</head>
+
+<body>
+  <script>
+    /**
+     * 目标：认识Promise状态
+    */
+    // 1. 创建Promise对象 （pending - 待定状态）（此时需要等待异步代码有了结果才能改变状态，此时代码会继续执行，先绑定then和catch的回调，当Promise对象创建完后，回调也有了结果后
+    const p = new Promise((resolve, reject) => {
+      // Promise对象创建时，这里的代码都会执行了
+      // 2. 执行异步代码
+      setTimeout(() => {
+        // 当resolve被调用后 => 'fulfilled状态 - 已兑现' =>（触发） then()
+        resolve('模拟AJAX请求-成功结果')
+        // 当reject被调用后 => 'rejected状态 - 已拒绝' =>（触发） catch()
+        reject(new Error('模拟AJAX请求-失败结果'))
+
+        // 当resolve 和 reject同时执行，由于resolve在上面，则状态会变成fulfilled，此时对象已经被兑现！无论下面执行什么代码都无法改变Promise的状态了！
+      }, 2000)
+    })
+    console.log(p)
+
+    // 3. 获取结果
+    p.then(result => {
+      console.log(result)
+    }).catch(error => {
+      console.log(error)
+    })
+
+
+  </script>
+</body>
+
+</html>
