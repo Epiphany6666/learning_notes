@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    span {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <a href="http://www.itcast.cn">支付成功<span>5</span>s后跳到首页</a>
+  <script>
+    const span = document.querySelector('span')
+    let i = 5
+    span.innerHTML = i
+    setInterval(function () {
+      i--
+      span.innerHTML = i
+      if (i == 0) {
+        location.href = 'http://www.itcast.cn'
+      }
+    }, 1000)
+  </script>
+</body>
+
+</html>

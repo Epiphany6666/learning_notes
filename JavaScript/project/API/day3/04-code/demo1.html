@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    div {
+      height: 100px;
+      width: 100px;
+      overflow: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <textarea name="" id="" cols="30" rows="10" resize="none"></textarea>
+  <textarea rows="4" cols="50" resize="none">
+    这是一个不可调整大小的文本区域。
+</textarea>
+  <script>
+    const div = document.querySelector('div')
+    document.documentElement
+    div.addEventListener('scroll', function () {
+      console.log(div.scrollTop);
+    })
+  </script>
+</body>
+
+</html>

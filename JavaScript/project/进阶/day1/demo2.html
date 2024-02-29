@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        let count = 0
+        function fn() {
+            count++
+            console.log(`函数被调用${count}次`)
+        }
+        fn()
+        fn()
+
+        function fn() {
+            let count = 1
+            function fun() {
+                count++
+                console.log(`函数被调用${count}次`)
+            }
+            return fun
+        }
+        const result = fn
+        result()
+        result()
+    </script>
+</body>
+</html>

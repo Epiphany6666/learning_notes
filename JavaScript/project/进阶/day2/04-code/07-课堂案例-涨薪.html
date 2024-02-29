@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    const arr = [{
+      name: '张三',
+      salary: 10000
+    }, {
+      name: '李四',
+      salary: 10000
+    }, {
+      name: '王五',
+      salary: 20000
+    },
+    ]
+
+    // 这里必须要写初始值，否则就会拿第一个元素当成初始值，但在这里我们的第一个元素是一个对象！
+    const money = arr.reduce(function (prev, item) {
+      return prev + item.salary * 0.3
+    }, 0)
+    // const money = arr.reduce((prev, item) => prev + item.salary * 0.3, 0)
+    // console.log(money)
+  </script>
+</body>
+
+</html>

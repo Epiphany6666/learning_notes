@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <ul>
+    <li>第1个孩子</li>
+    <li>第2个孩子</li>
+    <li>第3个孩子</li>
+    <li>第4个孩子</li>
+    <li>第5个孩子</li>
+    <p>我不需要变色</p>
+  </ul>
+  <script>
+    // 点击每个小li 当前li 文字变为红色
+    // 按照事件委托的方式  委托给父级，事件写到父级身上
+    // 1. 获得父元素
+    const ul = document.querySelector('ul')
+    ul.addEventListener('click', function (e) {
+      // 想让当前li变颜色肯定不能用this，因为事件委托是委托给父亲，此时ul里面所有的元素都会变红
+      // this.style.color = 'red'
+
+      // 正确做法：
+      // console.log(e);
+      //  e.target.style.color = 'red'
+
+      // 需求：只要点击li才会有效果
+      // dir 是打印对象，此时打印出来的对象里面有个tagName属性
+      console.dir(e.target);
+      if (e.target.tagName === 'LI') {
+        e.target.style.color = 'red'
+      }
+    })
+
+    const p = document.querySelector('ul p')
+    p.removeEventListener('click', function () {
+      console.log('我不需要被点击');
+    })
+  </script>
+</body>
+
+</html>

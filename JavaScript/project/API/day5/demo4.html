@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <script>
+    const obj = {
+      uname: 'pink',
+      age: 18,
+      gender: '女'
+    }
+    localStorage.setItem('obj', obj)
+    // console.log(localStorage.getItem('obj')) //'[object Object]'，直接输出来的是无法直接使用的
+    localStorage.setItem('obj', JSON.stringify(obj))
+    // console.log(localStorage.getItem('obj'));
+    console.log(JSON.parse(localStorage.getItem('obj')))
+  </script>
+</body>
+
+</html>

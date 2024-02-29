@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // const arr = [1, 2, 3]
+        const arr = new Array(1, 2, 3)
+        Array.prototype.reverse = function () {
+            let left = 0, right = this.length - 1
+            while (left < right) {
+                let tmp = arr[left]
+                arr[left] = arr[right]
+                arr[right] = tmp
+                left++
+                right--
+            }
+            return arr
+        }
+
+        Array.prototype.max = function () {
+            //     let max = arr[0]
+            //     for (let i = 0; i < arr.length; i++) max = Math.max(max, arr[i])
+            //     return max
+            return Math.max(...this)
+        }
+
+        Array.prototype.sum = function() {
+            return this.reduce((prev, cur) => prev + cur, 0)
+        }
+
+        console.log(arr.max());
+        console.log(arr.reverse());
+        console.log(arr.sum());
+    </script>
+</body>
+
+</html>

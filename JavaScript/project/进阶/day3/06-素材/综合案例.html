@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>面向对象封装消息提示</title>
+  <style>
+    .modal {
+      width: 300px;
+      min-height: 100px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      position: fixed;
+      z-index: 999;
+      left: 50%;
+      top: 50%;
+      transform: translate3d(-50%, -50%, 0);
+      background-color: #fff;
+    }
+
+    .modal .header {
+      line-height: 40px;
+      padding: 0 10px;
+      position: relative;
+      font-size: 20px;
+    }
+
+    .modal .header i {
+      font-style: normal;
+      color: #999;
+      position: absolute;
+      right: 15px;
+      top: -2px;
+      cursor: pointer;
+    }
+
+    .modal .body {
+      text-align: center;
+      padding: 10px;
+    }
+
+    .modal .footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 10px;
+    }
+
+    .modal .footer a {
+      padding: 3px 8px;
+      background: #ccc;
+      text-decoration: none;
+      color: #fff;
+      border-radius: 2px;
+      margin-right: 10px;
+      font-size: 14px;
+    }
+
+    .modal .footer a.submit {
+      background-color: #369;
+    }
+  </style>
+</head>
+
+<body>
+  <button id="delete">删除</button>
+  <button id="login">登录</button>
+
+  <!-- <div class="modal">
+    <div class="header">温馨提示 <i>x</i></div>
+    <div class="body">您没有删除权限操作</div>
+  </div> -->
+
+  <script>
+    function Model(title = '', message = '') {
+      this.modelBox = document.createElement('div')
+      this.modelBox.className = 'modal'
+      this.modelBox.innerHTML = `
+        <div class="header">${title} <i>x</i></div>
+        <div class="body">${message}</div>
+      `
+      console.log(this.modelBox);
+    }
+    Model.prototype.open = function() {
+      document.body.append(this.modelBox)
+      this.modelBox.querySelector('i').addEventListener('click', () => {
+        this.close()
+      })
+    }
+
+    Model.prototype.close = function() {
+      document.body.remove()
+    }
+
+    document.querySelector('#delete').addEventListener('click', () => {
+      const del = new Model('温馨提示', '您没有权限删除')
+      del.open()
+    })
+
+    document.querySelector('#login').addEventListener('click', () => {
+      const login = new Model('友情提示', '您您还没有注册账号')
+      login.open()
+    })
+  </script>
+</body>
+
+</html>

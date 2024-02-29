@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <style>
+    .box {
+      width: 500px;
+      height: 500px;
+      background-color: #ccc;
+      color: #fff;
+      text-align: center;
+      font-size: 100px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="box"></div>
+  <script>
+    const box = document.querySelector('.box')
+    let i = 1  // 让这个变量++
+
+    function mouseMove() {
+      box.innerHTML = ++i
+      // 如果里面存在大量操作 dom 的情况，可能会卡顿
+    }
+    function debounce(fn, t) {
+      // 起始时间
+      let timer = 0
+      // return 返回一个匿名函数
+      return function () {
+        // 2.3.4
+        if (timer) clearTimeout(timer)
+        timer = setTimeout(function () {
+          fn()
+        }, 500)
+      }
+    }
+    // 这里的回调函数有点特殊，它是带小括号的，所以页面一加载就会立马执行，鼠标滑动的时候就不会再调用了。此时需要返回一个匿名函数
+    box.addEventListener('mousemove', debounce(mouseMove, 500))
+
+    // throttle(mouseMove, 500) === function () { console.log(1) }
+
+
+    // box.addEventListener('mousemove', function () {
+    //   // 得到当前的时间
+    //   let now = Date.now()
+    //   // 判断如果大于等于 500 采取调用函数
+    //   if (now - startTime >= t) {
+    //     // 调用函数
+    //     fn()
+    //     // 起始的时间 = 现在的时间   写在调用函数的下面
+    //     startTime = now
+    //   }
+    // })
+
+  </script>
+</body>
+
+</html>
