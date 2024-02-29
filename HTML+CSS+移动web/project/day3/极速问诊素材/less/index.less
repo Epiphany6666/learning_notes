@@ -1,0 +1,57 @@
+// out: ../css/
+@import './base.less';
+
+// 定义变量
+@rootSize: 37.5rem;
+
+// 头部
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 (15 / @rootSize);
+    height: (44 / @rootSize);
+    // background-color: pink;
+    line-height: (44 / @rootSize);
+
+    .icon-left {
+        font-size: (22 / @rootSize);
+    }
+
+    h3 {
+        font-size: (17 / @rootSize);
+    }
+
+    .note {
+        font-size: (15 / @rootSize);
+        color: #2CB5A5;
+    }
+}
+
+// banner
+.banner {
+    text-align: center;
+    margin-top: (30 / @rootSize);
+    margin-bottom: (34 / @rootSize);
+
+    img {
+        margin-bottom: (18 / @rootSize);
+        width: (240 / @rootSize);
+        height: (206 / @rootSize);
+    }
+
+    p {
+        font-size: (16 / @rootSize);
+        span {
+            color: #16C2A3;
+        }
+    }
+}
+
+// 问诊类型
+.type {
+    padding: 0 (15 / @rootSize);
+    li {
+        height: (78 / @rootSize);
+        border: 0.5px solid #EDEDEDE5;
+    }
+}

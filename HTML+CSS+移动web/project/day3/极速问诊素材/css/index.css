@@ -1,0 +1,73 @@
+*,
+::after,
+::before {
+  box-sizing: border-box;
+}
+body,
+ul,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  padding: 0;
+  margin: 0;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, PingFangSC-Regular, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+img {
+  vertical-align: bottom;
+}
+ul {
+  list-style-type: none;
+}
+a {
+  color: #333;
+  text-decoration: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.4rem;
+  height: 1.17333333rem;
+  line-height: 1.17333333rem;
+}
+header .icon-left {
+  font-size: 0.58666667rem;
+}
+header h3 {
+  font-size: 0.45333333rem;
+}
+header .note {
+  font-size: 0.4rem;
+  color: #2CB5A5;
+}
+.banner {
+  text-align: center;
+  margin-top: 0.8rem;
+  margin-bottom: 0.90666667rem;
+}
+.banner img {
+  margin-bottom: 0.48rem;
+  width: 6.4rem;
+  height: 5.49333333rem;
+}
+.banner p {
+  font-size: 0.42666667rem;
+}
+.banner p span {
+  color: #16C2A3;
+}
+.type {
+  padding: 0 0.4rem;
+}
+.type li {
+  height: 2.08rem;
+  border: 0.5px solid #EDEDEDE5;
+}

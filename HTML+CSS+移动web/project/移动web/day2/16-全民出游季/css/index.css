@@ -1,0 +1,77 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  background: url(../images/f1_1.jpg) no-repeat center 0 / cover;
+}
+
+/* 云 */
+.cloud img {
+  position: absolute;
+  left: 50%;
+}
+
+.cloud img:nth-child(1) {
+  margin-left: -250px;
+  margin-top: 20px;
+  animation: cloud 1s infinite linear alternate;
+}
+
+.cloud img:nth-child(2) {
+  margin-top: 100px;
+  margin-left: 400px;
+  animation: cloud 1s 0.4s infinite linear alternate;
+}
+
+.cloud img:nth-child(3) {
+  margin-left: -550px;
+  margin-top: 200px;
+  animation: cloud 1s 0.6s infinite linear alternate;
+}
+
+@keyframes cloud {
+  100% {
+    transform: translate(20px);
+  }
+}
+
+.text img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation: text 1s;
+}
+
+@keyframes text {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  20% {
+    transform: translate(-50%, -50%) scale(0.1);
+
+  }
+
+  40% {
+    transform: translate(-50%, -50%) scale(1.4);
+
+  }
+
+  70% {
+    transform: translate(-50%, -50%) scale(0.8);
+
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+
+  }
+}

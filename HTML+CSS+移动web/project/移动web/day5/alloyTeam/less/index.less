@@ -1,0 +1,84 @@
+// out: ../css/
+
+// 导航
+.bg-body-tertiary {
+  background-color: transparent !important;
+
+  .navbar-collapse {
+    flex-grow: 0;
+    // color: transparent;
+  }
+}
+
+// 轮播图
+.carousel {
+  .carousel-item {
+    // height: 500px;
+    background-size: cover;
+    background-position: center 0;
+  }
+
+  .carousel-item:nth-child(1) {
+    background-image: url(../assets/uploads/banner_1.jpg);
+  }
+
+  .carousel-item:nth-child(2) {
+    background-image: url(../assets/uploads/banner_2.jpg);
+  }
+
+  .carousel-item:nth-child(3) {
+    background-image: url(../assets/uploads/banner_3.jpg);
+  }
+
+  .carousel-item:nth-child(4) {
+    background-image: url(../assets/uploads/banner_4.jpg);
+  }
+
+  @media (max-width: 768px) {
+    .carousel-item {
+      height: 250px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .carousel-item {
+      height: 400px;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .carousel-item {
+      height: 500px;
+    }
+  }
+}
+
+// 开源项目
+.project {
+  margin-top: 60px;
+  text-align: center;
+
+  .row {
+    div {
+      margin-bottom: 10px;
+      height: 200px;
+
+      // background-color: pink;
+      a {
+        display: block;
+        height: 200px;
+        background-color: green;
+        border-radius: 4px;
+      }
+
+      &:nth-child(1) a {
+        background-color: #70c3ff;
+      }
+
+      &:nth-child(2) a {
+        background-color: #fd6a7f;
+      }
+
+    }
+  }
+}

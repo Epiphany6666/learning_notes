@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>精灵动画</title>
+  <style>
+    div {
+      width: 140px;
+      height: 140px;
+      /* border: 1px solid #000; */
+      background-image: url(./images/bg.png);
+      animation: run 1s infinite steps(12), move 2s linear forwards;
+    }
+
+    @keyframes run {
+      0% {
+        background-position: 0 0;
+      }
+
+      100% {
+        background-position: -1680px 0;
+      }
+    }
+
+    @keyframes move {
+      from {
+        transform: translate(0px);
+      }
+
+      to {
+        transform: translate(800px);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+
+  </div>
+</body>
+
+</html>
