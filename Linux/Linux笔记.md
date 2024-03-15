@@ -2241,15 +2241,15 @@ chgrp = chage group：修改所属组
 >
 > •下载安装包自行安装
 >
-> •**如win系统使用exe****文件、****msi****文件等**
+> •如win系统使用exe文件、msi文件等
 >
-> •**如****mac****系统使用****dmg****文件、****pkg****文件等**
+> •如mac系统使用dmg文件、pkg文件等
 >
 > •系统的应用商店内安装
 >
-> •**如****win****系统有****Microsoft Store****商店**
+> •如win系统有Microsoft Store商店
 >
-> •**如mac系统有AppStore****商店**
+> •如mac系统有AppStore商店
 >
 > Linux系统同样支持这两种方式，我们首先，先来学习使用：Linux命令行内的”应用商店”，yum命令安装软件
 
@@ -2281,7 +2281,7 @@ chgrp = chage group：修改所属组
 >
 > •yum search wget，通过yum命令，搜索是否有wget安装包
 
-**apt****命令** **-** **扩展**
+apt命令 - 扩展
 
 > 前面学习的各类Linux命令，都是通用的。 但是软件安装，CentOS系统和Ubuntu是使用不同的包管理器。
 >
@@ -2335,7 +2335,7 @@ service 服务名 start | stop |  restart | status
 
 ![image-20231201175023060](O:\BaiduSyncdisk\other\StudyNote\Linux\img\image-20231201175023060.png)
 
-**2**）**C****e****n****t****O****S****7** 的运行级别简化为**:**
+**2**）CentOS7 的运行级别简化为**:**
 
 multi-user.target 等价于原运行级别 3 （多用户有网，无图形界面）
 

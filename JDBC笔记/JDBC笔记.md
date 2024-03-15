@@ -1,440 +1,440 @@
-1. ## 为什么要JDBC
+# 1.为什么要JDBC
 
-   - java和数据库必要纽带
-   - 数据库层框架底层原理jdbc概念理解
+- java和数据库必要纽带
+- 数据库层框架底层原理jdbc概念理解
 
-2. ## jbdb概念理解
+# 2.jbdb概念理解
 
-   - JDBC：Java Datebase Connectivity | Java链接数据库技术的统称！
-     通俗点说，在Java代码中，使用JDBC提供的方法，可以发送字符串类型的SQL语句到**数据库管理软件**（MySQL，Oracle等），并且获取语句执行结果！进而实现数据库数据CURD操作的技术
-   - java语言只提供规范（接口），规定数据库操作方法！标准的类库存在于java.sql，javax.sql包下
-     个数据库厂商，根据java的jdbc规范（接口），完成具体的实现驱动代码（jar）！实现代码可以不同！但是方法都相同！
-     JDBC由java提供的jdbc规范（接口）+ 各个数据库厂商的实现驱动jar包（里面装的就是JDBC的实现类）！
-   - JDBC是一种典型的面向接口编程！
-   - JDBC的优势：
-     1. 我们只需要学习jdbc接口规定方法，即可操作所有数据库软件
-     2. 项目中期需要切换数据库，我们只需要更新第三方驱动jar包，不需要更改代码！
+- JDBC：Java Datebase Connectivity | Java链接数据库技术的统称！
+  通俗点说，在Java代码中，使用JDBC提供的方法，可以发送字符串类型的SQL语句到**数据库管理软件**（MySQL，Oracle等），并且获取语句执行结果！进而实现数据库数据CURD操作的技术
+- java语言只提供规范（接口），规定数据库操作方法！标准的类库存在于java.sql，javax.sql包下
+  个数据库厂商，根据java的jdbc规范（接口），完成具体的实现驱动代码（jar）！实现代码可以不同！但是方法都相同！
+  JDBC由java提供的jdbc规范（接口）+ 各个数据库厂商的实现驱动jar包（里面装的就是JDBC的实现类）！
+- JDBC是一种典型的面向接口编程！
+- JDBC的优势：
+  1. 我们只需要学习jdbc接口规定方法，即可操作所有数据库软件
+  2. 项目中期需要切换数据库，我们只需要更新第三方驱动jar包，不需要更改代码！
 
-3. ## 核心api和使用路线
+# 3.核心api和使用路线
 
-   - jar包是java程序打成的一种压缩包格式，你可以将这些jar包引入你的项目中，然后你可以使用这个java程序中类和方法以及属性了！
-   - 设计具体核心类和接口
-     1. DriverManager
-        - 将第三方数据库厂商的实现驱动jar注册到程序中
-        - 可以根据数据库链接信息获取connection
-     2. Connection
-        - 和数据库建立的链接，在链接对象上，可以多次执行数据库curd动作
-        - 可以获取 statement 和 preparedstatement，callablestatement 对象
-     3. Statement（查询静态SQL路线（没有动态值语句） | PreparedStatement（预编译SQL路线（有动态值语句） | CallableStatement（执行标准存储过程SQL路线）
-        - 具体发送SQL语句到数据库管理软件的对象
-        - 不同发送方式稍有不同！**preparedstatement** 使用为重点！
-     4. Result
-        - 面向对象思维的产物（抽象成数据库的查询结果表）
-        - 存储DQL查询数据库结果的对象
-        - 需要我们进行解析，获取具体的数据库数据
+- jar包是java程序打成的一种压缩包格式，你可以将这些jar包引入你的项目中，然后你可以使用这个java程序中类和方法以及属性了！
+- 设计具体核心类和接口
+  1. DriverManager
+     - 将第三方数据库厂商的实现驱动jar注册到程序中
+     - 可以根据数据库链接信息获取connection
+  2. Connection
+     - 和数据库建立的链接，在链接对象上，可以多次执行数据库curd动作
+     - 可以获取 statement 和 preparedstatement，callablestatement 对象
+  3. Statement（查询静态SQL路线（没有动态值语句） | PreparedStatement（预编译SQL路线（有动态值语句） | CallableStatement（执行标准存储过程SQL路线）
+     - 具体发送SQL语句到数据库管理软件的对象
+     - 不同发送方式稍有不同！**preparedstatement** 使用为重点！
+  4. Result
+     - 面向对象思维的产物（抽象成数据库的查询结果表）
+     - 存储DQL查询数据库结果的对象
+     - 需要我们进行解析，获取具体的数据库数据
 
-4. ## 为什么选择8x版本驱动
+# 4.为什么选择8x版本驱动
 
-5. ## 使用步骤总结
+# 5.使用步骤总结
 
-   - 驱动jar版本选择
+- 驱动jar版本选择
 
-   - java工程导入依赖
+- java工程导入依赖
 
-     ​	a. 项目创建lib文件夹
+  ​	a. 项目创建lib文件夹
 
-     ​	b. 导入驱动依赖jar包
+  ​	b. 导入驱动依赖jar包
 
-     ​	c. jar包右键-添加为项目依赖（Add as Library）//因为此时和程序还没有什么关联
-     ​    如果出现了倒三角，可以展开，即说明关联成功，拥有能链接的环境
+  ​	c. jar包右键-添加为项目依赖（Add as Library）//因为此时和程序还没有什么关联
+  ​    如果出现了倒三角，可以展开，即说明关联成功，拥有能链接的环境
 
-   - jdbc基本使用步骤分析（6步）
+- jdbc基本使用步骤分析（6步）
 
-     1. 注册驱动
-     2. 获取链接
-     3. 创建发送sql语句对象
-     4. 发送sql语句，并获取返回结果
-     5. 结果集解析
-     6. 自愿关闭
+  1. 注册驱动
+  2. 获取链接
+  3. 创建发送sql语句对象
+  4. 发送sql语句，并获取返回结果
+  5. 结果集解析
+  6. 自愿关闭
 
-6. ## statement_基本步骤演示
+# 6.statement_基本步骤演示
 
-   - PS：在setting-Editor-File and Code Templates--Class里可以设置自动添加注释
+- PS：在setting-Editor-File and Code Templates--Class里可以设置自动添加注释
 
-     ```java
-     package com.atguigu.api.statement;
-     
-     import com.mysql.cj.jdbc.Driver;
-     
-     import java.sql.*;
-     import java.util.Collection;
-     
-     public class StatementQueryPart {
-         public static void main(String[] args) throws SQLException {
-             //1.注册驱动
-             /**
-              * TODO：
-              *   注册驱动
-              *   依赖：驱动版本8+ com.mysql.cj.jdbc.Driver
-              *        驱动版本5+ com.mysql.jdbc.Driver
-              */
-             DriverManager.registerDriver(new Driver());
-     
-             //2.获取连接
-             /**
-              * TODO
-              *   java程序要和数据库创建连接！
-              *   java程序，连接数据库，肯定是调用某个方法，方法也需要填入连接数据库的基本信息：
-              *         数据库ip地址 127.0.0.1 //本地机ip
-              *         数据库端口号 3306
-              *         账号 root
-              *         密码 123456
-              *         连接数据库的名称：atguigu
-              * DriverManager.getConnection会返回一个链接，用Connection接口去接收后面的实现类（多态）
-              */
-     
-             /**
-              * 参数1：url
-              *      jdbc:数据库厂商名://ip地址:prot/数据库名
-              *      jdbc:mysql://127.0.0.1:3306/itheima
-              * 参数2：username 数据库软件的账号 root
-              * 参数3：password 数据库软件的密码 root
-              */
-             // java.sql 接口 = 实现类
-             Connection connection = DriverManager.
-                     getConnection("jdbc:mysql://127.0.0.1:3306/itcast", "root", "123456");
-     
-             //3.创建statement
-             Statement statement = connection.createStatement();
-     
-             //发送sql语句，并获取返回结果
-             String sql = "select * from employee;";
-             ResultSet resultSet = statement.executeQuery(sql);
-     
-             //5.进行结果解析
-             //看看有没有下一行数据，有，你就可以获取
-             while (resultSet.next()) {
-                 /*int id = resultSet.getInt("id");
-                 String workno = resultSet.getString("workno");
-                 String name = resultSet.getString("name");
-                 String gender = resultSet.getString("gender");
-                 int age = resultSet.getInt("age");
-                 String idcard = resultSet.getString("idcard");
-                 String work = resultSet.getString("work");
-                 System.out.println(id + "--" + workno
-                         + "--" + name + "--" + gender + "--" + age + "--" + idcard + "--" + work);*/
-     
-                 int id = resultSet.getInt("id");
-                 int salary = resultSet.getInt("salary");
-                 System.out.println(id + "--" + salary);
-             }
-     
-             //关闭资源(从内往外关)
-             resultSet.close();
-             statement.close();
-             connection.close();
-         }
-     }
-     ```
+  ```java
+  package com.atguigu.api.statement;
+  
+  import com.mysql.cj.jdbc.Driver;
+  
+  import java.sql.*;
+  import java.util.Collection;
+  
+  public class StatementQueryPart {
+      public static void main(String[] args) throws SQLException {
+          //1.注册驱动
+          /**
+           * TODO：
+           *   注册驱动
+           *   依赖：驱动版本8+ com.mysql.cj.jdbc.Driver
+           *        驱动版本5+ com.mysql.jdbc.Driver
+           */
+          DriverManager.registerDriver(new Driver());
+  
+          //2.获取连接
+          /**
+           * TODO
+           *   java程序要和数据库创建连接！
+           *   java程序，连接数据库，肯定是调用某个方法，方法也需要填入连接数据库的基本信息：
+           *         数据库ip地址 127.0.0.1 //本地机ip
+           *         数据库端口号 3306
+           *         账号 root
+           *         密码 123456
+           *         连接数据库的名称：atguigu
+           * DriverManager.getConnection会返回一个链接，用Connection接口去接收后面的实现类（多态）
+           */
+  
+          /**
+           * 参数1：url
+           *      jdbc:数据库厂商名://ip地址:prot/数据库名
+           *      jdbc:mysql://127.0.0.1:3306/itheima
+           * 参数2：username 数据库软件的账号 root
+           * 参数3：password 数据库软件的密码 root
+           */
+          // java.sql 接口 = 实现类
+          Connection connection = DriverManager.
+                  getConnection("jdbc:mysql://127.0.0.1:3306/itcast", "root", "123456");
+  
+          //3.创建statement
+          Statement statement = connection.createStatement();
+  
+          //发送sql语句，并获取返回结果
+          String sql = "select * from employee;";
+          ResultSet resultSet = statement.executeQuery(sql);
+  
+          //5.进行结果解析
+          //看看有没有下一行数据，有，你就可以获取
+          while (resultSet.next()) {
+              /*int id = resultSet.getInt("id");
+              String workno = resultSet.getString("workno");
+              String name = resultSet.getString("name");
+              String gender = resultSet.getString("gender");
+              int age = resultSet.getInt("age");
+              String idcard = resultSet.getString("idcard");
+              String work = resultSet.getString("work");
+              System.out.println(id + "--" + workno
+                      + "--" + name + "--" + gender + "--" + age + "--" + idcard + "--" + work);*/
+  
+              int id = resultSet.getInt("id");
+              int salary = resultSet.getInt("salary");
+              System.out.println(id + "--" + salary);
+          }
+  
+          //关闭资源(从内往外关)
+          resultSet.close();
+          statement.close();
+          connection.close();
+      }
+  }
+  ```
 
-   7. ## and 8. 使用步骤详解_上 and 下
+# 7.and 8. 使用步骤详解_上 and 下
 
-   ```java
-   package com.atguigu.api.statement;
-   
-   import com.mysql.cj.jdbc.Driver;
-   
-   import java.sql.*;
-   import java.util.Properties;
-   import java.util.Scanner;
-   
-   /**
-    * TODO:
-    *  1.明确jdbc的使用流程 和 详解讲解内部设计api方法
-    *  2.发现问题，引出preparedstatement
-    *
-    * TODO
-    *  输入密码账号
-    *  进行数据库信息查询
-    *  反馈登录成功还是登录失败
-    *
-    *  TODO：
-    *      1.键盘输入事件，收集账号和密码信息
-    *      2.注册驱动
-    *      3.获取链接
-    *      4.创建statement
-    *      5.发送查询SQL语句，并获取返回结果
-    *      6.结果判断，显示登陆成功还是失败
-    *      4.关闭资源
-    */
-   
-   public class StatementUserLoginPart {
-       public static void main(String[] args) throws SQLException, ClassNotFoundException {
-           //获取用户输入信息
-           Scanner scanner = new Scanner(System.in);
-           System.out.println("请输入账号");
-   //        String account = scanner.nextLine();
-           /**
-            * PS:next()和nextLine()区别：
-            * 相同点是他们返回值都是String类型
-            * 不同的是nextLine()支持空格
-            */
-           System.out.println("请输入密码");
-   //        String password = scanner.nextLine();
-           //Tabnine Starter插件：按Tab会自动补全
-   
-   
-           //2.注册驱动
-           /**
-            * 方案1：DriverManager.registerDriver(new com.cj.jdbc.Driver())
-            *       注意：8+ com.mysql.cj.jdbc.Driver
-            *            5+ com.mysql.jdbc.Driver
-            *      问题：在DriverManager.registerDriver方法中，会注册一次驱动： registerDriver(driver, null);
-            *           在Driver类中的静态代码块中，也会注册一次驱动：DriverManager.registerDriver(new Driver());
-            *           这样就造成了一个性能消耗的问题
-            *      解决问题：只想注册一次
-            *              只触发静态代码块即可！Driver
-            *      触发静态代码块：
-            *              类加载机制：类加载的时刻，会触发静态代码块！
-            *              加载 [class文件 -> jvm虚拟机的class对象]
-            *              链接 [验证（检查文件类型） -> 准备（静态变量默认值） -> 解析（触发静态代码块）]
-            *              初始化 （静态属性赋真实值）
-            *      触发类加载：
-            *          1.new 关键字
-            *          2.调用静态方法
-            *          3.调用静态属性
-            *          4.接口 1.8以后新特性 加default默认实现
-            *          5.反射
-            *          6.子类触发父类
-            *          7.程序的入口main
-            */
-           //方案1：
-   //        DriverManager.registerDriver(new Driver());//填对应驱动的实现对象,注意要选择带cj的，它属于新更新的一个驱动内容，异常抛出即可
-   
-           //方案2：
-           //new Driver();//只会触发一次，但这样写非常不雅，代码就很固定化
-           //因为当前导的是mysql新版本的驱动，但如果有一天换成了oracle数据库，这个类就要改成oracle的类，就很不方便
-   
-           //字符串 -> 提取到外部的配置文件 -> 可以在不改代码的情况下，完成数据库驱动的切换！ -> 这样就很灵活
-           Class.forName("com.mysql.cj.jdbc.Driver");//通过反射机制，触发类加载，触发静态代码块的调用
-   
-           //获取数据库链接
-           /**
-            * 此时会发现，DriverManager.getConnection()是一个重载方法，即同名不同参，有三种参数传递形式
-            * 允许开发者，用不同的形式传入数据库连接的核心参数！
-            * PS：这三种只是参数传递的形式不同，但最终选择哪种都无所谓
-            *
-            * 核心属性：
-            *      1.数据库软件所在的主机的ip地址：127.0.0.1，或者本机的主机名：localhost
-            *      2.数据库软件所在的主机的端口号：3306//默认的端口号
-            *      3.连接的具体库：itcast
-            *      4.连接的账号：root
-            *      5.连接的密码：123456
-            *      6.可选的信息：稍后说
-            *
-            * 三个参数：
-            *   String url         数据库软件所在的信息，连接的具体库，以及其他可选信息
-            *                      语法：jdbc:数据库管理软件名称[mysql,oracle]://ip地址 | 主机名:port端口号/数据库名?key=value&key=value 可选信息！
-            *                      具体的： jdbc:mysql://127.0.0.1:3306/itcast
-            *                              jdbc:mysql://localhost:3306/itcast
-            *                      本机的省略写法：(强调：必须是本机，并且端口号是3306方可省略 使用///
-            *                      PS:如果没省略却使用了///则一定会报错
-            *                      如果你的数据库软件安装到本机，可以进行一些省略
-            *                      jdbc:mysql:///itcast
-            *
-            *
-            *
-            *                      PS:以jdbc开头：代表与jdbc连接的具体协议
-            *   String user       数据库的账号 root
-            *   String password    数据库的密码 123456
-            *
-            * 两个参数（更麻烦一些，推荐三个参数）：
-            *    String url :次url和三个参数的url的作用一样！
-            *    Properties info:存储账号和密码
-            *                    Properties 类似于 Map 只不过key = value 都是字符串形式的
-            *                    key user：账号信息
-            *                    key password：密码信息
-            *
-            * 一个参数：
-            *  String url：数据库ip，端口号，具体的数据库  可选信息（账号密码）
-            *              jdbc:mysql/localhost:3306/itcast?user=root&password=123456;
-            *              携带固定的参数名 user password  传递账号和密码信息！[规定！]
-            *
-            *   url的路径属性可选信息：
-            *          url?user=账号&password=密码
-            *
-            *          8.0.27版本驱动，下面都是一些可选属性！
-            *              8.0.25以后，自动识别时区！serverTimezone=Asia/Shanghai 不用添加！8.0.25之前版本，下面一句话还是要加的！
-            *              8版本以后，默认使用的就是utf-8格式，useUnicode=true&characterEncoding=utf8&useSSL=true 都可以省略了！
-            */
-           Connection connection = DriverManager.getConnection("jdbc:mysql:///itcast", "root", "123456");
-   
-           Properties info = new Properties();
-           info.put("user", "root");
-           info.put("password", "123456");
-           Connection connection1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/itcast", info);
-   
-           Connection connection2 = DriverManager.getConnection("jdbc:mysql://localhost:3306/itcast?user=root&password=123456");
-   
-           //3.创建发送SQL语句的statement对象
-           //statement 可以发送SQL语句到数据库，并且可以返回结果！
-           Statement statement = connection1.createStatement();
-   
-           //4.发送SQL语句（1.编写SQL语句 2.发送SQL语句）
-   //        String sql = "select * from employee where account = '" + account + "' and password = '" + password + "';";
-           String sql = "select * from employee;";
-   
-           /**
-            * SQL分类：DDL（容器创建，修改，删除） DML（增删改） DQL（查询） DCL（权限控制） TPL（事务控制语句）
-            *
-            * 参数：sql 非DQL
-            * 返回结果：int
-            *      情况1：DML 返回影响的行数，例如；删除了三条数据 return 3；插入了两条 return 2；
-            *      情况2：非DML return 0；
-            *
-            * 参数：sql DQL
-            * 返回：resultSet 结果封装对象
-            * ResultSet resultSet = executeQuery(sql);
-            */
-   //        int i = statement.executeUpdate(sql);
-           ResultSet resultSet = statement.executeQuery(sql);
-   
-           //5.查询结果集解析 resultSet
-           /**
-            * Java是一种面向对象的思维，将查询结果封装成了resultSet对象，我们应该理解，内部一定也是有行和有列的！和可视化工具是一样的！
-            *
-            * resultSet ->逐行获取数据，行-> 行的列的数据
-            * 最初resultSet的cursor（光标）会指向第一行的前一行，next()方法即将cursor移向下一行
-            * 若下一行有数据，返回true，若下一行没数据，则返回false
-            *
-            * tip：Translation插件可以支持源码翻译
-            *
-            * 想要进行数据解析，我们需要进行两件事情：1.移动游标指定获取数据行  2.获取指定数据行的列数据即可
-            * 1.游标移动问题
-            *      resultSet内部包含一个邮包，指定当前行数据！
-            *      默认游标指定的是第一行数据之前！
-            *      我们可以调用next()方法向后移动一行游标！
-            *      如果我们有很多行数据，我们可以使用while(next){获取每一行数据}
-            *
-            *      boolean = next() true：有更多行数据，并且向下移动一行
-            *                       false：没有更多行数据，不移动！
-            *
-            *    TODO：移动光标的方法有很多，只需要记next即可，配合while循环获取全部数据！
-            *          resultSet.get类型(String columnLabel | int columnIndex);//columnIndex不用加""
-            *              columnLabel：列名 如果有别名 写别名  select * | (id, account, password, nickname)
-            *                                               select id as aid, account as ac from
-            *              columnIndex：列的下标获取 从左向右 从1开始
-            *
-            * 2.获取列的数据问题（获取光标指定的行的列的数据）
-            */
-           while(resultSet.next()) {
-               int id = resultSet.getInt("id");
-               int salary = resultSet.getInt("salary");
-               System.out.println(id + "--" + salary);
-           }
-   
-           //移动一次光标，只要有数据，就代表登录成功
-           /*if (resultSet.next()) {
-               System.out.println("登陆成功");
-           } else {
-               System.out.println("登录失败");
-           }*/
-   
-           //关闭资源
-           connection1.close();
-           statement.close();
-           resultSet.close();
-       }
-   }
-   ```
+```java
+package com.atguigu.api.statement;
 
-   9. ## preparedstatement基本使用流程
+import com.mysql.cj.jdbc.Driver;
 
-      - 使用statement实现模拟登录会存在以下问题：
+import java.sql.*;
+import java.util.Properties;
+import java.util.Scanner;
 
-        1. SQL语句需要字符串拼接，比较麻烦
+/**
+ * TODO:
+ *  1.明确jdbc的使用流程 和 详解讲解内部设计api方法
+ *  2.发现问题，引出preparedstatement
+ *
+ * TODO
+ *  输入密码账号
+ *  进行数据库信息查询
+ *  反馈登录成功还是登录失败
+ *
+ *  TODO：
+ *      1.键盘输入事件，收集账号和密码信息
+ *      2.注册驱动
+ *      3.获取链接
+ *      4.创建statement
+ *      5.发送查询SQL语句，并获取返回结果
+ *      6.结果判断，显示登陆成功还是失败
+ *      4.关闭资源
+ */
 
-        2. 只能凭借字符串类型，其他的数据库类型无法处理
-
-        3. 可能发生注入攻击
-
-           > 动态值充当了SQL语句结构，影响了原有的查询结果！
-
-      - 具体的实现代码以及使用步骤：
-
-        ```java
-        package com.atguigu.api.statement.preparedstatement;
-        
-        import java.sql.*;
-        import java.util.Scanner;
-        
+public class StatementUserLoginPart {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+        //获取用户输入信息
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("请输入账号");
+//        String account = scanner.nextLine();
         /**
-         * TODO:防止注入攻击  |   演示ps的使用流程
+         * PS:next()和nextLine()区别：
+         * 相同点是他们返回值都是String类型
+         * 不同的是nextLine()支持空格
          */
-        
-        public class PSUserLoginPart {
-            public static void main(String[] args) throws ClassNotFoundException, SQLException {
-                Scanner scanner = new Scanner(System.in);
-                System.out.println("请输入id");
-                int id = scanner.nextInt();
-                /*System.out.println("请输入账号：");
-                String account = scanner.nextLine();
-                System.out.println("请输入密码：");
-                String password = scanner.nextLine();*/
-        
-                Class.forName("com.mysql.cj.jdbc.Driver");
-        
-                Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/itcast", "root", "123456");
-        
-                /**
-                 * statement
-                 *      1.创建statement
-                 *      2.拼接SQL语句
-                 *      3.发送SQL语句，并且获取返回结果
-                 *
-                 *  preparedstatement
-                 *      1.编写SQL语句结果 不包含动态值部分的语句，动态值部分使用占位符 ? 替代
-                 *        PS：？ 只能替代动态值
-                 *      2.创建preparedstatement，并且传入动态值
-                 *      3.动态值 占位符 赋值 ？ 单独赋值即可
-                 *      4.发送SQL语句即可，并获取返回结果
-                 */
-        
-                //3,。编写SQL语句结果
-                String sql = "select * from employee where id = ?;";
-        
-                //4.创建预编译statement并且设置SQL语句结果
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
-                //PS：statement是在发送SQL语句的时候传入的sql，而preparedstatement是在创建预编译statement的时候就发送了sql语句！
-        
-                //5.单独占位符进行赋值
-                /**
-                 * 参数1：index 占位符的位置 从左向右数 从1 开始
-                 * 参数2：object 占位符的值 可以设置任何类型的数据，避免了我们凭借和类型更加丰富
-                 */
-                //其实是可以写getInt的，但建议统一写Object，因为这样就不需要考虑了
-                preparedStatement.setObject(1, id);
-                //如果有多个 ? 占位符的话，需要使用多个preparedStatement.set
-        
-                //6.发送SQL语句，并返回返回结果！
-                ResultSet resultSet = preparedStatement.executeQuery();//此时就不需要传sql了，因为它已经知道语句动态值了！
-        
-                //结果集解析
-                while(resultSet.next()) {
-                    int id1 = resultSet.getInt("id");
-                    String salary = resultSet.getString("salary");
-                    System.out.println(id1 + "--" + salary);
-                }
-        
-                //8.关闭资源
-                connection.close();
-                preparedStatement.close();
-                resultSet.close();
-            }
-        }
-        ```
+        System.out.println("请输入密码");
+//        String password = scanner.nextLine();
+        //Tabnine Starter插件：按Tab会自动补全
 
-## 10.AND11.preparedstatement执行 **dml** 语句练习
+
+        //2.注册驱动
+        /**
+         * 方案1：DriverManager.registerDriver(new com.cj.jdbc.Driver())
+         *       注意：8+ com.mysql.cj.jdbc.Driver
+         *            5+ com.mysql.jdbc.Driver
+         *      问题：在DriverManager.registerDriver方法中，会注册一次驱动： registerDriver(driver, null);
+         *           在Driver类中的静态代码块中，也会注册一次驱动：DriverManager.registerDriver(new Driver());
+         *           这样就造成了一个性能消耗的问题
+         *      解决问题：只想注册一次
+         *              只触发静态代码块即可！Driver
+         *      触发静态代码块：
+         *              类加载机制：类加载的时刻，会触发静态代码块！
+         *              加载 [class文件 -> jvm虚拟机的class对象]
+         *              链接 [验证（检查文件类型） -> 准备（静态变量默认值） -> 解析（触发静态代码块）]
+         *              初始化 （静态属性赋真实值）
+         *      触发类加载：
+         *          1.new 关键字
+         *          2.调用静态方法
+         *          3.调用静态属性
+         *          4.接口 1.8以后新特性 加default默认实现
+         *          5.反射
+         *          6.子类触发父类
+         *          7.程序的入口main
+         */
+        //方案1：
+//        DriverManager.registerDriver(new Driver());//填对应驱动的实现对象,注意要选择带cj的，它属于新更新的一个驱动内容，异常抛出即可
+
+        //方案2：
+        //new Driver();//只会触发一次，但这样写非常不雅，代码就很固定化
+        //因为当前导的是mysql新版本的驱动，但如果有一天换成了oracle数据库，这个类就要改成oracle的类，就很不方便
+
+        //字符串 -> 提取到外部的配置文件 -> 可以在不改代码的情况下，完成数据库驱动的切换！ -> 这样就很灵活
+        Class.forName("com.mysql.cj.jdbc.Driver");//通过反射机制，触发类加载，触发静态代码块的调用
+
+        //获取数据库链接
+        /**
+         * 此时会发现，DriverManager.getConnection()是一个重载方法，即同名不同参，有三种参数传递形式
+         * 允许开发者，用不同的形式传入数据库连接的核心参数！
+         * PS：这三种只是参数传递的形式不同，但最终选择哪种都无所谓
+         *
+         * 核心属性：
+         *      1.数据库软件所在的主机的ip地址：127.0.0.1，或者本机的主机名：localhost
+         *      2.数据库软件所在的主机的端口号：3306//默认的端口号
+         *      3.连接的具体库：itcast
+         *      4.连接的账号：root
+         *      5.连接的密码：123456
+         *      6.可选的信息：稍后说
+         *
+         * 三个参数：
+         *   String url         数据库软件所在的信息，连接的具体库，以及其他可选信息
+         *                      语法：jdbc:数据库管理软件名称[mysql,oracle]://ip地址 | 主机名:port端口号/数据库名?key=value&key=value 可选信息！
+         *                      具体的： jdbc:mysql://127.0.0.1:3306/itcast
+         *                              jdbc:mysql://localhost:3306/itcast
+         *                      本机的省略写法：(强调：必须是本机，并且端口号是3306方可省略 使用///
+         *                      PS:如果没省略却使用了///则一定会报错
+         *                      如果你的数据库软件安装到本机，可以进行一些省略
+         *                      jdbc:mysql:///itcast
+         *
+         *
+         *
+         *                      PS:以jdbc开头：代表与jdbc连接的具体协议
+         *   String user       数据库的账号 root
+         *   String password    数据库的密码 123456
+         *
+         * 两个参数（更麻烦一些，推荐三个参数）：
+         *    String url :次url和三个参数的url的作用一样！
+         *    Properties info:存储账号和密码
+         *                    Properties 类似于 Map 只不过key = value 都是字符串形式的
+         *                    key user：账号信息
+         *                    key password：密码信息
+         *
+         * 一个参数：
+         *  String url：数据库ip，端口号，具体的数据库  可选信息（账号密码）
+         *              jdbc:mysql/localhost:3306/itcast?user=root&password=123456;
+         *              携带固定的参数名 user password  传递账号和密码信息！[规定！]
+         *
+         *   url的路径属性可选信息：
+         *          url?user=账号&password=密码
+         *
+         *          8.0.27版本驱动，下面都是一些可选属性！
+         *              8.0.25以后，自动识别时区！serverTimezone=Asia/Shanghai 不用添加！8.0.25之前版本，下面一句话还是要加的！
+         *              8版本以后，默认使用的就是utf-8格式，useUnicode=true&characterEncoding=utf8&useSSL=true 都可以省略了！
+         */
+        Connection connection = DriverManager.getConnection("jdbc:mysql:///itcast", "root", "123456");
+
+        Properties info = new Properties();
+        info.put("user", "root");
+        info.put("password", "123456");
+        Connection connection1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/itcast", info);
+
+        Connection connection2 = DriverManager.getConnection("jdbc:mysql://localhost:3306/itcast?user=root&password=123456");
+
+        //3.创建发送SQL语句的statement对象
+        //statement 可以发送SQL语句到数据库，并且可以返回结果！
+        Statement statement = connection1.createStatement();
+
+        //4.发送SQL语句（1.编写SQL语句 2.发送SQL语句）
+//        String sql = "select * from employee where account = '" + account + "' and password = '" + password + "';";
+        String sql = "select * from employee;";
+
+        /**
+         * SQL分类：DDL（容器创建，修改，删除） DML（增删改） DQL（查询） DCL（权限控制） TPL（事务控制语句）
+         *
+         * 参数：sql 非DQL
+         * 返回结果：int
+         *      情况1：DML 返回影响的行数，例如；删除了三条数据 return 3；插入了两条 return 2；
+         *      情况2：非DML return 0；
+         *
+         * 参数：sql DQL
+         * 返回：resultSet 结果封装对象
+         * ResultSet resultSet = executeQuery(sql);
+         */
+//        int i = statement.executeUpdate(sql);
+        ResultSet resultSet = statement.executeQuery(sql);
+
+        //5.查询结果集解析 resultSet
+        /**
+         * Java是一种面向对象的思维，将查询结果封装成了resultSet对象，我们应该理解，内部一定也是有行和有列的！和可视化工具是一样的！
+         *
+         * resultSet ->逐行获取数据，行-> 行的列的数据
+         * 最初resultSet的cursor（光标）会指向第一行的前一行，next()方法即将cursor移向下一行
+         * 若下一行有数据，返回true，若下一行没数据，则返回false
+         *
+         * tip：Translation插件可以支持源码翻译
+         *
+         * 想要进行数据解析，我们需要进行两件事情：1.移动游标指定获取数据行  2.获取指定数据行的列数据即可
+         * 1.游标移动问题
+         *      resultSet内部包含一个邮包，指定当前行数据！
+         *      默认游标指定的是第一行数据之前！
+         *      我们可以调用next()方法向后移动一行游标！
+         *      如果我们有很多行数据，我们可以使用while(next){获取每一行数据}
+         *
+         *      boolean = next() true：有更多行数据，并且向下移动一行
+         *                       false：没有更多行数据，不移动！
+         *
+         *    TODO：移动光标的方法有很多，只需要记next即可，配合while循环获取全部数据！
+         *          resultSet.get类型(String columnLabel | int columnIndex);//columnIndex不用加""
+         *              columnLabel：列名 如果有别名 写别名  select * | (id, account, password, nickname)
+         *                                               select id as aid, account as ac from
+         *              columnIndex：列的下标获取 从左向右 从1开始
+         *
+         * 2.获取列的数据问题（获取光标指定的行的列的数据）
+         */
+        while(resultSet.next()) {
+            int id = resultSet.getInt("id");
+            int salary = resultSet.getInt("salary");
+            System.out.println(id + "--" + salary);
+        }
+
+        //移动一次光标，只要有数据，就代表登录成功
+        /*if (resultSet.next()) {
+            System.out.println("登陆成功");
+        } else {
+            System.out.println("登录失败");
+        }*/
+
+        //关闭资源
+        connection1.close();
+        statement.close();
+        resultSet.close();
+    }
+}
+```
+
+# 9.preparedstatement基本使用流程
+
+- 使用statement实现模拟登录会存在以下问题：
+
+  1. SQL语句需要字符串拼接，比较麻烦
+
+  2. 只能凭借字符串类型，其他的数据库类型无法处理
+
+  3. 可能发生注入攻击
+
+     > 动态值充当了SQL语句结构，影响了原有的查询结果！
+
+- 具体的实现代码以及使用步骤：
+
+  ```java
+  package com.atguigu.api.statement.preparedstatement;
+  
+  import java.sql.*;
+  import java.util.Scanner;
+  
+  /**
+   * TODO:防止注入攻击  |   演示ps的使用流程
+   */
+  
+  public class PSUserLoginPart {
+      public static void main(String[] args) throws ClassNotFoundException, SQLException {
+          Scanner scanner = new Scanner(System.in);
+          System.out.println("请输入id");
+          int id = scanner.nextInt();
+          /*System.out.println("请输入账号：");
+          String account = scanner.nextLine();
+          System.out.println("请输入密码：");
+          String password = scanner.nextLine();*/
+  
+          Class.forName("com.mysql.cj.jdbc.Driver");
+  
+          Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/itcast", "root", "123456");
+  
+          /**
+           * statement
+           *      1.创建statement
+           *      2.拼接SQL语句
+           *      3.发送SQL语句，并且获取返回结果
+           *
+           *  preparedstatement
+           *      1.编写SQL语句结果 不包含动态值部分的语句，动态值部分使用占位符 ? 替代
+           *        PS：？ 只能替代动态值
+           *      2.创建preparedstatement，并且传入动态值
+           *      3.动态值 占位符 赋值 ？ 单独赋值即可
+           *      4.发送SQL语句即可，并获取返回结果
+           */
+  
+          //3,。编写SQL语句结果
+          String sql = "select * from employee where id = ?;";
+  
+          //4.创建预编译statement并且设置SQL语句结果
+          PreparedStatement preparedStatement = connection.prepareStatement(sql);
+          //PS：statement是在发送SQL语句的时候传入的sql，而preparedstatement是在创建预编译statement的时候就发送了sql语句！
+  
+          //5.单独占位符进行赋值
+          /**
+           * 参数1：index 占位符的位置 从左向右数 从1 开始
+           * 参数2：object 占位符的值 可以设置任何类型的数据，避免了我们凭借和类型更加丰富
+           */
+          //其实是可以写getInt的，但建议统一写Object，因为这样就不需要考虑了
+          preparedStatement.setObject(1, id);
+          //如果有多个 ? 占位符的话，需要使用多个preparedStatement.set
+  
+          //6.发送SQL语句，并返回返回结果！
+          ResultSet resultSet = preparedStatement.executeQuery();//此时就不需要传sql了，因为它已经知道语句动态值了！
+  
+          //结果集解析
+          while(resultSet.next()) {
+              int id1 = resultSet.getInt("id");
+              String salary = resultSet.getString("salary");
+              System.out.println(id1 + "--" + salary);
+          }
+  
+          //8.关闭资源
+          connection.close();
+          preparedStatement.close();
+          resultSet.close();
+      }
+  }
+  ```
+
+# 10.AND11.preparedstatement执行 **dml** 语句练习
 
 - PS：curd是增删改查的缩写
 
@@ -649,15 +649,16 @@
   }
   ```
 
-12. jdbc使用步骤总结和api回顾总结
-    1. 注册驱动
-    2. 获取链接
-    3. 编写sql语句，动态值的部分使用?代替
-    4. 创建preparedStatement，并且传入SQL语句
-    5. 占位符赋值
-    6. 发送sql语句
-    7. 输出结果
-    8. 关闭资源
+# 12.jdbc使用步骤总结和api回顾总结
+
+1. 注册驱动
+2. 获取链接
+3. 编写sql语句，动态值的部分使用?代替
+4. 创建preparedStatement，并且传入SQL语句
+5. 占位符赋值
+6. 发送sql语句
+7. 输出结果
+8. 关闭资源
 
 13. 拓展提升_主键回显和主键值获取
 
