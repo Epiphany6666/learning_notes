@@ -5,135 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab55b25e-57b3-4f59-8162-f087b4ede80e" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/lib/mysql-connector-java-8.0.27-bin.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/lib/servlet-api.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro01-javaweb-begin/web/WEB-INF/web.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro01-javaweb-begin/web/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro02-javaweb-begin/src/com/atguigu/servlets/AddServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro02-javaweb-begin/web/WEB-INF/web.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro02-javaweb-begin/web/add.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro03-javaweb-begin/web/WEB-INF/web.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro03-javaweb-begin/web/web/WEB-INF/web.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro08-javaweb-servlet/src/com/atguigu/servlets/Demo01Servlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro08-javaweb-servlet/src/com/atguigu/servlets/Demo02Servlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro08-javaweb-servlet/src/com/atguigu/servlets/Demo03Servlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro08-javaweb-servlet/src/com/atguigu/servlets/Demo04Servlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro08-javaweb-servlet/src/com/atguigu/servlets/Demo05Servlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro08-javaweb-servlet/src/com/atguigu/servlets/Demo06Servlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro08-javaweb-servlet/src/com/atguigu/servlets/Demo07Servlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro08-javaweb-servlet/web/WEB-INF/web.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro09-fruit1.4-thymeleaf/src/com/atguigu/fruit/dao/FruitDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro09-fruit1.4-thymeleaf/src/com/atguigu/fruit/dao/impl/FruitDAOImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro09-fruit1.4-thymeleaf/src/com/atguigu/fruit/pojo/Fruit.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro09-fruit1.4-thymeleaf/src/com/atguigu/myssm/basedao/BaseDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro09-fruit1.4-thymeleaf/src/com/atguigu/myssm/myspringmvc/ViewBaseServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro09-fruit1.4-thymeleaf/src/com/atguigu/servlets/IndexServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro09-fruit1.4-thymeleaf/web/WEB-INF/web.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro09-fruit1.4-thymeleaf/web/css/index.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro09-fruit1.4-thymeleaf/web/imgs/del.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro09-fruit1.4-thymeleaf/web/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro10-fruit1.5-thymeleaf/src/com/atguigu/demo/Demo01Servlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro10-fruit1.5-thymeleaf/src/com/atguigu/demo/Demo02Servlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro10-fruit1.5-thymeleaf/src/com/atguigu/fruit/dao/FruitDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro10-fruit1.5-thymeleaf/src/com/atguigu/fruit/dao/impl/FruitDAOImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro10-fruit1.5-thymeleaf/src/com/atguigu/fruit/pojo/Fruit.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro10-fruit1.5-thymeleaf/src/com/atguigu/myssm/basedao/BaseDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro10-fruit1.5-thymeleaf/src/com/atguigu/myssm/myspringmvc/ViewBaseServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro10-fruit1.5-thymeleaf/web/WEB-INF/web.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro10-fruit1.5-thymeleaf/web/css/index.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro10-fruit1.5-thymeleaf/web/imgs/del.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringMVC/program/pro-web/pro10-fruit1.5-thymeleaf/web/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../Ajax/AJAX.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Ajax/AJAX.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../Git/Git笔记.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Git/Git笔记.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../HTML+CSS+移动web/HTML+CSS+移动web.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../HTML+CSS+移动web/HTML+CSS+移动web.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../IDEA/IDEA快捷键.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../JDBC笔记/JDBC笔记.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../JDBC笔记/JDBC笔记.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../JDBC笔记/JDBC笔记_冲突文件_Epiphany_20231102102416.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../JavaWeb/JavaWeb笔记.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../JavaWeb/JavaWeb笔记.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../JavaWeb/project/test/test-gitee-project" beforeDir="false" afterPath="$PROJECT_DIR$/../../../JavaWeb/project/test/test-gitee-project" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../Linux/Linux笔记.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Linux/Linux笔记.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../MyBatis/MyBatis笔记_冲突文件_Epiphany_20231208081530.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../Servlet笔记.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../Spring6/Spring6笔记.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Spring6/Spring6笔记.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../SpringCloud.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../SpringCloud.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/eureka-server/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/src/main/java/cn/itcast/euraka/EurekaApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/target/classes/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/target/classes/cn/itcast/euraka/EurekaApplication.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/src/main/java/cn/itcast/Main.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/src/main/java/cn/itcast/feign/clients/UserClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/src/main/java/cn/itcast/feign/config/DefaultFeignConfiguration.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/src/main/java/cn/itcast/feign/pojo/Order.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/src/main/java/cn/itcast/feign/pojo/User.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/target/classes/cn/itcast/Main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/target/classes/cn/itcast/feign/clients/UserClient.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/target/classes/cn/itcast/feign/config/DefaultFeignConfiguration.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/target/classes/cn/itcast/feign/pojo/Order.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/target/classes/cn/itcast/feign/pojo/User.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/geteway/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/geteway/src/main/java/cn/itcast/gateway/AuthorizeFilter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/geteway/src/main/java/cn/itcast/gateway/GatewayApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/geteway/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/geteway/target/classes/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/geteway/target/classes/cn/itcast/gateway/AuthorizeFilter.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/geteway/target/classes/cn/itcast/gateway/GatewayApplication.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/order-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/src/main/java/cn/itcast/order/OrderApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/order-service/src/main/java/cn/itcast/order/OrderApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/src/main/java/cn/itcast/order/pojo/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/order-service/src/main/java/cn/itcast/order/pojo/Order.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/src/main/java/cn/itcast/order/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/order-service/src/main/java/cn/itcast/order/service/OrderService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/order-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/order-service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/target/classes/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/order-service/target/classes/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/target/classes/cn/itcast/order/OrderApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/order-service/target/classes/cn/itcast/order/OrderApplication.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/target/classes/cn/itcast/order/pojo/Order.class" beforeDir="false" afterPath="$PROJECT_DIR$/order-service/target/classes/cn/itcast/order/pojo/Order.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/target/classes/cn/itcast/order/service/OrderService.class" beforeDir="false" afterPath="$PROJECT_DIR$/order-service/target/classes/cn/itcast/order/service/OrderService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/cn/itcast/user/config/PatternProperties.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/cn/itcast/user/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/cn/itcast/user/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/cn/itcast/user/web/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/cn/itcast/user/web/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/resources/bootstrap.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/target/classes/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/bootstrap.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/UserApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/config/PatternProperties.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/config/PatternProperties.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/mapper/UserMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/pojo/User.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/service/UserService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/service/UserService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/web/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/web/UserController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/web/UserController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../资料/cloud-order.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../../资料/cloud-order.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../资料/cloud-user.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../../资料/cloud-user.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SpringMVC/SpringMVC笔记.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SpringMVC/SpringMVC笔记.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SpringSecurity/Spring Security Oauth2.0认证授权专题.lnk" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SpringSecurity/SpringSecurity.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SpringSecurity/SpringSecurity.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SpringSecurity/assets/image-20240228102347511.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SpringSecurity/assets/image-20240228102852035.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SpringSecurity/assets/image-20240228104014605.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SpringSecurity/assets/image-20240228105947307.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SpringSecurity/assets/image-20240228110045810.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SpringSecurity/assets/image-20240228110135809.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SpringSecurity/assets/image-20240228110311217.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SpringSecurity/assets/image-20240228110551382.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SpringSecurity/assets/image-20240228114515301.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../Vue2+Vue3/project/day3/code/05-脚手架相关代码/vue-demo1" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Vue2+Vue3/project/day3/code/05-脚手架相关代码/vue-demo1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../Vue2+Vue3/project/day7/素材/vue-cart-demo" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Vue2+Vue3/project/day7/素材/vue-cart-demo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../苍穹外卖/苍穹外卖.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../苍穹外卖/苍穹外卖.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/user-server/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/cn/itcast/user/UserApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-server/src/main/java/cn/itcast/user/UserApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/cn/itcast/user/mapper/UserMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-server/src/main/java/cn/itcast/user/mapper/UserMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/cn/itcast/user/pojo/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-server/src/main/java/cn/itcast/user/pojo/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/cn/itcast/user/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-server/src/main/java/cn/itcast/user/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/cn/itcast/user/web/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-server/src/main/java/cn/itcast/user/web/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/user-server/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/target/classes/application.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/UserApplication.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/mapper/UserMapper.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/pojo/User.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/service/UserService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/target/classes/cn/itcast/user/web/UserController.class" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -184,7 +74,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "jdk.selected.JAVA_MODULE": "1.8",
-    "last_opened_file_path": "O:/BaiduSyncdisk/other/StudyNote/SpringCloud/program/cloud-demo/eureka-server/pom.xml",
+    "last_opened_file_path": "G:/learning_notes/SpringCloud/program/cloud-demo/pom.xml",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -279,6 +169,7 @@
       <workItem from="1710332569724" duration="2542000" />
       <workItem from="1710375038099" duration="20760000" />
       <workItem from="1710556357607" duration="2000" />
+      <workItem from="1710559920498" duration="1799000" />
     </task>
     <servers />
   </component>
