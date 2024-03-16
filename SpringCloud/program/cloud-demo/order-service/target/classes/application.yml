@@ -41,3 +41,8 @@ ribbon:
     clients:
       - userservice
       - xxservice
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: FULL
