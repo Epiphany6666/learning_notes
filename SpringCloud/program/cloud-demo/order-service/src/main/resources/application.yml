@@ -10,10 +10,10 @@ spring:
     name: orderservice
   cloud:
     nacos:
-      server-addr: localhost:8848
+      server-addr: localhost:90
       discovery:
         cluster-name: HZ # 集群名称
-        namespace: d0062db2-7864-418d-91aa-be3720059f07 # dev 环境
+#        namespace: d0062db2-7864-418d-91aa-be3720059f07 # dev 环境
         ephemeral: false
 mybatis:
   type-aliases-package: cn.itcast.user.pojo

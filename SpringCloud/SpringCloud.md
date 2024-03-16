@@ -502,6 +502,7 @@ public Order queryOrderById(Long orderId) {
     String url = "http://localhost:8081/user/" + order.getUserId();
     // 2.2 发送http请求：实现远程调用
     // 得到的结果是一个JSON风格，但我们想要的是user对象，但是RestTemplate非常的智能
+    // getForObject：发送get方式的请求
     // 参数2：responseType 返回值类型。例如这里填User.class，它会自动帮你反序列化成User类型
     User user = restTemplate.getForObject(url, User.class);
     // 封装user到Order
@@ -793,7 +794,7 @@ eureka:
 
 
 
-orderservice也一样
+**orderservice也一样**
 
 **1）引入依赖**
 
@@ -1881,19 +1882,25 @@ Data ID其实就是配置文件的名称，但是这个名称不能像IDEA里面
 
 # 26.微服务配置拉取
 
+没有nacos时，服务获取配置的步骤：
+
+![image-20240316144028760](assets/image-20240316144028760.png)
+
 微服务要拉取nacos中管理的配置，并且与本地的application.yml配置合并，才能完成项目启动。
 
 但如果尚未读取application.yml，又如何得知nacos地址呢？
 
-因此spring引入了一种新的配置文件：bootstrap.yaml文件，会在application.yml之前被读取，流程如下：
+因此spring引入了一种新的配置文件：bootstrap.yaml文件，它的优先会比application.yml高很多会在application.yml之前被读取，流程如下：
 
 ![img](.\assets\L0iFYNF.png)
+
+因此，与nacos地址有关的所有信息都应该放到bootstrap.yml当中
 
 
 
 1）引入nacos-config依赖
 
-首先，在user-service服务中，引入nacos-config的客户端依赖：
+首先，在user-service服务中，引入nacos-config的客户端依赖，也就是配置管理依赖，以前引入的是 nacos-discovery ，服务注册发现
 
 ```xml
 <!--nacos配置管理依赖-->
@@ -1903,9 +1910,13 @@ Data ID其实就是配置文件的名称，但是这个名称不能像IDEA里面
 </dependency>
 ```
 
-2）添加bootstrap.yaml
 
-然后，在user-service中添加一个bootstrap.yaml文件，内容如下：
+
+2）新建 bootstrap.yaml（引导文件）
+
+然后，在user-service的resource目录下新建一个bootstrap.yaml / bootstrap.yml（两种后缀名都可以，但是文件名一定要是bootstrap，建好后可以发现文件名上带有云图标，表示这是特殊的文件）文件，内容如下。服务名称 + 开发环境 + 后缀名，三者结合就是刚刚在nacos控制台配的Data ID，所以这三个配置的目的是为了知道是哪个文件。配置Nacos地址的目的是：知道去哪读配置。
+
+![image-20240316145903426](assets/image-20240316145903426.png)
 
 ```yaml
 spring:
@@ -1919,6 +1930,8 @@ spring:
       config:
         file-extension: yaml # 文件后缀名
 ```
+
+在bootstrap.yml文件配置完上述配置后，user-service的resource目录下的application.yml中与bootstrap.yml配置文件中冲突的配置项就可以删掉了。例如Nacos的服务地址。
 
 这里会根据spring.cloud.nacos.server-addr获取nacos地址，再根据
 
@@ -1936,23 +1949,9 @@ spring:
 
 ![image-20210714170337448](.\assets\image-20210714170337448.png)
 
-
-
 完整代码：
 
 ```java
-package cn.itcast.user.web;
-
-import cn.itcast.user.pojo.User;
-import cn.itcast.user.service.UserService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 @Slf4j
 @RestController
 @RequestMapping("/user")
@@ -1972,17 +1971,15 @@ public class UserController {
 }
 ```
 
-
-
-在页面访问，可以看到效果：
+分别在8081、8082进行访问，可以看到效果，说明8081、8082都从Nacos控制台中得到了配置。
 
 ![image-20210714170449612](.\assets\image-20210714170449612.png)
 
 
 
+---
 
-
-## 1.2.配置热更新
+# 27.配置热更新
 
 我们最终的目的，是修改nacos中的配置后，微服务中无需重启即可让配置生效，也就是**配置热更新**。
 
@@ -1990,26 +1987,24 @@ public class UserController {
 
 要实现配置热更新，可以使用两种方式：
 
-### 1.2.1.方式一
+**方式一**
 
-在@Value注入的变量所在类上添加注解@RefreshScope：
+在@Value注入的变量所在类上添加注解@RefreshScope，也就是我们刚才所写的controller
 
 ![image-20210714171036335](.\assets\image-20210714171036335.png)
 
 
 
-### 1.2.2.方式二
+**方式二**
 
-使用@ConfigurationProperties注解代替@Value注解。
+> 由于有不同的将配置文件里属性注入的方式，所以不同的属性注入方式也会有不同的刷新方式
 
-在user-service服务中，添加一个类，读取patterrn.dateformat属性：
+使用@ConfigurationProperties注解代替@Value注解，通过这个注解可以完成配置的自动加载，不需要结合@RefreshScope，它自动实现刷新，因此这种方式更推荐。
+
+在user-service服务中，添加一个config类，读取patterrn.dateformat属性：
 
 ```java
 package cn.itcast.user.config;
-
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 @Component
 @Data
@@ -2019,31 +2014,14 @@ public class PatternProperties {
 }
 ```
 
-
-
 在UserController中使用这个类代替@Value：
 
 ![image-20210714171316124](.\assets\image-20210714171316124.png)
-
-
 
 完整代码：
 
 ```java
 package cn.itcast.user.web;
-
-import cn.itcast.user.config.PatternProperties;
-import cn.itcast.user.pojo.User;
-import cn.itcast.user.service.UserService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @RestController
@@ -2067,109 +2045,574 @@ public class UserController {
 
 
 
+使用上面任意一种方法对user-service修改后，重启user-service服务。
+
+然后在Nacos控制台中对userservice-dev.yaml文件夹中的配置内容进行编辑
+
+![image-20240316152404693](assets/image-20240316152404693.png)
+
+![image-20240316152446932](assets/image-20240316152446932.png)
+
+修改之后，userservice中的控制台中会有大量的日志，这些日志是因为Nacos配置发生修改，对微服务进行通知。
+
+此时不用重启服务，直接刷新浏览器，可以发现配置已经生效
+
+<img src="assets/image-20240316152535481.png" alt="image-20240316152535481" style="zoom:50%;" />
+
+---
+
+# 28.配置共享
+
+使用环境：有一个属性，它开发、生产、测试等环境下的值是一样的，这样的配置，如果在每个配置文件里都去写，是不是有点浪费；并且将来要改动，还得去每个配置文件中都去改，这样显然是不合适的。
 
 
-## 05.1.3.配置共享
 
 其实微服务启动时，会去nacos读取多个配置文件，例如：
 
 - `[spring.application.name]-[spring.profiles.active].yaml`，例如：userservice-dev.yaml
-
 - `[spring.application.name].yaml`，例如：userservice.yaml
 
-而`[spring.application.name].yaml`不包含环境，因此可以被多个环境共享。
+环境变化时，第一个配置文件会被改变，而`[spring.application.name].yaml`不包含环境，显然跟环境没有关系，因此可以被多个环境共享。
 
 
 
-下面我们通过案例来测试配置共享
+**下面我们通过案例来测试配置共享**
 
-
-
-### 1）添加一个环境共享配置
+**1）添加一个环境共享配置**
 
 我们在nacos中添加一个userservice.yaml文件：
 
 ![image-20210714173233650](.\assets\image-20210714173233650.png)
 
+![image-20240316154733497](assets/image-20240316154733497.png)
 
 
-### 2）在user-service中读取共享配置
+
+**2）在user-service中读取共享配置**
 
 在user-service服务中，修改PatternProperties类，读取新添加的属性：
 
 ![image-20210714173324231](.\assets\image-20210714173324231.png)
 
-在user-service服务中，修改UserController，添加一个方法：
+在user-service服务中，修改UserController，添加一个方法，Spring-MVC会把它转成JSON返回给页面：
 
 ![image-20210714173721309](.\assets\image-20210714173721309.png)
 
 
 
-### 3）运行两个UserApplication，使用不同的profile
+**3）运行两个UserApplication，使用不同的profile**
 
 修改UserApplication2这个启动项，改变其profile值：
 
 ![image-20210714173538538](.\assets\image-20210714173538538.png)
 
+有效配置文件里的 开发环境 会覆盖掉bootstrap.yml文件中配置的 开发环境
 
-
-![image-20210714173519963](.\assets\image-20210714173519963.png)
-
-
+![image-20240316155829418](assets/image-20240316155829418.png)
 
 这样，UserApplication(8081)使用的profile是dev，UserApplication2(8082)使用的profile是test。
 
 启动UserApplication和UserApplication2
 
-访问http://localhost:8081/user/prop，结果：
+访问 `localhost:8081/user/prop` 和 `localhost:8082/user/prop`，可以看出来，不管是dev，还是test环境，都读取到了envSharedValue这个属性的值。。
 
-![image-20210714174313344](.\assets\image-20210714174313344.png)
+![image-20240316160127288](assets/image-20240316160127288.png)
 
-访问http://localhost:8082/user/prop，结果：
+在IDEA的控制台中任然可以看见
 
-![image-20210714174424818](.\assets\image-20210714174424818.png)
+8081中：
 
-可以看出来，不管是dev，还是test环境，都读取到了envSharedValue这个属性的值。
+![image-20240316160632004](assets/image-20240316160632004.png)
+
+8082中：
+
+![image-20240316160704498](assets/image-20240316160704498.png)
 
 
 
-
-
-### 4）配置共享的优先级
+## 4）配置共享的优先级
 
 当nacos、服务本地同时出现相同属性时，优先级有高低之分：
+
+服务名-profile.yaml > 服务名称.yaml（配置共享） > 本地配置
+
+本地和远端来比，远端更高。当前环境 比 共享的高。
 
 ![image-20210714174623557](.\assets\image-20210714174623557.png)
 
 
 
+---
 
+# 29.Nacos集群搭建
 
-## 06.1.4.搭建Nacos集群
-
-Nacos生产环境下一定要部署为集群状态，部署方式参考课前资料中的文档：
-
-![image-20210714174728042](.\assets\image-20210714174728042.png)
-
-
-
-# 07.2.Feign远程调用
+Nacos生产环境下一定要部署为集群状态。
 
 
 
-先来看我们以前利用RestTemplate发起远程调用的代码：
+## 1）集群结构图
+
+官方给出的Nacos集群图：
+
+![image-20210409210621117](assets/image-20210409210621117.png)
+
+其中包含3个nacos节点，然后一个负载均衡器代理3个Nacos。这里负载均衡器可以使用nginx（Nginx可以做到反向代理和负载均衡）。
+
+我们计划的集群结构：
+
+首先要实现数据共享：整一个MySQL集群，让多个Nacos都来访问这个集群，在里面完成数据的读写。
+
+![image-20210409211355037](assets/image-20210409211355037.png)
+
+虽然我们需要按照图上的来做，但是条件有限，只有一台电脑。做法：在这一台电脑上去部署三个Nacos结点（IP是一样的，不一样的是端口，避免冲突），MySQL理论上是集群，我们也先弄个单点。
+
+三个nacos节点的地址：
+
+| 节点   | ip            | port |
+| ------ | ------------- | ---- |
+| nacos1 | 192.168.150.1 | 8845 |
+| nacos2 | 192.168.150.1 | 8846 |
+| nacos3 | 192.168.150.1 | 8847 |
+
+
+
+---
+
+
+
+## 2）搭建集群
+
+搭建集群的基本步骤：
+
+- 搭建数据库，初始化数据库表结构
+
+  这个结构Nacos官网已经提供给我们了
+
+- 下载nacos安装包
+
+- 配置nacos集群
+
+  这个配置和传统配置没有差别
+
+- 启动nacos集群
+
+- nginx反向代理
+
+
+
+### 搭建MySQL集群并初始化数据库
+
+Nacos默认数据存储在内嵌数据库Derby中，不属于生产可用的数据库。
+
+官方推荐的最佳实践是使用带有主从的高可用数据库集群，主从模式的高可用数据库可以参考**传智教育**的后续高手课程。
+
+这里我们以单点的数据库为例来讲解。
+
+首先新建一个数据库，命名为nacos，而后导入下面的SQL：
+
+```sql
+create database nacos;
+use nacos;
+
+CREATE TABLE `config_info` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `data_id` varchar(255) NOT NULL COMMENT 'data_id',
+  `group_id` varchar(255) DEFAULT NULL,
+  `content` longtext NOT NULL COMMENT 'content',
+  `md5` varchar(32) DEFAULT NULL COMMENT 'md5',
+  `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
+  `src_user` text COMMENT 'source user',
+  `src_ip` varchar(50) DEFAULT NULL COMMENT 'source ip',
+  `app_name` varchar(128) DEFAULT NULL,
+  `tenant_id` varchar(128) DEFAULT '' COMMENT '租户字段',
+  `c_desc` varchar(256) DEFAULT NULL,
+  `c_use` varchar(64) DEFAULT NULL,
+  `effect` varchar(64) DEFAULT NULL,
+  `type` varchar(64) DEFAULT NULL,
+  `c_schema` text,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_configinfo_datagrouptenant` (`data_id`,`group_id`,`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='config_info';
+
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = config_info_aggr   */
+/******************************************/
+CREATE TABLE `config_info_aggr` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `data_id` varchar(255) NOT NULL COMMENT 'data_id',
+  `group_id` varchar(255) NOT NULL COMMENT 'group_id',
+  `datum_id` varchar(255) NOT NULL COMMENT 'datum_id',
+  `content` longtext NOT NULL COMMENT '内容',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  `app_name` varchar(128) DEFAULT NULL,
+  `tenant_id` varchar(128) DEFAULT '' COMMENT '租户字段',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_configinfoaggr_datagrouptenantdatum` (`data_id`,`group_id`,`tenant_id`,`datum_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='增加租户字段';
+
+
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = config_info_beta   */
+/******************************************/
+CREATE TABLE `config_info_beta` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `data_id` varchar(255) NOT NULL COMMENT 'data_id',
+  `group_id` varchar(128) NOT NULL COMMENT 'group_id',
+  `app_name` varchar(128) DEFAULT NULL COMMENT 'app_name',
+  `content` longtext NOT NULL COMMENT 'content',
+  `beta_ips` varchar(1024) DEFAULT NULL COMMENT 'betaIps',
+  `md5` varchar(32) DEFAULT NULL COMMENT 'md5',
+  `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
+  `src_user` text COMMENT 'source user',
+  `src_ip` varchar(50) DEFAULT NULL COMMENT 'source ip',
+  `tenant_id` varchar(128) DEFAULT '' COMMENT '租户字段',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_configinfobeta_datagrouptenant` (`data_id`,`group_id`,`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='config_info_beta';
+
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = config_info_tag   */
+/******************************************/
+CREATE TABLE `config_info_tag` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `data_id` varchar(255) NOT NULL COMMENT 'data_id',
+  `group_id` varchar(128) NOT NULL COMMENT 'group_id',
+  `tenant_id` varchar(128) DEFAULT '' COMMENT 'tenant_id',
+  `tag_id` varchar(128) NOT NULL COMMENT 'tag_id',
+  `app_name` varchar(128) DEFAULT NULL COMMENT 'app_name',
+  `content` longtext NOT NULL COMMENT 'content',
+  `md5` varchar(32) DEFAULT NULL COMMENT 'md5',
+  `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
+  `src_user` text COMMENT 'source user',
+  `src_ip` varchar(50) DEFAULT NULL COMMENT 'source ip',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_configinfotag_datagrouptenanttag` (`data_id`,`group_id`,`tenant_id`,`tag_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='config_info_tag';
+
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = config_tags_relation   */
+/******************************************/
+CREATE TABLE `config_tags_relation` (
+  `id` bigint(20) NOT NULL COMMENT 'id',
+  `tag_name` varchar(128) NOT NULL COMMENT 'tag_name',
+  `tag_type` varchar(64) DEFAULT NULL COMMENT 'tag_type',
+  `data_id` varchar(255) NOT NULL COMMENT 'data_id',
+  `group_id` varchar(128) NOT NULL COMMENT 'group_id',
+  `tenant_id` varchar(128) DEFAULT '' COMMENT 'tenant_id',
+  `nid` bigint(20) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`nid`),
+  UNIQUE KEY `uk_configtagrelation_configidtag` (`id`,`tag_name`,`tag_type`),
+  KEY `idx_tenant_id` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='config_tag_relation';
+
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = group_capacity   */
+/******************************************/
+CREATE TABLE `group_capacity` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `group_id` varchar(128) NOT NULL DEFAULT '' COMMENT 'Group ID，空字符表示整个集群',
+  `quota` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '配额，0表示使用默认值',
+  `usage` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '使用量',
+  `max_size` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '单个配置大小上限，单位为字节，0表示使用默认值',
+  `max_aggr_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '聚合子配置最大个数，，0表示使用默认值',
+  `max_aggr_size` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '单个聚合数据的子配置大小上限，单位为字节，0表示使用默认值',
+  `max_history_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '最大变更历史数量',
+  `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_group_id` (`group_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='集群、各Group容量信息表';
+
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = his_config_info   */
+/******************************************/
+CREATE TABLE `his_config_info` (
+  `id` bigint(64) unsigned NOT NULL,
+  `nid` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `data_id` varchar(255) NOT NULL,
+  `group_id` varchar(128) NOT NULL,
+  `app_name` varchar(128) DEFAULT NULL COMMENT 'app_name',
+  `content` longtext NOT NULL,
+  `md5` varchar(32) DEFAULT NULL,
+  `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `src_user` text,
+  `src_ip` varchar(50) DEFAULT NULL,
+  `op_type` char(10) DEFAULT NULL,
+  `tenant_id` varchar(128) DEFAULT '' COMMENT '租户字段',
+  PRIMARY KEY (`nid`),
+  KEY `idx_gmt_create` (`gmt_create`),
+  KEY `idx_gmt_modified` (`gmt_modified`),
+  KEY `idx_did` (`data_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='多租户改造';
+
+
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = tenant_capacity   */
+/******************************************/
+CREATE TABLE `tenant_capacity` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `tenant_id` varchar(128) NOT NULL DEFAULT '' COMMENT 'Tenant ID',
+  `quota` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '配额，0表示使用默认值',
+  `usage` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '使用量',
+  `max_size` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '单个配置大小上限，单位为字节，0表示使用默认值',
+  `max_aggr_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '聚合子配置最大个数',
+  `max_aggr_size` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '单个聚合数据的子配置大小上限，单位为字节，0表示使用默认值',
+  `max_history_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '最大变更历史数量',
+  `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_tenant_id` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='租户容量信息表';
+
+
+CREATE TABLE `tenant_info` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `kp` varchar(128) NOT NULL COMMENT 'kp',
+  `tenant_id` varchar(128) default '' COMMENT 'tenant_id',
+  `tenant_name` varchar(128) default '' COMMENT 'tenant_name',
+  `tenant_desc` varchar(256) DEFAULT NULL COMMENT 'tenant_desc',
+  `create_source` varchar(32) DEFAULT NULL COMMENT 'create_source',
+  `gmt_create` bigint(20) NOT NULL COMMENT '创建时间',
+  `gmt_modified` bigint(20) NOT NULL COMMENT '修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_tenant_info_kptenantid` (`kp`,`tenant_id`),
+  KEY `idx_tenant_id` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='tenant_info';
+
+CREATE TABLE `users` (
+	`username` varchar(50) NOT NULL PRIMARY KEY,
+	`password` varchar(500) NOT NULL,
+	`enabled` boolean NOT NULL
+);
+
+CREATE TABLE `roles` (
+	`username` varchar(50) NOT NULL,
+	`role` varchar(50) NOT NULL,
+	UNIQUE INDEX `idx_user_role` (`username` ASC, `role` ASC) USING BTREE
+);
+
+CREATE TABLE `permissions` (
+    `role` varchar(50) NOT NULL,
+    `resource` varchar(255) NOT NULL,
+    `action` varchar(8) NOT NULL,
+    UNIQUE INDEX `uk_role_permission` (`role`,`resource`,`action`) USING BTREE
+);
+
+INSERT INTO users (username, password, enabled) VALUES ('nacos', '$2a$10$EuWPZHzz32dJN7jexM34MOeYirDdFAZm2kuWj7VEOJhhZkDrxfvUu', TRUE);
+
+INSERT INTO roles (username, role) VALUES ('nacos', 'ROLE_ADMIN');
+```
+
+
+
+### 下载nacos
+
+nacos在GitHub上有下载地址：https://github.com/alibaba/nacos/tags，可以选择任意版本下载。
+
+本例中才用1.4.1版本：
+
+![image-20210409212119411](assets/image-20210409212119411.png)
+
+
+
+### 配置Nacos（节点信息）、数据库配置
+
+集群配置就有点复杂了，所以我们还是按以前那种配置来配了
+
+首先将包解压到任意非中文目录下
+
+进入nacos的conf目录，修改配置文件cluster.conf.example，重命名为cluster.conf：
+
+![image-20210409212459292](assets/image-20210409212459292.png)
+
+然后添加内容，也就是配置集群中每一个结点的信息：
+
+> 由于这里是在本机，所以IP地址都是本机的IP地址。但如果是在真实生产环境下，就应该填写真实的IP地址和端口号。
+
+```
+127.0.0.1:8845
+127.0.0.1.8846
+127.0.0.1.8847
+```
+
+
+
+然后修改application.properties文件，添加数据库配置（第33行左右，将数据库源的注释全部去掉，这样是为了告诉Nacos我们使用的是mysql集群而不是其他集群）
+
+![image-20240316164945446](assets/image-20240316164945446.png)
+
+```properties
+spring.datasource.platform=mysql
+
+db.num=1 # 这个是问数据库的数量，即：你的集群中有几台MySQL，我们这里是有1台
+
+db.url.0=jdbc:mysql://127.0.0.1:3306/nacos?characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useUnicode=true&useSSL=false&serverTimezone=UTC
+db.user.0=root
+db.password.0=123
+```
+
+
+
+### 启动
+
+将nacos文件夹复制三份，分别命名为：nacos1、nacos2、nacos3
+
+![image-20210409213335538](assets/image-20210409213335538.png) 
+
+然后分别修改三个文件夹中的application.properties，
+
+nacos1:
+
+```properties
+server.port=8845
+```
+
+nacos2:
+
+```properties
+server.port=8846
+```
+
+nacos3:
+
+```properties
+server.port=8847
+```
+
+
+
+然后分别启动三个nacos节点，分别进入三个nacos目录的bin目录下，分别执行以下这条命令：
+
+> 这个启动的命令略有变化，不再需要加 -m 参数了，因为我们这里是集群启动，默认就是集群启动，直接回车就可以了
+
+```
+startup.cmd
+```
+
+启动成功后，查看终端，显示：Nacos在集群模式下启动成功
+
+![image-20240316165540542](assets/image-20240316165540542.png)
+
+![image-20240316165611747](assets/image-20240316165611747.png)
+
+![image-20240316165626167](assets/image-20240316165626167.png)
+
+
+
+### nginx反向代理
+
+找到课前资料提供的nginx安装包： 
+
+![image-20210410103253355](assets/image-20210410103253355.png) 
+
+解压到任意非中文目录下：
+
+![image-20210410103322874](assets/image-20210410103322874.png) 
+
+修改conf/nginx.conf文件，配置如下：
+
+> 配置一个upstream的集群，集群里有三个端口号，即三个nacos，这时nginx就会去对接三个地址做负载均衡
+>
+> 第二个是反向代理的配置，监听80端口localhost，意思是以后在访问的时候不用加8848，直接80就行了
+>
+> 第三个/nacos是nacos的默认路径，意思是只要访问到这个路径，就可以代理到上面的集群去
+
+将这一整段复制，将它粘贴到http内部，随便哪个地方都可以
+
+<img src="assets/image-20240316170033851.png" alt="image-20240316170033851" style="zoom: 50%;" />
+
+```nginx
+upstream nacos-cluster {
+    server 127.0.0.1:8845;
+	server 127.0.0.1:8846;
+	server 127.0.0.1:8847;
+}
+
+server {
+    listen       80;
+    server_name  localhost;
+
+    location /nacos {
+        proxy_pass http://nacos-cluster;
+    }
+}
+```
+
+然后我们去打开nginx
+
+![image-20240316170143034](assets/image-20240316170143034.png)
+
+而后在浏览器访问：http://localhost/nacos即可。
+
+看似页面只有一个，但是它会在3个nacos之间负载均衡。
+
+![image-20240316171106426](assets/image-20240316171106426.png)
+
+修改代码中application.yml文件配置如下，将Nacos地址端口号变成80：
+
+```yaml
+spring:
+  cloud:
+    nacos:
+      server-addr: localhost:80 # Nacos地址
+```
+
+测试：新建一个配置
+
+![image-20240316171552296](assets/image-20240316171552296.png)
+
+可以发现配置已经加进来了
+
+![image-20240316171622664](assets/image-20240316171622664.png)
+
+这个时候打开数据库，这个配置是已经存在数据库里面了，说明已经完成持久化了
+
+![image-20240316171714356](assets/image-20240316171714356.png)
+
+这个时候Nacos集群其实就已经搭建成功了，一旦搭建好，玩法和以前没什么区别。
+
+----
+
+## 3）优化
+
+- 实际部署时，需要给做反向代理的nginx服务器设置一个域名，这样后续如果有服务器迁移nacos的客户端也无需更改配置.
+
+- Nacos的各个节点应该部署到多个不同服务器，做好容灾和隔离
+
+----
+
+# 30.Feign远程调用
+
+先来看我们以前利用RestTemplate发起远程调用的代码，这个请求是通过URL地址指明要访问的服务名称、请求路径和请求的参数信息，请求方式和返回值类型。
+
+然后由RestTemplate帮我们向指定地址发送请求，再把结果转为指定类型。
 
 ![image-20210714174814204](.\assets\image-20210714174814204.png)
 
-存在下面的问题：
+这段代码已经是在Ribbon的基础上做了优化的。但依然存在下面的问题：
 
-•代码可读性差，编程体验不统一
+- 代码可读性差。并且以前都是写方法，而这里突然冒出来一次URL，编程体验不统一
 
-•参数复杂URL难以维护
+- 参数复杂URL难以维护
 
 
 
 Feign是一个声明式的http客户端，官方地址：https://github.com/OpenFeign/feign
+
+> 声明式这个词在学习事务的时候就已经接触过这个概念了，早期是我们手动自己去开启事务、提交事务。后来有了Spring，Spring的声明式事务，只需要你在配置文件里简单的告诉Spring：我要对谁加事务，就不需要你管了。
+>
+> 声明式的http客户端：你把你要发的http请求的信息写出来，剩下的你别管了，由Feign来帮你做。
 
 其作用就是帮助我们优雅的实现http请求的发送，解决上面提到的问题。
 
@@ -2179,13 +2622,15 @@ Feign是一个声明式的http客户端，官方地址：https://github.com/Open
 
 
 
-## 2.1.Feign替代RestTemplate
+## Feign的使用步骤
 
 Fegin的使用步骤如下：
 
-### 1）引入依赖
+**1）引入依赖**
 
 我们在order-service服务的pom文件中引入feign的依赖：
+
+> 这个依赖看名字就知道了，starter，属于自动装配，里面的各种配置都由spring帮我们做好了。
 
 ```xml
 <dependency>
@@ -2196,7 +2641,7 @@ Fegin的使用步骤如下：
 
 
 
-### 2）添加注解
+**2）添加注解**
 
 在order-service的启动类添加注解开启Feign的功能：
 
@@ -2204,17 +2649,14 @@ Fegin的使用步骤如下：
 
 
 
-### 3）编写Feign的客户端
+**3）声明一个远程调用**
 
-在order-service中新建一个接口，内容如下：
+在order-service中新建一个接口，内容如下，定义了一个接口叫：UserClient，这个接口里面将来封装的就是所有对UserService发起的远程调用，因此在这个接口上面加了一个注解@FeignClient（Feign的客户端），并且指明了服务的名称，因为将来发送http请求的时候需要知道服务名称。
+
+再往下，Feign为了减少大家的学习成本，采用了Spring-MVC来声明请求的方式、请求路径、请求参数、返回值类型。
 
 ```java
 package cn.itcast.order.client;
-
-import cn.itcast.order.pojo.User;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient("userservice")
 public interface UserClient {
@@ -2222,8 +2664,6 @@ public interface UserClient {
     User findById(@PathVariable("id") Long id);
 }
 ```
-
-
 
 这个客户端主要是基于SpringMVC的注解来声明远程调用的信息，比如：
 
@@ -2237,9 +2677,7 @@ public interface UserClient {
 
 
 
-
-
-### 4）测试
+**4）测试**
 
 修改order-service中的OrderService类中的queryOrderById方法，使用Feign客户端代替RestTemplate：
 
@@ -2247,11 +2685,19 @@ public interface UserClient {
 
 是不是看起来优雅多了。
 
+再次访问`localhost:8080/101 - 105`，同时发现Feign还实现了负载均衡，这是因为Feign的内部还继承了负载均衡的功能。
+
+使用Maven Helper插件，点击Feign依赖，然后点击下方的Dependency Analyzer（依赖关系分析器）
+
+![image-20240316175959504](assets/image-20240316175959504.png)
+
+然后点击Feign的核心依赖，可以看见它带上了Ribbon，所以Fegin已经集成了Ribbon，自动实现了负载均衡，根本不用我们去操心了。
+
+![image-20240316180215526](assets/image-20240316180215526.png)
 
 
 
-
-### 5）总结
+## 5）总结
 
 使用Feign的步骤：
 
@@ -2259,7 +2705,7 @@ public interface UserClient {
 
 ② 添加@EnableFeignClients注解
 
-③ 编写FeignClient接口
+③ 编写FeignClient接口，没有新的方式，全都是SpringMVC的注解
 
 ④ 使用FeignClient中定义的方法代替RestTemplate
 
