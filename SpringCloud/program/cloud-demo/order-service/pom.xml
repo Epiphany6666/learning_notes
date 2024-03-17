@@ -47,6 +47,13 @@
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-httpclient</artifactId>
         </dependency>
+
+        <!-- 引入feign的api -->
+        <dependency>
+            <groupId>cn.itcast</groupId>
+            <artifactId>feign-api</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

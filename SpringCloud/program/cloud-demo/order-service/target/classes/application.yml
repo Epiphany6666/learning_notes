@@ -46,3 +46,7 @@ feign:
     config:
       default:
         loggerLevel: FULL
+  httpclient:
+    enabled: true # 支持HttpClient的开关
+    max-connections: 200
+    max-connections-per-route: 50
