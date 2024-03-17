@@ -10,7 +10,7 @@ spring:
     name: orderservice
   cloud:
     nacos:
-      server-addr: localhost:90
+      server-addr: localhost:8848
       discovery:
         cluster-name: HZ # 集群名称
 #        namespace: d0062db2-7864-418d-91aa-be3720059f07 # dev 环境
@@ -46,3 +46,7 @@ feign:
     config:
       default:
         loggerLevel: FULL
+  httpclient:
+    enabled: true # 支持HttpClient的开关
+    max-connections: 200
+    max-connections-per-route: 50

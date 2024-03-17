@@ -2719,8 +2719,22 @@ Feign支持我们覆盖5个不同的配置，如下表所示：
 
 feign.Logger.Level：
 
+> 如果是要调试错误的时候，可以用FULL，但如果是平常情况下建议用BASIC或者NONE，因为记录日志还是会消耗一定性能的。
+
 - NONE：没有任何日志，默认就是NONE
 - BASIC：当你发起一次http请求时，我会帮你记录请求什么时候发的、什么时候结束的、耗时多久....这些基本信息
+- HEADERS：见名识义，除了记录请求基本信息以外，还会带上请求头和响应头信息
+- FULL：除了记录基本信息、头信息外，还会记录请求体信息和响应体信息
+
+feign.codec.Decoder：响应结果解析器。当Feign发起远程调用时，比如说Feign查到了一个用户，其实默认拿到的是一个JSON，但是最终我们想要把它转成User对象，就是这个Decoder来转。将查询到的数据转变成Java对象。
+
+feign.codec.Encoder：发请求时，我们传递的参数可以是各种格式，真正发请求时，需要把这些格式转变为Request请求体，这个动作就是由Encoder去完成的。做一个请求参数编码。
+
+feign. Contract：契约。用来规定Feign中支持哪种注解，默认情况下Spring帮我们实现了让它支持SpringMVC注解，这也是我们最熟悉的注解，所以这个我们一般不用去动它。
+
+feign. Retryer：失败重试。默认情况下Feign里面是没有做失败重试的，它是一个不重试机制。不过尽管Feign自己不会做重试，但Feign底层是依赖于Ribbon的，Ribbon它底层是有重试机制的，所以Feign就等于也有了失败重试了。
+
+失败重试：第一次访问8081，有可能网络问题导致查询异常，等待超过一定时间后，ribbon就不会等了，它此时ribbon就会去重试，试8082，直到拿到结果，如果全都不行，那就失败了。它是一种防范措施，避免因网络波动导致查询结果失败。
 
 | 类型                   | 作用             | 说明                                                   |
 | ---------------------- | ---------------- | ------------------------------------------------------ |
@@ -2730,21 +2744,21 @@ feign.Logger.Level：
 | feign. Contract        | 支持的注解格式   | 默认是SpringMVC的注解                                  |
 | feign. Retryer         | 失败重试机制     | 请求失败的重试机制，默认是没有，不过会使用Ribbon的重试 |
 
-> 失败重试：第一次访问8081，有可能网络问题导致查询异常，此时ribbon就会去重试，试8082，直到拿到结果，如果全都不行，那就失败了。
-
 一般情况下，默认值就能满足我们使用，如果要自定义时，只需要创建自定义的@Bean覆盖默认Bean即可。
 
 
 
-下面以日志为例来演示如何自定义配置。
+但一般情况下我们最多就是改改日志，其他的也就不用去改了。下面以日志为例来演示如何自定义配置。
 
-### 2.2.1.配置文件方式
+## 修改日志级别
+
+**1）配置文件方式**
 
 基于配置文件修改feign的日志级别可以针对单个服务：
 
 ```yaml
 feign:  
-  client:
+  client: # Feign的客户端配置
     config: 
       userservice: # 针对某个微服务的配置
         loggerLevel: FULL #  日志级别 
@@ -2771,13 +2785,15 @@ feign:
 
 
 
-### 2.2.2.Java代码方式
+**2）Java代码方式**
 
-也可以基于Java代码来修改日志级别，先声明一个类，然后声明一个Logger.Level的对象：
+也可以基于Java代码来修改日志级别，先声明一个类，这个类起个名字，比如叫：DefaultFeignConfiguration。然后声明一个Bean，Bean里面叫Logger.Level（日志级别）的对象：
 
 > 注意，Logger.Level是Feign下面的包
 
 ```java
+package cn.itcast.order.config;
+
 public class DefaultFeignConfiguration  {
     @Bean
     public Logger.Level feignLogLevel(){
@@ -2788,10 +2804,10 @@ public class DefaultFeignConfiguration  {
 
 
 
-如果要**全局生效**，将其放到启动类的@EnableFeignClients这个注解中：
+上面的类没有加注解，所以不会生效。如果要**全局生效**，将其放到启动类的@EnableFeignClients这个注解中：
 
 ```java
-@EnableFeignClients(defaultConfiguration = DefaultFeignConfiguration .class) 
+@EnableFeignClients(defaultConfiguration = DefaultFeignConfiguration.class) 
 ```
 
 
@@ -2799,42 +2815,40 @@ public class DefaultFeignConfiguration  {
 如果是**局部生效**，则把它放到对应的@FeignClient这个注解中：
 
 ```java
-@FeignClient(value = "userservice", configuration = DefaultFeignConfiguration .class) 
+@FeignClient(value = "userservice", configuration = DefaultFeignConfiguration.class) 
 ```
 
+---
 
-
-
-
-
-
-## 0.9.2.3.Feign使用优化
+# 32.Feign使用优化
 
 Feign底层发起http请求，依赖于其它的框架。其底层客户端实现包括：
 
-•URLConnection：默认实现，不支持连接池
+> Feign是一个声明式客户端，它只是帮助我们把我们的声明变成HTTP请求，发HTTP请求的时候还是会用到别的客户端。默认采用的是URLConnection，这个是JDK自带的一种，它的实现性能是不太好的，并且它也不支持连接池，有了连接池之后可以减少创建和销毁的性能损耗，连接创建每次都需要三次握手，断开都需要四次挥手，还是比较浪费性能浪费资源的。所以我们还是希望减少这些操作，解决办法就是使用连接池。
 
-•Apache HttpClient ：支持连接池
+- URLConnection：默认实现，不支持连接池
 
-•OKHttp：支持连接池
+- Apache HttpClient ：支持连接池
+
+- OKHttp：支持连接池
 
 
 
-因此优化Feign的性能主要包括：
+对Feign做性能优化，最重要的一点就是底层实现的改变。因此优化Feign的性能主要包括：
 
 ①使用连接池代替默认的URLConnection
 
-②日志级别，最好用basic或none
-
-> 因为不开性能会提升很多
+②日志级别，最好用basic或none，因为不开性能会提升很多
 
 
 
-这里我们用Apache的HttpClient来演示。
+这里我们用Apache的HttpClient来演示。因为这是Spring底层默认实现的方案。
 
 1）引入依赖
 
 在order-service的pom文件中引入Apache的HttpClient依赖：
+
+> 这个依赖已经被Spring管理起来了，所以我们不需要管版本，只需要引就行了。
 
 ```xml
 <!--httpClient的依赖 -->
@@ -2849,6 +2863,18 @@ Feign底层发起http请求，依赖于其它的框架。其底层客户端实�
 2）配置连接池
 
 在order-service的application.yml中添加配置：
+
+> 每个路径的最大连接数：例如查用户请求，我最多给你分配多少个连接数。
+>
+> 最大的连接数 和 每个路径的最大连接数 都需要测试出来，找到性能最优的配置。
+>
+> 这个默认值就是true，但是它缺少依赖就不会去实现，所以我们这里可以显示的给它写一下
+>
+> ![image-20240317120305420](assets/image-20240317120305420.png)
+>
+> 如果是开启OKHttp：
+>
+> ![image-20240317120538830](assets/image-20240317120538830.png)
 
 ```yaml
 feign:
@@ -2872,25 +2898,9 @@ Debug方式启动order-service服务，可以看到这里的client，底层就�
 
 ![image-20210714190041542](.\assets\image-20210714190041542.png)
 
+---
 
-
-
-
-
-
-总结，Feign的优化：
-
-1.日志级别尽量用basic
-
-2.使用HttpClient或OKHttp代替URLConnection
-
-①  引入feign-httpClient依赖
-
-②  配置文件开启httpClient功能，设置连接池参数
-
-
-
-## 10.2.4.最佳实践
+# 33.最佳实践
 
 所谓最近实践，就是使用过程中总结的经验，最好的一种使用方式。
 
