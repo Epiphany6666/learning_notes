@@ -5,16 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab55b25e-57b3-4f59-8162-f087b4ede80e" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/../../SpringCloud.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../SpringCloud.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/information_schema.FNRwLQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/information_schema.FNRwLQ.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/mysql.osA4Bg.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/mysql.osA4Bg.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/performance_schema.kIw0nw.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/performance_schema.kIw0nw.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/sys.zb4BAA.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/sys.zb4BAA.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/gateway/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,7 +57,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "jdk.selected.JAVA_MODULE": "17",
-    "last_opened_file_path": "F:/learning_notes/SpringCloud/program/cloud-demo/sql",
+    "last_opened_file_path": "F:/title",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -230,7 +222,8 @@
       <workItem from="1710583123613" duration="2558000" />
       <workItem from="1710646671826" duration="7013000" />
       <workItem from="1710689316070" duration="221000" />
-      <workItem from="1710689583237" duration="1779000" />
+      <workItem from="1710689583237" duration="1951000" />
+      <workItem from="1710720964566" duration="60000" />
     </task>
     <servers />
   </component>
