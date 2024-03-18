@@ -3107,6 +3107,10 @@ Zuul是基于Servlet的实现，属于阻塞式编程。而SpringCloudGateway则
 
 
 
+
+
+
+
 **1）创建gateway服务，引入依赖**
 
 创建服务：
@@ -3155,7 +3159,16 @@ public class GatewayApplication {
 
 > 网关端口、服务名称、nacos地址 这些配置其实是让我们的网关能够联系上Nacos，实现服务注册和发现。
 >
-> 路由规则包含：路由id、路由的目标地址、路由的断言
+> 路由配置包括：
+>
+> 1. 路由id：路由的唯一标示
+>
+> 2. 路由目标（uri）：路由的目标地址，http代表固定地址，lb代表根据服务名负载均衡
+>
+> 3. 路由断言（predicates）：判断路由的规则，判断一个请求是否符合要求
+>
+> 4. 路由过滤器（filters）：对请求或响应做处理
+>
 
 ```yaml
 server:
@@ -3171,8 +3184,12 @@ spring:
         - id: user-service # 路由id，每一个路由规则都应该有自己的id，确保它唯一，不重复。自定义，只要唯一即可
           # uri: http://127.0.0.1:8081 # 路由的目标地址 http就是固定地址，即向一个具体的http或者端口进行路由，即直接把路由地址写死，将来全往这个地址发，这个不推荐
           uri: lb://userservice # 路由的目标地址 lb（LoadBalance）就是负载均衡，后面跟服务名称。所以这个的意思就是：从Nacos中找到服务列表，然后去做负载均衡，实现请求路由。我要把请求路由到userservice（用户服务）
-          predicates: # 路由断言（断言是编程术语，表示为一些布尔表达），也就是判断请求是否符合路由规则的条件，如果符合规则，那就让它代理到userservice中去；如果不符合，就不会管
+          predicates: # 路由断言（断言是编程术语，表示为一些布尔表达），也就是判断请求是否符合路由规则的条件，如果符合规则，那就让它代理到userservice中去；如果不符合，就会出现404
             - Path=/user/** # 路径断言，判断路径是否是以/user开头，如果是则符合
+        - id: order-service
+          uri: lb://orderservice
+          predicates:
+            - Path=/order/**
 ```
 
 我们将符合`Path` 规则的一切请求，都代理到 `uri`参数指定的地址。
@@ -3183,11 +3200,13 @@ spring:
 
 **4）重启测试**
 
+注意的是，我们的网关是不处理任何业务逻辑的，但是却能查到业务信息，其实这就是把请求从网关路由到了微服务。
+
 重启网关，访问http://localhost:10010/user/1时，符合`/user/**`规则，请求转发到uri：http://userservice/user/1，得到了结果：
 
 ![image-20210714211908341](.\assets\image-20210714211908341.png)
 
-
+访问order效果也是一样的。
 
 
 
@@ -3197,69 +3216,47 @@ spring:
 
 ![image-20210714211742956](.\assets\image-20210714211742956.png)
 
-
-
-
-
-
-
-总结：
-
-网关搭建步骤：
-
-1. 创建项目，引入nacos服务发现和gateway依赖
-
-2. 配置application.yml，包括服务基本信息、nacos地址、路由
-
-路由配置包括：
-
-1. 路由id：路由的唯一标示
-
-2. 路由目标（uri）：路由的目标地址，http代表固定地址，lb代表根据服务名负载均衡
-
-3. 路由断言（predicates）：判断路由的规则，
-
-4. 路由过滤器（filters）：对请求或响应做处理
-
-
-
 接下来，就重点来学习路由断言和路由过滤器的详细知识
 
+---
 
+# 37.断言工厂
 
+断言是一种判断的规则，我们在配置文件中写的断言的规则其实只是一串简单的字符串，那个字符串将来需要被一个东西去解析，然后转变成真正的判断条件，谁去做的？就是断言工厂（Predicate Factory）。
 
+我们在配置文件中写的断言规则只是字符串，这些字符串会被Predicate Factory读取并处理，转变为路由判断的条件。所以断言工厂的作用就是读取用户定义的断言规则，然后把它解析成对应的判断条件，并且对用户请求做出判断。
 
-## 14.3.3.断言工厂
+例如Path=/user/**是按照路径匹配，这个规则是由`org.springframework.cloud.gateway.handler.predicate.PathRoutePredicateFactory`类来读取和处理的，像这样的断言工厂在SpringCloudGateway还有十几个，每一个都有自己判断的规则和条件。
 
-我们在配置文件中写的断言规则只是字符串，这些字符串会被Predicate Factory读取并处理，转变为路由判断的条件
+其中我们用的就是Path，它就是安装路径去匹配，多个路径用，分隔，多个路径规则只要有一个符合，那都算是符合的。第一个带路径占位符，意思是还能获取路径中的参数信息，但是大多数情况洗我们并不需要获取路径中的参数信息，我们只需要写/**就可以了。
 
-例如Path=/user/**是按照路径匹配，这个规则是由
+RemoteAddr：对请求者的ip地址做限制的。以前玩游戏的时候肯定碰到过这种情况：韩服可能会禁止中国大陆的ip访问。
 
-`org.springframework.cloud.gateway.handler.predicate.PathRoutePredicateFactory`类来
+每一个路由都会逐一匹配，并且predicates取的是&&，都要符合才行。
 
-处理的，像这样的断言工厂在SpringCloudGateway还有十几个:
+我们只需要掌握Path这种路由工程就可以了。
+
+下面表格的实例在Spring的官方网站里都有：[Spring Cloud Gateway](https://docs.spring.io/spring-cloud-gateway/docs/current/reference/html/#gateway-request-predicates-factories)，直接将官网的示例复制粘贴到配置文件中，然后按自己的需求修改即可。
+
+![image-20240318001321005](assets/image-20240318001321005.png)
 
 | **名称**   | **说明**                       | **示例**                                                     |
 | ---------- | ------------------------------ | ------------------------------------------------------------ |
-| After      | 是某个时间点后的请求           | -  After=2037-01-20T17:42:47.789-07:00[America/Denver]       |
+| After      | 是某个时间点后的请求           | -  After=2037-01-20T17:42:47.789-07:00[Asia/Shanghai]（后面的时区是亚洲/上海） |
 | Before     | 是某个时间点之前的请求         | -  Before=2031-04-13T15:14:47.433+08:00[Asia/Shanghai]       |
 | Between    | 是某两个时间点之前的请求       | -  Between=2037-01-20T17:42:47.789-07:00[America/Denver],  2037-01-21T17:42:47.789-07:00[America/Denver] |
 | Cookie     | 请求必须包含某些cookie         | - Cookie=chocolate, ch.p                                     |
 | Header     | 请求必须包含某些header         | - Header=X-Request-Id, \d+                                   |
 | Host       | 请求必须是访问某个host（域名） | -  Host=**.somehost.org,**.anotherhost.org                   |
 | Method     | 请求方式必须是指定方式         | - Method=GET,POST                                            |
-| Path       | 请求路径必须符合指定规则       | - Path=/red/{segment},/blue/**（多个路径用，分隔）           |
+| Path       | 请求路径必须符合指定规则       | - Path=/red/{segment},/blue/**                               |
 | Query      | 请求参数必须包含指定参数       | - Query=name, Jack或者-  Query=name                          |
 | RemoteAddr | 请求者的ip必须是指定范围       | - RemoteAddr=192.168.1.1/24                                  |
 | Weight     | 权重处理                       |                                                              |
 
-> 每一个路由都会逐一匹配，并且predicates取的是&&，都要符合才行
+---
 
-我们只需要掌握Path这种路由工程就可以了。
-
-
-
-## 15.3.4.过滤器工厂
+# 38.过滤器工厂
 
 GatewayFilter是网关中提供的一种过滤器，可以对进入网关的请求和微服务返回的响应做处理：
 
