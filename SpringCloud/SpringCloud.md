@@ -3274,7 +3274,13 @@ GatewayFilter是网关中提供的一种过滤器，可以对进入网关的请�
 
 ![image-20240318160609524](assets/image-20240318160609524.png)
 
-Spring提供了31种不同的路由过滤器工厂，这么多过滤器我们不可能一个一个去学，其实我们只需要知道有这么多过滤器，将来有需求的时候再来看就行了，并且可以通过过滤器的名字来简单做一个推测。例如：
+Spring提供了31种不同的路由过滤器工厂，这么多过滤器我们不可能一个一个去学，其实我们只需要知道有这么多过滤器，将来有需求的时候再来看就行了，并且可以通过过滤器的名字来简单做一个推测，并且在官网随意点击一个过滤器，它都是由详尽的语法说明的。
+
+如下图红框里的翻译来就是：这个配置的作用就是给下游（从我们的网关到微服务，微服务就是在下游）的请求添加一个X-Request-red头。注意 `AddRequestHeader=X-Request-red, blue` 中的逗号，是key value，并不是and的意思
+
+![image-20240318194629803](assets/image-20240318194629803.png)
+
+例如：
 
 | **名称**             | **说明**                     |
 | -------------------- | ---------------------------- |
@@ -3286,15 +3292,13 @@ Spring提供了31种不同的路由过滤器工厂，这么多过滤器我们不
 
 
 
-### 3.4.2.请求头过滤器
+下面我们以 AddRequestHeader（请求头过滤器） 为例来讲解。
 
-下面我们以AddRequestHeader 为例来讲解。
+**需求**：给所有进入userservice的请求添加一个请求头：Truth=itcast is freaking awesome!
 
-> **需求**：给所有进入userservice的请求添加一个请求头：Truth=itcast is freaking awesome!
+## 1)针对部分路由的过滤器
 
-
-
-只需要修改gateway服务的application.yml文件，添加路由过滤即可：
+只需要修改gateway服务的application.yml文件，添加路由过滤即可，配置在路由下的过滤器只对当前路由的请求生效：
 
 ```yaml
 spring:
@@ -3311,13 +3315,13 @@ spring:
 
 当前过滤器写在userservice路由下，因此仅仅对访问userservice的请求有效。
 
+验证，在随意请求方法上添加`@RequestHeader("Truth", required = false) String truth`
 
 
 
+## 2）针对所有路由的过滤器
 
-### 3.4.3.默认过滤器
-
-如果要对所有的路由都生效，则可以将过滤器工厂写到default下。格式如下：
+**默认过滤器**：如果要对所有的路由都生效，则可以将过滤器工厂写到defaultFilters下。格式如下：
 
 ```yaml
 spring:
@@ -3328,44 +3332,30 @@ spring:
         uri: lb://userservice 
         predicates: 
         - Path=/user/**
+#       filters: # 过滤器
+#       - AddRequestHeader=Truth, Itcast is freaking awesome! # 添加请求头
       default-filters: # 默认过滤项
       - AddRequestHeader=Truth, Itcast is freaking awesome! 
 ```
 
+---
 
-
-### 3.4.4.总结
-
-过滤器的作用是什么？
-
-① 对路由的请求或响应做加工处理，比如添加请求头
-
-② 配置在路由下的过滤器只对当前路由的请求生效
-
-defaultFilters的作用是什么？
-
-① 对所有路由都生效的过滤器
-
-
-
-## 16.3.5.全局过滤器
+# 39.全局过滤器（GlobalFilter）
 
 上一节学习的过滤器，网关提供了31种，但每一种过滤器的作用都是固定的。如果我们希望拦截请求，做自己的业务逻辑则没办法实现。
 
-### 3.5.1.全局过滤器作用
+**全局过滤器的作用**也是处理一切进入网关的请求和微服务响应，与GatewayFilter的作用一样。区别在于GatewayFilter通过配置定义，处理逻辑是固定的，是无法控制的，是由Spring写死的，而我们有些业务比较复杂，比如：你这个请求进来了，我想知道这个请求是谁发起的，身份是什么，有没有权限访问我。而GlobalFilter的逻辑需要自己写代码实现。
 
-全局过滤器的作用也是处理一切进入网关的请求和微服务响应，与GatewayFilter的作用一样。区别在于GatewayFilter通过配置定义，处理逻辑是固定的；而GlobalFilter的逻辑需要自己写代码实现。
-
-定义方式是实现GlobalFilter接口。
+定义方式是实现GlobalFilter接口，这个接口中只有一个方法：filter，顾名思义：过滤。
 
 ```java
 public interface GlobalFilter {
     /**
      *  处理当前请求，有必要的话通过{@link GatewayFilterChain}将请求交给下一个过滤器处理
      *
-     * @param exchange 请求上下文，里面可以获取Request、Response等信息
-     * @param chain 放行，用来把请求委托给下一个过滤器 
-     * @return {@code Mono<Void>} 返回标示当前过滤器业务结束
+     * @param exchange 请求上下文，这个上下文指的是：请求进入网关开始，一直到结束为止，整个流程中都可以共享exchange对象。里面可以获取Request、Response等信息，甚至我们可以往里面存东西。作用：让我们编写整个过滤器的业务逻辑的，你需要的信息参数里都有。
+     * @param chain：过滤器链，这个链上除了你这个过滤器外还有别的过滤器，它的作用就是放行，你调用这个过滤器链，让它往后走，这里逻辑处理完了，交给别人处理了，用来把请求委托给下一个过滤器
+     * @return {@code Mono<Void>} 返回标示当前过滤器业务结束，Mono是WebFl
      */
     Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain);
 }
@@ -3373,7 +3363,7 @@ public interface GlobalFilter {
 
 
 
-在filter中编写自定义逻辑，可以实现下列功能：
+**需求**：在filter中编写自定义逻辑，可以实现下列功能：
 
 - 登录状态判断
 - 权限校验

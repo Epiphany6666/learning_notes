@@ -5,41 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab55b25e-57b3-4f59-8162-f087b4ede80e" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/../../assets/image-20240318001321005.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/cloud_order.xIxfuQ.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/cloud_user.lV837Q.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/dlyk.mhkvAA.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/fruitdb.kkvm3A.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/information_schema.FNRwLQ.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/itcast.6vq9uQ.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/itcast.6vq9uQ.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/mybatis.03UUWg.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/mybatis_plus.hnzq5g.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/nacos.9LI7Bg.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/ry-vue.ANFHyQ.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/sakila.oXLGyQ.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/security-demo.UDA_0w.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/sky_take_out.9CAXBg.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/spring_cache_demo.8uElaw.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/sys.zb4BAA.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/test.kkQ2AA.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/tlias.41SVBg.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/world.khvBBg.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/youj.K7A4AA.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gateway/target/classes/application.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gateway/target/classes/cn/itcast/gateway/GatewayApplication.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sql/cloud-order.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sql/cloud-user.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../SpringCloud.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../SpringCloud.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/information_schema.FNRwLQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/information_schema.FNRwLQ.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/mysql.osA4Bg.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/mysql.osA4Bg.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/performance_schema.kIw0nw.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/performance_schema.kIw0nw.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/sys.zb4BAA.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b/storage_v2/_src_/schema/sys.zb4BAA.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/gateway/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway/target/classes/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/gateway/target/classes/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-server/src/main/java/cn/itcast/user/web/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-server/src/main/java/cn/itcast/user/web/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-server/target/classes/cn/itcast/user/web/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/user-server/target/classes/cn/itcast/user/web/UserController.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,7 +60,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;jdk.selected.JAVA_MODULE&quot;: &quot;17&quot;,
-    &quot;last_opened_file_path&quot;: &quot;F:/title&quot;,
+    &quot;last_opened_file_path&quot;: &quot;O:/note/notepad-backend/pom.xml&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -99,7 +69,7 @@
     &quot;project.structure.proportion&quot;: &quot;0.15429688&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
-    &quot;spring.configuration.checksum&quot;: &quot;36705cfbff9291dc8133d7fd8316049f&quot;,
+    &quot;spring.configuration.checksum&quot;: &quot;90509c73baba76cf5d734f1e9cc4b6ad&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -257,6 +227,8 @@
       <workItem from="1710689316070" duration="221000" />
       <workItem from="1710689583237" duration="1951000" />
       <workItem from="1710720964566" duration="60000" />
+      <workItem from="1710758441183" duration="3155000" />
+      <workItem from="1710768031658" duration="2199000" />
     </task>
     <servers />
   </component>

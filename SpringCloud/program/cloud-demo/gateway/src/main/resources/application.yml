@@ -12,8 +12,12 @@ spring:
           uri: lb://userservice # 路由目标地址
           predicates: # 路由断言，判断请求是否符合规则
             - Path=/user/** # 按照路径匹配
+#          filters:
+#            - AddRequestHeader=Truth, itcast is freaking awesome!
         - id: order-service
           uri: lb://orderservice
           predicates:
             - Path=/order/**
             - After=2031-01-20T17:42:47.789-07:00[Asia/Shanghai]
+      default-filters:
+        - AddRequestHeader=Truth, itcast is freaking awesome!
