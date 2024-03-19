@@ -3847,7 +3847,7 @@ yum remove docker \
 
 
 
-## 安装docker
+## 2）安装docker
 
 首先需要大家虚拟机联网，安装yum工具
 
@@ -3886,7 +3886,7 @@ docker-ce为社区免费版本。稍等片刻，docker即可安装成功。
 
 
 
-## 1.3.启动docker
+## 3）启动docker
 
 Docker应用需要用到各种端口，逐一去修改防火墙设置。非常麻烦，因此建议大家直接关闭防火墙！
 
@@ -3935,15 +3935,24 @@ docker -v
 
 
 
-## 1.4.配置镜像加速
+## 4）配置镜像加速
 
 docker官方镜像仓库网速较差，我们需要设置国内镜像服务：
 
 参考阿里云的镜像加速文档：https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors
 
+~~~bash
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["https://3e9vxxm6.mirror.aliyuncs.com"]
+}
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+~~~
 
-
-
+----
 
 # 2.CentOS7安装DockerCompose
 
