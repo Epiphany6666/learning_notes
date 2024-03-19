@@ -3319,7 +3319,7 @@ spring:
 
 
 
-## 2）针对所有路由的过滤器
+## 2）默认过滤器：针对所有路由的过滤器
 
 **默认过滤器**：如果要对所有的路由都生效，则可以将过滤器工厂写到defaultFilters下。格式如下：
 
@@ -3344,7 +3344,7 @@ spring:
 
 上一节学习的过滤器，网关提供了31种，但每一种过滤器的作用都是固定的。如果我们希望拦截请求，做自己的业务逻辑则没办法实现。
 
-**全局过滤器的作用**也是处理一切进入网关的请求和微服务响应，与GatewayFilter的作用一样。区别在于GatewayFilter通过配置定义，处理逻辑是固定的，是无法控制的，是由Spring写死的，而我们有些业务比较复杂，比如：你这个请求进来了，我想知道这个请求是谁发起的，身份是什么，有没有权限访问我。而GlobalFilter的逻辑需要自己写代码实现。
+**全局过滤器的作用**：也是处理一切进入网关的请求和微服务响应，与GatewayFilter的作用一样。区别在于GatewayFilter通过配置定义，处理逻辑是固定的，是无法控制的，是由Spring写死的，而我们有些业务比较复杂，比如：你这个请求进来了，我想知道这个请求是谁发起的，身份是什么，有没有权限访问我。而GlobalFilter的逻辑需要自己写代码实现。
 
 定义方式是实现GlobalFilter接口，这个接口中只有一个方法：filter，顾名思义：过滤。
 
@@ -3361,9 +3361,7 @@ public interface GlobalFilter {
 }
 ```
 
-
-
-**需求**：在filter中编写自定义逻辑，可以实现下列功能：
+在filter中编写自定义逻辑，可以实现下列功能：
 
 - 登录状态判断
 - 权限校验
@@ -3371,9 +3369,7 @@ public interface GlobalFilter {
 
 
 
-
-
-### 3.5.2.自定义全局过滤器
+## 自定义全局过滤器
 
 需求：定义全局过滤器，拦截请求，判断请求的参数是否满足下面条件：
 
@@ -3389,112 +3385,137 @@ public interface GlobalFilter {
 
 在gateway中定义一个过滤器：
 
+1. 实现 GlobalFilter 接口，并且实现里面的filter方法
+
+2. 添加@Component注解，将该过滤器放到Spring容器中
+
+3. 记住过滤器一定要有顺序！
+
+   @Order(-1)除了通过注解指定，还可以通过接口指定，实现接口：Ordered，此时就需要去实现value方法，此时直接返回-1即可！
+
+   ~~~java
+   @Component // 6.定义component组件，将它放到spring容器中作为一个bean
+   public class AuthorizeFilter implements GlobalFilter, Order {
+       @Override
+       public int value() { 
+           return -1; // 和在注解里写的是一样的
+       }
+   
+       @Override
+       public Class<? extends Annotation> annotationType() {
+           return null;
+       }
+   }
+   ~~~
+
+4. 编写处理逻辑
+
+
+
+**完整示例代码**
+
 ```java
 package cn.itcast.gateway.filters;
 
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
-
-@Order(-1)
-@Component
+@Order(-1) // 顺序注解，里面需要给一个int值。默认值为21亿4千7百48万。这个值越小，优先级越高，所以默认值其实是优先级最低的
+@Component // 6.定义component组件，将它放到spring容器中作为一个bean
 public class AuthorizeFilter implements GlobalFilter {
     @Override
+    // 网关里采用的几乎都是基于webflux的响应式api，没有以前所熟悉的server api了。
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        // 1.获取请求参数
-        MultiValueMap<String, String> params = exchange.getRequest().getQueryParams();
-        // 2.获取authorization参数
+        // 1.通过上下文获取请求参数，exchange.getRequest()：这里获取的request对象并不是servlet里的request
+        ServerHttpRequest request = exchange.getRequest();
+        // params的类型是一个Map，而且这个Map还有些特殊，当然它还是key，value结构。key就是我们的参数名称，值就是对应的值
+        MultiValueMap<String, String> params = request.getQueryParams();
+        // 2.获取authorization参数，取的时候有两个方法，我们一般会选择getFirst，取的时候选第一个匹配的
         String auth = params.getFirst("authorization");
-        // 3.校验
+        // 3.判断参数值是否等于 admin
         if ("admin".equals(auth)) {
-            // 放行
+            // 4.等于 =》 放行，当你调用filter那一刻，其实它是从一个过滤器链里找到下一个过滤器的filter方法，就等于放行了，而它的返回值就是Mono，直接return即可
             return chain.filter(exchange);
         }
-        // 4.拦截
-        // 4.1.禁止访问，设置状态码
-        exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-        // 4.2.结束处理
+        // 5.不等于 =》 拦截，然后结束处理，但这样拦截的用户体验不好，所以需要给用户一个提示：设置状态码
+        // 5.1 设置状态码，401代表的是未登录
+        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
         return exchange.getResponse().setComplete();
     }
 }
 ```
 
-> 记住过滤器一定要有顺序！
->
-> @Order(-1)除了通过注解指定，还可以通过接口指定，实现接口：Ordered，此时就需要去实现getOrder方法，此时直接返回-1即可！
+---
 
+# 40.过滤器执行顺序
 
+总结：
 
-## 17.3.5.3.过滤器执行顺序
+1. order值越小，优先级越高
+2. 当order值一样时，顺序是defaultFilter最先，然后是局部的路由过滤器，最后是全局过滤器
 
 请求进入网关会碰到三类过滤器：当前路由的过滤器、DefaultFilter、GlobalFilter
 
-请求路由后（因为这三个过滤器只有在路由确认之后才知道有哪些过滤器生效），会将当前路由过滤器和DefaultFilter、GlobalFilter，合并到一个过滤器链（集合）中，排序后依次执行每个过滤器：
+请求路由**后**（这三个过滤器只有在路由确认之后才知道有哪些过滤器生效，因为不同路由有不同过滤器），会将当前路由过滤器和DefaultFilter、GlobalFilter，合并到一个过滤器链（也就是一个List集合）中，排序后依次执行每个过滤器：
 
 ![image-20210714214228409](.\assets\image-20210714214228409.png)
 
+局部的配置路由器和全局的配置路由器，它俩的配法完全一样！区别就是一个放在路由内，一个放在默认的过滤器中。因此，从Java底层来看，他俩的本质是一样的，只不过作用范围不一样。
 
+![image-20231015172737586](.\assets\image-20231015172737586.png)
 
-> 局部的配置路由器和全局的配置路由器，它俩的配法完全一样！区别就是一个放在路由内，一个放在默认的过滤器
->
-> 从Java底层来看，他俩的本质是一样的，只不过作用范围不一样。
->
-> ![image-20231015172737586](.\assets\image-20231015172737586.png)
->
-> 它俩的本质都是：AddRequestHeaderGatewayFilterFactory
->
-> 这个过滤器的工厂它就会去读取配置文件，生成过滤器，生成的过滤器就叫做GatewayFilter。所以我们认为路由过滤器和default过滤器是同一类，都叫GatewayFilter。
->
-> 但是全局过滤器叫GlobalFilter。在网关里有这么一个东西：FilteringWebHandler（过滤器适配器），而它的内部又接收了一个：globalFilter。所以，如果我给它传一个globalFilter，它就等于把globalFilter做了一个适配，变成了GatewayFilter去用，也就是说在网关中，所有的globalFilter都可以被是配成GatewayFilter去用。
->
-> 所以从这个角度来说，网关中所有的过滤器最终都是GatewayFilter类型。
->
-> 那既然是同一个类型，它们就可以扔到同一个集合中去做排序了。
+它俩的本质都是：AddRequestHeaderGatewayFilterFactory
+
+这个过滤器的工厂它就会去读取配置文件，生成真正的过滤器，生成的过滤器就叫做GatewayFilter。所以我们认为路由过滤器和default过滤器是同一类，都叫GatewayFilter。
+
+![image-20240319103227636](assets/image-20240319103227636.png)
+
+但是全局过滤器叫GlobalFilter。在网关里有这么一个东西：FilteringWebHandler里面有个内部类：GatewayFilterAdapter（过滤器适配器），在这个适配器内，它实现了GatewayFilter接口而它的内部又接收了一个：globalFilter。所以，如果我给它传一个globalFilter，它就等于把globalFilter做了一个适配，变成了GatewayFilter去用，也就是说在网关中，所有的globalFilter都可以被适配成GatewayFilter去用。
+
+![image-20240319103606340](assets/image-20240319103606340.png)
+
+所以从这个角度来说，网关中所有的过滤器最终都是GatewayFilter类型。
+
+那既然是同一个类型，它们就可以扔到同一个集合中去做排序了。
 
 排序的规则是什么呢？
 
 - 每一个过滤器都必须指定一个int类型的order值，**order值越小，优先级越高，执行顺序越靠前**。
+
 - GlobalFilter通过实现Ordered接口，或者添加@Order注解来指定order值，由我们自己指定
+
 - 路由过滤器和defaultFilter的order由Spring指定，默认是按照声明顺序从1递增。
-- 当过滤器的order值一样时，会按照 defaultFilter > 路由过滤器 > GlobalFilter的顺序执行。
+
+  ~~~yml
+  default-filters:
+  - AddRequestHeader=Truth, itcast is freaking awesome! # order为1
+  - A×××Header=Truth, itcast is freaking awesome! # order为2
+  ~~~
+
+- 但由于GlobalFilter（自己将order值调为1）、路由过滤器和defaultFilter是分开计数的，当过滤器的order值一样时，会按照 defaultFilter > 路由过滤器 > GlobalFilter的顺序执行。
 
 详细内容，可以查看源码：
 
-`org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator#getFilters()`方法是先加载defaultFilters，然后再加载某个route的filters，然后合并。
+`org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator#getFilters()`方法就是用来加载路由过滤器和default过滤器的，并且给它们从1递增order值。先加载defaultFilters，然后再加载某个route的filters，然后合并。
 
+`org.springframework.cloud.gateway.handler.FilteringWebHandler#handle()`方法会加载全局过滤器，并且给它做了个适配，把它变成GatewayFilter。最后与前面的过滤器合并后根据order排序，组织过滤器链。
 
+---
 
-`org.springframework.cloud.gateway.handler.FilteringWebHandler#handle()`方法会加载全局过滤器，把它变成GatewayFilter。与前面的过滤器合并后根据order排序，组织过滤器链
+# 41.网关的cors跨域配置
 
-
-
-## 18.Gateway网关-网关的cors跨域配置
-
-## 3.6.跨域问题
-
-
-
-### 3.6.1.什么是跨域问题
+在微服务中，所有请求都要先结果网关，再到微服务，也就是说，跨域请求不需要在每个微服务里都去处理，仅仅在网关处理就可以了。但是网关又跟我们以前的实现又不一样，网关是基于webflux实现的，没有servlet情况下的api，因此，我们以前所学的哪些解决跨域方案不一定能够适用。
 
 跨域：域名不一致就是跨域，主要包括：
 
-- 域名不同： www.taobao.com 和 www.taobao.org 和 www.jd.com 和 miaosha.jd.com
+- 域名不同： www.taobao.com 和 www.taobao.org（一级域名不同） 和 www.jd.com（二级域名不同） 和 miaosha.jd.com（三级域名不同
 
 - 域名相同，端口不同：localhost:8080和localhost8081
 
-跨域问题：浏览器禁止请求的发起者与服务端发生跨域ajax请求，请求被浏览器拦截的问题
-
-
+跨域问题：**浏览器禁止**请求的发起者与服务端发生跨域**ajax请求**，请求被浏览器拦截的问题，即跨域只存在于客户端与服务端之间。
 
 解决方案：CORS，这个以前应该学习过，这里不再赘述了。不知道的小伙伴可以查看https://www.ruanyifeng.com/blog/2016/04/cors.html
 
 
 
-### 3.6.2.模拟跨域问题
+**模拟跨域问题**
 
 找到课前资料的页面文件：
 
@@ -3502,19 +3523,33 @@ public class AuthorizeFilter implements GlobalFilter {
 
 放入tomcat或者nginx这样的web服务器中，启动并访问。
 
+VSCode话下载 `Live Server (Five Server)` 插件
+
+![image-20240319112953349](assets/image-20240319112953349.png)
+
+然后右击鼠标，选择`Open with Five Server`
+
+![image-20240319113100039](assets/image-20240319113100039.png)
+
+此时就会发现服务启动成功
+
+![image-20240319113152896](assets/image-20240319113152896.png)
+
 可以在浏览器控制台看到下面的错误：
 
-![image-20210714215832675](.\assets\image-20210714215832675.png)
-
-
+![image-20240319114328292](assets/image-20240319114328292.png)
 
 从localhost:8090访问localhost:10010，端口不同，显然是跨域的请求。
 
 
 
-### 3.6.3.解决跨域问题
+## 解决跨域问题
 
-在gateway服务的application.yml文件中，添加下面的配置：
+AJAX采用的是Cors方案，Cors是浏览器去问服务器：你让不让它跨域，它有一次询问，这个询问请求方式是option默认情况下这种请求是会被网关拦截的。`add-to-simple-url-handler-mapping: true` 配置就是不拦截option请求，这样Cors的询问请求就会正常发出。
+
+但如果每一次发请求都去询问服务器，那对服务器的压力就会很大，跨域的Cors解决方案性能就会有损耗。因此为了减少这种损耗方案，跨域给跨域请求设置一个`maxAge`（有效期）值，有效期范围内，浏览器不再发起询问，而是直接放行，提高性能。
+
+在gateway服务的application.yml文件中，添加下面的配置，一下配置直接复制粘贴即可：
 
 ```yaml
 spring:
@@ -3524,7 +3559,7 @@ spring:
       globalcors: # 全局的跨域处理
         add-to-simple-url-handler-mapping: true # 解决options请求被拦截问题
         corsConfigurations:
-          '[/**]':
+          '[/**]': # /**表示拦截一切请求，凡是进入网关的请求都做跨域处理
             allowedOrigins: # 允许哪些网站的跨域请求 
               - "http://localhost:8090"
             allowedMethods: # 允许的跨域ajax的请求方式
@@ -3533,12 +3568,14 @@ spring:
               - "DELETE"
               - "PUT"
               - "OPTIONS"
-            allowedHeaders: "*" # 允许在请求中携带的头信息
-            allowCredentials: true # 是否允许携带cookie
+            allowedHeaders: "*" # 允许在请求中携带的头信息，*代表一切请求头
+            allowCredentials: true # 是否允许携带cookie，因为cookie里都是敏感信息
             maxAge: 360000 # 这次跨域检测的有效期
 ```
 
+然后重启网关，然后再次打开浏览器做一个刷新，可以发现能够成功访问出用户信息了。
 
+![image-20240319114528792](assets/image-20240319114528792.png)
 
 # Docker实用篇
 
