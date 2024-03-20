@@ -4079,30 +4079,53 @@ systemctl restart docker
 
 
 
+---
+
+# Docker的基本操作
+
+# 47.镜像操作
 
 
-# 2.Docker的基本操作
 
-## 2.1.镜像操作
-
-
-
-### 2.1.1.镜像名称
+**1）镜像名称**
 
 首先来看下镜像的名称组成：
 
 - 镜名称一般分两部分组成：[repository]:[tag]。
+
+  tag一般是指版本。
+
 - 在没有指定tag时，默认是latest，代表最新版本的镜像
 
 如图：
 
 ![image-20210731155141362](./assets/image-20210731155141362.png)
 
-这里的mysql就是repository，5.7就是tag，合一起就是镜像名称，代表5.7版本的MySQL镜像。
+这里的mysql就是repository，5.7就是tag，合一起就是镜像名称，代表5.7版本的MySQL镜像。因此 mysql:5.7 和 mysql:5.6 是两个不同的版本。
 
 
 
-### 2.1.2.镜像命令
+## 镜像命令
+
+获取镜像一般有两种做法：
+
+- 从本地获取，你会需要一个名为Dockerfile的文件，然后使用 `docker build` 命令把它构建成一个镜像，这一部分后期会去专门学习。
+- 除了从本地构建镜像以外，大多数情况下会使用 `docker pull` 命令从 Docker Registry 服务器里去拉取镜像。 `docker pull` 命令和从私服拉，也可以从公共的Docker Registry服务拉，例如DockerHub。
+
+使用 `docker images` 命令查看镜像。
+
+使用 `docker rmi` 删除镜像。rmi（remove images）。
+
+将镜像分享给别人也有两种方式：
+
+- 将镜像推送到镜像服务器中，例如公司的私服，这种方式需要用到 `docker push` 命令。
+- 将镜像用U盘拷给同事，使用 `docker save` 命令将镜像保存成一个压缩包，此时同事就可以拿着U盘来拷这个压缩包了。拷过去后，使用 `docker load` 命令将压缩包加载为镜像。
+
+查看帮助文档：`docker --help`，此时会出现关于docker的所有命令。
+
+如果我想知道 `docker images` 命令是做什么的，就可以使用：`docker images --help`， 它的作用就是：列出所有的镜像，并且还有各种各样的参数，每个参数什么含义这里都有说明。
+
+![image-20240320212020628](assets/image-20240320212020628.png)
 
 常见的镜像操作命令如图：
 
@@ -4112,7 +4135,7 @@ systemctl restart docker
 
 
 
-### 2.1.3.案例1-拉取、查看镜像
+## 案例1-拉取、查看镜像
 
 需求：从DockerHub中拉取一个nginx镜像并查看
 
@@ -4120,19 +4143,31 @@ systemctl restart docker
 
 ![image-20210731155844368](./assets/image-20210731155844368.png)
 
-2）根据查看到的镜像名称，拉取自己需要的镜像，通过命令：docker pull nginx
+在它的上面有一个标识：Official Image。证明它是官方的正版镜像，所以我们就使用它。
+
+![image-20240320212233743](assets/image-20240320212233743.png)
+
+点进去后，可以看见它有很多不同的版本，如果不指定版本的时候，它就是默认最新版（latest）
+
+![image-20240320212537720](assets/image-20240320212537720.png)
+
+在网页的最右侧，浏览器给出了示例的命令，`docker pull nginx`就是在拉取nginx的镜像，但它没有指定版本，所以默认就是最新版本
+
+![image-20240320212952720](assets/image-20240320212952720.png)
+
+2）根据查看到的镜像名称，拉取自己需要的镜像，通过命令：docker pull nginx，这个拉取速度会比较慢
 
 ![image-20210731155856199](./assets/image-20210731155856199.png)
 
-3）通过命令：docker images 查看拉取到的镜像
+3）通过命令：docker images 查看拉取到的镜像，后面可以跟参数也可以不跟。每一个镜像都会有一个自己的唯一id。创建时间是3周前，大小只有133M
 
 ![image-20210731155903037](./assets/image-20210731155903037.png)
 
 
 
-### 2.1.4.案例2-保存、导入镜像
+## 案例2-保存、导入镜像
 
-需求：利用docker save将nginx镜像导出磁盘，然后再通过load加载回来
+需求：利用docker save将nginx镜像导出磁盘，变成一个压缩包，然后再通过load加载回来
 
 1）利用docker xx --help命令查看docker save和docker load的语法
 
@@ -4142,7 +4177,9 @@ systemctl restart docker
 docker save --help
 ```
 
-结果：
+结果：保存一个或多个镜像到tar文件当中（也就是一个压缩文件当中）。Usage后面给出的是命令的示例，IMAGE：你要输出的是哪个镜像，写的是镜像的名字。Options：选项。
+
+-o：输出，写入到一个指定的文件当中
 
 ![image-20210731161104732](./assets/image-20210731161104732.png)
 
