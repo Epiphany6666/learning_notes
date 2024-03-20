@@ -3849,7 +3849,7 @@ yum remove docker \
 
 ## 2）安装docker
 
-首先需要大家虚拟机联网，安装yum工具
+首先需要大家虚拟机联网，安装yum工具，安装docker之前需要先安装yum-utils这个工具
 
 ```sh
 yum install -y yum-utils \
@@ -3859,7 +3859,7 @@ yum install -y yum-utils \
 
 
 
-然后更新本地镜像源：
+然后更新本地镜像源，yum安装是在线联网下载，这个下载如果安装docker，默认是去国外的网站，速度比较慢，所以这里通过yum工具去配置了安装的仓库在阿里云仓库，这样我们将来去安装的时候速度就会快很多了。
 
 ```shell
 # 设置docker镜像源
@@ -3882,7 +3882,7 @@ yum makecache fast
 yum install -y docker-ce
 ```
 
-docker-ce为社区免费版本。稍等片刻，docker即可安装成功。
+docker-ce为社区免费版本。-y的意思就是按照的过程中不要问。稍等片刻，docker即可安装成功。
 
 
 
@@ -3937,12 +3937,14 @@ docker -v
 
 ## 4）配置镜像加速
 
-docker官方镜像仓库网速较差，我们需要设置国内镜像服务：
+docker官方镜像仓库网速较差，我们需要设置国内镜像服务。将来我们需要利用Docker去DockerHub这样的网站去下载镜像，这些镜像在国外的网站下载的速度很慢，所以建议大家配到国内的镜像服务器，这样下载的速度就会变得很快，首推阿里云。
 
 参考阿里云的镜像加速文档：https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors
 
 ~~~bash
+# 新建文件夹
 sudo mkdir -p /etc/docker
+# 新建 daemon.json 这样的一个文件，然后把下面一堆的内容给它输出到这个文件里去
 sudo tee /etc/docker/daemon.json <<-'EOF'
 {
   "registry-mirrors": ["https://3e9vxxm6.mirror.aliyuncs.com"]
