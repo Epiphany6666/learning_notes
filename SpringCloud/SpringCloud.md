@@ -4114,7 +4114,7 @@ systemctl restart docker
 
 使用 `docker images` 命令查看镜像。
 
-使用 `docker rmi` 删除镜像。rmi（remove images）。
+使用 `docker rmi` 删除镜像。rmi（remove images），后面跟上 镜像名称 或者 镜像id
 
 将镜像分享给别人也有两种方式：
 
@@ -4179,13 +4179,13 @@ docker save --help
 
 结果：保存一个或多个镜像到tar文件当中（也就是一个压缩文件当中）。Usage后面给出的是命令的示例，IMAGE：你要输出的是哪个镜像，写的是镜像的名字。Options：选项。
 
--o：输出，写入到一个指定的文件当中
+-o：输出，写入到一个指定的文件当中，如果文件不存在，将来它会自动创建
 
 ![image-20210731161104732](./assets/image-20210731161104732.png)
 
-
-
 命令格式：
+
+> 镜像名由两部分组成：repository:tag
 
 ```shell
 docker save -o [保存的目标文件名称] [镜像名称]
@@ -4207,13 +4207,15 @@ docker save -o nginx.tar nginx:latest
 
 
 
-3）使用docker load加载镜像
+3）导入：使用docker load加载镜像
 
 先删除本地的nginx镜像：（remove images）
 
 ```sh
 docker rmi nginx:latest
 ```
+
+然后通过 `docker images` 查看nginx:latest 这个镜像是否还存在
 
 
 
@@ -4223,15 +4225,21 @@ docker rmi nginx:latest
 docker load -i nginx.tar
 ```
 
+-i：你要读哪个文件，从 tar 存档文件读取，而不是从 STDIN 读取
+
+-q：quiet（安静的，即不打印日志
+
+![image-20240321093525195](assets/image-20240321093525195.png)
+
 结果：
 
 ![image-20210731161746245](./assets/image-20210731161746245.png)
 
+然后再通过 `docker images` 查看nginx:latest 这个镜像是否加载回来。
 
+---
 
-
-
-### 2.1.5.练习
+# 48.镜像命令练习
 
 需求：去DockerHub搜索并拉取一个Redis镜像
 
@@ -4249,11 +4257,35 @@ docker load -i nginx.tar
 
 6）利用docker load 重新加载 redis.tar文件
 
+---
 
+# 49.容器操作
 
-## 08.2.2.容器操作
+创建容器比较常见的目录就是：`docker run` ，这个命令不仅仅可以帮助我们创建一个容器，而且还可以让这个容器处于运行状态。
 
-### 2.2.1.容器相关命令
+容器除了运行状态，还会有暂停、停止这两个状态。
+
+`docker pause` 可以让容器从运行进入暂停。
+
+`docker unpause` 可以让容器从暂停恢复运行。
+
+`docker stop` 可以让容器从运行变成停止。
+
+`docker start` 可以让容器从停止恢复运行。
+
+停止和暂停差别主要在于 操作系统的处理方式。
+
+如果容器进入暂停状态，操作系统会将容器内的进程挂起，容器关联的内存暂存起来，cpu不再执行这个进程。当你把它恢复时，内存空间恢复，容器接着被运行。
+
+停止的话 会直接将进程杀死，容器所占的内存回收，保留下来的仅剩容器的文件系统了，也就是那些静态的东西。因此，一旦停止，你是没办法恢复的，因为进程已经被杀死了，我们能做的，就是使用 `docker start` 重新生一个，此时它就会创建一个全新的进程。
+
+使用 `docker ps` 查看容器所有的容器及状态。
+
+使用 `docker logs` 查看容器运行日志。可以看见运行过程中产生的细节。
+
+如果不满足从表面观察容器，想要深入内部了解，可以使用 `docker exec` 进入容器执行命令。
+
+使用 `docker rm` 删除指定容器。它不仅仅是把进程干掉，内存回收，包括硬盘上的文件系统彻底删除。
 
 容器操作的命令如图：
 
