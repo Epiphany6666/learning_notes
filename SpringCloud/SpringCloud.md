@@ -1858,6 +1858,8 @@ Nacos一方面可以将配置集中管理，另一方可以在配置变更时，
 
 ---
 
+
+
 ## 在nacos中添加配置文件
 
 如何在nacos中管理配置呢？
@@ -2081,6 +2083,8 @@ public class UserController {
 **1）添加一个环境共享配置**
 
 我们在nacos中添加一个userservice.yaml文件：
+
+![image-20240322171106564](assets/image-20240322171106564.png)
 
 ![image-20210714173233650](.\assets\image-20210714173233650.png)
 
@@ -3956,53 +3960,6 @@ sudo systemctl restart docker
 
 ----
 
-# 2.CentOS7安装DockerCompose
-
-
-
-## 2.1.下载
-
-Linux下需要通过命令下载：
-
-```sh
-# 安装
-curl -L https://github.com/docker/compose/releases/download/1.23.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
-```
-
-如果下载速度较慢，或者下载失败，可以使用课前资料提供的docker-compose文件：
-
-![image-20210417133020614](assets/image-20210417133020614.png)
-
-上传到`/usr/local/bin/`目录也可以。
-
-
-
-## 2.2.修改文件权限
-
-修改文件权限：
-
-```sh
-# 修改权限
-chmod +x /usr/local/bin/docker-compose
-```
-
-
-
-
-
-## 2.3.Base自动补全命令：
-
-```sh
-# 补全命令
-curl -L https://raw.githubusercontent.com/docker/compose/1.29.1/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose
-```
-
-如果这里出现错误，需要修改自己的hosts文件：
-
-```sh
-echo "199.232.68.133 raw.githubusercontent.com" >> /etc/hosts
-```
-
 
 
 
@@ -4822,63 +4779,82 @@ mysq1:5.7.25
 
 # 56.镜像结构
 
+镜像是分层结构，每一层称之为一个Layer。
+
+- BaseImage层：包含基本的系统函数库、环境变量、文件系统
+
+- Entrypoint：入口，是镜像中应用启动的命令
+
+- 其他：在BaseImage基础上添加依赖、安装程序、完成整个应用的安装和配置。
+
+  这一步里面的具体操作我们就不能确定了，因为镜像在构建的时候它中间要做哪些动作，我们不知道，但是我们可以知道的是：每做一次操作一定会产生新的一层。
+
 镜像是将应用程序及其需要的系统函数库、环境、配置、依赖打包而成。这些只是镜像的组成，结构还需要看这些组成怎么样去组合。并且这些组成当然有相互的依赖关系或者顺序，如果没有最底层的系统函数库，底层的文件系统怎么完成环境的配置？如果没有环境变量，怎么去做依赖的安装？没有依赖的的安装怎么去完成应用的安装？没有应用的安装，那怎么样去做应用的配置呢？可见，镜像不仅仅是把这一堆东西揉在一起，并且还需要安装一定的顺序去分层构建。
 
 我们以MySQL为例，来看看镜像的组成结构，这个是模拟的mysql镜像，它不是很完整，但足以说明问题了。
 
-这里就分成了n层，它就是按照我们刚刚所分析的依赖顺序来去分层的。要想构建一个镜像，最底层一定是它所依赖的系统函数库，在这里就用了一个Ubuntu的操作系统，当让不是完整的系统，只是mysql依赖的部分系统函数库。
+这里就分成了n层，它就是按照我们刚刚所分析的依赖顺序来去分层的。要想构建一个镜像，最底层一定是它所依赖的系统函数库，在这里就用了一个Ubuntu的操作系统，当让不是完整的系统，只是mysql依赖的部分系统函数库和部分文件，它就像这栋大楼的地基一样，只有先将它搞定，我们才能继续向上，所以这一层我们一般称为：BaseImage（基础镜像层）。
+
+在此基础上我可以给MySQL这个应用配置环境变量，搞定环境变量后，我们还需要搞定它所依赖的其他东西。把这些都搞定了那我就可以开始安装MySQL了。我就把MySQL的安装包给它拷进来，然后在此基础上我就去rpm安装MySQL，安装完MySQL后，还需要配置MySQL的配置文件等等。等所有的安装步骤全部做完，这个楼就盖的差不多了，还差个入口（Entrypoint）。你把这一堆文件打了个包，将来别人需要启动里面的应用，你得给它一个入口，也就是启动的脚本。所以任何的镜像一定有这么一层。此时我们的镜像就构建完成了。
+
+那么我们在这个过程中从基础开始完成了环境变量的配置，依赖的安装，应用的安装等等，这每一次操作都会产生新的一层，这个东西称之为layer（层）。
+
+逐层构建的好处：方便升级，可以提高复用性，节省时间。
 
 ![image-20210731175806273](./assets/image-20210731175806273.png)
 
-
-
 简单来说，镜像就是在系统函数库、运行环境基础上，添加应用程序文件、配置文件、依赖文件等组合，然后编写好启动脚本打包在一起形成的文件。
-
-
 
 我们要构建镜像，其实就是实现上述打包的过程。
 
+---
 
+# 57.Dockerfile语法
 
-## 3.2.Dockerfile语法
+构建自定义的镜像时，并不需要一个个文件去拷贝，打包。我们只需要告诉Docker，我们的镜像的组成，需要哪些BaseImage、需要拷贝什么文件、需要安装什么依赖、启动脚本是什么，将来Docker会帮助我们构建镜像。
 
-构建自定义的镜像时，并不需要一个个文件去拷贝，打包。
+而描述上述信息的文件就是**Dockerfile**文件。Dockerfile就是一个文本文件，里面有很多指令(Instruction)，这些指令就是来描述你这个镜像内部是如何构建的，它可以当做是镜像构建的说明书，将来docker会按照里面的指令去构建好我们的镜像，每一个指令都会形成一层Layer。
 
-我们只需要告诉Docker，我们的镜像的组成，需要哪些BaseImage、需要拷贝什么文件、需要安装什么依赖、启动脚本是什么，将来Docker会帮助我们构建镜像。
+Dockerfile的第一行必须是FROM，从一个基础镜像来构建，这个基础镜像可以是从0开始的基础系统，这样来做的话就比较麻烦，还可以是别人做好的镜像，这样可以直接共享前面几层，只需要做后面的就行了。
 
+- FROM centos:6  	就是基于centos6来完成构建
 
+- ENV     环境变量一旦配置好后，大家都可以使用环境变量中配置好的东西
 
-而描述上述信息的文件就是Dockerfile文件。
+- COPY   本地有一个java的项目包，将来我们要拷到镜像里面去，就可以用COPY的命令了
 
+- RUN     运行，特指执行Linux的shell命令，一般是安装命令
 
+- EXPOSE   指暴露端口，但这个不是真正的暴露端口。之前我们在创建容器时要加 `-p` 参数，那个才是指定宿主机和容器的映射端口。这里只是指定容器内我监听的是什么端口，它是给镜像的使用者看的，假如使用的是 `EXPOSE 8080` ，那么 `-p` 参数冒号后面那一部分就必须写 8080 了。
 
-**Dockerfile**就是一个文本文件，其中包含一个个的**指令(Instruction)**，用指令来说明要执行什么操作来构建镜像。每一个指令都会形成一层Layer。
+  这个加 和 不加其实都可以，加了的话，镜像使用者一下就明白了。
 
-![image-20210731180321133](./assets/image-20210731180321133.png)
+- ENTRYPOINT    启动命令。镜像一定要有一个启动的脚本，一个java项目启动的命令就非常的简单：`java -jar xx.jar`
 
-
+| **指令**           | **说明**                                     | **示例**                    |
+| ------------------ | -------------------------------------------- | --------------------------- |
+| FROM               | 指定基础镜像                                 | FROM centos:6               |
+| ENV（environment） | 设置环境变量，可在后面指令使用               | ENV key value               |
+| COPY               | 拷贝本地文件到镜像的指定目录                 | COPY ./mysql-5.7.rpm /tmp   |
+| RUN                | 执行Linux的shell命令，一般是安装过程的命令   | RUN yum install gcc         |
+| EXPOSE             | 指定容器运行时监听的端口，是给镜像使用者看的 | EXPOSE 8080                 |
+| ENTRYPOINT         | 镜像中应用的启动命令，容器运行时调用         | ENTRYPOINT java -jar xx.jar |
 
 更新详细语法说明，请参考官网文档： https://docs.docker.com/engine/reference/builder
 
+---
 
 
 
-
-
-
-## 3.3.构建Java项目
-
-
-
-### 3.3.1.基于Ubuntu构建Java项目
+## 案例：基于Ubuntu构建Java项目
 
 需求：基于Ubuntu镜像构建一个新镜像，运行一个java项目
 
-- 步骤1：新建一个空文件夹docker-demo
+- 步骤1：新建一个空文件夹docker-demo，这个文件时用来放我们构建镜像所需要的各种材料的。
 
   ![image-20210801101207444](./assets/image-20210801101207444.png)
 
-- 步骤2：拷贝课前资料中的docker-demo.jar文件到docker-demo这个目录
+- 步骤2：拷贝课前资料中的docker-demo.jar（java项目）文件到docker-demo这个目录
 
   ![image-20210801101314816](./assets/image-20210801101314816.png)
 
@@ -4886,11 +4862,11 @@ mysq1:5.7.25
 
   ![image-20210801101410200](./assets/image-20210801101410200.png)
 
-- 步骤4：拷贝课前资料提供的Dockerfile到docker-demo这个目录
+- 步骤4：拷贝课前资料提供的Dockerfile（构建的说明书）到docker-demo这个目录
 
   ![image-20210801101455590](./assets/image-20210801101455590.png)
 
-  其中的内容如下：
+  其中的内容如下，所使用的基础镜像是干干净净的一个基础镜像，上面啥都没有，但是java项目运行必须基于jdk，所以在这个构建过程中它主要就是在安装JDK。
 
   ```dockerfile
   # 指定基础镜像
@@ -4899,13 +4875,13 @@ mysq1:5.7.25
   ENV JAVA_DIR=/usr/local
   
   # 拷贝jdk和java项目的包
-  COPY ./jdk8.tar.gz $JAVA_DIR/
-  COPY ./docker-demo.jar /tmp/app.jar
+  COPY ./jdk8.tar.gz $JAVA_DIR/ # 将jdk拷贝到 $JAVA_DIR 下
+  COPY ./docker-demo.jar /tmp/app.jar # 将java项目拷贝到 tmp 目录下，并重命名为app.jar
   
   # 安装JDK
-  RUN cd $JAVA_DIR \
-   && tar -xf ./jdk8.tar.gz \
-   && mv ./jdk1.8.0_144 ./java8
+  RUN cd $JAVA_DIR \ # 首先进入$JAVA_DIR目录
+   && tar -xf ./jdk8.tar.gz \ # 解压缩
+   && mv ./jdk1.8.0_144 ./java8 # 重命名
   
   # 配置环境变量
   ENV JAVA_HOME=$JAVA_DIR/java8
@@ -4917,43 +4893,54 @@ mysq1:5.7.25
   ENTRYPOINT java -jar /tmp/app.jar
   ```
 
+- 步骤5：运行命令。
+
+  `-t：tag`：镜像要有名称，名称由repository和tag组成，名称可以随便起，这里取名为：javaweb
   
-
-- 步骤5：进入docker-demo
-
-  将准备好的docker-demo上传到虚拟机任意目录，然后进入docker-demo目录下
-
-- 步骤6：运行命令：
-
-- > -t：tag
->
-  > .代表dockerFile所在的目录
-
+  `.` 代表dockerFile所在的目录，build（构建）的时候需要知道dockerFile在哪里
   ```sh
 docker build -t javaweb:1.0 .
   ```
 
-  
+  并且拷贝的指令是从当前目录去拷，拷到指定位置，所以一定要复制到当前目录
+
+![image-20240322153114747](assets/image-20240322153114747.png)
+
+查看镜像是否构建好
+
+~~~bash
+docker images
+~~~
+
+![image-20240322153152093](assets/image-20240322153152093.png)
+
+创建容器
+
+~~~bash
+docker run --name web -p 8090:8090 -d javaweb:1.0
+~~~
+
+
 
 最后访问 http://192.168.150.101:8090/hello/count，其中的ip改成你的虚拟机ip
 
-> 运行容器
-
-```sh
-docker run --name web -p 8090:8090 -d javaweb:1.0
-```
+![image-20240322153421291](assets/image-20240322153421291.png)
 
 
 
-### 3.3.2.基于java8构建Java项目
+---
 
-虽然我们可以基于Ubuntu基础镜像，添加任意自己需要的安装包，构建镜像，但是却比较麻烦。所以大多数情况下，我们都可以在一些安装了部分软件的基础镜像上做改造。
 
-例如，构建java项目的镜像，可以在已经准备了JDK的基础镜像基础上构建。
+
+## 基于java8构建Java项目
+
+虽然我们可以基于Ubuntu基础镜像，添加任意自己需要的安装包，构建镜像，但是却比较麻烦。所以大多数情况下，我们都可以在一些安装了部分软件的基础镜像上做改造。例如，构建java项目的镜像，可以在已经准备了JDK的基础镜像基础上构建。
 
 
 
 需求：基于java:8-alpine镜像，将一个Java项目构建为镜像
+
+> java:8-alpine是一个体积非常小的jdk的镜像，这个镜像已经帮我们把上面安装jdk的步骤做完了。
 
 实现思路如下：
 
@@ -4988,9 +4975,7 @@ docker run --name web -p 8090:8090 -d javaweb:1.0
 
 
 
-## 3.4.小结
-
-小结：
+## 小结
 
 1. Dockerfile的本质是一个文件，通过指令描述镜像的构建过程
 
@@ -5000,31 +4985,60 @@ docker run --name web -p 8090:8090 -d javaweb:1.0
 
 
 
-# 4.Docker-Compose
+---
 
-Docker Compose可以基于Compose文件帮我们快速的部署分布式应用，而无需手动一个个创建和运行容器！
+# 58.Docker-Compose
 
-![image-20210731180921742](./assets/image-20210731180921742.png)
+作用：帮我们快速部署分布式应用，无需一个个微服务去构建镜像和部署。
 
-## 4.1.初识DockerCompose
+在前面几章，我们已经实现了用Docker来部署像Redis、MySQL这样的中间件，还有利用Dockerfile实现微服务的自定义镜像构建、docker部署，但是所有的这些部署都是我们手动一个个去完成的，但是在实际生产环境中，微服务的数量非常多，这么多微服务我们都一个个去构建，肯定受不了，所以我们一定要有一种集群部署的手段，那么这就是我们这一章要学习的Docker Compose。
 
-Compose文件是一个文本文件，通过指令定义集群中的每个容器如何运行。格式如下：
+Docker Compose可以基于Compose文件帮我们快速的部署分布式应用，它就是一个分布式应用部署的一个帮手，无需手动一个个创建和运行容器！下面这只章鱼手上拿的是容器，它在帮我们部署容器。
 
-```json
+<img src="./assets/image-20210731180921742.png" alt="image-20210731180921742" style="zoom:50%;" />
+
+但是它来做集群部署，是要基于Compose文件才行的。
+
+Compose文件是一个文本文件，通过**指令**定义集群中的每个容器如何运行。以前我们是通过 `docker run` 命令来运行每个容器，而现在是通过Compose文件来定义集群中的n个容器如何运行，那么我们就可以认为Compose文件就是n个docker run命令的集合，但事实上确实是如此，只不过它不是直接用run，它把run当中的东西利用另外的一种语法，也就是指令来代替。
+
+以前的 `docker run` 指令。
+
+~~~bash
+docker run \
+--namemysql \
+-e MYSQL_ROOT_PASSWORD=my-secret-pw \ # 环境变量，MYSQL_ROOT的密码，这个环境变量可以让我们直接搞定密码
+-p 3306:3306 \
+-v /tmp/mysql/conf/hmy.cnf:/etc/mysql/conf.d/hmy.cnf- \ 
+-v /tmp/mysql/data:/var/lib/mysql \
+-d \
+mysq1:5.7.25
+~~~
+
+~~~bash
+docker build -t javaweb:1.0 .
+~~~
+
+Compose文本文件格式如下，整体是一个yml格式。这里没配端口的原因是，这里是微服务集群部署，MySQL仅仅是供给给集群内的服务用的，端口就不需要暴露了。这里也不需要 `/d` ，默认就是 `\d`。对比一下 `docker run` 命令：将所有参数都转变为了docker中的指令了。
+
+```yml
+# 语法的版本，Compose文件来讲当前有三个大的版本：1.x、2.x、3.x，这里我们选择3.8是它的最新版本，不同版本的语法还是有些差异的。
 version: "3.8"
+ # 往下就是具体的微服务定义了，这里有两个二级配置，即两个微服务配置
+ # 第一种部署的方式：基于镜像直接部署
  services:
-  mysql:
-    image: mysql:5.7.25
-    environment:
+  mysql: # 容器名
+    image: mysql:5.7.25 
+    environment: # 配置环境变量
      MYSQL_ROOT_PASSWORD: 123 
-    volumes:
+    volumes: # 数据卷配置
      - "/tmp/mysql/data:/var/lib/mysql"
      - "/tmp/mysql/conf/hmy.cnf:/etc/mysql/conf.d/hmy.cnf"
-  web:
+  # 第二种部署的方式：没有指定镜像，使用build（构建），build后面的小点就是指从当前目录来构建镜像，这种命令将docker build和docker run都包含进来了，这种就是临时构建镜像并且运行
+  web: # 指定容器的名称
     build: .
-    ports:
+    # 构建完就可以开始创建容器了
+    ports: # 端口
      - "8090:8090"
-
 ```
 
 上面的Compose文件就描述一个项目，其中包含两个容器：
@@ -5032,27 +5046,64 @@ version: "3.8"
 - mysql：一个基于`mysql:5.7.25`镜像构建的容器，并且挂载了两个目录
 - web：一个基于`docker build`临时构建的镜像容器，映射端口时8090
 
-
-
 DockerCompose的详细语法参考官网：https://docs.docker.com/compose/compose-file/
 
 
 
-其实DockerCompose文件可以看做是将多个docker run命令写到一个文件，只是语法稍有差异。
+---
 
 
 
-## 4.2.安装DockerCompose
+## CentOS7安装DockerCompose
 
-参考课前资料
+**1)下载**
+
+Linux下需要通过命令下载有两种方式：
+
+```sh
+# 在GitHub慢慢下，但是速度特别的慢，不建议大家这么做
+curl -L https://github.com/docker/compose/releases/download/1.23.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+```
+
+第二种方式：使用课前资料提供的docker-compose文件上传到`/usr/local/bin/`目录也可以。
+
+![image-20210417133020614](assets/image-20210417133020614.png)
 
 
 
-## 4.3.部署微服务集群
+**2）修改文件权限**
+
+修改文件权限：
+
+```sh
+# 修改权限
+chmod +x /usr/local/bin/docker-compose
+```
+
+
+
+**3）配置Base自动补全命令**
+
+一旦配了自动补全，将来我们再去用DockerCompose时它会有提示，比较方便
+
+```sh
+# 补全命令
+curl -L https://raw.githubusercontent.com/docker/compose/1.29.1/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose
+```
+
+如果这里出现错误，这是因为这个域名是无法访问的，没法解析，需要修改自己的hosts文件：
+
+```sh
+echo "199.232.68.133 raw.githubusercontent.com" >> /etc/hosts
+```
+
+
+
+---
+
+# 59.部署微服务集群
 
 **需求**：将之前学习的cloud-demo微服务集群利用DockerCompose部署
-
-
 
 **实现思路**：
 
@@ -5068,82 +5119,95 @@ DockerCompose的详细语法参考官网：https://docs.docker.com/compose/compo
 
 
 
-### 4.3.1.compose文件
+## 1）详细阅读课前资料提供的cloud-demo文件夹
 
 查看课前资料提供的cloud-demo文件夹，里面已经编写好了docker-compose文件，而且每个微服务都准备了一个独立的目录：
 
 ![image-20210731181341330](./assets/image-20210731181341330.png)
 
-内容如下：
-
-```yaml
-version: "3.2"
-
-services:
-  nacos:
-    image: nacos/nacos-server
-    environment:
-      MODE: standalone
-    ports:
-      - "8848:8848"
-  mysql:
-    image: mysql:5.7.25
-    environment:
-      MYSQL_ROOT_PASSWORD: 123
-    volumes:
-      - "$PWD/mysql/data:/var/lib/mysql"
-      - "$PWD/mysql/conf:/etc/mysql/conf.d/"
-  userservice:
-    build: ./user-service
-  orderservice:
-    build: ./order-service
-  gateway:
-    build: ./gateway
-    ports:
-      - "10010:10010"
-```
-
-可以看到，其中包含5个service服务：
-
-- `nacos`：作为注册中心和配置中心
-  - `image: nacos/nacos-server`： 基于nacos/nacos-server镜像构建
-  - `environment`：环境变量
-    - `MODE: standalone`：单点模式启动
-  - `ports`：端口映射，这里暴露了8848端口
-- `mysql`：数据库
-  - `image: mysql:5.7.25`：镜像版本是mysql:5.7.25
-  - `environment`：环境变量
-    - `MYSQL_ROOT_PASSWORD: 123`：设置数据库root账户的密码为123
-  - `volumes`：数据卷挂载，这里挂载了mysql的data、conf目录，其中有我提前准备好的数据
-- `userservice`、`orderservice`、`gateway`：都是基于Dockerfile临时构建的
-
-
-
-查看mysql目录，可以看到其中已经准备好了cloud_order、cloud_user表：
-
-![image-20210801095205034](./assets/image-20210801095205034.png)
-
 查看微服务目录，可以看到都包含Dockerfile文件：
 
 ![image-20210801095320586](./assets/image-20210801095320586.png)
 
-内容如下：
+首先：gateway里面只有一个Dockerfile，并且它里面的内容非常简单，其中有一步，我们需要拷贝jar包进去，但是现在我们目录里是没有的，所以将来我们应该把网关的jar包放到这个文件中。
 
-```dockerfile
+~~~dockerfile
 FROM java:8-alpine
 COPY ./app.jar /tmp/app.jar
 ENTRYPOINT java -jar /tmp/app.jar
-```
+~~~
+
+而user-service和order-service文件夹里同理。当我们将每个微服务的jar包都打好，然后扔进去，将来DockerCompose就会帮助我们自动的去构建这三个微服务的镜像了。
+
+而这三个微服务依赖于MySQL，所以在这我们准备了一个MySQL的包，里面存放着conf配置和data，data里面存放着数据库表，将来我们只需要让MySQL容器挂载到这两个上面去，那么数据也好，配置也好，也都有了。查看mysql目录，可以看到其中已经准备好了cloud_order、cloud_user表：
+
+![image-20210801095205034](./assets/image-20210801095205034.png)
+
+最后就是docker-compose.yml文件了，打开看一眼。可以看到，其中包含5个service服务：
+
+`nacos`：作为注册中心和配置中心
+
+- `image: nacos/nacos-server`： 基于nacos/nacos-server镜像构建
+- `environment`：环境变量
+  - `MODE: standalone`：单点模式启动
+- `ports`：端口映射，这里暴露了8848端口
+
+`mysql`：数据库
+
+- `image: mysql:5.7.25`：镜像版本是mysql:5.7.25
+- `environment`：环境变量
+  - `MYSQL_ROOT_PASSWORD: 123`：设置数据库root账户的密码为123
+- `volumes`：数据卷挂载，这里挂载了mysql的data、conf目录，其中有我提前准备好的数据
+
+`userservice`、`orderservice`、`gateway`：都是基于Dockerfile临时构建的
+
+~~~yml
+version: "3.2"
+
+services:
+  # 第一个是nacos服务，因为所有的服务都需要注册到nacos上面，所以nacos放在第一个
+  nacos:
+    image: nacos/nacos-server # nacos镜像是 nacos-server 
+    environment: # 环境变量名字叫 MODE，值为 standalone，这个就是我们以前单机运行的 -m 参数
+      MODE: standalone
+    ports: # 端口
+      - "8848:8848"
+  mysql: # mysql端口我们并没有对外暴露，这是因为mysql仅仅是对内进行访问的，所以不需要暴露
+    image: mysql:5.7.25 # 镜像名称
+    environment:
+      MYSQL_ROOT_PASSWORD: 123 # 密码
+    volumes: # 数据卷挂载，$PWD是执行PWD命令，去得到当前地址(即相对于compose当前，只要在这执行就一定会找到mysql、conf.d)
+      - "$PWD/mysql/data:/var/lib/mysql"
+      - "$PWD/mysql/conf:/etc/mysql/conf.d/"
+  userservice: # 微服务端口不应该暴露在外界，因为网关才是整个微服务的入口，它要再这里面去做一些身份认证、权限校验之类的，如果把这两暴露出去了，那任何人都能访问，那就很危险了
+    build: ./user-service
+  orderservice:
+    build: ./order-service
+  gateway:
+    build: ./gateway # 基于Dockerfile完成构建，这个Dockerfile目录在当前目录的gateway目录下
+    ports:
+      - "10010:10010"
+~~~
+
+将来DockerCompose一旦执行，它就会去启动Nacos、mysql，然后基于user-service、order-service和网关里面的Dockerfile完成镜像构建和自动的部署，这样我们就能实现一次性把整个集群都给部署好了，如果将来有更多的微服务就继续往下写，有几个就写几个，将来它都能帮助我们去完成部署。
+
+---
+
+## 2）修改微服务配置
+
+修改自己的cloud-demo项目，将数据库、nacos地址都命名为docker-compose中的服务名
+
+因为以前项目都是写localhost，都是在本地，但现在是集群部署了，微服务将来要部署为docker容器，而这些容器不一定是在同一个机器，而我们并不知道对方的地址，容器之间互联不是通过IP地址，而是通过容器名互相访问。这里我们将order-service、user-service、gateway服务的mysql、nacos地址都修改为基于容器名的访问。
+
+首先进入IDEA，从user-service开始，找到它的yml文件，包含bootstrap.yml 和 application.yml
+
+user-service / bootstrap.yml
+
+~~~yml
+
+~~~
 
 
-
-
-
-### 4.3.2.修改微服务配置
-
-因为微服务将来要部署为docker容器，而容器之间互联不是通过IP地址，而是通过容器名。这里我们将order-service、user-service、gateway服务的mysql、nacos地址都修改为基于容器名的访问。
-
-如下所示：
 
 ```yaml
 spring:
