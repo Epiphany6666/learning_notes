@@ -5211,6 +5211,10 @@ gateway：
 
 如果需要停止，可以使用 stop / down，down不仅会停掉，还会删掉。
 
+~~~bash
+docker-compose down
+~~~
+
 如果想要重启，可以使用 restart，如果需要查看日志，可以使用logs。这些命令跟单个docker运行命令都非常相似。
 
 然后运行下面的命令， `-d`参数代表后台运行：
@@ -5231,7 +5235,7 @@ docker-compose up -d
 docker-compose restart gateway userservice orderservice
 ~~~
 
-此时访问浏览器 `1.12.77.253:/user/2?authorization=admin`查询是否可以访问成功
+此时访问浏览器 `192.168.150.101:/user/2?authorization=admin`查询是否可以访问成功
 
 ---
 
@@ -5249,15 +5253,17 @@ docker-compose restart gateway userservice orderservice
 
 
 
-docker的镜像仓库是基于
+docker的镜像仓库是基于官方提供的 `DockerRegistry` 镜像来实现的，它的搭建有两种办法，第一种是简化版，虽然是简化版，但是它却具备了仓库管理的完整功能，只不过是缺少了图形化界面而已，所以它用起来不是很方便。
 
 官网地址：https://hub.docker.com/_/registry
 
-## 3.1.简化版镜像仓库
+
+
+## 1）简化版镜像仓库
 
 Docker官方的Docker Registry是一个基础版本的Docker镜像仓库，具备仓库管理的完整功能，但是没有图形化界面。
 
-搭建方式比较简单，命令如下：
+搭建方式比较简单，起了个名字，给了个端口，然后配了一下数据卷挂载，注意看端口是5000，说明DockerRegistry默认占用的是5000端口。命令如下：
 
 ```sh
 docker run -d \
@@ -5276,9 +5282,9 @@ docker run -d \
 
 
 
-## 3.2.带有图形化界面版本
+## 2）带有图形化界面版本
 
-使用DockerCompose部署带有图象界面的DockerRegistry，命令如下：
+图形化界面并不是docker官方提供的，它是由一个第三方的个人在官方registry的基础上去开发的，所以说它是额外的一个服务。因此这里是使用DockerCompose部署带有图象界面的DockerRegistry，将两者组合部署，命令如下：
 
 ```yaml
 version: '3.0'
@@ -5287,27 +5293,29 @@ services:
     image: registry
     volumes:
       - ./registry-data:/var/lib/registry
-  ui:
+  ui: # 图形化界面
     image: joxit/docker-registry-ui:static
     ports:
-      - 8080:80
+      - 8080:80 # 端口是8080
     environment:
-      - REGISTRY_TITLE=传智教育私有仓库
-      - REGISTRY_URL=http://registry:5000
-    depends_on:
+      - REGISTRY_TITLE=传智教育私有仓库 # 将来服务部署起来后的标题
+      - REGISTRY_URL=http://registry:5000 # 配置registry服务的地址，使用服务名互相访问，这个5000端口只是它们两者内部的访问端口，我们是无法使用的，因为它没有暴露，我们将来只能访问 8080
+    depends_on: # 依赖于registry，将来我们到DockerCompose部署的时候，就会先启动registry，再启动ui
       - registry
 ```
 
 
 
-## 3.3.配置Docker信任地址
+## 3）配置Docker信任地址
+
+在执行DockerCompose之前，需要先配置Docker的信任地址。
 
 我们的私服采用的是http协议，默认不被Docker信任，所以需要做一个配置：
 
 ```sh
-# 打开要修改的文件
+# 打开要修改的文件，这个文件里就是用来记录各种各样的信息的，其中以前的时候我们就配了阿里云的地址
 vi /etc/docker/daemon.json
-# 添加内容：
+# 添加内容，insecure-registries：不安全的注册中心，因为它采用的是http，不被信任，端口是8080，地址是自己的ip
 "insecure-registries":["http://192.168.150.101:8080"]
 # 重加载
 systemctl daemon-reload
@@ -5315,11 +5323,47 @@ systemctl daemon-reload
 systemctl restart docker
 ```
 
+配置之间注意一定要有一个逗号分隔！
+
+![image-20240322214735143](assets/image-20240322214735143.png)
+
+
+
+## 4）执行DockerCompose
+
+将上述DockerCompose命令拷一下，DockerCompose命令其实要放到DockerCompose文件，所以我们需要先新建一个DockerCompose文件，建议不要随便放，而是建一个文件夹，我这里在 `tmp` 目录下建一个文件夹叫registry-ui（代表是Docker镜像仓库的一个ui界面）。
+
+~~~bash
+mkdir registry-ui
+~~~
+
+进入到 `registry-ui` 文件夹中
+
+~~~bash
+cd registry-ui
+~~~
+
+新建一个 `docker-compose.yml` 文件
+
+~~~bash
+touch docker-compose.yml
+~~~
+
+然后使用高级文本编辑工具编辑
+
+![image-20240322215731064](assets/image-20240322215731064.png)
+
+执行docker-compose.yml文件，如果里面镜像没有下载过，是需要花不少时间去下载的。
+
+~~~bash
+docker-compose up -d
+~~~
 
 
 
 
-## 5.2.推送、拉取镜像
+
+## 5）推送、拉取镜像
 
 推送镜像到私有镜像服务必须先tag，步骤如下：
 
