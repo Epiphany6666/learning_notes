@@ -5,36 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab55b25e-57b3-4f59-8162-f087b4ede80e" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/../../SpringCloud.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../SpringCloud.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/target/classes/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/target/classes/cn/itcast/eureka/EurekaApplication.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/target/classes/cn/itcast/feign/clients/UserClient.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/target/classes/cn/itcast/feign/config/DefaultFeignConfiguration.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/feign-api/target/classes/cn/itcast/feign/pojo/User.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/gateway/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/gateway/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway/target/classes/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway/target/classes/cn/itcast/gateway/GatewayApplication.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/order-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/order-service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/target/classes/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/target/classes/cn/itcast/order/OrderApplication.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/target/classes/cn/itcast/order/mapper/OrderMapper.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/target/classes/cn/itcast/order/pojo/Order.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/target/classes/cn/itcast/order/service/OrderService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/order-service/target/classes/cn/itcast/order/web/OrderController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-server/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/user-server/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-server/src/main/resources/bootstrap.yml" beforeDir="false" afterPath="$PROJECT_DIR$/user-server/src/main/resources/bootstrap.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-server/target/classes/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/user-server/target/classes/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-server/target/classes/bootstrap.yml" beforeDir="false" afterPath="$PROJECT_DIR$/user-server/target/classes/bootstrap.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-server/target/classes/cn/itcast/user/UserApplication.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-server/target/classes/cn/itcast/user/config/PatternProperties.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-server/target/classes/cn/itcast/user/mapper/UserMapper.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-server/target/classes/cn/itcast/user/pojo/User.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-server/target/classes/cn/itcast/user/service/UserService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-server/target/classes/cn/itcast/user/web/UserController.class" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -256,7 +227,7 @@
       <workItem from="1710768031658" duration="2199000" />
       <workItem from="1710811980604" duration="4738000" />
       <workItem from="1710984605651" duration="600000" />
-      <workItem from="1711097984565" duration="2459000" />
+      <workItem from="1711097984565" duration="4128000" />
     </task>
     <servers />
   </component>

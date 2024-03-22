@@ -2912,7 +2912,7 @@ feign客户端：这个代码其实就是来用一些注解来声明远程调用
 
 目的：让消费者基于这些信息去发送http的请求
 
-观察可以发现，Feign的客户端与服务提供者的controller代码非常相似，这个一样是一个巧合，而是必须一样：
+观察可以发现，Feign的客户端与服务提供者的controller代码非常相似，这个一样并不是一个巧合，而是必须一样：
 
 ```java
 @FeignClient("userservice")
@@ -3958,82 +3958,6 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker
 ~~~
 
-----
-
-
-
-
-
-# 3.Docker镜像仓库
-
-搭建镜像仓库可以基于Docker官方提供的DockerRegistry来实现。
-
-官网地址：https://hub.docker.com/_/registry
-
-
-
-## 3.1.简化版镜像仓库
-
-Docker官方的Docker Registry是一个基础版本的Docker镜像仓库，具备仓库管理的完整功能，但是没有图形化界面。
-
-搭建方式比较简单，命令如下：
-
-```sh
-docker run -d \
-    --restart=always \
-    --name registry	\
-    -p 5000:5000 \
-    -v registry-data:/var/lib/registry \
-    registry
-```
-
-
-
-命令中挂载了一个数据卷registry-data到容器内的/var/lib/registry 目录，这是私有镜像库存放数据的目录。
-
-访问http://YourIp:5000/v2/_catalog 可以查看当前私有镜像服务中包含的镜像
-
-
-
-## 3.2.带有图形化界面版本
-
-使用DockerCompose部署带有图象界面的DockerRegistry，命令如下：
-
-```yaml
-version: '3.0'
-services:
-  registry:
-    image: registry
-    volumes:
-      - ./registry-data:/var/lib/registry
-  ui:
-    image: joxit/docker-registry-ui:static
-    ports:
-      - 8080:80
-    environment:
-      - REGISTRY_TITLE=传智教育私有仓库
-      - REGISTRY_URL=http://registry:5000
-    depends_on:
-      - registry
-```
-
-
-
-## 3.3.配置Docker信任地址
-
-我们的私服采用的是http协议，默认不被Docker信任，所以需要做一个配置：
-
-```sh
-# 打开要修改的文件
-vi /etc/docker/daemon.json
-# 添加内容：
-"insecure-registries":["http://192.168.150.101:8080"]
-# 重加载
-systemctl daemon-reload
-# 重启docker
-systemctl restart docker
-```
-
 
 
 ---
@@ -4971,6 +4895,12 @@ docker run --name web -p 8090:8090 -d javaweb:1.0
 
 - ④ 使用docker build命令构建镜像
 
+  ```sh
+docker build -t javaweb:1.0 .
+  ```
+
+
+
 - ⑤ 使用docker run创建容器并运行
 
 
@@ -5195,7 +5125,7 @@ services:
 
 ## 2）修改微服务配置
 
-修改自己的cloud-demo项目，将数据库、nacos地址都命名为docker-compose中的服务名
+修改自己的cloud-demo项目，将数据库、nacos地址都命名为docker-compose中的服务名，并且数据库的密码记得跟上面的一样
 
 因为以前项目都是写localhost，都是在本地，但现在是集群部署了，微服务将来要部署为docker容器，而这些容器不一定是在同一个机器，而我们并不知道对方的地址，容器之间互联不是通过IP地址，而是通过容器名互相访问。这里我们将order-service、user-service、gateway服务的mysql、nacos地址都修改为基于容器名的访问。
 
@@ -5204,34 +5134,29 @@ services:
 user-service / bootstrap.yml
 
 ~~~yml
-
+erver-addr: nacos:8848 # Nacos地址
 ~~~
 
+user-service / application.yml
 
+~~~yml
+url: jdbc:mysql://mysql:3306/cloud_user?useSSL=false
+~~~
 
-```yaml
-spring:
-  datasource:
-    url: jdbc:mysql://mysql:3306/cloud_order?useSSL=false
-    username: root
-    password: 123
-    driver-class-name: com.mysql.jdbc.Driver
-  application:
-    name: orderservice
-  cloud:
-    nacos:
-      server-addr: nacos:8848 # nacos服务地址
-```
+order-service / application.yml 中也是将mysql 和 nacos地址修改为服务名
+
+网关中只需要修改nacos地址即可。
 
 
 
-### 4.3.3.打包
+## 3）打包
 
-接下来需要将我们的每个微服务都打包。因为之前查看到Dockerfile中的jar包名称都是app.jar，因此我们的每个微服务都需要用这个名称。
+接下来需要将我们的每个微服务都打包成 `app.jar`。这因为之前查看到Dockerfile中的jar包名称都是app.jar，因此我们的每个微服务都需要用这个名称。
 
 可以通过修改pom.xml中的打包名称来实现，每个微服务都需要修改：
 
 ```xml
+<!-- 这个build就是在做项目打包 -->
 <build>
   <!-- 服务打包的最终名称 -->
   <finalName>app</finalName>
@@ -5244,11 +5169,15 @@ spring:
 </build>
 ```
 
-打包后：
+都叫app并不会冲突，因为它们各自都有各自的target文件夹。
 
-![image-20210801095951030](./assets/image-20210801095951030.png)
+打包时候先clean一下，然后再打包。打包后：
 
-### 4.3.4.拷贝jar包到部署目录
+<img src="./assets/image-20210801095951030.png" alt="image-20210801095951030" style="zoom:50%;" />
+
+
+
+## 4）拷贝jar包到部署目录
 
 编译打包好的app.jar文件，需要放到Dockerfile的同级目录中。注意：每个微服务的app.jar放到与服务名称对应的目录，别搞错了。
 
@@ -5264,7 +5193,9 @@ gateway：
 
 ![image-20210801100308102](./assets/image-20210801100308102.png)
 
-### 4.3.5.部署
+
+
+## 5）部署
 
 最后，我们需要将文件整个cloud-demo文件夹上传到虚拟机中，理由DockerCompose部署。
 
@@ -5274,25 +5205,117 @@ gateway：
 
 部署：
 
-进入cloud-demo目录，然后运行下面的命令：
+进入cloud-demo目录，查看帮助文档可以看见，up的意思是创建并运行容器
+
+![image-20240322175948013](assets/image-20240322175948013.png)
+
+如果需要停止，可以使用 stop / down，down不仅会停掉，还会删掉。
+
+如果想要重启，可以使用 restart，如果需要查看日志，可以使用logs。这些命令跟单个docker运行命令都非常相似。
+
+然后运行下面的命令， `-d`参数代表后台运行：
 
 ```sh
 docker-compose up -d
 ```
 
+使用 `docker ps` 查看创建的多个容器
+
+使用 `docker-compose logs -f` 查看日志，可以看见我们的服务跑起来了，此时会报 `nacos连接失败` 错误，这是因为通过查看日志可以发现，显示userservice启动，然后才是nacos启动，nacos启动的太慢了，到下面才成功。userservice、orderservice启动的过程中都会去尝试注册，但此时nacos还没启动成功，于是就失败了，这是SpringCloudAlibaba写的代码上的一个问题，代码有Bug，并且当它失败的时候它也不重试。
+
+![image-20240322211533079](assets/image-20240322211533079.png)
+
+所以在生产部署的时候，Nacos最好先部署，然后再去部署微服务，其他微服务可以一键部署。这里我们就简单一点，直接把所有的微服务给它重启一下，包括getway、userservice、orderservice
+
+~~~bash
+docker-compose restart gateway userservice orderservice
+~~~
+
+此时访问浏览器 `1.12.77.253:/user/2?authorization=admin`查询是否可以访问成功
+
+---
+
+# 60.Docker镜像仓库
+
+在前面几节课中我们解除了各种各样的镜像，有一些是别人制作好的，如：redis、mysql，还有一些是我们基于微服务去构建的镜像，这些镜像一定有一个统一的地方去做保存和管理，管理镜像的地方就称之为镜像仓库。
+
+搭建镜像仓库可以基于Docker官方提供的DockerRegistry来实现，但这个是一个公共的镜像仓库，这一章中，会带大家去了解一下私有镜像仓库怎么搭建，和怎么样在私有镜像仓库中完成镜像的管理。
+
+镜像仓库（ 镜像仓库本来叫：Docker Registry ，即注册中心，就是将我们的镜像注册到服务上去，但是我觉得翻译成镜像仓库更顺口一些）有公共的和私有的两种形式：
+
+- 公共仓库：例如Docker官方的 [Docker Hub](https://hub.docker.com/)，国内也有一些云服务商提供类似于 Docker Hub 的公开服务，比如 [网易云镜像服务](https://c.163.com/hub)、[DaoCloud](https://hub.daocloud.io/)[ ](https://hub.daocloud.io/)[镜像服务](https://hub.daocloud.io/)、[阿里云镜像服务](https://cr.console.aliyun.com/)等。
+
+- 除了使用公开仓库外，用户还可以在本地搭建私有 Docker Registry。企业自己的镜像最好是采用私有Docker Registry来实现。
 
 
 
+docker的镜像仓库是基于
+
+官网地址：https://hub.docker.com/_/registry
+
+## 3.1.简化版镜像仓库
+
+Docker官方的Docker Registry是一个基础版本的Docker镜像仓库，具备仓库管理的完整功能，但是没有图形化界面。
+
+搭建方式比较简单，命令如下：
+
+```sh
+docker run -d \
+    --restart=always \
+    --name registry	\
+    -p 5000:5000 \
+    -v registry-data:/var/lib/registry \
+    registry
+```
 
 
 
-# 5.Docker镜像仓库 
+命令中挂载了一个数据卷registry-data到容器内的/var/lib/registry 目录，这是私有镜像库存放数据的目录。
+
+访问http://YourIp:5000/v2/_catalog 可以查看当前私有镜像服务中包含的镜像
 
 
 
-## 5.1.搭建私有镜像仓库
+## 3.2.带有图形化界面版本
 
-参考课前资料《CentOS7安装Docker.md》
+使用DockerCompose部署带有图象界面的DockerRegistry，命令如下：
+
+```yaml
+version: '3.0'
+services:
+  registry:
+    image: registry
+    volumes:
+      - ./registry-data:/var/lib/registry
+  ui:
+    image: joxit/docker-registry-ui:static
+    ports:
+      - 8080:80
+    environment:
+      - REGISTRY_TITLE=传智教育私有仓库
+      - REGISTRY_URL=http://registry:5000
+    depends_on:
+      - registry
+```
+
+
+
+## 3.3.配置Docker信任地址
+
+我们的私服采用的是http协议，默认不被Docker信任，所以需要做一个配置：
+
+```sh
+# 打开要修改的文件
+vi /etc/docker/daemon.json
+# 添加内容：
+"insecure-registries":["http://192.168.150.101:8080"]
+# 重加载
+systemctl daemon-reload
+# 重启docker
+systemctl restart docker
+```
+
+
 
 
 
