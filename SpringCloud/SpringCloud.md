@@ -6686,11 +6686,19 @@ public void testSendFanoutExchange() {
 
 # 74.DirectExchange
 
-在Fanout模式中，一条消息，会被所有订阅的队列都消费。但是，在某些场景下，我们希望不同的消息被不同的队列消费。这时就要用到Direct类型的Exchange。
+在上节课已经学习了发布订阅的第一个交换机：FanoutExchange，这个交换机会把消息发给跟它绑定的所有队列。
+
+这节课我们继续学习第二个交换机：DirectExchange，这个交换机 会将规则路由到指定的queue，这种方式被官方称之为：路由模式（routes）。
+
+在Direct模型下，每一个queue都会与exchange设置一个 `bindingKey`，这个bindingKey就像约定的暗号一样，咱两只要约定好，将来就按照这个暗号去进行通信。因此这个暗号是可以随便指定的，这里queue1指定的是blue，queue2指定的是yellow。因此这两个队列就各自有自己的 `bindingKey` 了。
+
+将来publisher在发布消息时，也要指定一个key，这个key叫 `routingKey`。比如说此时publisher发布了一条消息，制定了一个key叫：blue，那么这个时候交换机就会根据 `routingKey` 和 `bindingKey` 进行一个比对了。只有队列的`Routingkey`与消息的 `Routing key`完全一致，才会接收到消息。
+
+既然queue能够绑定key，那我们也能绑定相同的key。我们第一个队列在跟交换机绑定的时候可以指定多个key，比如说我又绑定blue、又绑定red，queue2我也绑定yellow 和 red，此次它俩就具备了相同的bindingKey了，那这个时候如果publisher发送了一条消息，并且这条消息恰好是red，它就二话不说，直接给两边都发过去了，这个时候的效果跟fanoutExchange的效果是一样的，即广播，所以可以认为DirectExchange可以模拟FanoutExchange，它比FanoutExchange更加灵活一些，这种灵活性它是有代价的，你在指定队列和交换机绑定的时候，必须要指定key，而发消息的时候也需要指定key，所以这个千万别忘了，也不要把key搞错了，否则将来就乱套了。
 
 ![image-20210717170041447](.\assets\image-20210717170041447.png)
 
- 在Direct模型下：
+总结来讲：
 
 - 队列与交换机的绑定，不能是任意绑定了，而是要指定一个`RoutingKey`（路由key）
 - 消息的发送方在 向 Exchange发送消息时，也必须指定消息的 `RoutingKey`。
@@ -6698,11 +6706,13 @@ public void testSendFanoutExchange() {
 
 
 
-
+## 案例：利用SpringAMQP演示DirectExchange的使用
 
 **案例需求如下**：
 
-1. 利用@RabbitListener声明Exchange、Queue、RoutingKey
+1. 利用@RabbitListener声明Exchange（交换机），它的名字叫 `itcast.direct`、声明两个Queue（队列），分别叫 `direct.queue1` 和 `direct.queue2`、，它们两个在绑定的时候所用的 `bindingKey` 就是我们刚刚讲到的，上面是 blue 、red，下面是yellow、red，这样它们有相同的key又有不同的key，就能演示出不同效果来了。
+
+   但这里有一点不同，我们在声明交换机和队列的时候不会再像之前那样用Bean去声明了，因为用Bean去声明其实它有些复杂，想一下看，声明俩度低劣，再声明一个交换机，再声明两个绑定关系，绑定的时候我还需要指定key。这里面至少需要五个以上的Bean去声明，让人声明这个绑定key还会更复杂，所以在这个地方，用Bean方式声明还是太麻烦了，所以这里会讲一种新的方式：基于 `@RabbitListener` 注解来去声明。在之前我们写的所有的消费者当中，都有这个注解，也就是说在这个注解上还可以同时完成队列、交换机的声明，这个时候就不需要额外的再去创建Bean了，所以等一会绑定的方式会有变化，而剩下的消息发送和接收的代码就跟你以前一样没什么变化。
 
 2. 在consumer服务中，编写两个消费者方法，分别监听direct.queue1和direct.queue2
 
@@ -6712,9 +6722,7 @@ public void testSendFanoutExchange() {
 
 
 
-
-
-### 3.5.1.基于注解声明队列和交换机
+**1）基于注解声明队列和交换机**
 
 基于@Bean的方式声明队列和交换机比较麻烦，Spring还提供了基于注解方式来声明。
 
