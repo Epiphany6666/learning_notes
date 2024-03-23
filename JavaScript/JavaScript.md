@@ -4,7 +4,7 @@ console.log()输出，变量中间用逗号隔开，得到的效果是空格，�
 console.log(leave, year, month, day);
 ~~~
 
-![image-20240107111532039](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107111532039.png)
+![image-20240107111532039](.\assets\image-20240107111532039.png)
 
 
 
@@ -50,11 +50,11 @@ shift+回车，直接跳过后面的字符直接新开一行
 
    使用VSCode自带的格式化工具：
 
-   ![image-20231227215105612](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231227215105612.png)
+   ![image-20231227215105612](.\assets\image-20231227215105612.png)
 
 6. 设置代码缩进字符为2个字符（即一个tab两个键）：
 
-   ![image-20231227215251338](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231227215251338.png)
+   ![image-20231227215251338](.\assets\image-20231227215251338.png)
 
 7. 左右分屏：Live Server
 
@@ -111,7 +111,7 @@ JavaScript的组成
 - 数据交互 (获取后台的数据, 渲染到前端)
 - 服务端编程 (node.js）
 
-![image-20231228113258001](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228113258001.png)
+![image-20231228113258001](.\assets\image-20231228113258001.png)
 
 
 
@@ -442,25 +442,25 @@ JavaScript 代码执行顺序：
 
 3.更新变量： 变量赋值后，还可以通过简单地给它一个不同的值来更新它。
 
-![image-20231228140713192](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228140713192.png)
+![image-20231228140713192](.\assets\image-20231228140713192.png)
 
 4.声明多个变量： 变量赋值后，还可以通过简单地给它一个不同的值来更新它。
 
 语法：多个变量中间用逗号隔开。
 
-![image-20231228140807883](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228140807883.png)
+![image-20231228140807883](.\assets\image-20231228140807883.png)
 
 说明：看上去代码长度更短，但并不推荐这样。为了更好的可读性，请一行只声明一个变量。
 
-![image-20231228140834893](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228140834893.png)
+![image-20231228140834893](.\assets\image-20231228140834893.png)
 
 打印时连续打印两个，中间用逗号隔开，控制台显示的是中间使用了空格隔开
 
-![image-20231228141131703](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228141131703.png)
+![image-20231228141131703](.\assets\image-20231228141131703.png)
 
 如果出错了，可以使用检查检测到，还会告诉你是第几行
 
-![image-20231228141703076](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228141703076.png)
+![image-20231228141703076](.\assets\image-20231228141703076.png)
 
 # 10.变量的本质
 
@@ -468,7 +468,7 @@ JavaScript 代码执行顺序：
 
 变量本质：是程序在内存中申请的一块用来存放数据的小空间
 
-![image-20231228172826507](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228172826507.png)
+![image-20231228172826507](.\assets\image-20231228172826507.png)
 
 
 
@@ -573,7 +573,7 @@ const PI = 3.14
 
 计算机程序可以处理大量的数据，为了方便数据的管理，将数据分成了不同的类型：
 
-![image-20231228190802275](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228190802275.png)
+![image-20231228190802275](.\assets\image-20231228190802275.png)
 
 数值类型
 
@@ -650,11 +650,11 @@ console.log('pink老师' + 2)   // pink老师2
 
 NaN（not a number) 代表一个计算错误。它是一个不正确的或者一个未定义的数学操作所得到的结果
 
-![image-20231228191712137](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228191712137.png)
+![image-20231228191712137](.\assets\image-20231228191712137.png)
 
 NaN 是粘性的。任何对 NaN 的操作都会返回NaN
 
-![image-20231228191807756](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228191807756.png)
+![image-20231228191807756](.\assets\image-20231228191807756.png)
 
 ```js
 alert(NaN == NaN) //返回false，它自己也不等于自己，一些未知的结果都统称NaN
@@ -688,7 +688,7 @@ alert(NaN == NaN) //返回false，它自己也不等于自己，一些未知的�
 
 > 在谷歌浏览器中可以看见，数字的颜色是蓝色的，而字符串的是黑色的
 >
-> ![image-20231228192616104](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228192616104.png)
+> ![image-20231228192616104](.\assets\image-20231228192616104.png)
 
 ```html
 <!DOCTYPE html>
@@ -728,7 +728,7 @@ ES6新加的
 - 拼接字符串和变量
 - 在没有它之前，要拼接变量比较麻烦
 
-![image-20231228194429021](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228194429021.png)
+![image-20231228194429021](.\assets\image-20231228194429021.png)
 
 语法
 
@@ -736,7 +736,7 @@ ES6新加的
 - 在英文输入模式下按键盘的tab键上方那个键（1左边那个键）
 - 内容拼接变量时，用 ${ } 包住变量
 
-![image-20231228194519550](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228194519550.png)
+![image-20231228194519550](.\assets\image-20231228194519550.png)
 
 
 
@@ -794,7 +794,7 @@ ES6新加的
 
 JavaScript 中的 null 仅仅是一个代表“无”、“空”或“值未知”的特殊值
 
-![image-20231228195718714](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228195718714.png)
+![image-20231228195718714](.\assets\image-20231228195718714.png)
 
 null 和 undefined 区别：
 
@@ -972,7 +972,7 @@ console.log(parseFloat('abc12px')) //NFloat
 
 VSCode里可以直接看见数据类型
 
-![image-20231228203832129](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228203832129.png)
+![image-20231228203832129](.\assets\image-20231228203832129.png)
 
 # 19.综合案例
 
@@ -1059,7 +1059,7 @@ console.log(num)
 
 众多的 JavaScript 的运算符可以根据所需表达式的个数，分为一元运算符、二元运算符、三元运算符
 
-![image-20231228214334473](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228214334473.png)
+![image-20231228214334473](.\assets\image-20231228214334473.png)
 
 | 符号 | 作用 | 说明                       |
 | ---- | ---- | -------------------------- |
@@ -1154,7 +1154,7 @@ console.log(num)
 
   > JS中小数运算一般会先转为整数
   >
-  > ![image-20231228220111615](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228220111615.png)
+  > ![image-20231228220111615](.\assets\image-20231228220111615.png)
 
 > 不同类型之间比较会发生隐式转换
 >
@@ -1207,7 +1207,7 @@ console.log(num)
 
 ### 运算符优先级
 
-![image-20231229080731921](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231229080731921.png)
+![image-20231229080731921](.\assets\image-20231229080731921.png)
 
 > 逻辑运算符优先级： ！> && >  ||  
 
@@ -1324,7 +1324,7 @@ VSCode小技巧：
 
 点击一个单词，相同单词的都会被框起来，没框起来的就是错的
 
-![image-20231229082900184](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231229082900184.png)
+![image-20231229082900184](.\assets\image-20231229082900184.png)
 
 # 26.if 多分支语句
 
@@ -1458,15 +1458,15 @@ switch：开关
 
 代码是从上往下指定的，打完断点后一定要刷新浏览器
 
-![image-20231229085932284](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231229085932284.png)
+![image-20231229085932284](.\assets\image-20231229085932284.png)
 
 可以观察到变量里的数值
 
-![image-20231229090204088](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231229090204088.png)
+![image-20231229090204088](.\assets\image-20231229090204088.png)
 
 在监视里可以添加想要观察的变量
 
-![image-20231229090324906](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231229090324906.png)
+![image-20231229090324906](.\assets\image-20231229090324906.png)
 
 
 
@@ -1905,7 +1905,7 @@ for (let i = 1; i <= 9; i++) {
 
 中文一定要加引号，因为js里面变量名字是中文它也支持
 
-![image-20231228185446226](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231228185446226.png)
+![image-20231228185446226](.\assets\image-20231228185446226.png)
 
 注意小错误：
 
@@ -1994,11 +1994,11 @@ console.log(arr); //[1, 5]
 
 第一次打开浏览器页面的时候会出现对象的形式
 
-![image-20231229112427371](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231229112427371.png)
+![image-20231229112427371](.\assets\image-20231229112427371.png)
 
 再刷新一下就是数组了
 
-![image-20231229112524573](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231229112524573.png)
+![image-20231229112524573](.\assets\image-20231229112524573.png)
 
 # 46.数组操作 - 删除
 
@@ -2135,7 +2135,7 @@ JavaScript 基础 - 第4天笔记
 
 > 注：函数名的命名规则与变量是一致的，小驼峰命名法，前缀已改为动词。并且尽量保证函数名的语义。
 >
-> ![image-20231229143929274](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231229143929274.png)
+> ![image-20231229143929274](.\assets\image-20231229143929274.png)
 
 小案例： 小星星
 
@@ -2378,7 +2378,7 @@ function getArrSum(arr = []) {
 
 以下结果为20
 
-![image-20231229165537869](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231229165537869.png)
+![image-20231229165537869](.\assets\image-20231229165537869.png)
 
 
 
@@ -2450,7 +2450,7 @@ fn()//这个变量名就相当于函数名，只是把这个函数赋给了这�
 
 1. 短路：只存在于 && 和 || 中，当满足一定条件会让右边代码不执
 
-   ![image-20231229175756573](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231229175756573.png)
+   ![image-20231229175756573](.\assets\image-20231229175756573.png)
 
 2. 原因：通过左边能得到整个式子的结果，因此没必要再判断右边
 
@@ -2538,7 +2538,7 @@ JavaScript 基础 - 第5天
 >
 > 方法：功能或叫行为（动词）。
 >
-> ![image-20231229195937556](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231229195937556.png)
+> ![image-20231229195937556](.\assets\image-20231229195937556.png)
 
 ### 属性和访问
 
@@ -2785,7 +2785,7 @@ for of语法中的 value（值）
 
 > 通过这种方式来遍历数组，可以看见k打印出来的是字符串类型的下标（在谷歌浏览器中呈黑色），所以在操作时很容易出问题，所以很少用这种方式来遍历数组
 >
-> ![image-20231229212707677](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231229212707677.png)
+> ![image-20231229212707677](.\assets\image-20231229212707677.png)
 >
 > ```js
 > let arr = ['pink', 'red', 'blue']
@@ -2998,7 +2998,7 @@ function getRandomColor(flag = true) {
 
 关键字、保留字
 
-![image-20231230164325650](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231230164325650.png)
+![image-20231230164325650](.\assets\image-20231230164325650.png)
 
 简单类型又叫做基本数据类型或者值类型，复杂类型又叫做引用类型。
 
@@ -3083,7 +3083,7 @@ Web APIs - 第1天笔记
 
 这两种情况可以把 let 改为 const，基本数据类型就不行，引用类型就可以（因为地址没变，只是堆里面的发生了变化
 
-![image-20231230171152802](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231230171152802.png)
+![image-20231230171152802](.\assets\image-20231230171152802.png)
 
 ## 介绍
 
@@ -3107,7 +3107,7 @@ ECMAScript 运行在浏览器中然后再结合 Web APIs 才是真正的 JavaScr
 
 分类：DOM (文档对象模型)、BOM（浏览器对象模型）
 
-![image-20231230173447906](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231230173447906.png)
+![image-20231230173447906](.\assets\image-20231230173447906.png)
 
 **什么是DOM?**
 
@@ -3222,7 +3222,7 @@ document（这是DOM里面最大的对象）
    >
    > 1. 语法：
    >
-   >    ![image-20231230195950455](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231230195950455.png)
+   >    ![image-20231230195950455](.\assets\image-20231230195950455.png)
    >
    > 2. 参数：包含一个或多个有效的CSS选择器 **字符串**(所以一定要加引号)
    >
@@ -3287,7 +3287,7 @@ document（这是DOM里面最大的对象）
 
    > 语法：
    >
-   > ![image-20231230200232624](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231230200232624.png)
+   > ![image-20231230200232624](.\assets\image-20231230200232624.png)
    >
    > 参数:
    >
@@ -3370,7 +3370,7 @@ document（这是DOM里面最大的对象）
 
 # 83.常用属性修改
 
-> 语法：![image-20231230212030792](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231230212030792.png)
+> 语法：![image-20231230212030792](.\assets\image-20231230212030792.png)
 >
 > 有这个属性就是改，没有这个属性，就是增
 
@@ -3395,7 +3395,7 @@ document（这是DOM里面最大的对象）
 
 此时它会把之前的样式覆盖掉，因为它使用的是行内样式！行内样式的权重高于样式表
 
-![image-20231231111057970](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231231111057970.png)
+![image-20231231111057970](.\assets\image-20231231111057970.png)
 
 > 修改值一定是**字符串**！
 
@@ -3445,7 +3445,7 @@ document（这是DOM里面最大的对象）
 
 语法：
 
-![image-20231230220015215](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231230220015215.png)
+![image-20231230220015215](.\assets\image-20231230220015215.png)
 
 > PS:
 >
@@ -3813,7 +3813,7 @@ let n = setInterval(function () {
 >
 > 所有的事件类型全部小写，没有大写字母
 
-![image-20231231141315999](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231231141315999.png)
+![image-20231231141315999](.\assets\image-20231231141315999.png)
 
 - 事件监听三要素：
   1. 事件源： 哪个dom元素被事件触发了，要获取dom元素                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
@@ -3930,7 +3930,7 @@ mouseleave：鼠标离开
 
 事件类型
 
-![image-20231231164555246](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231231164555246.png)
+![image-20231231164555246](.\assets\image-20231231164555246.png)
 
 `click` 译成中文是【点击】的意思，它的含义是监听（等着）用户鼠标的单击操作，除了【单击】还有【双击】`dblclick`
 
@@ -4237,7 +4237,7 @@ input
 
    现在不提倡使用KeyCode
 
-   ![image-20231231210241770](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20231231210241770.png)
+   ![image-20231231210241770](.\assets\image-20231231210241770.png)
 
 注：在事件回调函数内部通过 window.event 同样可以获取事件对象。
 
@@ -4574,7 +4574,7 @@ Web APIs - 第3天
 
 代码（需要在后面加上 是否使用捕获机制）：
 
-![image-20240106070608413](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240106070608413.png)
+![image-20240106070608413](.\assets\image-20240106070608413.png)
 
 ~~~html
 <!DOCTYPE html>
@@ -4721,7 +4721,7 @@ Web APIs - 第3天
 
 语法：（这句话既能阻止冒泡，也能阻止捕获，但我们平时也不使用捕获）
 
-![image-20240106073442548](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240106073442548.png)
+![image-20240106073442548](.\assets\image-20240106073442548.png)
 
 ```js
 const fa = document.querySelector('.father')
@@ -4747,7 +4747,7 @@ son.addEventListener('click', function (e) {
 
 我们某些情况下需要阻止默认行为的发生，比如 阻止 链接的跳转，表单域跳
 
-![image-20240106073953227](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240106073953227.png)
+![image-20240106073953227](.\assets\image-20240106073953227.png)
 
 ~~~html
 <body>
@@ -4780,7 +4780,7 @@ son.addEventListener('click', function (e) {
 
    语法：
 
-   <img src="O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240106074055498.png" alt="image-20240106074055498" style="zoom:50%;" />
+   <img src=".\assets\image-20240106074055498.png" alt="image-20240106074055498" style="zoom:50%;" />
 
 2. addEventListener方式，必须使用：
 
@@ -4788,7 +4788,7 @@ son.addEventListener('click', function (e) {
 
    > 查看mdn网站，第三个参数是可以省略的：
    >
-   > ![image-20240106074853731](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240106074853731.png)
+   > ![image-20240106074853731](.\assets\image-20240106074853731.png)
 
    注意：匿名函数无法被解绑
 
@@ -4822,7 +4822,7 @@ son.addEventListener('click', function (e) {
 
 孩子没有鼠标经过事件，但它会进行冒泡，father有鼠标经过事件，所以又会触发一次。
 
-<img src="O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240106075634529.png" alt="image-20240106075634529" style="zoom: 33%;" />
+<img src=".\assets\image-20240106075634529.png" alt="image-20240106075634529" style="zoom: 33%;" />
 
 ~~~html
 <!DOCTYPE html>
@@ -4869,7 +4869,7 @@ son.addEventListener('click', function (e) {
 
 但如果使用mouseenter、mouseleave，则鼠标滑到孩子身上的时候，mouseleave也不会触发
 
-<img src="O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240106080319747.png" alt="image-20240106080319747" style="zoom: 33%;" />
+<img src=".\assets\image-20240106080319747.png" alt="image-20240106080319747" style="zoom: 33%;" />
 
 
 
@@ -4904,7 +4904,7 @@ ul.addEventListener('click' , function(){}) 执行父级点击事件
 
 > 鼠标移到li上去，就可以检测出是第几个小li
 >
-> <img src="O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240106094055409.png" alt="image-20240106094055409" style="zoom:50%;" />
+> <img src=".\assets\image-20240106094055409.png" alt="image-20240106094055409" style="zoom:50%;" />
 
 大量的事件监听是比较耗费性能的，如下代码所示
 
@@ -5122,7 +5122,7 @@ scrollLeft和scrollTop （属性）
 
 - 获取被卷去的大小
 
-  ![image-20240106111622743](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240106111622743.png)
+  ![image-20240106111622743](.\assets\image-20240106111622743.png)
 
 - 获取元素内容往左、往上滚出去看不到的距离
 
@@ -5289,7 +5289,7 @@ window.addEventListener('resize', function() {
 
   如下图，不包含边框以外的部分
 
-  ![image-20240106125658928](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240106125658928.png)
+  ![image-20240106125658928](.\assets\image-20240106125658928.png)
 
 看flexible.js源码：
 
@@ -5455,7 +5455,7 @@ element.getBoundingClientRect()
 
 ### 总结
 
-![image-20240106170140341](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240106170140341.png)
+![image-20240106170140341](.\assets\image-20240106170140341.png)
 
 # 115.综合案例-电梯导航案例上集
 
@@ -5542,11 +5542,11 @@ element.getBoundingClientRect()
 
 查看mdn：
 
-![image-20240106193333472](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240106193333472.png)
+![image-20240106193333472](.\assets\image-20240106193333472.png)
 
 在底下这里可以进行模拟，默认属性值是auto，即直接跳转
 
-![image-20240106193449832](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240106193449832.png)
+![image-20240106193449832](.\assets\image-20240106193449832.png)
 
 ~~~css
 /* 页面滑动 */
@@ -5940,7 +5940,7 @@ DOM 树中的任意节点都不是孤立存在的，它们要么是父子关系�
 - parentNode 属性
 - 返回**最近一级**的父节点 找不到返回为null
 
-![image-20240107125712586](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107125712586.png)
+![image-20240107125712586](.\assets\image-20240107125712586.png)
 
 ```html
 <script>
@@ -6038,7 +6038,7 @@ DOM 树中的任意节点都不是孤立存在的，它们要么是父子关系�
      父元素.appendChild(要插入的元素)
      ~~~
 
-     ![image-20240107134515897](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107134515897.png)
+     ![image-20240107134515897](.\assets\image-20240107134515897.png)
 
    - 插入到父元素中某个子元素的前面
 
@@ -6088,7 +6088,7 @@ DOM 树中的任意节点都不是孤立存在的，它们要么是父子关系�
 
 需求：按照数据渲染页面
 
-![image-20240107143352899](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107143352899.png)
+![image-20240107143352899](.\assets\image-20240107143352899.png)
 
 分析： 
 
@@ -6145,11 +6145,11 @@ for (let i = 0; i < data.length; i++) {
 
 这里注意属性和属性之间一定要加空格
 
-![image-20240107150212517](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107150212517.png)
+![image-20240107150212517](.\assets\image-20240107150212517.png)
 
 否则就变成拼接了
 
-![image-20240107150308400](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107150308400.png)
+![image-20240107150308400](.\assets\image-20240107150308400.png)
 
 # 122.克隆结点和删除结点
 
@@ -6227,7 +6227,7 @@ cloneNode会克隆出一个跟原标签一样的元素，括号内传入布尔�
 
 - 常见的触屏事件如下：
 
-  ![image-20240107153310117](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107153310117.png)
+  ![image-20240107153310117](.\assets\image-20240107153310117.png)
 
 ~~~html
 <script>
@@ -6257,7 +6257,7 @@ cloneNode会克隆出一个跟原标签一样的元素，括号内传入布尔�
 
 - 熟悉官网,了解这个插件可以完成什么需求 https://www.swiper.com.cn/
 
-  ![image-20240107155407379](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107155407379.png)
+  ![image-20240107155407379](.\assets\image-20240107155407379.png)
 
 - 看在线演示,找到符合自己需求的demo，如果没有，那就二次开发(在别人的基础上修改) https://www.swiper.com.cn/demo/index.html
 
@@ -6269,34 +6269,34 @@ cloneNode会克隆出一个跟原标签一样的元素，括号内传入布尔�
 
 里面有很多炫酷模板
 
-![image-20240107155633371](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107155633371.png)
+![image-20240107155633371](.\assets\image-20240107155633371.png)
 
 ## swiper使用
 
 1. 下载
 
-   ![image-20240107161050334](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107161050334.png)
+   ![image-20240107161050334](.\assets\image-20240107161050334.png)
 
 2. 找到这两个文件
 
-   ![image-20240107161813238](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107161813238.png)
+   ![image-20240107161813238](.\assets\image-20240107161813238.png)
 
 3. 找到自己想要的素材，并记住序号，
 
-   ![image-20240107161640041](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107161640041.png)
+   ![image-20240107161640041](.\assets\image-20240107161640041.png)
 
 4. 如果没有网，就在demo文件夹里就能找到这个
 
-   ![image-20240107161724854](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107161724854.png)
+   ![image-20240107161724854](.\assets\image-20240107161724854.png)
 
 
    如果有网，直接点击右上角的 ’ 在新窗口打开 ‘ 
 
-   ![image-20240107162050464](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107162050464.png)
+   ![image-20240107162050464](.\assets\image-20240107162050464.png)
 
 5. 右击，点击查看网页源代码
 
-   ![image-20240107162140381](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107162140381.png)
+   ![image-20240107162140381](.\assets\image-20240107162140381.png)
 
 6. 定义轮播图盒子的大小
 
@@ -6326,23 +6326,23 @@ cloneNode会克隆出一个跟原标签一样的元素，括号内传入布尔�
 
 9. 在API文档中，可以选择需要的组件
 
-   ![image-20240107164224359](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107164224359.png)
+   ![image-20240107164224359](.\assets\image-20240107164224359.png)
 
-   ![image-20240107164204341](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107164204341.png)
+   ![image-20240107164204341](.\assets\image-20240107164204341.png)
 
 10. 自动播放
 
-    ![image-20240107164920041](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107164920041.png)
+    ![image-20240107164920041](.\assets\image-20240107164920041.png)
 
     触摸之后是否暂停
 
-    ![image-20240107164526603](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107164526603.png)
+    ![image-20240107164526603](.\assets\image-20240107164526603.png)
 
 11. 使用键盘控制Swiper切换
 
     使用它开启键盘切换，使用键盘的左右键就可以进行切换了
 
-    ![image-20240107165149660](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107165149660.png)
+    ![image-20240107165149660](.\assets\image-20240107165149660.png)
 
 > 如果原项目是通过less来写的，则复制的css可以直接放到本地，注意js的引入顺序，现有swiper的js才能使用下面手写的js         
 >
@@ -6371,7 +6371,7 @@ cloneNode会克隆出一个跟原标签一样的元素，括号内传入布尔�
 
 ②： 点击删除可以删除当前的数据
 
-![image-20240107173837388](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107173837388.png)
+![image-20240107173837388](.\assets\image-20240107173837388.png)
 
 **说明**：
 
@@ -6389,7 +6389,7 @@ cloneNode会克隆出一个跟原标签一样的元素，括号内传入布尔�
 
 2. 创建新的对象，里面存储 表单获取过来的数据，格式如图
 
-   <img src="O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107184246015.png" alt="image-20240107184246015" style="zoom:50%;" />
+   <img src=".\assets\image-20240107184246015.png" alt="image-20240107184246015" style="zoom:50%;" />
 
 3. 追加给数组
 
@@ -6403,7 +6403,7 @@ cloneNode会克隆出一个跟原标签一样的元素，括号内传入布尔�
 
 鼠标放在items上面，可以看见这个集合已经获取过来了
 
-![image-20240107201134101](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107201134101.png)
+![image-20240107201134101](.\assets\image-20240107201134101.png)
 
 ~~~html
 <table>
@@ -6629,7 +6629,7 @@ clearTimeout(timeId)
 
 > 以下两题的结果都是132
 >
-> ![image-20240107204815228](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107204815228.png)
+> ![image-20240107204815228](.\assets\image-20240107204815228.png)
 
 JavaScript 语言的一大特点就是单线程，也就是说，同一个时间只能做一件事。
 
@@ -6665,7 +6665,7 @@ JS 的异步是通过**回调函数**实现的。
 
 异步任务相关添加到**任务队列**中（任务队列也称为消息队列）。
 
-<img src="O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107205728889.png" alt="image-20240107205728889" style="zoom:50%;" />
+<img src=".\assets\image-20240107205728889.png" alt="image-20240107205728889" style="zoom:50%;" />
 
 1. 先执行执行栈中的同步任务。
 
@@ -6675,7 +6675,7 @@ JS 的异步是通过**回调函数**实现的。
 
 4. 时间循环：执行代码和收集异步任务的模型，在调用栈空闲，反复调用任务队列里回调函数的执行机制
 
-   ![image-20240107205827337](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107205827337.png)
+   ![image-20240107205827337](.\assets\image-20240107205827337.png)
 
 > js是没有办法处理单线程的，但浏览器可以处理多线程
 >
@@ -6687,7 +6687,7 @@ JS 的异步是通过**回调函数**实现的。
 >
 > 执行栈里执行完就会出栈
 
-![image-20240107205932874](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107205932874.png)
+![image-20240107205932874](.\assets\image-20240107205932874.png)
 
 由于主线程不断的重复获得任务、执行任务、再获取任务、再执行，所以这种机制被称为事件循环（ event loop） 。
 
@@ -6701,7 +6701,7 @@ location (地址) 的数据类型是**对象**，它拆分并保存了 URL 地�
 >
 >    后期vue路由的铺垫，经常用于不刷新页面，显示不同页面，比如 网易云音
 >
->    ![image-20240107214402152](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240107214402152.png)
+>    ![image-20240107214402152](.\assets\image-20240107214402152.png)
 >
 > 3. 强制刷新：不从本地取数据，而是从在线重新拉下来这些数据。
 
@@ -6898,11 +6898,11 @@ localStorage.removeItem(key)
 
 可以拽着Application把它拽到前面来
 
-![image-20240108113417286](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240108113417286.png)
+![image-20240108113417286](.\assets\image-20240108113417286.png)
 
 点击浏览器右上角的键，可以全部删除
 
-![image-20240108114246105](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240108114246105.png)
+![image-20240108114246105](.\assets\image-20240108114246105.png)
 
 ~~~html
 <script>
@@ -7005,7 +7005,7 @@ JSON字符串：
 
 技巧：直接将案例数据复制到需要添加的地方，然后再1对里面的值根据自己的需要进行修改
 
-![image-20240108164036492](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240108164036492.png)
+![image-20240108164036492](.\assets\image-20240108164036492.png)
 
 ~~~html
 <script>
@@ -7225,7 +7225,7 @@ map 可以遍历数组处理数据，并且返回**新的数组**，并不会改
 
    - reg就是正则表达式的意思
 
-     ![image-20240108174951188](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240108174951188.png)
+     ![image-20240108174951188](.\assets\image-20240108174951188.png)
 
 2. 使用正则
 
@@ -7247,7 +7247,7 @@ map 可以遍历数组处理数据，并且返回**新的数组**，并不会改
      regObj.exec(被检测字符串)
      ~~~
    
-     ![image-20240108175612248](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240108175612248.png)
+     ![image-20240108175612248](.\assets\image-20240108175612248.png)
    
      如果匹配成功，exec() 方法返回一个数组，否则返回null
 
@@ -7425,7 +7425,7 @@ console.log(/^[a-zA-Z0-9]$/.test('P'))  // true
 
   {4,}重复的一定是离它最近的那个
 
-  ![image-20240108204823983](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240108204823983.png)
+  ![image-20240108204823983](.\assets\image-20240108204823983.png)
 
 [ ] 里面加上 ^ 取反符号
 
@@ -7589,7 +7589,7 @@ console.log(re)  // 前端是一门编程语言， 学完前端工资很高
 
 右键可以修改HTML
 
-![image-20240109105252290](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240109105252290.png)
+![image-20240109105252290](.\assets\image-20240109105252290.png)
 
 ~~~js
 // 2. 验证的是用户名
@@ -7713,7 +7713,7 @@ function verifyConfirm() {
 
 按上下箭头可以查看上一次的语句
 
-![image-20240109114345027](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240109114345027.png)
+![image-20240109114345027](.\assets\image-20240109114345027.png)
 
 ~~~js
 // 7. 我同意
@@ -8211,7 +8211,7 @@ JavaScript 中的作用域是程序被执行时的底层机制，了解这一机
 - 在函数被执行时，会优先查找当前函数作用域中查找变量
 - 如果当前作用域查找不到则会依次逐级查找父级作用域直到全局作用域
 
-![image-20240112145227613](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240112145227613.png)
+![image-20240112145227613](.\assets\image-20240112145227613.png)
 
 总结：
 
@@ -8324,7 +8324,7 @@ fn()
 
 标记所有的引用
 
-![image-20240112151344521](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240112151344521.png)
+![image-20240112151344521](.\assets\image-20240112151344521.png)
 
 ~~~js
 function fn() {
@@ -8384,7 +8384,7 @@ function outer() {
 
 > 旁边的（outer）表示的是它是用outer函数包起来的，但其实闭包是由fn函数和a变量构成的
 
-![image-20240112153613648](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240112153613648.png)
+![image-20240112153613648](.\assets\image-20240112153613648.png)
 
 
 
@@ -8779,7 +8779,7 @@ obj.sayHi()
 
 在开发中【使用箭头函数前需要考虑函数中 this 的值】，事件回调函数使用箭头函数时，this 为全局的 window，因此 **DOM事件回调函数为了简便，还是不太推荐使用箭头函数**
 
-![image-20240112173927821](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240112173927821.png)
+![image-20240112173927821](.\assets\image-20240112173927821.png)
 
 # 159.解构赋值
 
@@ -9510,7 +9510,7 @@ console.log(arr.reduce((prev, cur) => prev + cur.salary, 0))
 
 旁边是可以切换语言的
 
-![image-20240113145902066](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240113145902066.png)
+![image-20240113145902066](.\assets\image-20240113145902066.png)
 
 查看方式：
 
@@ -9573,7 +9573,7 @@ console.log(flag)
 
 const spec = { size: '40cm*40cm' , color: '黑色'} 请将里面的值写到div标签里面，展示内容如下：
 
-![image-20240113152957374](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240113152957374.png)
+![image-20240113152957374](.\assets\image-20240113152957374.png)
 
 ~~~js
 const spec = { size: '40cm*40cm', color: '黑色' }
@@ -9902,7 +9902,7 @@ console.log(ldh.sing === zxy.sing) //false，说明俩函数不一样
 
 前面我们学过的构造函数方法很好用，但是 存在`浪费内存`的问题
 
-![image-20240114154637727](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240114154637727.png)
+![image-20240114154637727](.\assets\image-20240114154637727.png)
 
 # 179.原型对象prototype
 
@@ -10079,7 +10079,7 @@ Star.prototype = {
 
 但是 为啥实例对象可以访问原型对象里面的属性和方法呢？
 
-![image-20240114163450068](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240114163450068.png)
+![image-20240114163450068](.\assets\image-20240114163450068.png)
 
 ### 对象原型
 
@@ -10109,7 +10109,7 @@ console.log(ldh.__proto__.constructor === Star) //true
 - 用来表明当前实例对象指向哪个原型对象prototype
 - `__proto__`对象原型里面也有一个 constructor属性，指向创建该实例对象的构造函数
 
-![image-20240114164506027](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240114164506027.png)
+![image-20240114164506027](.\assets\image-20240114164506027.png)
 
 1. prototype是什么？哪里来的？
    - 原型（原型对象）
@@ -10157,7 +10157,7 @@ console.dir(Woman.prototype);
 
 男人和女人都同时使用了同一个对象，根据引用类型的特点，他们指向同一个对象，修改一个就会都影响
 
-![image-20240114172553842](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240114172553842.png)
+![image-20240114172553842](.\assets\image-20240114172553842.png)
 
 解决：
 
@@ -10245,7 +10245,7 @@ const ldh = new Person()
 
 > 这也是MDN里面`map`方法写的是`Array.prototype.map()的`原因
 >
-> ![image-20240114175203216](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240114175203216.png)
+> ![image-20240114175203216](.\assets\image-20240114175203216.png)
 
 ③ 如果还没有就查找原型对象的原型（Object的原型对象）
 
@@ -10275,7 +10275,7 @@ console.log(Array instanceof Object) // true，万物皆对象
 
 需求：
 
-![image-20240114180425375](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240114180425375.png)
+![image-20240114180425375](.\assets\image-20240114180425375.png)
 
 弹出来的框也被称为模态框，是Model英译过来的，因为提示框有关闭按钮、确定按钮供用户来进行操作
 
@@ -10544,7 +10544,7 @@ Lodash 是一个一致性、模块化、高性能的 JavaScript 实用工具库�
 
 > Lodash有个典型特点：所有的函数前面都加上`_.` 后面写函数名就行了（因为这样不会存在命名冲突的问题）。传的参数就是拷贝值，返回来的参数就是拷贝完的对象
 
-![image-20240114212636534](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240114212636534.png)
+![image-20240114212636534](.\assets\image-20240114212636534.png)
 
 ~~~html
 <body>
@@ -10707,7 +10707,7 @@ obj.sayHi()
 >
 > 写法：在当前作用域或者整个js前面写上：'use strict'，下面所有的代码都要按照严格模式来写了
 >
-> ![image-20240114215116763](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240114215116763.png)
+> ![image-20240114215116763](.\assets\image-20240114215116763.png)
 
 ### 箭头函数this指向
 
@@ -10970,7 +10970,7 @@ box.addEventListener('mousemove', mouseMove) // 移动1px就会调用一次函�
 
 1. lodash提供的防抖来处理
 
-   ![image-20240114224223111](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240114224223111.png)
+   ![image-20240114224223111](.\assets\image-20240114224223111.png)
 
    - wait：默认时间，底层就是靠定时器实现的
 
@@ -11048,7 +11048,7 @@ box.addEventListener('mousemove', debounce(mouseMove, 500))
 
 1. lodash提供的节流函数来处理
 
-   ![image-20240114230307829](O:\BaiduSyncdisk\other\StudyNote\JavaScript\assets\image-20240114230307829.png)
+   ![image-20240114230307829](.\assets\image-20240114230307829.png)
 
    ~~~js
    const box = document.querySelector('.box')
