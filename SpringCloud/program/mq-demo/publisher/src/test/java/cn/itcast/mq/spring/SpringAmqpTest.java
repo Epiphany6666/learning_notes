@@ -44,4 +44,24 @@ public class SpringAmqpTest {
         // 参数1：交换机名称；参数2：routingkey，这个我们还没学过，先不管，先给个空；参数3：指定消息
         rabbitTemplate.convertAndSend(exchangeName, "", message);
     }
+
+    @Test
+    public void testSendDirectExchange() {
+        // 交换机名称
+        String exchangeName = "itcast.direct";
+        // 消息
+        String message = "hello，red！";
+        // 参数1：交换机名称；参数2：routingkey，这个我们还没学过，先不管，先给个空；参数3：指定消息
+        rabbitTemplate.convertAndSend(exchangeName, "yellow", message);
+    }
+
+    @Test
+    public void testSendDirectExchange2() {
+        // 交换机名称
+        String exchangeName = "itcast.direct";
+        // 消息
+        String message = "红色警报！日本乱排核废水，导致海洋生物变异，惊现哥斯拉！";
+        // 发送消息
+        rabbitTemplate.convertAndSend(exchangeName, "red", message);
+    }
 }

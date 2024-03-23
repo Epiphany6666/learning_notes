@@ -6722,19 +6722,38 @@ public void testSendFanoutExchange() {
 
 
 
-**1）基于注解声明队列和交换机**
+**1）基于注解声明队列和交换机、消息接收**
 
 基于@Bean的方式声明队列和交换机比较麻烦，Spring还提供了基于注解方式来声明。
 
-在consumer的SpringRabbitListener中添加两个消费者，同时基于注解来声明队列和交换机：
+以前是声明一个叫Banding的类，现在不用了，有个属性就叫bandings，它的类型是 `QueueBinding[]`，这是一个注解类型 `@QueueBinding`。 即：队列绑定。快捷键 `ctrl + p` 查看注释所具有的属性。
+
+<img src="assets/image-20240323225615185.png" alt="image-20240323225615185" style="zoom:50%;" />
+
+bindings里面就可以声明Queue、exchange、key（这个key就是bindingKey）了，这几个都是注解类型。
+
+<img src="assets/image-20240323225757448.png" alt="image-20240323225757448" style="zoom:50%;" />
+
+这个key是字符串数组，所以有多个key直接写字符串数组即可。
+
+<img src="assets/image-20240323230027912.png" alt="image-20240323230027912" style="zoom:50%;" />
+
+交换机默认类型是 `direct`，如果一定要指定也可以，加上type属性即可，这个值可以直接写 `direct`，也可以根据枚举来写：`ExchangeTypes.DIRECT`
+
+<img src="assets/image-20240323230405221.png" alt="image-20240323230405221" style="zoom:50%;" />
+
+虽然代码很复杂，但是在写的时候每一步都是有提示的。
+
+在consumer的SpringRabbitListener中添加两个消费者，同时基于注解来声明队列和交换机。
 
 ```java
+// 以前这里只需要加一个队列，但现在需要声明：1.队列 2.交换机 3.绑定的key
 @RabbitListener(bindings = @QueueBinding(
     value = @Queue(name = "direct.queue1"),
     exchange = @Exchange(name = "itcast.direct", type = ExchangeTypes.DIRECT),
     key = {"red", "blue"}
 ))
-public void listenDirectQueue1(String msg){
+public void listenDirectQueue1(String msg) {
     System.out.println("消费者接收到direct.queue1的消息：【" + msg + "】");
 }
 
@@ -6743,16 +6762,68 @@ public void listenDirectQueue1(String msg){
     exchange = @Exchange(name = "itcast.direct", type = ExchangeTypes.DIRECT),
     key = {"red", "yellow"}
 ))
-public void listenDirectQueue2(String msg){
+public void listenDirectQueue2(String msg) {
     System.out.println("消费者接收到direct.queue2的消息：【" + msg + "】");
 }
 ```
 
+写完后直接启动ConsumerApplication，在它重启的过程中我们就可以去浏览器看一下，查看它有没有正确的去声明。
+
+在Exchanges界面可以看见多出了一个 `itcast.direct` 的交换机。
+
+<img src="assets/image-20240323231233735.png" alt="image-20240323231233735" style="zoom:50%;" />
+
+队列里也多了两个队列。
+
+<img src="assets/image-20240323231309171.png" alt="image-20240323231309171" style="zoom: 33%;" />
+
+然后进入 `itcast.direct` 看一眼，此时可以看见queue1绑定了两个key，queue2也绑定了两个key，跟预期完全一致。
+
+<img src="assets/image-20240323231737841.png" alt="image-20240323231737841" style="zoom:50%;" />
 
 
-### 3.5.2.消息发送
+
+
+
+**2）消息发送**
 
 在publisher服务的SpringAmqpTest类中添加测试方法：
+
+一、绑定key给blue人收到
+
+```java
+@Test
+public void testSendDirectExchange() {
+    // 交换机名称
+    String exchangeName = "itcast.direct";
+    // 消息
+    String message = "hello，blue！";
+    // 参数1：交换机名称；参数2：routingkey；参数3：指定消息
+    rabbitTemplate.convertAndSend(exchangeName, "blue", message);
+}
+```
+
+执行测试方法后，赶紧去看一下consumer，查看控制台，可以发现queue1收到了消息
+
+当我们将`RoutingKey`换成`yellow`
+
+```java
+@Test
+public void testSendDirectExchange() {
+    // 交换机名称
+    String exchangeName = "itcast.direct";
+    // 消息
+    String message = "hello，red！";
+    // 参数1：交换机名称；参数2：routingkey，这个我们还没学过，先不管，先给个空；参数3：指定消息
+    rabbitTemplate.convertAndSend(exchangeName, "yellow", message);
+}
+```
+
+执行测试方法，可以发现队列2收到了
+
+<img src="assets/image-20240323232348089.png" alt="image-20240323232348089" style="zoom:50%;" />
+
+下面再发一个 `red` ，此时应该它俩都收到了。
 
 ```java
 @Test
@@ -6766,16 +6837,24 @@ public void testSendDirectExchange() {
 }
 ```
 
+执行测试方法，可以发现队列1和队列2都收到了。
+
+<img src="assets/image-20240323232451755.png" alt="image-20240323232451755" style="zoom:50%;" />
 
 
 
-
-### 3.5.3.总结
+## 总结
 
 描述下Direct交换机与Fanout交换机的差异？
 
 - Fanout交换机将消息路由给每一个与之绑定的队列
+
+- Fanout交换机采用的是基于Bean的方式声明队列、交换机、绑定。
+
+  而Direct交换机绑定的方式采用的是注解的方式，使用的是 `@RabbitListener` 注解的bingdings的属性。
+
 - Direct交换机根据RoutingKey判断路由给哪个队列
+
 - 如果多个队列具有相同的RoutingKey，则与Fanout功能类似
 
 基于@RabbitListener注解声明队列和交换机有哪些常见注解？
@@ -6783,11 +6862,13 @@ public void testSendDirectExchange() {
 - @Queue
 - @Exchange
 
+将来写代码的时候只需要安装它的提示写就行了，或者直接CV大法改也行。
 
 
 
+---
 
-## 15.3.6.Topic
+# 75.TopicExchange
 
 
 
