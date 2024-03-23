@@ -6119,6 +6119,8 @@ System.out.println("等待接收消息。。。。");
 
 ----
 
+# ------------------------------------------
+
 # 68.SpringAMQP基本介绍
 
 在刚刚我们利用RabbitMQ官方的API实现了它的 `hello world` （简单队列模型），我们发现官方提供的API写起来非常的麻烦，甚至于都懒得写，直接基于写好的代码进行断点跟踪。因此接下来我们需要学习一种新的东西：SpringAMQP，它可以大大的简化消息发送和推送的API。
@@ -6158,8 +6160,6 @@ SpringAmqp的官方地址：https://spring.io/projects/spring-amqp
 
 
 ---
-
-# ------------------------------------------
 
 # 案例：利用SpringAMQP实现HelloWorld中的基础消息队列功能
 
@@ -6325,59 +6325,94 @@ public class SpringRabbitListener {
 
 Work queues，也被称为（Task queues），任务模型。简单来说就是**让多个消费者绑定到一个队列，共同消费队列中的消息**。
 
+作用：提高消息的速度，避免消息的堆积。
+
+我们知道，在RabbitMQ里，消息是阅后即焚，消息一旦给了消费者1，它看完了，消息就会立即被删除，消费者2并不会拿到消息，那如果我有50条消息，想想看，它不可能是每个消费者50条，而是他两各自处理一部分消息，加在一起是50条消息，所以它俩就具备了合作关系，共同处理。
+
 ![image-20210717164238910](.\assets\image-20210717164238910.png)
 
-当消息处理比较耗时的时候，可能生产消息的速度会远远大于消息的消费速度。长此以往，消息就会堆积越来越多，无法及时处理。
+当消息处理比较耗时的时候，可能生产消息的速度会远远大于消息的消费速度。长此以往，消息就会堆积越来越多，无法及时处理。并且队列在内存中是有一个存储上线的，当队列消息堆满时，当再有消息进来，就已经进不去了，如果进不去，消息就会丢弃，此时就出问题。此时就可以使用work 模型，多个消费者共同处理消息处理，速度就能大大提高了。
 
-此时就可以使用work 模型，多个消费者共同处理消息处理，速度就能大大提高了。
+Work模型的使用：
+
+- 多个消费者绑定到一个队列，同一条消息只会被一个消费者处理
+- 通过设置prefetch来控制消费者预取的消息数量
 
 
 
-### 3.2.1.消息发送
+## 案例：模拟WorkQueue，实现一个队列绑定多个消费者
+
+基本思路如下：
+
+1. 在publisher服务中定义测试方法，每秒产生50条消息，发送到simple.queue
+
+2. 在consumer服务中定义两个消息监听者，都监听simple.queue队列
+
+3. 消费者1每秒处理50条消息，消费者2每秒处理10条消息，加在一起每秒钟就能处理60条消息，已经超出了我们这个发送频率了。
+
+   理论上将，我们应该能够在一秒内把这50条消息处理完。
+
+
+
+**1）消息发送**
 
 这次我们循环发送，模拟大量消息堆积现象。
 
 在publisher服务中的SpringAmqpTest类中添加一个测试方法：
 
 ```java
+package cn.itcast.mq.spring;
+
 /**
-     * workQueue
-     * 向队列中不停发送消息，模拟消息堆积。
-     */
-@Test
-public void testWorkQueue() throws InterruptedException {
-    // 队列名称
-    String queueName = "simple.queue";
-    // 消息
-    String message = "hello, message_";
-    for (int i = 0; i < 50; i++) {
-        // 发送消息
-        rabbitTemplate.convertAndSend(queueName, message + i);
-        Thread.sleep(20);
+ * workQueue
+ * 向队列中不停发送消息，模拟消息堆积。
+*/
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SpringAmqpTest {
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    
+    @Test
+    public void testSendMessage2WorkQueue() throws InterruptedException {
+        // 队列名称
+        String queueName = "simple.queue";
+        // 消息
+        String message = "hello, message__";
+        for (int i = 0; i < 50; i++) {
+            // 发送消息
+            rabbitTemplate.convertAndSend(queueName, message + i);
+            // 让消息不要发的那么快，休眠一下，让这50条在一秒钟内发完
+            Thread.sleep(20);
+        }
     }
 }
+
 ```
 
 
 
 
 
-### 3.2.2.消息接收
+**2）消息接收**
 
-要模拟多个消费者绑定同一个队列，我们在consumer服务的SpringRabbitListener中添加2个新的方法：
+先将之前的SimpleQueue代码给注释掉。然后要模拟多个消费者绑定同一个队列，我们在consumer服务的SpringRabbitListener中添加2个新的方法：
 
 ```java
 @RabbitListener(queues = "simple.queue")
-public void listenWorkQueue1(String msg) throws InterruptedException {
-    System.out.println("消费者1接收到消息：【" + msg + "】" + LocalTime.now());
-    Thread.sleep(20);
-}
+    public void listenWorkQueueMessage1(String msg) throws InterruptedException {
+        System.out.println("消费者1接收到消息：【" + msg + "】" + LocalTime.now());
+        // 为了演示它每秒处理的速度，也让它休眠一下，让它一秒钟能处理50条消息
+        Thread.sleep(20);
+    }
 
-@RabbitListener(queues = "simple.queue")
-public void listenWorkQueue2(String msg) throws InterruptedException {
-    System.err.println("消费者2........接收到消息：【" + msg + "】" + LocalTime.now());
-    Thread.sleep(200);
-}
+    @RabbitListener(queues = "simple.queue")
+    public void listenWorkQueueMessage2(String msg) throws InterruptedException {
+        // 为了让它们看的更清晰，让他们两个消息打印的时候有点差别
+        System.err.println("消费者2............接收到消息：【" + msg + "】" + LocalTime.now());
+        // 让它休眠一下，让它一秒钟能处理5条消息
+        Thread.sleep(200);
+    }
 ```
 
 注意到这个消费者sleep了1000秒，模拟任务耗时。
@@ -6386,25 +6421,27 @@ public void listenWorkQueue2(String msg) throws InterruptedException {
 
 
 
-### 3.2.3.测试
+**3）测试**
 
 启动ConsumerApplication后，在执行publisher服务中刚刚编写的发送测试方法testWorkQueue。
 
-可以看到消费者1很快完成了自己的25条消息。消费者2却在缓慢的处理自己的25条消息。
+可以看到消费者1很快完成了自己的25条消息（并且处理的是偶数条消息）。消费者2却在缓慢的处理自己的25条消息（并且处理的是奇数条消息）。
+
+![image-20240323194016616](assets/image-20240323194016616.png)
+
+![image-20240323194144762](assets/image-20240323194144762.png)
+
+现在我们有两个消费者，消费者1每秒处理50条，速度非常快。消费者2每秒处理5条，处理的比较慢，现在它两一起消费，我们认为慢的少消费两条，快的多消费两条，能者多劳。而事实是消息平均分配给每个消费者，并没有考虑到消费者的处理能力，这是由于RabbitMQ内部的 `消息预取机制` 造成的。这样显然是有问题的。
+
+所谓的消息预取就是指，当我们有大量的消息到达我们的队列时，队列会做一件事情：将消息进行投递，此时consumer1和consumer2的channel会提前先把消息拿过来，有几个consumer大家一起轮流拿消息，管它能不能处理，先拿过来再说，于是就造成了两个人平均分配消息。但是消费者1处理的快，很快就搞定了，消费者2处理的慢，它就花了很长时间才搞定，所以就导致总时间超出。
+
+为了要解决这个问题，就不能让它直接拿一堆。
 
 
 
-也就是说消息是平均分配给每个消费者，并没有考虑到消费者的处理能力。这样显然是有问题的。
+**4）能者多劳**
 
-
-
-
-
-### 3.2.4.能者多劳
-
-> 默认值是无限大
-
-在spring中有一个简单的配置，可以解决这个问题。我们修改consumer服务的application.yml文件，添加配置：
+在spring中有一个简单的配置 —— prefetch（预取），它决定了预取的上线，默认值是无限。我们修改consumer服务的application.yml文件，添加配置：
 
 ```yaml
 spring:
@@ -6416,26 +6453,19 @@ spring:
 
 
 
-### 3.2.5.总结
+**5）重启consumer，清空日志，重新调用PublisherTest发送50条消息，观察处理速度**
 
-Work模型的使用：
-
-- 多个消费者绑定到一个队列，同一条消息只会被一个消费者处理
-- 通过设置prefetch来控制消费者预取的消息数量
+PS：如果是放在服务器上的RabbitMQ，可能会多几秒。。。
 
 
 
+---
 
+# 72.发布/订阅模型介绍
 
-## 12.3.3.发布/订阅
+上面讲的SimpleQueue（简单队列）案例和WorkQueue（工作队列）案例，这两个案例有一个共同的特点：你所发出的消息，只可能被一个消费者消费，因为一旦被消费完，就会从队列中删除，而这样一个特点，就无法满足我们课程开始时提出的那个需求：当用户支付完成了，需要通知订单服务、仓储服务、短信服务，然后这三个服务各自去完成自己的业务，也就是说你发送的这条用户支付成功的消息要被三个消费者都收到，那就要用到这节课所学习的发布和订阅模型了，也就是发布消息、订阅消息。
 
-发布订阅的模型如图：
-
-![image-20210717165309625](.\assets\image-20210717165309625.png)
-
-
-
-可以看到，在订阅模型中，多了一个exchange角色，而且过程略有变化：
+发布订阅的模型如图。可以看到，在订阅模型中，多了一个exchange角色，而且过程略有变化：
 
 - Publisher：生产者，也就是要发送消息的程序，但是不再发送到队列中，而是发给X（交换机）
 - Exchange：交换机，图中的X。一方面，接收生产者发送的消息。另一方面，知道如何处理消息，例如递交给某个特别队列、递交给所有队列、或是将消息丢弃。到底如何操作，取决于Exchange的类型。Exchange有以下3种类型：
@@ -6445,15 +6475,31 @@ Work模型的使用：
 - Consumer：消费者，与以前一样，订阅队列，没有变化
 - Queue：消息队列也与以前一样，接收消息、缓存消息。
 
+![image-20210717165309625](.\assets\image-20210717165309625.png)
+
+在这个模型中，它同样会有个publisher（发布者）、queue（队列）、consumer（消费者），消费者跟队列之间依然会去做一个绑定，它可以是两个消费者绑定一个队列，也可以是一个消费者绑定一个队列。这一点跟之前相比没什么变化。所以在发布 / 订阅模型中，我们不关心消费者这一块怎么去绑定，以前怎么做现在就怎么做，而我们关心的是消息怎么样从发布者这里到达队列。
+
+消息发送时，以前是直接发到队列，现在不行了，现在需要先发送给交换机。交换机就相当于教室的路由器一样，所有的网线都连着路由器，老师发出的数据都会经过交换机然后到达你们的电脑上，我们才可以看见老师的屏幕，这其实也是一种数据的转发。
+
+所以我们的Publisher把消息发给交换机，交换机把消息转发到队列中，因此消息发布者并不需要知道队列的存在，将来消息不管是投递给一个队列还是多个队列，都是由交换机来决定的。那如果我们这个消息真的转发给了多个队列，就实现了一个消息被多个消费者消费了。
+
+至于交换机到底是发给一个还是多个，这个就是由交换机的类型来决定的，在RabbitMQ中，交换机的类型有很多，常见的就是这三种：
+
+1. Fanout：广播
+2. Direct：路由
+3. Topic：话题
+
+**Exchange（交换机）只负责转发消息，不具备存储消息的能力**，因此如果没有任何队列与Exchange绑定，或者没有符合路由规则的队列，那么消息会丢失！它并不会帮你存消息！
 
 
-**Exchange（交换机）只负责转发消息，不具备存储消息的能力**，因此如果没有任何队列与Exchange绑定，或者没有符合路由规则的队列，那么消息会丢失！
 
+---
 
+# 73.FanoutExchange
 
-## 3.4.Fanout
+Fanout，英文翻译是扇出，我觉得在MQ中叫广播更合适。这种交换机它会把它之前接收到的每一个消息都路由给每一个跟其绑定的队列。
 
-Fanout，英文翻译是扇出，我觉得在MQ中叫广播更合适。
+SpringAMQP就提供了一系列的API，可以帮助我们实现这件事。因此待会写代码的时候，除了像以前那样要做消息发送、消息接收，还需要利用SpringAMQP提供的API去声明两个队列和一个交换机，然后让它们绑定起来。
 
 ![image-20210717165438225](.\assets\image-20210717165438225.png)
 
@@ -6467,10 +6513,13 @@ Fanout，英文翻译是扇出，我觉得在MQ中叫广播更合适。
 
 
 
-我们的计划是这样的：
+## 案例：利用SpringAMQP演示FanoutExchange的使用
 
-- 创建一个交换机 itcast.fanout，类型是Fanout
-- 创建两个队列fanout.queue1和fanout.queue2，绑定到交换机itcast.fanout
+实现思路如下，这里交换机名字和队列名字可以随便写。
+
+1. 在consumer服务中，利用SpringAMQP的API去 创建一个交换机 itcast.fanout，创建两个队列fanout.queue1和fanout.queue2，类型是Fanout，绑定到交换机itcast.fanout
+2. 在consumer服务中，编写两个消费者方法，分别监听fanout.queue1和fanout.queue2
+3. 在publisher中编写测试方法，向itcast.fanout（交换机）中发送消息
 
 ![image-20210717165509466](.\assets\image-20210717165509466.png)
 
@@ -6478,15 +6527,21 @@ Fanout，英文翻译是扇出，我觉得在MQ中叫广播更合适。
 
 
 
-### 3.4.1.声明队列和交换机
+**1）声明队列和交换机**
 
-Spring提供了一个接口Exchange，来表示所有不同类型的交换机：
+队列的声明、交换机的声明、绑定关系，这一块SpringAMQP给我们提供了相关的API。
+
+API有多个，首先是交换机的API。Spring提供了一个接口Exchange，它下面有三个子类，来表示所有不同类型的交换机：
 
 ![image-20210717165552676](.\assets\image-20210717165552676.png)
 
+声明队列、交换机、绑定关系的Bean分别是：
 
+- 队列：Queue
+- 交换机：Exchange的子类FanoutExchange
+- 绑定关系：Binding
 
-在consumer中创建一个类，声明队列和交换机：
+在consumer中创建一个类，这个类加上@Configuration，表示它是一个配置类，配置类中可以声明各种各样的Bean。声明队列和交换机：这里我们是通过声明Bean的方式来写的，将来spring读取到这些Bean以后，就会帮助我们向RabbitMQ去声明队列、交换机绑定关系。
 
 ```java
 package cn.itcast.mq.config;
@@ -6505,24 +6560,28 @@ public class FanoutConfig {
      * @return Fanout类型交换机
      */
     @Bean
-    public FanoutExchange fanoutExchange(){
-        return new FanoutExchange("itcast.fanout");
+    public FanoutExchange fanoutExchange(){ // 方法的返回值就是交换机的类型
+        return new FanoutExchange("itcast.fanout"); // 交换机在new的过程中起了个名字叫itcast.fanout
     }
 
     /**
      * 第1个队列
      */
     @Bean
-    public Queue fanoutQueue1(){
-        return new Queue("fanout.queue1");
+    public Queue fanoutQueue1(){ // 队列类型是 Queue，注意是amqp.core包下的Queue，注意方法名称就是将来这个Bean的唯一id，所以这个名字千万不能冲突了
+        return new Queue("fanout.queue1"); // 在new队列的时候给队列起个名字fanout.queue1
     }
 
     /**
      * 绑定队列和交换机
      */
     @Bean
-    public Binding bindingQueue1(Queue fanoutQueue1, FanoutExchange fanoutExchange){
-        return BindingBuilder.bind(fanoutQueue1).to(fanoutExchange);
+    // 2. 将需要绑定的队列和交换机作为参数传递，参数的名字千万别写错了，它会按照类型和名称进行注入
+    public Binding fanoutBanding1(Queue fanoutQueue1, FanoutExchange fanoutExchange){ // 1. 声明了一个Binding类型，这个类也是amqp.core下的类
+        // 3. 然后在方法当中利用BindingBuilder.bind，将队列1和交换机绑定起来了。BindingBuilder是spring给我们提供的一个工厂，调用builder构建器。将fanoutQueue1队列绑定到fanoutExchange交换机。
+        return BindingBuilder
+            .bind(fanoutQueue1)
+            .to(fanoutExchange);
     }
 
     /**
@@ -6537,7 +6596,7 @@ public class FanoutConfig {
      * 绑定队列和交换机
      */
     @Bean
-    public Binding bindingQueue2(Queue fanoutQueue2, FanoutExchange fanoutExchange){
+    public Binding fanoutBanding2(Queue fanoutQueue2, FanoutExchange fanoutExchange){
         return BindingBuilder.bind(fanoutQueue2).to(fanoutExchange);
     }
 }
@@ -6545,26 +6604,29 @@ public class FanoutConfig {
 
 
 
-### 3.4.2.消息发送
+**2）启动项目，检查它是否成功声明**
 
-在publisher服务的SpringAmqpTest类中添加测试方法：
+重启ConsumerApplication，然后打开浏览器访问RabbitMQ的控制台。
 
-```java
-@Test
-public void testFanoutExchange() {
-    // 队列名称
-    String exchangeName = "itcast.fanout";
-    // 消息
-    String message = "hello, everyone!";
-    rabbitTemplate.convertAndSend(exchangeName, "", message);
-}
-```
+首先看交换机，已经出现了一个 `itcast.fanout` 的交换机
+
+![image-20240323210940993](assets/image-20240323210940993.png)
+
+然后再来看一下队列
+
+![image-20240323210308949](assets/image-20240323210308949.png)
+
+然后再回到交换机查看，可以发现 `fanout.queue1` 、`fanout.queue2` 已经和 `itcast.fanout` 给绑定上了
+
+![image-20240323210910117](assets/image-20240323210910117.png)
 
 
 
-### 3.4.3.消息接收
 
-在consumer服务的SpringRabbitListener中添加两个方法，作为消费者：
+
+**3）消息接收**
+
+消息接收跟之前的比较接近。在consumer服务的SpringRabbitListener中添加两个方法，作为消费者：
 
 ```java
 @RabbitListener(queues = "fanout.queue1")
@@ -6578,28 +6640,51 @@ public void listenFanoutQueue2(String msg) {
 }
 ```
 
+然后重启ConsumerApplication
 
 
-### 3.4.4.总结
+
+**4）消息发送**
+
+在publisher服务的SpringAmqpTest类中添加测试方法，以前是直接发送到队列，现在是发送到交换机了。
+
+```java
+@Test
+// testSendFanoutExchange：发送到交换机。
+public void testSendFanoutExchange() {
+    // 交换机名称
+    String exchangeName = "itcast.fanout";
+    // 消息
+    String message = "hello，everyone！";
+    // 参数1：交换机名称；参数2：routingkey，这个我们还没学过，先不管，先给个空；参数3：需要发送的消息
+    rabbitTemplate.convertAndSend(exchangeName, "", message);
+}
+```
+
+**5）调用testSendFanoutExchange测试方法**
+
+查看控制台日志，可以发现queue1、queue2都收到了相同的消息，这样就实现了一次发送，多个消费者都能接收的情况了。
+
+![image-20240323212203348](assets/image-20240323212203348.png)
 
 
+
+
+
+## 总结：交换机的作用
 
 交换机的作用是什么？
 
 - 接收publisher发送的消息
 - 将消息按照规则路由到与之绑定的队列
-- 不能缓存消息，路由失败，消息丢失
+- 不能缓存消息，如果将来路由没有成功，消息会丢失
 - FanoutExchange的会将消息路由到每个绑定的队列
 
-声明队列、交换机、绑定关系的Bean是什么？
-
-- Queue
-- FanoutExchange
-- Binding
 
 
+---
 
-## 14.3.5.Direct
+# 74.DirectExchange
 
 在Fanout模式中，一条消息，会被所有订阅的队列都消费。但是，在某些场景下，我们希望不同的消息被不同的队列消费。这时就要用到Direct类型的Exchange。
 
