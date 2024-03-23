@@ -5805,13 +5805,65 @@ Publisher就是消息的发送者，consumer就是消息的消费者。Publisher
 
 # 66.消息队列模型介绍
 
+首先打开RabbitMQ的官网地址：[RabbitMQ](https://v3-12.rabbitmq.com/documentation.html)
+
+点开官方文档
+
+![image-20240323130554463](assets/image-20240323130554463.png)
+
+文档里有个入门的入口，点进去
+
+![image-20240323130651214](assets/image-20240323130651214.png)
+
+可以看见在这个入门当中，就给出了7个demo
+
+![image-20240323130737981](assets/image-20240323130737981.png)
+
+这7个demo当中，其中跟消息发送和接收有关的主要就是前面的五个。这也是接下来带大家去学习的五个。这五个我们对它做了一个划分。对应了几种不同的用法，其中前两个我给它命名为基本消息队列和工作消息队列。这两种都有一个特征：它的消息发送和接收都是直接基于队列来完成的，而并没有出现我们之前在架构中讲到的交换机，不是一个完整的消息驱动的模型。可以看到下面两个图，p就是Publisher，c就是consumer，中间红色的就是队列了。
+
+​	
+
+- 基本消息队列（BasicQueue）![image-20240323131235629](assets/image-20240323131235629.png)
+
+- 工作消息队列（WorkQueue）![image-20240323131241098](assets/image-20240323131241098.png)
 
 
 
+最后三种起了个名字叫：发布订阅（Publish、Subscribe），又根据交换机类型不同分为三种。这三种的共同特征可以看见多了紫色这一块，这个就是交换机。
+
+- Fanout Exchange：广播	![image-20240323131457750](assets/image-20240323131457750.png)
+
+- Direct Exchange：路由      ![image-20240323131505464](assets/image-20240323131505464.png)
+
+- Topic Exchange：主题       ![image-20240323131511541](assets/image-20240323131511541.png)
 
 
 
-## 2.3.导入Demo工程
+接下来通过一个案例来研究一下HelloWorld入门案例基本消息队列模型。
+
+官方的HelloWorld是基于最基础的消息队列模型来实现的，只包括三个角色：
+
+- publisher：消息发布者，将消息发送到队列queue
+
+- queue：消息队列，负责接受并缓存消息
+
+- consumer：消费者，订阅队列，处理队列中的消息
+
+这里queue是RabbitMQ来管理的。而publisher、consumer则需要我们亲自编写代码来实现。
+
+![image-20240323131825480](assets/image-20240323131825480.png)
+
+
+
+---
+
+# 67.完成官方Demo中的hello world案例
+
+做法不是让大家亲自去写代码，因为代码比较复杂，我们的做法是让大家导入课前资料中的demo工程，我们基于这个工程去做一个学习和讲解就可以了。
+
+
+
+**1）导入Demo工程**
 
 课前资料提供了一个Demo工程，mq-demo:
 
@@ -5821,7 +5873,7 @@ Publisher就是消息的发送者，consumer就是消息的消费者。Publisher
 
 ![image-20210717163604330](.\assets\image-20210717163604330.png)
 
-包括三部分：
+它是一个聚合工程，包括三部分：
 
 - mq-demo：父工程，管理项目依赖
 - publisher：消息的发送者
