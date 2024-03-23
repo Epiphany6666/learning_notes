@@ -5863,7 +5863,7 @@ Publisher就是消息的发送者，consumer就是消息的消费者。Publisher
 
 
 
-**1）导入Demo工程**
+## 1）导入Demo工程
 
 课前资料提供了一个Demo工程，mq-demo:
 
@@ -5879,25 +5879,11 @@ Publisher就是消息的发送者，consumer就是消息的消费者。Publisher
 - publisher：消息的发送者
 - consumer：消息的消费者
 
-
-
-## 2.4.入门案例
-
-简单队列模式的模型图：
-
- ![image-20210717163434647](.\assets\image-20210717163434647.png)
-
-官方的HelloWorld是基于最基础的消息队列模型来实现的，只包括三个角色：
-
-- publisher：消息发布者，将消息发送到队列queue
-- queue：消息队列，负责接受并缓存消息
-- consumer：订阅队列，处理队列中的消息
+其中test目录：单元测试。PublishTest中写好的消息发送的代码。ConsumerTest就是用来做消息接收的。
 
 
 
-
-
-### 2.4.1.publisher实现
+## 2）publisher实现
 
 思路：
 
@@ -5907,9 +5893,7 @@ Publisher就是消息的发送者，consumer就是消息的消费者。Publisher
 - 发送消息
 - 关闭连接和channel
 
-
-
-代码实现：
+完整代码：
 
 ```java
 package cn.itcast.mq.helloworld;
@@ -5925,26 +5909,33 @@ import java.util.concurrent.TimeoutException;
 public class PublisherTest {
     @Test
     public void testSendMessage() throws IOException, TimeoutException {
-        // 1.建立连接
+        // 1.建立连接，ConnectionFactory：连接工厂，要向MQ发送消息，就需要建立连接，而建立连接就必须得用连接工厂了。
         ConnectionFactory factory = new ConnectionFactory();
-        // 1.1.设置连接参数，分别是：主机名、端口号、vhost、用户名、密码
-        factory.setHost("192.168.150.101");
+        // 1.1.设置连接参数（MQ地址信息），分别是：主机名、端口号、vhost、用户名、密码
+        factory.setHost("1.12.77.253");
+        // MQ当中消息通信使用的是5672，ui管理台是15672
         factory.setPort(5672);
+        // 每个用户都会有自己的虚拟主机，itcast就有/这个虚拟主机的访问权
         factory.setVirtualHost("/");
+        // 设置用户名
         factory.setUsername("itcast");
+        // 设置密码
         factory.setPassword("123321");
-        // 1.2.建立连接
+        // 1.2.连接工程准备好了，参数准备好了，接下来就是建立连接了
+        // 这行代码一旦走完，回到控制台的Connection界面看一眼，可以发现已经有一个连接了
         Connection connection = factory.newConnection();
 
         // 2.创建通道Channel
         Channel channel = connection.createChannel();
 
         // 3.创建队列
-        String queueName = "simple.queue";
+        String queueName = "simple.queue"; // 声明队列的名称
+        // queueDeclare：声明队列，第一个参数是队列名称，剩下的我们不需要管
         channel.queueDeclare(queueName, false, false, false, null);
 
         // 4.发送消息
         String message = "hello, rabbitmq!";
+        // basicPublish：发布消息，往 queueName发（第二个参数），message.getBytes()将消息转成字节发送
         channel.basicPublish("", queueName, null, message.getBytes());
         System.out.println("发送消息成功：【" + message + "】");
 
@@ -5958,11 +5949,99 @@ public class PublisherTest {
 
 
 
+代码追踪：
+
+```java
+// 1.建立连接，ConnectionFactory：连接工厂，要向MQ发送消息，就需要建立连接，而建立连接就必须得用连接工厂了。
+ConnectionFactory factory = new ConnectionFactory();
+// 1.1.设置连接参数（MQ地址信息），分别是：主机名、端口号、vhost、用户名、密码
+factory.setHost("1.12.77.253");
+// MQ当中消息通信使用的是5672，ui管理台是15672
+factory.setPort(5672);
+// 每个用户都会有自己的虚拟主机，itcast就有/这个虚拟主机的访问权
+factory.setVirtualHost("/");
+// 设置用户名
+factory.setUsername("itcast");
+// 设置密码
+factory.setPassword("123321");
+// 1.2.连接工程准备好了，参数准备好了，接下来就是建立连接了
+// 这行代码一旦走完，回到控制台的Connection界面看一眼，可以发现已经有一个连接了
+Connection connection = factory.newConnection();
+```
+
+![image-20240323145628471](assets/image-20240323145628471.png)
+
+回到代码区域，往下走
+
+```java
+// 2.创建通道Channel
+Channel channel = connection.createChannel();
+```
+
+通道一旦创建，回到浏览器控制台的Channels界面，可以看见出现了一个通道，状态是running
+
+![image-20240323145753773](assets/image-20240323145753773.png)
+
+通道有了，将来就可以通过通道向队列当中去发送消息了。但是点击Queues界面，可以发现现在还没有队列。
+
+![image-20240323145916300](assets/image-20240323145916300.png)
+
+所以接下来要做的事情就是创建队列
+
+```java
+// 3.创建队列
+String queueName = "simple.queue"; // 声明队列的名称
+// queueDeclare：声明队列，第一个参数是队列名称，剩下的我们不需要管
+channel.queueDeclare(queueName, false, false, false, null);
+```
+
+回到浏览器看一眼，可以发现已经成功创建了一个队列了，名字叫 `simple.queue` ，虚拟主机是 `\`
+
+![image-20240323150151110](assets/image-20240323150151110.png)
+
+有了队列，下一步生产者就可以向队列中发送消息了。
+
+```java
+// 4.发送消息
+String message = "hello, rabbitmq!";
+// basicPublish：发布消息，往 queueName发（第二个参数），message.getBytes()将消息转成字节发送
+channel.basicPublish("", queueName, null, message.getBytes());
+System.out.println("发送消息成功：【" + message + "】");
+```
+
+最后一步，关闭通道和连接，直接放行即可。
+
+~~~java
+// 5.关闭通道和连接
+channel.close();
+connection.close();
+~~~
+
+查看控制台，可以发现发送消息是成功的
+
+![image-20240323150441897](assets/image-20240323150441897.png)
+
+此时我们再回到浏览器的控制台，可以发现我们刚刚创建的队列里面已经有一条消息了
+
+![image-20240323150525238](assets/image-20240323150525238.png)
+
+点进去看看
+
+![image-20240323150548111](assets/image-20240323150548111.png)
+
+在这里面就可以看见成功到队列里的消息
+
+<img src="assets/image-20240323150635177.png" alt="image-20240323150635177" style="zoom:50%;" />
+
+但是此时我们的发布者已经结束了，连接都断开了，也就是说我现在发完了，我的事就没了。发布者并不管谁收到了，这样就解除了耦合。
+
+接下来就是Consumer（消费者）来接手
 
 
 
+## 3）consumer实现
 
-### 2.4.2.consumer实现
+consumer的代码和生产者的代码非常的像
 
 代码思路：
 
@@ -5973,107 +6052,132 @@ public class PublisherTest {
 
 
 
-代码实现：
+代码追踪：
 
 ```java
-package cn.itcast.mq.helloworld;
-
-import com.rabbitmq.client.*;
-
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
-
-public class ConsumerTest {
-
-    public static void main(String[] args) throws IOException, TimeoutException {
-        // 1.建立连接
-        ConnectionFactory factory = new ConnectionFactory();
-        // 1.1.设置连接参数，分别是：主机名、端口号、vhost、用户名、密码
-        factory.setHost("192.168.150.101");
-        factory.setPort(5672);
-        factory.setVirtualHost("/");
-        factory.setUsername("itcast");
-        factory.setPassword("123321");
-        // 1.2.建立连接
-        Connection connection = factory.newConnection();
-
-        // 2.创建通道Channel
-        Channel channel = connection.createChannel();
-
-        // 3.创建队列
-        String queueName = "simple.queue";
-        channel.queueDeclare(queueName, false, false, false, null);
-
-        // 4.订阅消息
-        channel.basicConsume(queueName, true, new DefaultConsumer(channel){
-            @Override
-            public void handleDelivery(String consumerTag, Envelope envelope,
-                                       AMQP.BasicProperties properties, byte[] body) throws IOException {
-                // 5.处理消息
-                String message = new String(body);
-                System.out.println("接收到消息：【" + message + "】");
-            }
-        });
-        System.out.println("等待接收消息。。。。");
-    }
-}
+// 1.建立连接，创建ConnectionFactory（连接工厂）
+ConnectionFactory factory = new ConnectionFactory();
+// 1.1.设置连接参数，分别是：主机名、端口号、vhost、用户名、密码
+factory.setHost("1.12.77.253");
+factory.setPort(5672);
+factory.setVirtualHost("/");
+factory.setUsername("itcast");
+factory.setPassword("123321");
+// 1.2.建立连接
+Connection connection = factory.newConnection();
 ```
 
+建立连接后，此时再去浏览器上看：此时又有新连接出现了
+
+![image-20240323151222153](assets/image-20240323151222153.png)
+
+建立连接完后创建通道
+
+```java
+// 2.创建通道Channel
+Channel channel = connection.createChannel();
+```
+
+再往下又来声明队列了，但是Publisher不是已经生产过了吗？这是因为生产者和消费者它们启动的顺序是不确定的，万一消费者先启动呢，我想来找队列，结果不存在怎么办，所以为了避免这种问题的发生，他们俩各自都去声明。
+
+```java
+// 3.创建队列
+String queueName = "simple.queue";
+channel.queueDeclare(queueName, false, false, false, null);
+```
+
+当我再次执行创建队列代码的时候，查看控制台，可以发现它并没有再去创建一个队列，所以说代码重复执行没关系，它是一种保险措施，防止队列不存在。
+
+![image-20240323151800213](assets/image-20240323151800213.png)
+
+继续往下走，consume：消费，这里需要传入一个匿名内部类对象，告诉这个方法拿到消息后需要做什么事情。
+
+```java
+// 4.订阅消息，DefaultConsumer：默认的消费者
+channel.basicConsume(queueName, true, new DefaultConsumer(channel){
+    @Override
+    // handleDelivery：处理投递的消息，这个就像js里的回调函数一样，提前写好了处理消息的代码，拿到消息后我要干什么事，然后把这个处理的行为挂到队列上，将来队列里一旦有了消息，我这个函数就会被执行，所以这就是一种回调函数的机制，因此它其实就是异步的。生产者发消息不需要等待消费者，消费者处理消息也不需要去等待其他别的事情。
+    // 并且可以看见最后一个参数是body（消息体），是从那边传过来的，也是使用字节数组接收的
+    public void handleDelivery(String consumerTag, Envelope envelope,
+                               AMQP.BasicProperties properties, byte[] body) throws IOException {
+        // 5.处理消息，将字节转为字符串
+        String message = new String(body);
+        // 模拟输出
+        System.out.println("接收到消息：【" + message + "】");
+    }
+});
+System.out.println("等待接收消息。。。。");
+```
+
+绑定到了队列以后，消费者就可以去消费消息了，接下来就接着走。`等待接收消息。。。。` 要比 `接收到消息：【" + message + "】`先执行。执行上面这块代码仅仅是将消费者处理的回调函数与队列绑定了，但是消息并没有真正过来，此时逻辑继续往下执行，就继续打印了，等RabbitMQ把消息投递过来了，回调函数才会执行，所以这行代码不就在后面打印了。这就再次证明了我们这种异步的机制。
+
+回到浏览器再看一眼，可以发现消息也没了，发完消息后，只要消费者一旦消费，消息会立即被删除，这是RabbitMQ的一个机制。
+
+![image-20240323160118209](assets/image-20240323160118209.png)
 
 
 
+----
 
-## 2.5.总结
+# 68.SpringAMQP基本介绍
 
-基本消息队列的消息发送流程：
+在刚刚我们利用RabbitMQ官方的API实现了它的 `hello world` （简单队列模型），我们发现官方提供的API写起来非常的麻烦，甚至于都懒得写，直接基于写好的代码进行断点跟踪。因此接下来我们需要学习一种新的东西：SpringAMQP，它可以大大的简化消息发送和推送的API。
 
-1. 建立connection
+想要知道SpringAMQP，就需要先知道AMQP。
 
-2. 创建channel
+AMQP的全称是：`Advanced Message Queuing Protocol`（高级消息队列协议），所以它的落脚点是在协议，协议就是一种标准或者规范。它是应用程序之间传递业务消息的标准和规范，所以它就是消息队列的规范。这种规范它跟平台和语言无关，所以可以使用任何语言来发送或者接收了，所以它更符合微服务里对技术独立性的这样的需求。
 
-3. 利用channel声明队列
+<img src=".\assets\image-20210717164024967.png" alt="image-20210717164024967" style="zoom:50%;" />
 
-4. 利用channel向队列发送消息
+RabbitMQ恰好就实现了AMQP协议。SpringAMQP显然是spring对AMQP这种协议的一种具体的实现。它在实现的时候还提供了一套API的规范，并且定义了一套模板来实现消息的发送和接收。回想以前学习Spring Redis，Spring也提供了一套模板，称之为RedisTemplate。
 
-基本消息队列的消息接收流程：
+那这套API由谁来实现呢，所以SpringAMQP项目里就包含了两部分内容，一部分就是SpringAMQP，它是一层API的抽象和规范，再往下的具体实现是由spring-rabbit来实现的，所以底层封装的其实就是rabbit的客户端。
 
-1. 建立connection
+SpringAMQP是基于RabbitMQ封装的一套模板（Template），并且还利用SpringBoot对其实现了自动装配，使用起来非常方便。
 
-2. 创建channel
-
-3. 利用channel声明队列
-
-4. 定义consumer的消费行为handleDelivery()
-
-5. 利用channel将消费者与队列绑定
-
-
-
-
-
-# 3.SpringAMQP
-
-SpringAMQP是基于RabbitMQ封装的一套模板，并且还利用SpringBoot对其实现了自动装配，使用起来非常方便。
+<img src=".\assets\image-20210717164038678.png" alt="image-20210717164038678" style="zoom:50%;" />
 
 SpringAmqp的官方地址：https://spring.io/projects/spring-amqp
 
-![image-20210717164024967](.\assets\image-20210717164024967.png)
+官方网站中最关键的就是特征。
 
-![image-20210717164038678](.\assets\image-20210717164038678.png)
-
-
-
-SpringAMQP提供了三个功能：
-
-- 自动声明队列、交换机及其绑定关系
 - 基于注解的监听器模式，异步接收消息
+
+  监听消息，它提供了监听器容器，可以用异步的方式来处理消息，如果有消息来了，我就处理；如果没有消息，那就不管，继续干别的事。
+
 - 封装了RabbitTemplate工具，用于发送消息 
 
+  它还提供了一个Template，称之为RabbiTemplate，用这个Template就可以很轻松的完成消息的发送或者接收了，但是一般我们利用它做发送就可以了，接收有监听器容器去做。
+
+- 自动声明队列、交换机及其绑定关系 - RabbitAdmin
+
+  来实现自动化的队列声明、交换和绑定，这个意思就是说我们以前队列的创建都是手动创建的，有了这个东西后就能自动的创建队列，非常的舒服。
+
+![image-20240323161919392](assets/image-20240323161919392.png)
 
 
-## 3.1.Basic Queue 简单队列模型
 
-在父工程mq-demo中引入依赖
+---
+
+# ------------------------------------------
+
+# 案例：利用SpringAMQP实现HelloWorld中的基础消息队列功能
+
+# 69.利用SpringAMQP实现消息发送
+
+流程：
+
+1. 引依赖
+2. 配MQ地址
+3. 利用RebbitTemplate发消息
+
+
+
+**1）在父工程mq-demo中引入SpringAMQP的依赖**
+
+在父工程引入的原因是：等会不管是消息的发送还是消息的接收，都依赖于这个，所以当我们在父亲引入后，两个儿子也都有这个了。
+
+这个依赖名叫 `spring-boot-starter-amqp`，一看就知道它是SpringBoot自动装配依赖，所以只要引入了这个功能，那么SpringAMQP的各种配置你就不用管了，对象也不用自己创建了，都有Spring替我们去操心。
 
 ```xml
 <!--AMQP依赖，包含RabbitMQ-->
@@ -6085,9 +6189,13 @@ SpringAMQP提供了三个功能：
 
 
 
-### 3.1.1.消息发送
+2）在publisher服务中新建一个测试类，编写测试方法向 `simple.queue` 发消息。
 
-首先配置MQ地址，在publisher服务的application.yml中添加配置：
+RabbitTemplate类似于RedisTemplate，都是Spring提供好的模板工具，拿这玩意发消息就可以了，非常的简单。往 `simple.queue` 这个队列发消息，这个队列就是我们之前在入门案例中用到过的。
+
+![image-20240323170502806](assets/image-20240323170502806.png)
+
+首先配置MQ地址，在publisher服务的application.yml中添加配置，我们使用RabbitMQ官方API也是要去先建立连接，但是这里不需要自己管了，只需要告诉它地址，所以这里是由spring帮你去建立连接了，并且帮你创建channel等。你要做的事情就是用它的工具类发消息就行了。
 
 ```yaml
 spring:
@@ -6101,7 +6209,9 @@ spring:
 
 
 
-然后在publisher服务中编写测试类SpringAmqpTest，并利用RabbitTemplate实现消息发送：
+然后在publisher服务中编写测试类SpringAmqpTest，并利用RabbitTemplate（Spring提供的RabbitMQ模板工具）实现消息发送，用这个有工具类有一个方法：convertAndSend（转换并且发送），发送的时候你把队列名称告诉我，再把message消息告诉我，剩下的就不用管了，它直接帮你发。
+
+由于这里是用单元测试来做的，将来肯定不是单元测试，而是在微服务里做业务，比如说有人支付成功了，然后我想发个消息，那只需要在支付之后的业务里加上这行发消息的代码就ok了。
 
 ```java
 package cn.itcast.mq.spring;
@@ -6113,9 +6223,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+// 加上这两个注解之后，就有了spring的运行环境了，想注入任何的对象就能成功的去注入了
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class SpringAmqpTest {
+public class testSendMessage2SimpleQueue {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -6132,13 +6243,33 @@ public class SpringAmqpTest {
 }
 ```
 
+运行该单元测试，再次打开浏览器查看，可以发现队列里已经有消息了！
+
+![image-20240323172650015](assets/image-20240323172650015.png)
 
 
 
+---
 
-### 3.1.2.消息接收
+# 70.利用SpringAMQP接收消息
 
-首先配置MQ地址，在consumer服务的application.yml中添加配置：
+步骤：
+
+1. 引入AMQP的starter依赖
+2. 配置RabbitMQ地址
+3. 定义类，添加@Component注解
+4. 添加@RabbitListener注解，指定队列名称
+5. 类中声明方法，方法参数就是消息
+
+注意：消息一旦消费就会从队列删除，RabbitMQ没有消息回溯功能
+
+
+
+**1）第一步肯定是引依赖，但是这一步我们在父工程中做了，所以这一步可以省掉了。**
+
+**2）在consumer服务中编写消费逻辑，绑定`simple.queue`这个队列，做一个消息的监听**
+
+首先配置MQ地址，在consumer服务的application.yml中添加配置，因为不管是接收消息还是发送消息，都得知道消息在哪
 
 ```yaml
 spring:
@@ -6152,7 +6283,7 @@ spring:
 
 
 
-然后在consumer服务的`cn.itcast.mq.listener`包中新建一个类SpringRabbitListener，代码如下：
+然后在consumer服务的`cn.itcast.mq.listener`包中新建一个类SpringRabbitListener，Spring已经帮我们跟MQ建立了连接，这些杂七杂八的事情我们就不用管了，我们唯一要操心的就是：我们要监听哪个队列，监听到这个队列了，我要干什么事，干什么事其实就是行为，行为直接封装到方法。但在Spring当中，我们只需要写一个类，然后定义一个方法，这个方法就是处理消息的行为，但是你要加注解告诉Spring，先加@Component把这个类声明为一个bean，此时spring就可以找到它了，然后再方法上加上 `@RabbitListener` 注解，这个注解是用来声明队列的名称的，加上这个注解后，这个方法就成为了消息处理的方法。将来一旦有这个队列的消息，就会立即投放到这个方法中去了，这个方法就能处理对应的消息了，看这个方法的参数，就是消息。也就是说spring会自动把消息投递给这个方法，然后参数里传给你，然后你就可以拿到这个消息为所欲为了。
 
 ```java
 package cn.itcast.mq.listener;
@@ -6163,7 +6294,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpringRabbitListener {
 
+    // 参数：队列，这个队列可以指定多个也可以指定一个
     @RabbitListener(queues = "simple.queue")
+    // 发送的消息是什么类型的这里就用什么类型接，将来都会有spring帮我们自动处理
     public void listenSimpleQueueMessage(String msg) throws InterruptedException {
         System.out.println("spring 消费者接收到消息：【" + msg + "】");
     }
@@ -6172,15 +6305,23 @@ public class SpringRabbitListener {
 
 
 
-### 3.1.3.测试
+**3）测试**
 
-启动consumer服务，然后在publisher服务中运行测试代码，发送MQ消息
+启动consumer服务，这个类是spring中的一个bean，将来接收消息是用spring来处理的，它投递给你你才能处理消息，所以现在必须要将整个spring运行起来。此时可以发现消息接收成功：
+
+![image-20240323174415260](assets/image-20240323174415260.png)
+
+再去浏览器中看一眼，可以发现消息已经变成0条了，再一次证明了我们之前的结论：RabbitMQ阅后即焚，不可以重复消费。
+
+![image-20240323174450606](assets/image-20240323174450606.png)
+
+然后在publisher服务中运行测试代码，发送MQ消息。
 
 
 
+---
 
-
-## 3.2.WorkQueue
+# 71.WorkQueue模型
 
 Work queues，也被称为（Task queues），任务模型。简单来说就是**让多个消费者绑定到一个队列，共同消费队列中的消息**。
 
