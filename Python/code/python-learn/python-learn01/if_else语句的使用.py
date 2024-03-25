@@ -18,9 +18,28 @@ import random
 #     print("恭喜你猜对啦！")
 # else:
 #     print("Sorry, 全部猜错啦，我想的是：%d" % num)
+num = random.randint(1, 10)
 
-num = random.random(1, 10)
-if int(input("请猜第一次")) != 10:
-    if int(input())
-else
-    print("猜对啦")
+guess_num = int(input("输入你要猜测的数字："))
+if guess_num == num:
+    print("恭喜，第一次就猜中了")
+else:
+    if guess_num > num:
+        print("你猜测的数字大了")
+    else:
+        print("你猜测的数字小了")
+        guess_num = int(input("再次输入你要猜测的数字："))
+
+    if guess_num == num:
+        print("恭喜，第二次猜中了")
+    else:
+        if guess_num > num:
+            print("你猜测的数字大了")
+        else:
+            print("你猜测的数字小了")
+            guess_num = int(input("第三次输入你要猜测的数字："))
+
+            if guess_num == num:
+                print("第三次猜中了")
+            else:
+                print("三次机会用完了，没有猜中。")
