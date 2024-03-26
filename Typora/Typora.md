@@ -294,8 +294,6 @@ H~2~O
 
 ----
 
-
-
 # 七、代码显示
 
 ## 1）行内代码
@@ -344,94 +342,125 @@ H~2~O
 
 ---
 
+# 八、链接
+代码：
+
+> 第三种和第二种的区别在于，第三种鼠标放上面会出现引号内的文字
+
+```text
+www.baidu.com
+[百度一下](https://www.baidu.com)
+[百度一下](https://www.baidu.com "https://www.baidu.com")
+```
 
 
-## 七、链接
->代码:
->
->```text
+
+效果:
+
 >www.baidu.com
 >[百度一下](https://www.baidu.com)
 >[百度一下](https://www.baidu.com "https://www.baidu.com")
->```
 
->效果:
->www.baidu.com
->[百度一下](https://www.baidu.com)
->[百度一下](https://www.baidu.com "https://www.baidu.com")
 
->快捷键:  Ctrl+K
 
-## 八、脚注
+快捷键:  Ctrl+K
 
->说明:  对文本进行解释说明。
 
->代码: 
->
->```text
->[^文本]
->[^文本]:解释说明
->```
 
->效果:
+---
+
+# 九、脚注
+
+说明:  对文本进行解释说明。
+
+代码: 
+
+~~~
+词语[^文本]
+[^文本]:解释说明
+~~~
+
+
+
+效果:
+
 >这是一个技术[^①]
 >
 >[^①]: 这是一个非常好用的框架。
 
-## 九、图片插入
->代码:
->```text
->![不显示的文字](图片路径 "图片标题")
->```
 
->效果:
->![This is a picture](C:\Users\asus\Pictures\Saved Pictures\Snipaste_2020-09-03_13-19-11.png "漫步图")
->
->(注：效果路径为C:\Users\asus\Pictures\Saved Pictures\Snipaste_2020-09-03_13-19-11.png。在其他电脑上可能不显示。)
 
->快捷键:  Ctrl+Shift+I
+---
 
-## 十、表格
+# 十、图片插入
 
->代码:
->```text
->|  1   |  2   |  3   |
->| :--- | :--: | ---: |
->|  4   |  5   |  6   |
->|  7   |  8   |  9   |
->|  10  |  11  |  12  |
->```
+代码:
+~~~
+![不显示的文字](图片路径 "图片标题")
+~~~
 
->效果:
->
+
+
+效果:
+
+>![This is a picture](//www.runoob.com/wp-content/uploads/2016/04/docker01.png "docker的logo")
+
+
+
+快捷键:  Ctrl+Shift+I
+
+
+
+---
+
+# 十一、表格
+
+代码:
+~~~
+|  1   |  2   |  3   |
+| :--- | :--: | ---: |
+|  4   |  5   |  6   |
+|  7   |  8   |  9   |
+|  10  |  11  |  12  |
+~~~
+
+
+
+效果:
+
 >| 1    |  2   |    3 |
 >| ---- | :--: | ---: |
 >| 4    |  5   |    6 |
 >| 7    |  8   |    9 |
 >| 10   |  11  |   12 |
 
->快捷键:  Ctrl+T
 
-## 十一、流程图
 
-### 1、横向流程图
+快捷键:  Ctrl+T
 
-> 代码:
->
-> ````text
-> ​```mermaid
-> graph LR
-> A[方形]==>B(圆角)
-> B==>C{条件a}
-> C-->|a=1|D[结果1]
-> C-->|a=2|E[结果2]
-> F[横向流程图]
-> ```
-> ````
-> 
-> ````
 
->效果:
+
+---
+
+# 十二、流程图
+
+## 1）横向流程图
+
+代码:
+
+~~~
+```mermaid
+graph LR
+A[方形]==>B(圆角)
+B==>C{条件a}
+C-->|a=1|D[结果1]
+C-->|a=2|E[结果2]
+F[横向流程图]
+~~~
+
+
+
+效果:
 >```mermaid
 >graph LR
 >A[方形]==>B(圆角)
@@ -441,21 +470,26 @@ H~2~O
 >F[横向流程图]
 >```
 
-### 2、竖向流程图
 
-> 代码:
-> ````text
-> ​```mermaid
-> graph TD
-> A[方形]==>B(圆角)
-> B==>C{条件a}
-> C-->|a=1|D[结果1]
-> C-->|a=2|E[结果2]
-> F[竖向流程图]
-> ```
-> ````
-> 
-> ````
+
+---
+
+
+
+## 2）竖向流程图
+
+代码:
+~~~
+```mermaid
+graph TD
+A[方形]==>B(圆角)
+B==>C{条件a}
+C-->|a=1|D[结果1]
+C-->|a=2|E[结果2]
+F[竖向流程图]
+~~~
+
+
 
 >效果:
 >```mermaid
@@ -467,150 +501,257 @@ H~2~O
 >F[竖向流程图]
 >```
 
-## 十二、表情符号
 
->代码:
->```text
->:happy:、:cry:、:man:
->```
+
+---
+
+# 十三、表情符号
+
+代码:
+~~~
+:happy:、:cry:、:man:
+~~~
+
+
 
 >效果:
 >:happy:、 :cry:、 :man:
 
-## 十三、数学公式的输入
 
-### 1、公式的插入
 
-#### ①行中公式
+---
 
->代码:
->```text
->$公式$
->```
+# 十四、数学公式的输入
+
+## 1）公式的插入
+
+### ①行中公式
+
+代码:
+~~~
+$公式$
+~~~
+
+
 
 >效果:
 >$公式$
 
-#### ②独立公式
 
->代码:
->
->```text
+
+### ②独立公式
+
+代码:
+
+~~~
+$$
+公式
+$$
+~~~
+
+
+
+效果:
+
 >$$
 >公式
 >$$
->```
 
->效果:
->$$
->公式
->$$
 
-### 2、上下标
->代码:
->
->```text
+
+---
+
+
+
+## 2）上下标
+
+代码:
+
+~~~
+$x^{y^z}=(1+e^x)^{-2xy^w}$
+$\sideset{^1_2}{^3_4}{\underset{6}\bigotimes}$
+~~~
+
+
+
+效果:
+
 >$x^{y^z}=(1+e^x)^{-2xy^w}$
 >$\sideset{^1_2}{^3_4}{\underset{6}\bigotimes}$
->```
 
->效果:
->$x^{y^z}=(1+e^x)^{-2xy^w}$
->$\sideset{^1_2}{^3_4}{\underset{6}\bigotimes}$
 
-### 3、括号和分隔符
 
->代码:
->```text
+---
+
+
+
+## 3）括号和分隔符
+
+代码:
+~~~
+$\langle\quad\rangle\quad\lceil\quad\rceil\quad\lfloor\quad\rfloor\quad\lbrace\quad\rbrace\quad\lVert\quad\rVert$
+$f(x,y,z)=3y^2z\left(3+\dfrac{7x+5}{1+y^2}\right)$
+$\left.\dfrac{\mathrm{d}u}{\mathrm{d}x}\right|_{x=0}$
+~~~
+
+
+
+效果:
+
 >$\langle\quad\rangle\quad\lceil\quad\rceil\quad\lfloor\quad\rfloor\quad\lbrace\quad\rbrace\quad\lVert\quad\rVert$
 >$f(x,y,z)=3y^2z\left(3+\dfrac{7x+5}{1+y^2}\right)$
 >$\left.\dfrac{\mathrm{d}u}{\mathrm{d}x}\right|_{x=0}$
->```
 
->效果:
->$\langle\quad\rangle\quad\lceil\quad\rceil\quad\lfloor\quad\rfloor\quad\lbrace\quad\rbrace\quad\lVert\quad\rVert$
->$f(x,y,z)=3y^2z\left(3+\dfrac{7x+5}{1+y^2}\right)$
->$\left.\dfrac{\mathrm{d}u}{\mathrm{d}x}\right|_{x=0}$
 
-### 4、分数
 
->代码:
->
->```text
+---
+
+
+
+## 4）分数
+
+代码:
+
+~~~
+$\frac{a}{b}\quad\dfrac{a}{b}\quad {a\over b}$
+~~~
+
+
+
+效果:
+
 >$\frac{a}{b}\quad\dfrac{a}{b}\quad {a\over b}$
->```
 
->效果:
->$\frac{a}{b}\quad\dfrac{a}{b}\quad {a\over b}$
 
-### 5、开方
 
->代码:
->
->```text
->$\sqrt[根指数,省略时为2]{被开方数}$
->```
+---
 
->效果:
+
+
+## 5）开方
+
+代码:
+
+~~~
+$\sqrt[根指数,省略时为2]{被开方数}$
+~~~
+
+
+
+效果:
+
 >$\sqrt{2}\quad\sqrt[3]{2}$
 
-### 6、省略号
 
->代码:
->```text
+
+---
+
+
+
+## 6）省略号
+
+代码:
+~~~
+$\cdots\quad\ldots\quad\vdots\quad\ddots$
+~~~
+
+
+
+效果:
+
 >$\cdots\quad\ldots\quad\vdots\quad\ddots$
->```
 
->效果:
->$\cdots\quad\ldots\quad\vdots\quad\ddots$
 
-### 7、矢量和均值
 
->代码:
->
->```text
+---
+
+
+
+## 7）矢量和均值
+
+代码:
+
+~~~
+$\overrightarrow{E(\vec{r})}\quad\overleftarrow{E(\vec{r})}\quad\overleftrightarrow{E(\vec{r})}\quad\underrightarrow{E(\vec{r})}\quad\underleftarrow{E(\vec{r})}\quad\underleftrightarrow{E(\vec{r})}\quad\overline{v}=\bar{v}\quad\underline{v}$
+~~~
+
+
+
+效果:
+
 >$\overrightarrow{E(\vec{r})}\quad\overleftarrow{E(\vec{r})}\quad\overleftrightarrow{E(\vec{r})}\quad\underrightarrow{E(\vec{r})}\quad\underleftarrow{E(\vec{r})}\quad\underleftrightarrow{E(\vec{r})}\quad\overline{v}=\bar{v}\quad\underline{v}$
->```
 
->效果:
->$\overrightarrow{E(\vec{r})}\quad\overleftarrow{E(\vec{r})}\quad\overleftrightarrow{E(\vec{r})}\quad\underrightarrow{E(\vec{r})}\quad\underleftarrow{E(\vec{r})}\quad\underleftrightarrow{E(\vec{r})}\quad\overline{v}=\bar{v}\quad\underline{v}$
 
-### 8、积分
 
->代码:
->
->```text
+---
+
+
+
+## 8）积分
+
+代码:
+
+~~~
+$$
+\iint\limits_D\left(\dfrac{\partial Q}{\partial x}-\dfrac{\partial P}{\partial y}\right){\rm d}x{\rm d}y=\oint\limits_LP{\rm d}x+Q{\rm d}y
+$$
+~~~
+
+
+
+效果:
+
 >$$
 >\iint\limits_D\left(\dfrac{\partial Q}{\partial x}-\dfrac{\partial P}{\partial y}\right){\rm d}x{\rm d}y=\oint\limits_LP{\rm d}x+Q{\rm d}y
 >$$
->```
 
->效果:
->$$
->\iint\limits_D\left(\dfrac{\partial Q}{\partial x}-\dfrac{\partial P}{\partial y}\right){\rm d}x{\rm d}y=\oint\limits_LP{\rm d}x+Q{\rm d}y
->$$
 
-### 9、极限
 
->代码:
->
->```text
+---
+
+
+
+## 9）极限
+
+代码:
+
+~~~
+$\lim\limits_{n\to\infin}(1+\dfrac{1}{n})^n=e$
+~~~
+
+
+
+效果:
+
 >$\lim\limits_{n\to\infin}(1+\dfrac{1}{n})^n=e$
->```
 
->效果:
->$\lim\limits_{n\to\infin}(1+\dfrac{1}{n})^n=e$
 
-### 10、累加、累乘及交集、并集
 
->```text
+---
+
+
+
+## 10）累加、累乘及交集、并集
+
+代码：
+
+~~~
+$\sum\limits_{i=1}^n\dfrac{1}{n^2}\quad and\quad\prod\limits_{i=1}^n\dfrac{1}{n^2}\quad and\quad\bigcup\limits_{i=1}^n\dfrac{1}{n^2}\quad and\quad\bigcap\limits_{i=1}^n\dfrac{1}{n^2}$
+~~~
+
+
+
+效果:
+
 >$\sum\limits_{i=1}^n\dfrac{1}{n^2}\quad and\quad\prod\limits_{i=1}^n\dfrac{1}{n^2}\quad and\quad\bigcup\limits_{i=1}^n\dfrac{1}{n^2}\quad and\quad\bigcap\limits_{i=1}^n\dfrac{1}{n^2}$
->```
 
->效果:
->$\sum\limits_{i=1}^n\dfrac{1}{n^2}\quad and\quad\prod\limits_{i=1}^n\dfrac{1}{n^2}\quad and\quad\bigcup\limits_{i=1}^n\dfrac{1}{n^2}\quad and\quad\bigcap\limits_{i=1}^n\dfrac{1}{n^2}$
 
-### 11、希腊字母
+
+---
+
+
+
+## 11）希腊字母
 
 | 语法                          | 字母                            | 语法                    | 字母                      | 语法               | 字母                 |
 | ----------------------------- | ------------------------------- | ----------------------- | ------------------------- | ------------------ | -------------------- |
@@ -625,7 +766,13 @@ H~2~O
 | \ell                          | $\ell$                          | \eth                    | $\eth$                    | \hbar              | $\hbar$              |
 | \hslash                       | $\hslash$                       | \mho                    | $\mho$                    | \partial           | $\partial$           |
 
-### 12、特殊字符
+
+
+---
+
+
+
+## 12）特殊字符
 
 #### ①说明
 >可以在字符前使用`\large`或`\small`以显示更大或更小的字符。${\LARGE A}{\Large A}{\large A}A{\small A}$
@@ -721,13 +868,19 @@ H~2~O
 | \\!  | $|\!|$ | 默认    | $||$   | \quad  | $|\quad|$  |
 | \,   | $|\,|$ | \;(\\ ) | $|\;|$ | \qquad | $|\qquad|$ |
 
-### 13、字体
 
-> 代码:
->
-> ```text
-> ${\字体{需要转换的字符}}$
-> ```
+
+---
+
+
+
+## 13）字体
+
+代码:
+
+~~~
+${\字体{需要转换的字符}}$
+~~~
 
 | 输入 | 说明 | 显示  | 输入  | 说明 | 显示 |
 | ---- | ---- | ----- | ----- | ---- | ------ |
@@ -737,12 +890,18 @@ H~2~O
 | \sf  | 等线体 | ${\sf{Sample}}$ | \scr  | 手写体 | ${\scr{Sample}}$ |
 | \tt  | 打字机体 | ${\tt{Sample}}$ | \frak | 旧德式字体 | ${\frak{Sample}}$|
 
-### 14、大括号和行标
 
->说明:  使用`\left`和`\right`来创建自动匹配高度的`()`、`[]`、`{}`、`.`。在每个公式末尾使用`\tag{行标}`来实现行标。
 
->代码:
->
+---
+
+
+
+## 14）大括号和行标
+
+说明:  使用`\left`和`\right`来创建自动匹配高度的`()`、`[]`、`{}`、`.`。在每个公式末尾使用`\tag{行标}`来实现行标。
+
+代码:
+
 >```text
 >$$
 >f\left(
@@ -755,39 +914,58 @@ H~2~O
 >$$
 >```
 
->效果:
+
+
+效果:
+
 >$$
 >f\left(\left[\dfrac{1+\{x,y\}}{\left(\dfrac{x}{y}+\dfrac{y}{x}\right)(u+1)}+a\right]^{\dfrac{3}{2}}\right)\tag{行标}
 >$$
 
->说明:如果你想将行内显示的分隔符也变大,也可以使用`\middle`命令
+说明:如果你想将行内显示的分隔符也变大,也可以使用`\middle`命令
 
->代码:
->
+
+
+代码:
+
 >```text
 >$$
 >\left\langle q\middle\|\dfrac{\dfrac{x}{y}}{\dfrac{u}{v}}\middle|p\right\rangle
 >$$
 >```
 
->效果:
+
+
+效果:
+
 >$$
 >\left\langle q\middle\|\dfrac{\dfrac{x}{y}}{\dfrac{u}{v}}\middle|p\right\rangle
 >$$
 
-### 15、其他命令
+
+
+---
+
+
+
+## 15）其他命令
 
 #### ①注释文字
 
->代码:
+代码:
 >```text
 >$\text{文字}$
 >```
 
->效果:
+
+
+效果:
+
 >$$
 >f(n)=\begin{cases}n/2,&\text{if $n$ is even}\\3n+1,&\text{if $n$ is odd}\end{cases}
 >$$
+
+
 
 #### ③文字颜色
 
@@ -831,11 +1009,14 @@ H~2~O
 | #AF0 | $\color{#AF0}{color}$ | #AF5 | $\color{#AF5}{color}$ | #AFA | $\color{#AFA}{color}$ | #AFF | $\color{#AFF}{color}$ |
 | #FF0 | $\color{#FF0}{color}$ | #FF5 | $\color{#FF5}{color}$ | #FFA | $\color{#FFA}{color}$ | #FFF | $\color{#FFF}{color}$ |
 
+
+
 #### ③删除线
 
->说明:  使用`\require{cancle}`声明，再使用`\cancle{字符}`、`\bcancle{字符}`、`\xcancle{字符}`、`\cancleto{字符}{字符}`来实现各种**片段删除线**效果。
+说明:  使用`\require{cancle}`声明，再使用`\cancle{字符}`、`\bcancle{字符}`、`\xcancle{字符}`、`\cancleto{字符}{字符}`来实现各种**片段删除线**效果。
 
->代码:
+代码:
+
 >```text
 >$$
 >\require{cancel}\begin{array}{r1}
@@ -849,7 +1030,8 @@ H~2~O
 >$$
 >```
 
->效果:
+效果:
+
 >$$
 >\require{cancel}\begin{array}{r1}
 >\verb|y+\cancel{x}|&y+\cancel{x}\\
@@ -861,9 +1043,11 @@ H~2~O
 >\end{array}
 >$$
 
->说明:  使用`\require{enclose}`来允许**整段删除线**的显示，再使用`\enclose{删除线效果}{字符}`来使用各种整段删除线效果。其中，删除线效果有`horizontalstrike`、`verticalstrike`、`updiagonalstrike`和`downdiagonalstrike`,可以叠加使用。
 
->代码:
+
+说明:  使用`\require{enclose}`来允许**整段删除线**的显示，再使用`\enclose{删除线效果}{字符}`来使用各种整段删除线效果。其中，删除线效果有`horizontalstrike`、`verticalstrike`、`updiagonalstrike`和`downdiagonalstrike`,可以叠加使用。
+
+代码:
 >```text
 >$$
 >\require{enclose}\begin{array}{r1}
@@ -887,11 +1071,13 @@ H~2~O
 >\end{array}
 >$$
 
-### 16、矩阵
+
+
+## 16）矩阵
 
 #### ①无框矩阵
 
->代码:
+代码:
 >```text
 >$$
 >\begin{matrix}
@@ -902,7 +1088,10 @@ H~2~O
 >$$
 >```
 
->效果:
+
+
+效果:
+
 >$$
 >\begin{matrix}
 >1&x&x^2\\
@@ -911,19 +1100,23 @@ H~2~O
 >\end{matrix}
 >$$
 
+
+
 #### ②边框矩阵
 
->说明:  在开头将`matrix`替换为`pmatrix`、`bmatrix`、`Bmatrix`、`vmatrix`、`Vmatrix`。
+说明:  在开头将`matrix`替换为`pmatrix`、`bmatrix`、`Bmatrix`、`vmatrix`、`Vmatrix`。
 
 | matrix                               | pmatrix                                | bmatrix                                | Bmatrix                                | vmatrix                                | Vmatrix                                |
 | ------------------------------------ | -------------------------------------- | -------------------------------------- | -------------------------------------- | -------------------------------------- | -------------------------------------- |
 | $\begin{matrix}1&2\\3&4\end{matrix}$ | $\begin{pmatrix}1&2\\3&4\end{pmatrix}$ | $\begin{bmatrix}1&2\\3&4\end{bmatrix}$ | $\begin{Bmatrix}1&2\\3&4\end{Bmatrix}$ | $\begin{vmatrix}1&2\\3&4\end{vmatrix}$ | $\begin{Vmatrix}1&2\\3&4\end{Vmatrix}$ |
 
+
+
 #### ③带分割线的矩阵
 
->说明:  可以使用`cc|c`来在一个三列矩阵中插入分割线。
+说明:  可以使用`cc|c`来在一个三列矩阵中插入分割线。
 
->代码:
+代码:
 >```text
 >$$
 >\left[
@@ -935,7 +1128,8 @@ H~2~O
 >$$
 >```
 
->效果:
+效果:
+
 >$$
 >\left[
 >\begin{array}{cc|c}
@@ -944,22 +1138,27 @@ H~2~O
 >\end{array}
 >\right]
 >$$
+
+
 
 #### ④行中矩阵
 
->代码:
+代码:
 >```text
 >$\bigl(\begin{smallmatrix}a&b\\c&d\end{smallmatrix}\bigr)$
 >```
 
->效果:
+效果:
+
 >$\bigl(\begin{smallmatrix}a&b\\c&d\end{smallmatrix}\bigr)$
 
-### 17、方程式序列
 
->说明:  可以使用`\begin{align}...\end{align}`来创建一列整齐且默认右对齐的方程式序列。请注意`{align}`是**自动编号**的，使用`{align*}`来声明停止自动编号，也可以使用`\notag`来取消特定行的自动编号。在需要的时候，你可以使用`\begin{equation}...\end{equation}`来强制表达式自动编号。
 
->代码:
+## 17）方程式序列
+
+说明:  可以使用`\begin{align}...\end{align}`来创建一列整齐且默认右对齐的方程式序列。请注意`{align}`是**自动编号**的，使用`{align*}`来声明停止自动编号，也可以使用`\notag`来取消特定行的自动编号。在需要的时候，你可以使用`\begin{equation}...\end{equation}`来强制表达式自动编号。
+
+代码:
 >$$
 >\begin{align}
 >f(x)&=1+1\\
@@ -1001,7 +1200,10 @@ H~2~O
 >$$
 >```
 
->效果:
+
+
+效果:
+
 >$$
 >\begin{align}
 >\sqrt{37}&=\sqrt{\dfrac{73^2-1}{12^2}}\\
@@ -1025,11 +1227,13 @@ H~2~O
 >
 >公式1和2的不同列之间存在间隔，如果你不想要，可以通过将`align`替换为`alignat{1}`来去除列间隔。
 
-### 18、条件表达式
 
->说明:  使用`\begin{cases}`来创造一组默认左对齐的条件表达式,在每一行插入`&`来指定需要对齐的内容,并在每一行结尾处使用`\\`,以`\end{cases}`结尾。
 
->代码:
+## 18）条件表达式
+
+说明:  使用`\begin{cases}`来创造一组默认左对齐的条件表达式,在每一行插入`&`来指定需要对齐的内容,并在每一行结尾处使用`\\`,以`\end{cases}`结尾。
+
+代码:
 >```text
 >$$
 >f(n)=
@@ -1040,7 +1244,8 @@ H~2~O
 >$$
 >```
 
->效果:
+效果:
+
 >$$
 >f(n)=
 >\begin{cases}
@@ -1049,11 +1254,13 @@ H~2~O
 >\end{cases}
 >$$
 
-### 19、配置行高
 
->说明:  可以使用`\\[2ex]`语句替代该行末尾的`\\`来让编译器适配 , 其中`[ex]`指一个"X-Height" , 即x字母高度 , 也可以使用`[3ex]`或`[4ex]`等。
 
->代码:
+## 19）配置行高
+
+说明:  可以使用`\\[2ex]`语句替代该行末尾的`\\`来让编译器适配 , 其中`[ex]`指一个"X-Height" , 即x字母高度 , 也可以使用`[3ex]`或`[4ex]`等。
+
+代码:
 >```text
 >$$
 >f(n)=
@@ -1073,7 +1280,7 @@ H~2~O
 >$$
 >```
 
->效果:
+效果:
 >$$
 >f(n)=
 >\begin{cases}
@@ -1091,12 +1298,14 @@ H~2~O
 >\end{cases}\tag{不适配[2ex]}
 >$$
 
-### 20、数组与表格
 
->说明:  数组与表格均以`\begin{array}`开头,并在其后定义列数及每一列的文本对齐方式,`c` `l` `r`分别代表居中、左对齐及右对齐。若要插入垂直分割线，在定义中插入`|`，若要插入水平分割线，在定义中加入`\hline`。
 
->代码:
->
+## 20）数组与表格
+
+说明:  数组与表格均以`\begin{array}`开头,并在其后定义列数及每一列的文本对齐方式,`c` `l` `r`分别代表居中、左对齐及右对齐。若要插入垂直分割线，在定义中插入`|`，若要插入水平分割线，在定义中加入`\hline`。
+
+代码:
+
 >```text
 >$$
 >\begin{array}{c|lcr}
@@ -1109,7 +1318,8 @@ H~2~O
 >$$
 >```
 
->效果:
+效果:
+
 >$$
 >\begin{array}{c|lcr}
 >n&\text{左对齐}&\text{居中对齐}&\text{右对齐}\\
@@ -1120,9 +1330,11 @@ H~2~O
 >\end{array}
 >$$
 
-### 21、嵌套表格或数组
 
->代码:
+
+## 21）嵌套表格或数组
+
+代码:
 >```text
 >$$
 >% outer vertical array of arrays 外层垂直表格
@@ -1165,7 +1377,8 @@ H~2~O
 >$$
 >```
 
->效果:
+效果:
+
 >$$
 >% outer vertical array of arrays 外层垂直表格
 >\begin{array}{c}
@@ -1206,11 +1419,13 @@ H~2~O
 >\end{array}
 >$$
 
-### 22、方程组
 
->说明:  使用`\begin{array}...\end{array}`和`\left\{...\right.`来创建一个方程组,或者你也可以使用条件表达式组`\begin{cases}...\end{cases}`来实现相同效果。
 
->代码:
+## 22）方程组
+
+说明:  使用`\begin{array}...\end{array}`和`\left\{...\right.`来创建一个方程组,或者你也可以使用条件表达式组`\begin{cases}...\end{cases}`来实现相同效果。
+
+代码:
 >```text
 >$$
 >\left\{
@@ -1229,7 +1444,8 @@ H~2~O
 >$$
 >```
 
->效果:
+效果:
+
 >$$
 >\left\{
 >\begin{array}{l}
@@ -1246,51 +1462,58 @@ H~2~O
 >\end{cases}
 >$$
 
-### 23、连分式
 
->说明:  就像`\frac`一样,使用`\cfrac`或`\dfrac`来创建一个连分式,不要使用普通的`\frac`或`\over`来创建,否则看起来会**很恶心**。
 
->代码:
+## 23）连分式
+
+说明:  就像`\frac`一样,使用`\cfrac`或`\dfrac`来创建一个连分式,不要使用普通的`\frac`或`\over`来创建,否则看起来会**很恶心**。
+
+代码:
 >```text
 >$$
 >x=a_0+\cfrac{1^2}{a_1+\cfrac{2^2}{a_2+\cfrac{3^2}{a_3+\cfrac{4^2}{a_4+\cdots}}}}
 >$$
 >```
 
->效果:
+效果:
+
 >$$
 >x=a_0+\cfrac{1^2}{a_1+\cfrac{2^2}{a_2+\cfrac{3^2}{a_3+\cfrac{4^2}{a_4+\cdots}}}}
 >$$
 
->反例:
+反例:
 >```text
 >x=a_0+\frac{1^2}{a_1+\frac{2^2}{a_2+\frac{3^2}{a_3+\frac{4^2}{a_4+\cdots}}}}
 >```
 
->效果:
+效果:
+
 >$$
 >x=a_0+\frac{1^2}{a_1+\frac{2^2}{a_2+\frac{3^2}{a_3+\frac{4^2}{a_4+\cdots}}}}
 >$$
 
->补充:  当然,你可以使用`\frac`来表达连分数的**紧缩记法**。
+补充:  当然,你可以使用`\frac`来表达连分数的**紧缩记法**。
 
->代码:
+代码:
 >```text
 >$$
 >x=a_0+\frac{1^2}{a_1+}\frac{2^2}{a_2+}\frac{3^2}{a_3+}\frac{4^2}{a_4+}\cdots
 >$$
 >```
 
->效果:
+效果:
+
 >$$
 >x=a_0+\frac{1^2}{a_1+}\frac{2^2}{a_2+}\frac{3^2}{a_3+}\frac{4^2}{a_4+}\cdots
 >$$
 
-### 24、交换图表
 
->说明:  使用一行`$\require{AMScd}$`语句来允许交换图表的显示,并通过在开头使用`\begin{CD}`,结尾使用`\end{CD}`来创建。
 
->代码:
+## 24）交换图表
+
+说明:  使用一行`$\require{AMScd}$`语句来允许交换图表的显示,并通过在开头使用`\begin{CD}`,结尾使用`\end{CD}`来创建。
+
+代码:
 >```text
 >$$
 >\require{AMScd}
@@ -1302,7 +1525,8 @@ H~2~O
 >$$
 >```
 
->效果:
+效果:
+
 >$$
 >\require{AMScd}
 >\begin{CD}
@@ -1312,9 +1536,9 @@ H~2~O
 >\end{CD}
 >$$
 
->补充:  其中,`@>>>`代表右箭头、`@<<<`代表左箭头、`@VVV`代表下箭头、`@AAA`代表上箭头、`@=`代表水平双实线、`@|`代表竖直双实线、`@.`代表没有箭头。在`@>>>`的`>>>`之间任意插入文字即代表该箭头的注释文字。
+补充:  其中,`@>>>`代表右箭头、`@<<<`代表左箭头、`@VVV`代表下箭头、`@AAA`代表上箭头、`@=`代表水平双实线、`@|`代表竖直双实线、`@.`代表没有箭头。在`@>>>`的`>>>`之间任意插入文字即代表该箭头的注释文字。
 
->代码:
+代码:
 >```text
 >$$
 >\begin{CD}
@@ -1325,7 +1549,8 @@ H~2~O
 >$$
 >```
 
->效果:
+效果:
+
 >$$
 >\begin{CD}
 >A@>>>B@>{\text{very long label}}>>C\\
@@ -1334,23 +1559,35 @@ H~2~O
 >\end{CD}
 >$$
 
-### 25、其他
+
+
+## 25）其他
 
 >* 搜索$\LaTeX$
 
-## 十四、支持的HTML元素
 
-### 1、文本居中
->代码
+
+---
+
+# 十五、支持的HTML元素
+
+## 1）文本居中
+代码
 >```text
 ><center>内容</center>
 >```
 
->效果
->
+效果
+
 ><center>内容</center>
 
-### 2、快捷键显示
+
+
+---
+
+
+
+## 2）快捷键显示
 
 >代码:
 >```text
@@ -1360,46 +1597,74 @@ H~2~O
 >效果:
 ><kbd>内容</kbd>
 
-### 3、加粗
 
->代码:
->
+
+---
+
+
+
+## 3）加粗
+
+代码:
+
 >```text
 ><b>加粗</b>
 >```
 
->效果:
->
+效果:
+
 ><b>加粗</b>
 
-### 4、倾斜
->代码:
+
+
+---
+
+
+
+## 4）倾斜
+
+代码:
 >```text
 ><i>倾斜</i>
 >```
 
->效果:
+效果:
+
 ><i>倾斜</i>
 
-### 5、上下标
 
->代码:
+
+---
+
+
+
+## 5）上下标
+
+代码:
 >```text
 >开始<sup>123hi你好</sup>
 >开始<sub>321hi你好</sub>
 >```
 
->效果:
+效果:
+
 >开始<sup>123hi你好</sup>
 >开始<sub>321hi你好</sub>
 
-### 6、填充的黑色箭头
 
-> 代码：
->
+
+---
+
+
+
+## 6）填充的黑色箭头
+
+代码：
+
 > ```text
-> &#x27A4;
+>&#x27A4;
 > ```
 
-> 效果：
+效果：
+
 > &#x27A4;
