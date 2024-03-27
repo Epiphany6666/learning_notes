@@ -396,13 +396,25 @@ Java在操作系统中，是不可以直接运行的，因为操作系统它是�
 
 ## HelloWorld案例的编写
 
-1、新建文本文档文件，修改名称为HelloWorld.java。
+> 新版本的JDK不需要先配置环境变量。直接按照以下步骤编写即可。
+
+### 1、新建文本文档文件，修改名称为HelloWorld.java。
 
 <img src="assets/image-20240327112611211.png" alt="image-20240327112611211" style="zoom:50%;" />
 
+**注意**：
+
+- 后缀名为java的才是java文件。修改文件名后缀的时候会出现一个弹窗，点击yes即可。
+
+  <img src="assets/image-20240327112843317.png" alt="image-20240327112843317" style="zoom:50%;" />
+
+- 如果文件后缀名并没有展示，需要按如下步骤进行设置。勾选上文件扩展名，文件扩展名就是后缀名。
+
+  <img src="assets/image-20240327113113809.png" alt="image-20240327113113809" style="zoom:50%;" />
 
 
-2、用记事本打开HelloWorld.java文件，输写程序内容。代码要跟我编写的完全保持一致。
+
+### 2、用记事本打开HelloWorld.java文件，输写程序内容。代码要跟我编写的完全保持一致。
 
 右键点击文件，然后点击打开，此时就可以使用windows自带的记事本来编辑了。
 
@@ -424,7 +436,7 @@ public class HelloWorld {
 
 
 
-3、<kbd>ctrl + s</kbd> 保存，或者也可以直接图形化点击保存。
+### 3、<kbd>ctrl + s</kbd> 保存，或者也可以直接图形化点击保存。
 
 <img src="assets/image-20240327113957364.png" alt="image-20240327113957364" style="zoom:50%;" />
 
@@ -434,141 +446,89 @@ public class HelloWorld {
 
 
 
-4、编译文件。
+### 4、编译文件。
 
-此时就需要使用到Java当中的工具了，找到JDK的安装目录里的bin文件夹`E:\develop\JDK17\bin`，我们所要找的工具一个是 `javac`，另一个是 `java`，用 `javac` 去编译，然后再用 `java` 去运行。
+此时就需要使用到Java当中的工具了，找到JDK的安装目录里的bin文件夹`E:\develop\JDK17\bin`，我们所要找的工具一个是 `javac`，另一个是 `java`，用 `javac` 去编译，然后再用 `java` 去运行。`javac` 是JDK提供的一个编译工具，我们可以通过这个工具，把当前路径下的java文件编译成class文件。
 
-这两个工具是在cmd中使用的。
+<img src="assets/image-20240327132509702.png" alt="image-20240327132509702" style="zoom:50%;" />
 
-编译后会产生一个class文件。
+这两个工具是在cmd中使用的。cmd默认操作的是 `C:\User\XXX` 下的文件夹，如果要进入到刚刚编写的HelloWorld所在的文件夹，就需要使用cmd命令进行切换了。
 
-java文件：程序员自己编写的代码。
+切换到编写的HelloWorld.java所在的文件夹后，执行 `javac HelloWorld.java`。执行完后如果没有任何信息出现，表示编译成功。编译后会多一个文件，这个文件就是翻译之后的文件，它的后缀名是class，所以我们也会把这个文件叫做class文件，或者是字节码文件。这个文件就是给操作系统在运行的时候使用的，我们人是看不懂的。
 
-class文件：交给计算机执行的文件。
+<img src="assets/image-20240327131001440.png" alt="image-20240327131001440" style="zoom:50%;" />
 
-5. 运行代码
+我们可以右键点击它，然后使用记事本打开。可以发现里面的东西我们是看不懂的。
 
-   **注意**：运行的是编译之后的class文件。
+<img src="assets/image-20240327131535808.png" alt="image-20240327131535808"  />
 
-> 用到两个命令：
->
-> ​	javac + 文件名 + 后缀名 （就是编译java文件）
->
-> ​	java + 文件名（运行编译之后的class文件）
 
-**注意**：
 
-- 后缀名为java的才是java文件。修改文件名后缀的时候会出现一个弹窗，点击yes即可。
+### 5、运行代码。
 
-  <img src="assets/image-20240327112843317.png" alt="image-20240327112843317" style="zoom:50%;" />
+`java` 是JKD提供的运行代码的工具。接下来使用 `java` 工具，执行 `java HelloWorld`，注意不需要加上后缀名。运行的是编译之后的class文件。此时发现，HelloWorld已经出来了。
 
-- 如果文件后缀名并没有展示，需要按如下步骤进行设置。勾选上文件扩展名，文件扩展名就是后缀名。
+![image-20240327132931942](assets/image-20240327132931942.png)
 
-  <img src="assets/image-20240327113113809.png" alt="image-20240327113113809" style="zoom:50%;" />
 
-### 1.4 HelloWorld案例常见问题
 
-#### 1.4.1 BUG
+小技巧：如果不想每次编译的时候都切换路径，可以在java文件当前所在的文件夹的上方，直接输入cmd，然后回车。此时打开的cmd窗口所在的路径就是java文件所在的路径。
 
-​	在电脑系统或程序中，隐藏着的一些未被发现的缺陷或问题统称为bug（漏洞）。
+<img src="assets/image-20240327134250790.png" alt="image-20240327134250790" style="zoom:50%;" />
 
-#### 1.4.2 BUG的解决
+
+
+---
+
+# 9.HelloWorld案例常见问题
+
+## BUG
+
+BUG（小甲虫）。计算机刚开始出现的时候，因为体积比较大，一些小虫子很容易转进去。有一天有一只蟑螂钻到了计算机当中，从而导致计算机不能正常运行，此时就有两个工作人员去排查了，就是下图的两个小姐姐。
+
+<img src="assets/image-20240327133017667.png" alt="image-20240327133017667" style="zoom:50%;" />
+
+在电脑系统或程序中，隐藏着的一些未被发现的缺陷或问题统称为bug（漏洞）。
+
+
+
+## BUG的解决
 
 1. 具备识别BUG的能力：多看
 2. 具备分析BUG的能力：多思考，多查资料
 3. 具备解决BUG的能力：多尝试，多总结
 
-#### 1.4.3 HelloWorld常见问题
+
+
+## HelloWorld常见问题
 
 1、非法字符问题。Java中的符号都是英文格式的。
 
+例如，下方将分号改为了中文的分号，然后重新编译，此时它就会报错——第三行出现了问题：错误：需要 ’ ; ‘，并且出现了一个小箭头，指向了小括号的后面，意思就是说：这个符号我不认识，是不是一个中文？
+
+![image-20240327133403977](assets/image-20240327133403977.png)
+
+有一个小技巧，可以避免标点符号的问题：将输入法设置为 `中文时使用英文标点`，以下以搜狗输入法举例。右击搜狗输入法，选择 `更多设置` ,然后勾选上 `中文时使用英文标点`，此时以后你输入的标点符号全部都是英文状态下的了。
+
+<img src="assets/image-20240327133852177.png" alt="image-20240327133852177" style="zoom:50%;" />
+
+
+
 2、大小写问题。Java语言对大小写敏感（区分大小写）。
 
-3、在系统中显示文件的扩展名，避免出现HelloWorld.java.txt文件。
+例如将 `System` 的大写 `S` 改为了小写 `s`，重新编译，就会报以下错误。此时又会出现一个小箭头，表示在小箭头的前后出现了问题。
 
-4、编译命令后的java文件名需要带文件后缀.java
+<img src="assets/image-20240327134448882.png" alt="image-20240327134448882" style="zoom:50%;" />
 
-5、运行命令后的class文件名（类名）不带文件后缀.class
 
-...
 
-#### 常见错误代码1：
+---
 
-```java
-publicclass HelloWorld{
-    public static void main(String[] args){
-        System.out.println("HelloWorld");
-    }
-}
-```
+# 10.环境变量
 
-问题：
+开发Java程序，需要使用JDK提供的开发工具（比如javac.exe、java.exe等命令），而这些工具在JDK的安装目录的bin目录下，如果不配置环境变量，那么这些命令只可以在bin目录下使用，而我们想要在任意目录下都能使用，所以就要配置环境变量。
 
-​	public和class之间缺少一个空格。
-
-技巧：一般来讲在单词之间的空格是不能省略的。
-
-​	如果是单词和符号之间的空格是可以省略的。
-
-#### 常见错误代码2：
-
-```java
-public class HelloWorld{
-    public static void main(String[] args){
-        system.out.println("HelloWorld");
-    }
-}
-```
-
-问题：
-
-​	system首字母必须大写。
-
-技巧：
-
-​	Java代码中，是严格区分大小写的。
-
-​	所以该大写的地方一定要大写，该小写的地方一定要小写。多多练习。
-
-#### 常见错误代码3：
-
-```java
-public class HelloWorld{
-    public static void main(String[] args){
-        System.out.println(HelloWorld);
-    }
-}
-```
-
-问题：
-
-​	第三行代码中的HelloWorld必须用双引号引起来，否则就会出现问题。
-
-#### 常见错误代码4：
-
-```java
-public class HelloWorld{
-    public static void main(String[] args){
-        System.out.println("HelloWorld")；
-    }
-}
-```
-
-问题：
-
-​	在以后代码当中，所有的标点符号必须是英文状态下的。
-
-技巧：
-
-​	可以在输入法中进行对应的设置。
-
-### 1.5 环境变量
-
-#### 1.5.1 为什么配置环境变量
-
-​	开发Java程序，需要使用JDK提供的开发工具（比如javac.exe、java.exe等命令），而这些工具在JDK的安装目录的bin目录下，如果不配置环境变量，那么这些命令只可以在bin目录下使用，而我们想要在任意目录下都能使用，所以就要配置环境变量。
-
-注意：现在最新从官网上下载的JDK安装时会自动配置javac、java命令的路径到Path环境变量中去 ，所以javac、java可以直接使用。
+现在最新从官网上下载的JDK安装时会自动配置javac、java命令的路径到Path环境变量中去 ，所以javac、java可以直接使用。
 
 #### 1.5.2配置方式
 
