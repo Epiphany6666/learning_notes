@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ccaa41a3-268c-481c-8fce-d51b3fb4c3ca" name="更改" comment="">
+      <change beforePath="$PROJECT_DIR$/day2/basic-code/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/day2/basic-code/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/day2/basic-code/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/day2/basic-code/basic-code.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/day2/basic-code/basic-code/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/day2/basic-code/day02-code/day02-code.iml" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="localRepository" value="F:\develop\apache-maven-3.6.1\maven-repo" />
+        <option name="mavenHome" value="F:/develop/apache-maven-3.6.1" />
+        <option name="userSettingsFile" value="F:\develop\apache-maven-3.6.1\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="jdkForImporter" value="17" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="2eMoQ1nfAOADc9ZXDHS2ca6zkXM" />
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "E:/learning_notes/JAVA/code/basic-code",
+    "settings.editor.selected.configurable": "MavenSettings",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="ccaa41a3-268c-481c-8fce-d51b3fb4c3ca" name="更改" comment="" />
+      <created>1711723787455</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1711723787455</updated>
+      <workItem from="1711723788554" duration="26000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
