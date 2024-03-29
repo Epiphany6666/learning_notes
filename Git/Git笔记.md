@@ -1336,65 +1336,65 @@ gitlab-ctl stop
 
 #### 4.5.4.1 安装GitLab插件
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image002.jpg)
+![img](./img/clip_image002.jpg)
 
 #### 4.5.4.2 配置GitLab
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image004.jpg)
+![img](./img/clip_image004.jpg)
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image006.jpg)
+![img](./img/clip_image006.jpg)
 
 #### 4.5.4.3 创建新项目
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image008.jpg)
+![img](./img/clip_image008.jpg)
 
 #### 4.5.4.4 创建本地仓库
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image010.jpg)
+![img](./img/clip_image010.jpg)
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image012.jpg)
+![img](./img/clip_image012.jpg)
 
 #### 4.5.4.5 创建新代码
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image014.jpg)
+![img](./img/clip_image014.jpg)
 
 #### 4.5.4.6 提交文件
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image016.jpg)
+![img](./img/clip_image016.jpg)
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image018.jpg)
+![img](./img/clip_image018.jpg)
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image020.jpg)
+![img](./img/clip_image020.jpg)
 
 #### 4.5.4.7 推送远程库
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image022.jpg)
+![img](./img/clip_image022.jpg)
 
 #### 4.5.4.8 配置远程库
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image024.jpg)
+![img](./img/clip_image024.jpg)
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image026.jpg)
+![img](./img/clip_image026.jpg)
 
 #### 4.5.4.9 推送文件
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image028.jpg)
+![img](./img/clip_image028.jpg)
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image030.jpg)
+![img](./img/clip_image030.jpg)
 
 #### 4.5.4.10 合并提交请求
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image032.jpg)
+![img](./img/clip_image032.jpg)
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image034.jpg)
+![img](./img/clip_image034.jpg)
 
 合并
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image036.jpg)
+![img](./img/clip_image036.jpg)
 
 确认文件提交
 
-![img](file:///C:/Users/Epiphany/AppData/Local/Temp/msohtmlclip1/01/clip_image038.jpg)
+![img](assets/clip_image038.jpg)
 
  
 
@@ -1425,7 +1425,7 @@ gitlab-ctl stop
 
    - 先创建一个文件（git支持少数Linux命令）
 
-     ![image-20231125172841649](O:\2023.11.25Git讲解\img\image-20231125172841649.png)
+     ![image-20231125172841649](.\img\image-20231125172841649.png)
 
 
 
@@ -1437,7 +1437,7 @@ gitlab-ctl stop
 
    在用户设置中搜索“settings.json”
 
-   ![image-20231125171808298](O:\2023.11.25Git讲解\img\image-20231125171808298.png)
+   ![image-20231125171808298](.\img\image-20231125171808298.png)
 
    -->git.path为null-->将git.path路径改为自己计算机中git.path的路径
 
@@ -1445,7 +1445,7 @@ gitlab-ctl stop
 
    **PS**：后面有个逗号别忘记了！！！
 
-   ![image-20231125171852205](O:\2023.11.25Git讲解\img\image-20231125171852205.png)
+   ![image-20231125171852205](.\img\image-20231125171852205.png)
 
    保存
 
@@ -1455,11 +1455,11 @@ gitlab-ctl stop
 
 在VSCode中添加git终端
 
-![image-20231125171808298](O:\2023.11.25Git讲解\img\image-20231125171808298.png)
+![image-20231125171808298](.\img\image-20231125171808298.png)
 
 在设置搜索窗口中输入 Profiles: Windows，找到Terminal › Integrated › Profiles: Windows。再点击settings.json.进入文件编辑。
 
-![image-20231125180524835](C:\Users\Epiphany\AppData\Roaming\Typora\typora-user-images\image-20231125180524835.png)
+![image-20231125180524835](assets/image-20231125180524835-1711715970453-1.png)
 
 在"terminal.integrated.profiles.windows"下添加，其中path后面的"D:\\Program Files\\Git\\bin\\bash.exe"是你的ba[sh文件](https://so.csdn.net/so/search?q=sh文件&spm=1001.2101.3001.7020)路径。
 ```json
@@ -1473,17 +1473,17 @@ gitlab-ctl stop
 
 右击旁边的资源管理器 --> 在集成终端中打开
 
-![image-20231125181942364](O:\2023.11.25Git讲解\img\image-20231125181942364.png)
+![image-20231125181942364](.\img\image-20231125181942364.png)
 
 点击底下的小三角，选择**bash**
 
-<img src="O:\2023.11.25Git讲解\img\image-20231125182052627.png" alt="image-20231125182052627" style="zoom:67%;" />
+<img src=".\img\image-20231125182052627.png" alt="image-20231125182052627" style="zoom:67%;" />
 
 此时就会出现git终端，这个终端跟我们使用Git Bash Here是一模一样的，我们就可以在VSCode里面执行git命令了
 
-<img src="O:\2023.11.25Git讲解\img\image-20231125182303001.png" alt="image-20231125182303001" style="zoom:50%;" />
+<img src=".\img\image-20231125182303001.png" alt="image-20231125182303001" style="zoom:50%;" />
 
-![image-20231125182141176](O:\2023.11.25Git讲解\img\image-20231125182141176.png)
+![image-20231125182141176](.\img\image-20231125182141176.png)
 
 
 
