@@ -2898,6 +2898,7 @@ public class ArithmeticoperatorDemo2 {
         //除法
         System.out.println(10 / 2);//5
         System.out.println(10 / 3);//3
+        // 整数操作只能得到整数，想要得到小数，必须有浮点数参与运算
         System.out.println(10.0 / 3);//3.3333333333333335
 
         //取模，也叫取余。实际上也是做除法运算，只不过得到的是余数而已。
@@ -2952,9 +2953,9 @@ public class Test1 {
         int ge = number % 10;
         int shi = number / 10 % 10;
         int bai = number / 100 % 10;
-        System.out.println("个位是：" + ge);
-        System.out.println("十位是：" + shi);
-        System.out.println("百位是：" + bai);
+        System.out.println(ge);
+        System.out.println(shi);
+        System.out.println(bai);
     }
 }
 ```
@@ -2963,7 +2964,9 @@ public class Test1 {
 
 ---
 
-# 3.隐式转换 和 强制转换
+# 31.隐式转换 和 强制转换
+
+## 一、引入
 
 关于算术运算符的基本用法我们已经学习完了，现在来学习关于运算符的高级用法。
 
@@ -3011,7 +3014,7 @@ public class Test {
 
 ---
 
-## 一、隐式转换
+## 二、隐式转换
 
 隐式转换也叫 `自动类型提升`。就是把一个取值范围小的数据或者变量，赋值给另一个取值范围大的变量。此时不需要我们额外写代码单独实现，是程序自动帮我们完成的。
 
@@ -3077,199 +3080,137 @@ public class Test {
 
 - 转换规则2：
 
-  byte、short、char这三种类型的数据在运算的时候，都会直接先提升为int，然后再进行运算
+  byte、short、char这三种类型的数据在参与计算的时候，都会直接先提升为int，然后再进行运算
 
 
 
-### 简单记忆：
+---
 
-​	就是小的给大的，可以直接给。
+## 三、隐式转换练习：请问最终的运算结果是什么类型的？
 
-### 两种提升规则：
+**例一**：加法运算时从左到右依次计算。所以它是先计算 `i + n`，i + n是int 加上long，两个类型不一样，很明显要转换，由于long 大于 int，所以i里面的值会自动提神为long类型。前面两个数在参与计算的时候就相当是两个long进行计算。
 
-* 取值范围小的，和取值范围大的进行运算，小的会先提升为大的，再进行运算。
-* byte、short、char三种类型的数据在运算的时候，都会直接先提升为int，然后再进行运算。
+然后就是一个long类型加上一个double类型，两个类型又不一样，所以还要再转换，由于double 大于 long，所以long类型的数据会自动提升为double类型，所以最终结果就是double类型。
 
-### 取值范围从小到大的关系：
-
-​	byte short int long float double
-
-# 4.隐式转换的练习
-
-请看下面案例是否有误，如果有问题，请说出原因，如果没有问题，请说出运算过程和运算结果
-
-### 案例一：
-
-```java
-double d = 10;
-System.out.println(d);//10.0
-```
-
-解释：
-
-​	10是整数，整数默认是int类型的。
-
-​	而在取值范围的顺序中：byte short int long float double
-
-​	在赋值的时候把一个int类型的赋值给了一个double类型的。把一个小的赋值给一个大的是可以直接给的。
-
-
-
-### 案例二：
-
-```java
-byte b = 100;
-int i = b;//可以成功赋值
-```
-
-解释：
-
-​	因为byte的取值范围是小的，int的取值范围是大的，在底层进行了隐式转换，不需要我们额外写代码单独实现，是可以直接赋值。
-
-
-
-### 案例三：
-
-```java
-int i = 10;
-long n = 20L;
-??? result = i + n;
-问变量result是什么类型的？
-```
-
-解释：
-
-​	变量i是int类型的，变量n是long类型的。
-
-​	而在取值范围的顺序中：byte short int long float double
-
-​	变量i里面的值会自动提升为long类型的，最终的结果其实就是两个long相加，那么最终的result是long类型的。
-
-### 案例四：
-
-```java
+~~~java
 int i = 10;
 long n = 100L;
 double d = 20.0;
-??? result = i + n + d;
-问变量result是什么类型的？
-```
+数据类型 result = i + n + d;
+~~~
 
-解释：
+**例二**：首先是 `b + s`，由于b是byte类型的，s是short类型的，根据刚刚讲的第二个规则，byte、short在参与计算的时候，统一先提升为int，然后再参与运算，所以 `b + s` 就相当于是两个int相加，最终的结果是int。
 
-​	变量i是int类型，变量n是long类型，变量d是double类型。
+然后int 再去和 long类型的 n 相加，int最终提升为long。所以最终的result为long类型。
 
-​	而在取值范围的顺序中：byte short int long float double
-
-​	所以变量i和变量n里面的值在参与运算的时候，都会进行类型提升，变成double。
-
-​	最终其实就是三个double进行相加，那么最终的结果就是double类型的。
-
-
-
-
-
-### 案例五：
-
-```java
-byte b1 = 10;
-byte b2 = 20;
-??? result = b1 + b2;//int
-问变量result是什么类型的？
-```
-
-解释：
-
-​	因为b1和b2都是byte类型的。所以在参与计算的时候，变量b1和变量b2里面的值都会自动提升为int类型的。最终其实就是两个int类型的相加，最终结果也是int类型的。
-
-
-
-### 案例六：
-
-```java
+~~~java
 byte b = 10;
 short s = 20;
 long n = 100L;
-??? result = b + s + n;
-问变量result是什么类型的？long
-```
+数据类型 result = b + s + n;
+~~~
 
-解释：
+---
 
-​	变量b是byte类型的，变量s是short类型的，变量n是long类型的。
+## 四、强制转换
 
-​	byte，short，char类型的变量在参与运算的时候，变量里面的值会直接先提升为int。
+在代码当中，如果要把一个取值范围大的数值，赋值给取值范围小的变量。是不允许直接赋值的。如果一定要这么做就需要加入强制转换。强制转换是需要我们自己手动编写代码的，它的格式是：`目标数据类型 变量名 = （目标数据类型）被强转的数据` ，简单理解就是，你想要转成什么类型，就在小括号中写什么类型就行了。
 
-第一步：变量b和变量s里面的值会先提升为int参与运算。
+例如：将下面变量a里的数据直接赋值给变量b，肯定是不行的，因为等号后面变量a，取值范围是比较大的，而现在是把一个大的，给小的，是不能直接给的。但如果你一定要这么办，就需要先将a转为int类型。
 
-​		int + int + long
+~~~java
+double a = 12.3;
+int b = (int)a;
+~~~
 
-第二步：而long类型的取值范围是大于int的取值范围的。
+PS：强制转换有可能导致数据发生错误。（数据的精度丢失）
 
-​		所以变量b和变量s里面的值会再次提升为long。
+例如：int 类型的 a中存放的数据比较大，超出了byte的范围，此时数据就会发生错误。
 
-​		long + long + long。
+~~~java
+int a = 300;
+byte b = (byte) a;
+~~~
 
-所以最终结果是long类型的。
+---
 
-# 5.强制转换
+## 五、强制转换练习
 
-### 概念：
+如果将等号左边的result的int类型改为byte类型，那等号右边应该如何变？
 
-​	如果要把一个取值范围大的数据或者变量赋值给另一个取值范围小的变量。是不允许直接操作。
+~~~java
+byte b1 = 10;
+byte b2 = 20;
+// int result = b1 + b2;
+byte result = b1 + b2;
+~~~
 
-​	如果一定要这么干，就需要加入强制转换。
+代码示例
 
-### 书写格式：
+~~~java
+package com.itheima.arithmeticoperator;
 
-​	目标数据类型 变量名 = （目标数据类型）被强转的数据；
-
-简单理解：
-
-​	要转成什么类型的，那么就在小括号中写什么类型就可以了。
-
-案例：
-
-```java
-public class OperatorDemo2 {
+public class ArithmeticoperatorDemo3 {
     public static void main(String[] args) {
-        double a = 12.3;
-        int b = (int) a;
-        System.out.println(b);//12
+        byte b1 = 10;
+        byte b2 = 20;
+        //现在我们要强转的是谁？
+        //b1 + b2计算之后的结果。
+        // (byte)b1 + b2 强转的是b1，并不是最终的结果
+        byte result = (byte)(b1 + b2);
+        System.out.println(result);//30
     }
 }
-```
+~~~
 
-注意点：
+但如果转换的数据过大，就会发生错误
 
-​	强制转换有可能会导致数据发生错误。（数据的精度丢失）
+~~~java
+package com.itheima.arithmeticoperator;
 
-# 6.字符串的+操作
+public class ArithmeticoperatorDemo3 {
+    public static void main(String[] args) {
+        byte b1 = 100;
+        byte b2 = 200;
+        byte result = (byte)(b1 + b2);
+        System.out.println(result);//-56，结果就发生错误了。因为要转换的数据过大
+    }
+}
+~~~
 
-### 核心技巧：
 
-* 当+操作中出现字符串时，此时就是字符串的连接符，会将前后的数据进行拼接，并产生一个新的字符串。
+
+---
+
+
+
+# 32.字符串 和 字符的 + 操作
+
+技巧：有字符串，那就是字符串拼接，没有字符串，那就是普通的运算符
+
+* 当+操作中出现字符串时，此时就是字符串的连接符，会将前后的数据进行**拼接**，并产生一个新的字符串。
+
+  例如：`"123" + 123`，结果为 `"123123"`，而不是246。
+
 * 当连续进行+操作时，从左到右逐个执行的。
 
-# 7.字符串相加的练习：
+  例如：`1 + 2 + "abc"`，结果："3abc"
 
-案例1：
+  解释：
 
-```java
-1 + "abc" + 1
-```
+  ​	第一步：1 + 2 。在这个过程中，没有字符串参与的，所以做的是加法运算，结果为3。
 
-结果："1abc1"
+  ​	第二步：3 + "abc"。在这个过程中，有字符串参与的，所以做的是拼接操作，产生一个新的字符串"3abc"。
 
-解释：
+---
 
-​	第一步： 1 + "abc"。在这个过程中，有字符串参与的，所以做的是拼接操作，产生一个新的字符串"1abc"
+## 二、字符串相加的练习
 
-​	第二步：  "1abc" + 1。这个过程中，有字符串参与的，所以做的也是拼接操作，产生一个新的字符串"1abc1"
+字符串只有 + 操作，是没有 -、*、/运算的
 
+这里特别注意的是，变量在进行拼接的时候，会把变量里的值拿出来进行拼接！！！
 
-
-案例2：
+![image-20240330154715627](assets/image-20240330154715627.png)
 
 ```java
 1 + 2 + "abc" + 2 + 1
@@ -3287,40 +3228,81 @@ public class OperatorDemo2 {
 
 ​	第四步："3abc2" + 1。在这个过程中，有字符串参与的，所以做的是拼接操作，产生一个新的字符串“3abc21”
 
+---
+
+## 三、练习：数值拆分
+
+需求：键盘录入一个三位数，将其拆分为个位、十位、百位后，打印在控制台
+
+我们以前在进行计算的时候是通过一系列公式将个位、十位、百位都获取出来，并打印在控制台当中，打印出来的结果就是
+
+![image-20240330155411554](assets/image-20240330155411554.png)
+
+但是这种打印结果看起来非常累，如果我不看题目，我怎么知道这个3是什么，2是什么，1是什么？那能不能在打印的时候前面有一些说明性的提示呢？
+
+~~~java
+package com.itheima.test;
+
+import java.util.Scanner;
+
+public class Test1 {
+    public static void main(String[] args) {
+        //键盘录入一个三位数，获取其中的个位，十位，百位
+
+        //1.键盘录入
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请输入一个三位数");
+        int number = sc.nextInt();
+
+        //2.获取个位，十位，百位
+        //公式：
+        //个位：  数字 % 10
+        //十位：  数字 / 10 % 10
+        //百位：  数字 / 10 / 10 % 10
+        //...
+        int ge = number % 10;
+        int shi = number / 10 % 10;
+        int bai = number / 100 % 10;
+        System.out.println("个位是：" + ge);
+        System.out.println("十位是：" + shi);
+        System.out.println("百位是：" + bai);
+    }
+}
+~~~
+
+结果：
+
+<img src="assets/image-20240330155300495.png" alt="image-20240330155300495" style="zoom:50%;" />
+
+---
+
+## 四、字符的+操作
+
+在学习隐式转换的时候，曾经有过这样的提升规则：byte、short、char三种数据在参与运算的时候，都会先提升为int，然后再进行运算。但此时就有一个问题了，byte、short都是一个数字，容易提升，但是char是一个字符，怎么进行提升呢？我们先不着急，先来看一段代码：
+
+~~~java
+char c = 'a'; // 首先定义一个字符类型的变量
+int result = c + 0; // 用字符c跟数字0进行了相加
+System.out.println(result);// 打印结果为：97
+~~~
+
+打印结果为什么为97呢，这就要说到字符在进行计算的时候会有以下规则：
+
+**当+操作（作为运算符的时候）中出现了字符，会拿着字符到计算机内置的ASCII码表中去查对应的数字，然后再进行计算。**
+
+ASCII码表（American Standard Code for Information Interchange）美国信息交换标准码表。下面红色框框起来的部分，这张表中，每一个数字都会跟一个唯一的数字产生一个一一对应的关系。这张表是操作系统类似的，每个人的系统中都是存在的，不需要你额外下载。
+
+![image-20240330160306905](assets/image-20240330160306905.png)
+
+ASCII码表中：'a'   -----    97、'A'   -----    65
+
+示例：![image-20240330160340677](assets/image-20240330160340677.png)
 
 
-案例3：
 
-```java
-String name = "黑默丁格";
-System.out.println("我的名字是" + name);
-```
+---
 
-结果： 我的名字是黑默丁格
-
-解释：当字符串跟变量相加的时候，实际上是跟变量里面的值进行拼接。
-
-# 8.字符的+操作
-
-### 规则：
-
-​	当+操作中出现了字符，会拿着字符到计算机内置的ASCII码表中去查对应的数字，然后再进行计算。
-
-### 案例：
-
-```java
-char c = 'a';
-int result = c + 0;
-System.out.println(result);//97
-```
-
-ASCII码表中：
-
-​	'a'   -----    97
-
-​	'A'   -----    65
-
-# 9.算术运算符的总结
+## 五、算术运算符的总结
 
 分类：
 
@@ -3339,9 +3321,11 @@ ASCII码表中：
 
 特例：字符串只有+操作，没有其他操作。
 
-# 10.自增自减运算符
+---
 
-### 分类：
+# 33.自增自减运算符
+
+## 一、分类
 
 ```java
 ++  自增运算符
@@ -3352,114 +3336,170 @@ ASCII码表中：
 
 --：就是把变量里面的值-1
 
-### 使用方式：
+---
+
+## 二、使用方式
 
 * 放在变量的前面，我们叫做先++。 比如：++a
 * 放在变量的后面，我们叫做后++。 比如：a++
 
-### 注意点：
+**注意点**：不管是先++，还是后++。单独写在一行的时候，运算结果是一模一样的。
 
-​	不管是先++，还是后++。单独写在一行的时候，运算结果是一模一样的。
+---
 
-### 案例：
+## 三、代码示例
 
 ```java
-//++
-int a = 10;
-a++;//就是让变量a里面的值 + 1
-System.out.println(a);//11
-++a;//就是让变量a里面的值 + 1
-System.out.println(a);//12
+package com.itheima.arithmeticoperator;
+
+public class ArithmeticoperatorDemo5 {
+    public static void main(String[] args) {
+        //++ 和 --
+        int a = 10;
+        //表示把变量a里面的值+1
+        a++;
+        System.out.println(a);//11
+        //表示把变量a里面的值+1
+        ++a;
+        System.out.println(a);//12
+        //表示把变量a里面的值-1
+        a--;
+        System.out.println(a);//11
+        //表示把变量a里面的值-1
+        --a;
+        System.out.println(a);//10
+    }
+}
 ```
 
-### 自增自减运算符的应用场景：
+---
+
+## 四、自增自减运算符的应用场景
 
 某些情况下，变量需要进行加1或者减1的时候使用。
 
 比如：过生日多一岁，就用到了自增运算符。
 
+<img src="assets/image-20240330161046450.png" alt="image-20240330161046450" style="zoom:50%;" />
+
 比如：购物商场中，选择商品数量，也用到了自增或者自减运算符。
+
+<img src="assets/image-20240330161056063.png" alt="image-20240330161056063" style="zoom:50%;" />
 
 比如：统计很多数据中，有多少个数据满足要求，也用到了自增运算符。
 
-# 11.赋值运算符
+---
+
+## 五、参与计算
+
+之前我们学到过，`++`、`--` 无论是放在变量的前面还是后边，单独写一行结果是一样。但是如果自增自减运算符参与了计算，先++和后++就不一样了。
+
+后++的口诀 — 先加后用：先把变量a里面的值进行自增变成11，自增完了，再赋值给变量b。此时b的结果为10。
+
+先++的口诀 -— 先用后加：先将a里面的变量拿出来用，用完了再进行自增。此时b的结果为11。
+
+<img src="assets/image-20240330161307552.png" alt="image-20240330161307552" style="zoom:50%;" />
+
+---
+
+## 六、练习
+
+x、y、z的值分别为？
+
+~~~java
+int x = 10;
+int y = x++;
+int z = ++x;
+System.out.println("x:" + x);
+System.out.println("y:" + y);
+System.out.println("z:" + z);
+~~~
+
+
+
+~~~java
+package com.itheima.arithmeticoperator;
+
+public class ArithmeticoperatorDemo6 {
+    public static void main(String[] args) {
+        int x = 10;
+        //后++：先用后加
+        //先把x变量中的值拿出来用，赋值给y，然后再进行自增。
+        //赋值给y的值是自增前的。
+        int y = x++;// 这一行执行后：x = 11  y = 10
+        //先++：先加后用
+        //先把x进行自增，然后把自增后的结果赋值给左边的变量
+        //先把x自增，变成12，然后再把自增之后的12赋值给z
+        int z = ++x;// 这一行执行后：x = 12 z = 12
+        System.out.println("x:" + x);//12
+        System.out.println("y:" + y);//10
+        System.out.println("z:" + z);//12
+    }
+}
+~~~
+
+
+
+---
+
+# 34.赋值运算符 和 关系运算符
+
+## 赋值运算符
 
 最为常用的：	=
 
+扩展赋值运算符：+=、-=、*=、/=、%=，注意两个符号之间是没有间隔的，是挨在一块的。
+
 运算过程：就是把等号右边的结果赋值给左边的变量
 
-案例：
+---
+
+### 二、扩展赋值运算符
+
+**分类**：+=、-=、*=、/=、%=
+
+**运算规则**：就是把左边跟右边进行运算，把最终的结果赋值给左边，对右边没有任何影响。
+
+**注意点**：扩展的赋值运算符中隐层还包含了一个强制转换。
+
+**案例**：以 `+=` 为例
 
 ```java
-public class OperatorDemo6 {
+package com.itheima.assigningoperator;
+
+public class AssigningoperatorDemo1 {
     public static void main(String[] args) {
-        //1.最为简单的赋值运算符用法
-        int a = 10;//就是把10赋值给变量a
-        System.out.println(a);
-
-        //2.如果等号右边需要进行计算。
-        int b = 20;
-        int c = a + b;//先计算等号右边的，把计算的结果赋值给左边的变量
-        System.out.println(c);
-
-        //3.特殊的用法
-        a = a + 10;//先计算等号右边的，把计算的结果赋值给左边的变量
-        System.out.println(a);//20
-    }
-}
-```
-
-# 12.扩展赋值运算符
-
-### 分类：
-
-​	+=、-=、*=、/=、%=
-
-### 运算规则：
-
-​	就是把左边跟右边进行运算，把最终的结果赋值给左边，对右边没有任何影响。
-
-### 案例：
-
-```java
-public class OperatorDemo7 {
-    public static void main(String[] args) {
-        //扩展赋值运算符
+        //+=
+        //规则：将左边和右边进行相加，然后再把结果赋值给左边
         int a = 10;
         int b = 20;
-        a += b;//把左边和右边相加，再把最终的结果赋值给左边，对右边没有任何影响
-        // 相当于 a = a + b;
+        //把a+b，再把结果赋值给左边的变量a
+        a += b;
+        //等同于 a = (int)(a + b);
         System.out.println(a);//30
         System.out.println(b);//20
+
+
+        //细节：
+        //+=，-=，*=，/=，%= 底层都隐藏了一个强制类型转换，强转的类型是 左边变量的类型 所决定的
+        short s = 1;
+        //把左边和右边进行相加，得到结果2，再赋值给左边的变量
+        s += 1;
+        //等同于：s = s + 1;但是short类型在参与计算的时候，会先提升为int类型参与计算， s + 1 最终的结果应该是int类型的。但是如果不进行强制转换，那就是：将一个int类型的数赋值给short类型的数，就会报错了！
+        // 但是为什么这里没有报错呢？这是因为 +=，-=，*=，/=，%= 底层都隐藏了一个强制类型转换，所以它并不是等同于 s = s + 1，而是： s = (short) (s + 1); 强转的类型是 左边变量的类型 所决定的
+        System.out.println(s);//2
     }
 }
+
 ```
 
-### 注意点：
+---
 
-​	扩展的赋值运算符中隐层还包含了一个强制转换。
+## 关系运算符
 
-以+=为例。
+关系运算符又叫比较运算符，其实就是拿着左边跟右边进行了判断而已。
 
-a += b ;实际上相当于 a = (byte)(a + b);
-
-```java
-public class OperatorDemo8 {
-    public static void main(String[] args) {
-        byte a = 10;
-        byte b = 20;
-        //a += b;
-        a = (byte)(a + b);
-        System.out.println(a);//30
-    }
-}
-```
-
-# 13.关系运算符
-
-又叫比较运算符，其实就是拿着左边跟右边进行了判断而已。
-
-### 分类：
+**分类**：
 
 | 符号 | 解释                                                         |
 | ---- | ------------------------------------------------------------ |
@@ -3470,16 +3510,89 @@ public class OperatorDemo8 {
 | <    | 就是判断左边是否小于右边，如果成立就是true，如果不成立就是false |
 | <=   | 就是判断左边是否小于等于右边，如果成立就是true，如果不成立就是false |
 
-### 注意点：
+**注意点**：
 
 * 关系运算符最终的结果一定是布尔类型的。要么是true，要么是false
-* 在写==的时候，千万不要写成=
+* 在写 == 的时候，千万不要写成=
+* 两个符号之间是没有空格的，例如 `==`、`!=`
 
-# 14.逻辑运算符
+**代码示例**
 
-### & 和 | 的使用：
+~~~java
+package com.itheima.compareoperator;
 
-&：逻辑与（而且）
+public class CompareoperatorDemo1 {
+    public static void main(String[] args) {
+        //1.== 判断左右两边是否相等
+        int a = 10;
+        int b = 10;
+        int c = 20;
+        System.out.println(a == b);//true
+        System.out.println(a == c);//false
+
+        //!= 判断左右两边是否不相等
+    }
+}
+~~~
+
+---
+
+## 练习：约会
+
+这个练习是美国斯坦福大学Java的一个入门练习。
+
+需求：
+        您和您的约会对象在餐厅里面正在约会。
+        键盘录入两个整数，表示你和你约会对象衣服的时髦度。（手动录入0~10之间的整数，不能录其他）
+        如果你的时髦程度大于你对象的时髦程度，相亲就成功，输出true。
+        否则输出false。
+
+~~~java
+package com.itheima.test;
+
+import java.util.Scanner;
+
+public class Test2 {
+    public static void main(String[] args) {
+        //1.键盘录入两个整数表示衣服的时髦度
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请输入我们自己的衣服时髦度");
+        int myFashion = sc.nextInt();
+        System.out.println("请输入相亲对象衣服的时髦度");
+        int girlFashion = sc.nextInt();
+
+        //2.把我衣服的时髦度跟女孩的时髦度进行对比就可以了
+        boolean result = myFashion > girlFashion;
+
+        //3.打印结果
+        System.out.println(result);
+    }
+}
+~~~
+
+
+
+---
+
+# 35.逻辑运算符
+
+## 一、什么是逻辑运算符？
+
+- 在数学中，一个x，大于5，小于15，我们可以这样来进行表示： `5 < x < 15`。
+
+- 在Java中，需要把上面的式子先进行拆解，再进行合并表达。
+
+  拆解为：x>5 和 x<15这两个式子，然后再使用逻辑运算符将它们两个合在一起：x>5 & x<15，表示x同时要满足x>5 和 x<15两个条件。
+
+逻辑运算符一共有四个分类：
+
+![image-20240330164206070](assets/image-20240330164206070.png)
+
+---
+
+## 二、& 和 | 的使用：
+
+&：逻辑与（个人习惯读作：且，因为它就表示并且、而且）
 
 ​	两边都为真，结果才是真，只要有一个为假，那么结果就是假。
 
@@ -3490,66 +3603,87 @@ public class OperatorDemo8 {
 代码示例：
 
 ```java
-// &  //两边都是真，结果才是真。
-System.out.println(true & true);//true
-System.out.println(false & false);//false
-System.out.println(true & false);//false
-System.out.println(false & true);//false
+package com.itheima.logicoperator;
 
-System.out.println("===================================");
+public class LogicoperatorDemo1 {
+    public static void main(String[] args) {
+        //1.& 并且
+        //两边都为真，结果才是真
+        System.out.println(true & true);//true
+        System.out.println(false & false);//false
+        System.out.println(true & false);//false
+        System.out.println(false & true);//false
 
-// | 或  //两边都是假，结果才是假，如果有一个为真，那么结果就是真。
-System.out.println(true | true);//true
-System.out.println(false | false);//false
-System.out.println(true | false);//true
-System.out.println(false | true);//true
+
+        //2. | 或者
+        //两边都为假，结果才是假，只要有一个为真，结果就为真
+        System.out.println(true | true);//true
+        System.out.println(false | false);//false
+        System.out.println(true | false);//true
+        System.out.println(false | true);//true
+    }
+}
 ```
 
-### 使用场景：
+---
 
-​	根据固定的场景，来选择使用&还是使用|
+### 三：使用场景
 
-* 用户登录。
+根据固定的场景，来选择使用&还是使用|
 
-  用户名输入正确  & 密码输入正确
+**场景一：用户登录。**
 
-  因为只有用户名和密码同时都正确了，那么才能成功登录，只要有一个失败了都不行。
+用户名输入正确  & 密码输入正确
 
-  使用技巧：
+因为只有用户名和密码同时都正确了，那么才能成功登录，只要有一个失败了都不行。
 
-  ​	当我们需要同时满足左边和右边两种情况时，可以使用且
+使用技巧：当我们需要同时满足左边和右边两种情况时，可以使用且
 
-* 丈母娘选女婿
+<img src="assets/image-20240330164621176.png" alt="image-20240330164621176" style="zoom:50%;" />
 
-  丈母娘：女婿啊，你要么买个房子，要么买辆车。就可以把我的小棉袄穿走了。
 
-  买个房子 | 买辆车
 
-  两个条件中，只要满足其中一个，就可以穿走小棉袄了。
+**场景二：丈母娘选女婿**
 
-  使用技巧：
+丈母娘：女婿啊，你要么买个房子，要么买辆车。就可以把我的小棉袄穿走了。
 
-  ​	当两种条件只要满足其中一个的时候，可以使用或
+买个房子 | 买辆车
 
-### ^（异或）的使用：
+两个条件中，只要满足其中一个，就可以穿走小棉袄了。
 
-​	在以后用的不多，了解一下即可。
+使用技巧：
+
+​	当两种条件只要满足其中一个的时候，可以使用或
+
+---
+
+## 三、^（异或）的使用
+
+在以后用的不多，了解一下即可。
 
 计算规则：如果两边相同，结果为false，如果两边不同，结果为true
+
+这里有一个小故事：有一个机构叫民政局，是用来结婚登记的，两男和两女，同性是不能登记的。但是一男一女，就可以登记，所以不同为true，相同为false。
 
 代码示例：
 
 ```java
-//^   //左右不相同，结果才是true，左右相同结果就是false
-System.out.println(true ^ true);//false
-System.out.println(false ^ false);//false
-System.out.println(true ^ false);//true
-System.out.println(false ^ true);//true
+package com.itheima.logicoperator;
+
+public class LogicoperatorDemo2 {
+    public static void main(String[] args) {
+        // ^ 逻辑异或
+        //相同为false，不同为true
+        //了解一下即可
+        System.out.println(true ^ true);//false
+        System.out.println(false ^ false);//false
+        System.out.println(true ^ false);//true
+        System.out.println(false ^ true);//true
+    }
+}
 ```
 
-### !（取反）的使用：
-
-​	是取反，也叫做非。
+**!（取反）的使用**：是取反，也叫做非。
 
 计算规则：false取反就是true，true取反就是false
 
@@ -3558,121 +3692,199 @@ System.out.println(false ^ true);//true
 代码示例：
 
 ```java
+//! 逻辑非 取反
+//提示：
+//取反的感叹号不要写多次，要么不写，要么只写一次
 System.out.println(!false);//true
 System.out.println(!true);//false
-
-System.out.println(!!false);//注意点：取反最多只用一个。
 ```
 
-# 15.短路逻辑运算符
+
+
+---
+
+# 36.短路逻辑运算符
+
+## 一、为什么有短路逻辑运算符
+
+上一节讲了四种逻辑运算符，但是使用逻辑运算符编写代码的时候是可以进一步优化，提高代码的效率的。此时就需要用到短路逻辑运算符。
+
+**例一**：用户登录，当用户输入用户名和密码，点击登录之后，程序就去判断用户名和密码是否正确。那么在判断的时候需要判断两次，首先判断用户名是否正确，然后还要判断密码是否正确。但是如果判断用户名的时候，用户名就已经出错了，此时就不需要再判断密码了，因为此时不管密码是真还是假，整个表达式的结果都是false，用户都会登录失败。
+
+此时如果我们在中间只用一个 &，也就是我们之前学到的逻辑运算符，不管用户名是真还是假，都需要判断密码。因此为了提高程序运行的效率，我们就需要来学习短路逻辑运算符了。
+
+短路逻辑运算符分为两种：&&（而且）、||（或者）。我们要使用的是&&。
+
+此时用户名如果正确，它就会去判断密码；但是如果用户名错误的话，就不会再去判断密码了，直接得到整个表达式的结果为false，表示用户登录失败，这样就能提升程序的运行效率。
+
+<img src="assets/image-20240330165522066.png" alt="image-20240330165522066" style="zoom:50%;" />
+
+
+
+**例二**：丈母娘选女婿，有房 |  有车，首先先看看有没有房，发现有，然后再去看看有没有车。
+
+这样写代码是没有问题的，但是效率比较低，因为丈母娘看完房子之后，就会有两种情况：有房和没房。
+
+如果没有房子，就必须去看看车子；但是如果房子已经有了，就没必要去看车子了。此时就可以用到短路逻辑运算符中的 ||，如果左边为true，就不会执行右边；如果左边会false，才会去执行右边。
+
+<img src="assets/image-20240330170052397.png" alt="image-20240330170052397" style="zoom:50%;" />
+
+---
+
+## 二、分类
 
 分类：  &&   ||
 
-### &&：
+**&&**：运算结果跟`&`是一模一样的，只不过具有短路效果，并且效率会比较高。左边为false，右边不管是真是假，整个表达式的结果一定是false。
 
-​	运算结果跟&是一模一样的，只不过具有短路效果。
+**||**：运算结果跟`|`是一模一样的。只不过具有短路效果，并且效率会比较高。左边为true，右边不管是真是假，整个表达式的结果一定是true。
 
-### ||：
+**逻辑核心**：当左边不能确定整个表达式的结果，右边才会执行。当左边能确定整个表达式的结果，那么右边就不会执行了。从而提高了代码的运行效率。
 
-​	运算结果跟|是一模一样的。只不过具有短路效果。
+& | ：无论左边 true false，右边都要执行。
 
-### 逻辑核心：
+&& ||：如果左边能确定整个表达式的结果，右边不执行。
 
-​	当左边不能确定整个表达式的结果，右边才会执行。
+**建议**：最为常用的逻辑运算符： &&   ||   ！
 
-​	当左边能确定整个表达式的结果，那么右边就不会执行了。从而提高了代码的运行效率。
+![image-20240330170601675](assets/image-20240330170601675.png)
 
-### 举例：
+---
 
-* 用户登录案例
+## 三、代码示例
 
-  用户名正确  & 密码正确
+~~~java
+package com.itheima.logicoperator;
 
-  如果使用一个&，不管用户名是否正确都会去验证密码。
+public class LogicoperatorDemo3 {
+    public static void main(String[] args) {
+        //1.&&
+        //运行结果跟单个&是一样的
+        //表示两边都为真，结果才是真
+        System.out.println(true && true);//true
+        System.out.println(false && false);//false
+        System.out.println(false && true);//false
+        System.out.println(true && false);//false
 
-思考：
 
-​	如果用户名输入正确了，那么我们再判断密码是否正确，是符合业务逻辑的。
+        //2.||
+        //运行结果跟单个|是一样的
+        //表示两边都为假，结果才是假。只要有一个为真，结果就为真
+        System.out.println(true || true);//true
+        System.out.println(false || false);//false
+        System.out.println(false || true);//true
+        System.out.println(true || false);//true
 
-​	但是如果用户名输入错误了，那么现在还有必要去比较密码吗？没有不要了。
 
-​	如果使用一个&，那么左边和右边不管什么情况下，都会执行。
+        //3.短路逻辑运算符具有短路效果
+        //简单理解：当左边的表达式能确定最终的结果，那么右边就不会参与运行了
+        int a = 10;
+        int b = 10;
+        boolean result1 = ++a < 5 & ++b < 5;
+        System.out.println(result);//false
+        System.out.println(a);//11
+        System.out.println(b);//10，因为左边已经是false了，变量b自增并不会执行了
+        
+        boolean result2 = ++a < 5 & ++b < 5;
+        System.out.println(result);//false
+        System.out.println(a);//11
+        System.out.println(b);//11，如果是单个的，左边不管真假，右边都会执行
+    }
+}
+~~~
+
+---
+
+## 四、练习：数字6
+
+这个练习也是美国斯坦福大学，java入门的一个练习。
+
+数字6是一个真正伟大的数字，键盘录入两个整数。如果其中一个为 6，最终结果输出true。如果它们的和为 6的倍数。最终结果输出true。其他情况都是false。
+
+代码示例：为true的情况有三种情况
+
+~~~java
+package com.itheima.test;
+
+import java.util.Scanner;
+
+public class Test3 {
+    public static void main(String[] args) {
+        //分析：
+        //1.键盘录入两个整数
+        // 变量a   变量b
+
+        //2.a == 6 || b == 6 || (a + b) % 6 == 0
+        //如果满足其中一个，那么就可以输出true
+
+        //键盘录入两个整数
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请输入一个整数");
+        int number1 = sc.nextInt();
+        System.out.println("请输入第二个整数");
+        int number2 = sc.nextInt();
+
+        //可以短路逻辑运算符去连接三个判断
+        boolean result = number1 == 6 || number2 == 6 || (number1 + number2) % 6 == 0;
+
+        System.out.println(result);
+    }
+}
+~~~
 
 
 
-​	用户名正确  &&  密码正确
+---
 
-​	如果用户名输入正确了，那么才会验证密码是否输入正确。
+# 37.三元运算符
 
-​	如果用户名输入错误了，那么就不会再去验证密码是否正确，最终的结果直接为false。从而提高了程序运行的效率。
+## 一、引入
 
-* 丈母娘选女婿
+又叫做：三元表达式或者问号冒号表达式。作用：可以进行判断，根据判断的结果得到不同的内容。
 
-  有房 |  有车
+**格式**：`关系表达式 ？ 表达式1 ：表达式2 ；`
 
-  首先先看看有没有房，发现有，然后再去看看有没有车。
+其中的 关系表达式 就是一个判断
 
-思考：
-
-​	既然都有房子，干嘛还要去看车呢？多此一举。
-
-​	有房 ||  有车
-
-​	首先先看看有没有房，如果有，那么右边就不执行了。最终的结果直接为true。
-
-​	如果没有房子，才会去看右边有没有车。
-
-### 总结：
-
-​	&& 和 & 、||和|的运行结果都是一模一样的。
-
-​	但是短路逻辑运算符可以提高程序的运行效率。
-
-### 建议：
-
-​	最为常用： &&   ||   ！
-
-# 16.三元运算符
-
-又叫做：三元表达式或者问号冒号表达式。
-
-### 格式：
-
-​	关系表达式 ？ 表达式1 ：表达式2 ；
-
-### 计算规则：
+**计算规则**：
 
 * 计算关系表达式的值。
 * 如果关系表达式的值为真，那么执行表达式1。
 * 如果关系表达式的值为假，那么执行表达式2。
 
-### 注意点：
+**注意点**：三元运算符的最终结果一定要被使用，要么赋值给一个变量，要么直接打印出来，如果单独在代码中写一个三元表达式，是会报错的。
 
-​	三元运算符的最终结果一定要被使用，要么赋值给一个变量，要么直接打印出来。
+---
 
-### 案例：
+## 二、代码示例
+
+需求：使用三元运算符，获取两个数的较大值
 
 ```java
-public class OperatorDemo12 {
-    public static void main(String[] args) {
-        //需求：求两个数的较大值
-        int a = 10;
-        int b = 20;
+package com.itheima.ternaryoperator;
 
-        //格式：关系表达式 ？ 表达式1 ： 表达式2 ；
-        //注意点：
-        //三元运算符的最终结果一定要被使用。
-        //要么赋值给一个变量，要么直接输出。
-       int max =  a > b ? a : b ;
+public class TernaryoperatorDemo1 {
+    public static void main(String[] args) {
+        //分析：
+        //1.定义两个变量记录两个整数
+        int number1 = 10;
+        int number2 = 20;
+
+        //2.使用三元运算符获取两个整数的较大值
+        //格式：  关系表达式 ? 表达式1 : 表达式2;
+        //整个三元运算符的结果必须要被使用
+        int max = number1 > number2 ? number1 : number2; // 赋值给一个变量
         System.out.println(max);
 
-
-        System.out.println(a > b ? a : b);
+        System.out.println(number1 > number2 ? number1 : number2); // 直接打印出来，此时在式子的最后就不需要加分号了
     }
 }
+
 ```
 
-# 17.练习1-两只老虎
+---
+
+## 三、练习1-两只老虎
 
 需求：
 
@@ -3683,19 +3895,32 @@ public class OperatorDemo12 {
 代码示例：
 
 ```java
-//1.获取两只老虎的体重
-Scanner sc = new Scanner(System.in);
-System.out.println("请输入第一只老虎的体重");
-int weight1 = sc.nextInt();
-System.out.println("请输入第二只老虎的体重");
-int weight2 = sc.nextInt();
+package com.itheima.test;
 
-//2.利用三元运算符求出最终结果
-String result = weight1 == weight2 ? "相同" : "不相同";
-System.out.println(result);
+import java.util.Scanner;
+
+public class Test4 {
+    public static void main(String[] args) {
+        //分析：
+        //1.键盘录入两只老虎的体重
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请输入第一只老虎的体重");
+        int weight1 = sc.nextInt();
+        System.out.println("请输入第二只老虎的体重");
+        int weight2 = sc.nextInt();
+        //2.比较
+        //System.out.println(weight1 == weight2); 这种写法打印出来的要么是true，要么是false。但是现在我们想打印出相同 / 不同
+
+        String result = weight1 == weight2 ? "相同" : "不同";
+        System.out.println(result);
+    }
+}
+
 ```
 
-# 18.练习2-求三个数的最大值
+---
+
+## 四、练习2-求三个数的最大值
 
 需求：
 
@@ -3706,31 +3931,105 @@ System.out.println(result);
 代码示例：
 
 ```java
-//1.定义三个变量记录和尚的身高
-int height1 = 150;
-int height2 = 210;
-int height3 = 165;
+package com.itheima.test;
 
-//2.利用三元运算符求出两个数中的较大值。
-int temp = height1 > height2 ? height1 : height2;
-
-//3.求出最终的结果
-int max = temp > height3 ? temp : height3;
-
-System.out.println(max);
+public class Test5 {
+    public static void main(String[] args) {
+        //1.定义三个变量记录三个和尚的身高
+        int height1 = 150;
+        int height2 = 210;
+        int height3 = 165;
+        //2.拿着第一个和尚和第二个和尚进行比较
+        //再拿着结果跟第三个和尚进行比较即可
+        int temp = height1 > height2 ? height1 : height2;
+        int max = temp > height3 ? temp : height3;
+        //快捷键：ctrl + alt + L 自动的格式化代码
+        System.out.println(max);
+    }
+}
 ```
 
-# 19.运算符的优先级
+
+
+---
+
+## 五、运算符的优先级
 
 在Java中涉及了很多的运算符，每一种运算符都有各自的优先级。但是这些优先级不需要记忆。
 
-咱们只要知道其中一点：
+咱们只要知道其中一点：小括号优先于所有。
 
-​	小括号优先于所有。
+![image-20240330173054838](assets/image-20240330173054838.png)
 
+---
 
+# 38.原码反码补码
 
+原码：十进制数据的二进制表示形式，最左边是符号位，0为正，1为负。
 
+反码：正数的补码反码是其本身，负数的反码是符号位保持不变，其余位取反。
+
+补码：整数的补码是其本身，负数的补码是在其反码的基础上加1。
+
+## 二、原码
+
+原码：十进制数据的二进制表示形式，最左边是符号位，0为正，1为负。
+
+例如：56，下图转为二进制就是它的原码
+
+![image-20240330174321153](assets/image-20240330174321153.png)
+
+其中左边的第一位是它的符号位，0为正，1为负，后面才是具体的数值
+
+![image-20240330174250270](assets/image-20240330174250270.png)
+
+在计算机中，一个0或者一个1，我们称之为一个bit，中文名字叫比特位。比特币和比特位它们两个之间没有任何关系，就是名字比较像而已。
+
+但是一个bit能表示的数据太少了，所以我们会把8个bit分为一组，叫为一个字节，而一个字节是我们计算机中最小的存储单元。
+
+那么一个字节最大值能取到多少？第一个符号位一定是0，后面的7位肯定是1。因为二进制最多只能到1，不能到2，因为到2就会逢二进一。所以一个字节的最大值是0后面跟着7个1。把它转为十进制，那就是正的127
+
+![image-20240330174711815](assets/image-20240330174711815.png)
+
+那么一个字节最小值能取到多少？第一个符号位肯定是1，表示负数，后面的数字是不能为0的，如果为0，这个就是-0了，-0也是0。我们应该将后面的值都变成1才行。后面的7个1转为十进制，就是127，组合在一起就是-127。
+
+![image-20240330174939275](assets/image-20240330174939275.png)
+
+在原码当中，如果是正数计算，结果不会有任何的问题。例如在0的基础上加1，直接将右边的0变成1就行了。
+
+![image-20240330175233480](assets/image-20240330175233480.png)
+
+---
+
+### 原码的弊端
+
+左边的第一位为1，表示负数，后面7个都是0，转成十进制后，就是-0，-0其实也是0。现在我在它的基础上加个1。
+
+现在，我要在这个基础上加1，正常来说是1，但是下面这个二进制转成十进制后，结果是-1 。
+
+<img src="assets/image-20240330175544781.png" alt="image-20240330175544781" style="zoom:50%;" />
+
+现在以-1为基础，再加1。正确应该为0，但是通过这个二进制转换后的结果，实际确实-2。
+
+<img src="assets/image-20240330175657821.png" alt="image-20240330175657821" style="zoom:50%;" />
+
+现在我在-2的基础上继续加1，正确来讲结果应该为-1，但是现在通过这个二进制转换后的十进制，实际为-3。
+
+<img src="assets/image-20240330175741107.png" alt="image-20240330175741107" style="zoom:50%;" />
+
+为什么会这样呢？我们讲数字归零，要说明这个，只需要结合数轴去理解。现在数据是0。
+
+![image-20240330175925426](assets/image-20240330175925426.png)
+
+现在是0要加1，我的想法是，应该向数轴的正方向去走一步。但是在这个前面，它有一个1，1表示符号。
+
+![image-20240330180126001](assets/image-20240330180126001.png)
+
+所以实际情况，它是反过来，往负的方向走了一步。
+
+![image-20240330180258041](assets/image-20240330180258041.png)
+
+总结：如果是负数计算，结果就会出错，实际运算的结果，跟我们预期的结果是相反的。
 
 
 
