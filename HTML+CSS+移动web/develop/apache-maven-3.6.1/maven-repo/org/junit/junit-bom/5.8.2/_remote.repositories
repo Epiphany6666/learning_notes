@@ -1,5 +1,0 @@
-#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Wed Oct 25 21:39:10 CST 2023
-junit-bom-5.8.2.pom>nexus-aliyun=
-junit-bom-5.8.2.pom>central=
-junit-bom-5.8.2.pom>alimaven=

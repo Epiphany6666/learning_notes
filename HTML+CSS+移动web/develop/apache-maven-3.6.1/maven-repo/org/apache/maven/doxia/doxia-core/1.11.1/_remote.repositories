@@ -1,8 +1,0 @@
-#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu Nov 02 09:01:46 CST 2023
-doxia-core-1.11.1.jar>central=
-doxia-core-1.11.1.pom>nexus-aliyun=
-doxia-core-1.11.1.pom>alimaven=
-doxia-core-1.11.1.jar>nexus-aliyun=
-doxia-core-1.11.1.jar>alimaven=
-doxia-core-1.11.1.pom>central=
