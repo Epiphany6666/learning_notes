@@ -1,0 +1,5 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed Oct 25 21:41:16 CST 2023
+maven-shared-components-21.pom>nexus-aliyun=
+maven-shared-components-21.pom>alimaven=
+maven-shared-components-21.pom>central=

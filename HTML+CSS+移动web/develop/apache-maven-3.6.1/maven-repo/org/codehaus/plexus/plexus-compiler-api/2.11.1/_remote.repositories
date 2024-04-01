@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed Oct 25 21:40:52 CST 2023
+plexus-compiler-api-2.11.1.jar>nexus-aliyun=
+plexus-compiler-api-2.11.1.pom>nexus-aliyun=
+plexus-compiler-api-2.11.1.pom>alimaven=
+plexus-compiler-api-2.11.1.jar>alimaven=

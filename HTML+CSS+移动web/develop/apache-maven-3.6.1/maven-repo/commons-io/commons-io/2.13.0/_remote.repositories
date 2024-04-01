@@ -1,0 +1,10 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed Mar 06 10:04:20 CST 2024
+commons-io-2.13.0.jar>alimaven=
+commons-io-2.13.0.pom>alimaven=
+commons-io-2.13.0.jar>central=
+commons-io-2.13.0.pom>central=
+commons-io-2.13.0.jar>public=
+commons-io-2.13.0.pom>nexus-aliyun=
+commons-io-2.13.0.pom>public=
+commons-io-2.13.0.jar>nexus-aliyun=

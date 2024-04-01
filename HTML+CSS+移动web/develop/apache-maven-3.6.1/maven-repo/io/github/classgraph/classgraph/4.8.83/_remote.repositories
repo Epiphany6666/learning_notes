@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Mon Dec 11 19:11:24 CST 2023
+classgraph-4.8.83.jar>central=
+classgraph-4.8.83.pom>alimaven=
+classgraph-4.8.83.pom>central=
+classgraph-4.8.83.jar>alimaven=

@@ -7207,7 +7207,7 @@ map 可以遍历数组处理数据，并且返回**新的数组**，并不会改
 
 - 从字符串中获取我们想要的特定部分(提取)等 
 
- ![67607966636](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第六天/02-笔记/assets/1676079666366.png)
+ ![67607966636](./assets/1676079666366.png)
 
 
 
@@ -7281,7 +7281,7 @@ map 可以遍历数组处理数据，并且返回**新的数组**，并不会改
 
 正则表达式中的边界符（位置符）用来提示字符所处的位置，主要有两个字符
 
-![67608008165](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第六天/02-笔记/assets/1676080081650.png)
+![67608008165](./assets/1676080081650.png)
 
 >如果 ^ 和 $ 在一起，表示必须是精确匹配
 
@@ -7308,7 +7308,7 @@ map 可以遍历数组处理数据，并且返回**新的数组**，并不会改
 
 量词用来设定某个模式重复次数
 
-![67608018538](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第六天/02-笔记/assets/1676080185383.png)
+![67608018538](./assets/1676080185383.png)
 
 > 注意： 逗号左右两侧千万不要出现空格
 
@@ -7475,9 +7475,9 @@ input.addEventListener('blur', function () {
 
 预定义：指的是 某些常见模式的简写方式，区分字母和数字
 
-![67608035363](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第六天/02-笔记/assets/1676080353637.png)
+![67608035363](./assets/1676080353637.png)
 
- ![67608037232](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第六天/02-笔记/assets/1676080372325.png)
+ ![67608037232](./assets/1676080372325.png)
 
 
 
@@ -7504,7 +7504,7 @@ console.log(/^java$/i.test('Java'))
 
 **replace 替换方法**，可以完成字符的替换
 
-![67608043716](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第六天/02-笔记/assets/1676080437160.png)
+![67608043716](./assets/1676080437160.png)
 
 ~~~js
 const str = 'java是一门编程语言， 学完JAVA工资很高'
@@ -8061,7 +8061,7 @@ middle.addEventListener('mousemove', function (e) {
 
 ## 正则插件
 
- 包含了常见的正则表达式![67608054863](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第六天/02-笔记/assets/1676080548639.png)
+ 包含了常见的正则表达式![67608054863](./assets/1676080548639.png)
 
 # 
 

@@ -1,0 +1,5 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Oct 26 19:25:33 CST 2023
+opentelemetry-bom-1.25.0.pom>nexus-aliyun=
+opentelemetry-bom-1.25.0.pom>central=
+opentelemetry-bom-1.25.0.pom>alimaven=

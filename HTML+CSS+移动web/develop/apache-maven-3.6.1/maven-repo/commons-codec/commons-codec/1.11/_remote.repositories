@@ -1,0 +1,8 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed Oct 25 21:42:44 CST 2023
+commons-codec-1.11.pom>nexus-aliyun=
+commons-codec-1.11.jar>alimaven=
+commons-codec-1.11.pom>alimaven=
+commons-codec-1.11.jar>nexus-aliyun=
+commons-codec-1.11.pom>central=
+commons-codec-1.11.jar>central=

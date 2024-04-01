@@ -1,0 +1,8 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Nov 02 09:01:45 CST 2023
+maven-reporting-api-3.1.1.jar>central=
+maven-reporting-api-3.1.1.jar>nexus-aliyun=
+maven-reporting-api-3.1.1.pom>nexus-aliyun=
+maven-reporting-api-3.1.1.jar>alimaven=
+maven-reporting-api-3.1.1.pom>central=
+maven-reporting-api-3.1.1.pom>alimaven=

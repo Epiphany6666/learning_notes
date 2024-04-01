@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Feb 22 11:24:25 CST 2024
+junit-bom-5.10.0.pom>nexus-aliyun=
+junit-bom-5.10.0.pom>public=
+junit-bom-5.10.0.pom>alimaven=
+junit-bom-5.10.0.pom>central=

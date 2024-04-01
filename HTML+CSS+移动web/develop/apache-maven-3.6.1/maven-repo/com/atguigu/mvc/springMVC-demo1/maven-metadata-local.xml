@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.atguigu.mvc</groupId>
+  <artifactId>springMVC-demo1</artifactId>
+  <versioning>
+    <versions>
+      <version>1.0-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20230922120240</lastUpdated>
+  </versioning>
+</metadata>

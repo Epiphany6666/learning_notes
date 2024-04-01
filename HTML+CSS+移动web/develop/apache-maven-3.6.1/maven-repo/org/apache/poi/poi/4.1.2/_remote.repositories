@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Feb 22 11:25:00 CST 2024
+poi-4.1.2.jar>public=
+poi-4.1.2.jar>alimaven=
+poi-4.1.2.pom>public=
+poi-4.1.2.pom>alimaven=

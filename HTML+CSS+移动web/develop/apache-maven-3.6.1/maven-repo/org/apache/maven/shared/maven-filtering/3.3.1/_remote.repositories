@@ -1,0 +1,8 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Oct 26 19:27:45 CST 2023
+maven-filtering-3.3.1.jar>central=
+maven-filtering-3.3.1.jar>nexus-aliyun=
+maven-filtering-3.3.1.pom>alimaven=
+maven-filtering-3.3.1.pom>central=
+maven-filtering-3.3.1.jar>alimaven=
+maven-filtering-3.3.1.pom>nexus-aliyun=

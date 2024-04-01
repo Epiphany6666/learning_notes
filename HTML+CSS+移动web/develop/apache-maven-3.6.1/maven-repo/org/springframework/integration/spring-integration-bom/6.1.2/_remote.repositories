@@ -1,0 +1,4 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Fri Sep 22 19:23:40 CST 2023
+spring-integration-bom-6.1.2.pom>central=
+spring-integration-bom-6.1.2.pom>nexus-aliyun=

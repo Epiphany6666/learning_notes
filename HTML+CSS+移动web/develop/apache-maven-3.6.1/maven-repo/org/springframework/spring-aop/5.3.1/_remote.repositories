@@ -1,0 +1,8 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Fri Mar 01 21:43:53 CST 2024
+spring-aop-5.3.1.jar>central=
+spring-aop-5.3.1.jar>alimaven=
+spring-aop-5.3.1.pom>alimaven=
+spring-aop-5.3.1.pom>central=
+spring-aop-5.3.1.jar>nexus-aliyun=
+spring-aop-5.3.1.pom>nexus-aliyun=

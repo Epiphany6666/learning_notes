@@ -1,0 +1,9 @@
+2024-03-19 10:08:11,078|172.20.10.4|userservice|DEFAULT_GROUP|null|unknown|-1|pull|not-found|-1|127.0.0.1
+2024-03-19 10:08:11,158|172.20.10.4|userservice.yaml|DEFAULT_GROUP|null|unknown|1710575227934|pull|ok|238863224|127.0.0.1
+2024-03-19 10:08:11,170|172.20.10.4|userservice-dev.yaml|DEFAULT_GROUP|null|unknown|1710574772292|pull|ok|239318878|127.0.0.1
+2024-03-19 10:08:14,527|172.20.10.4|userservice|DEFAULT_GROUP|null|unknown|-1|pull|not-found|-1|127.0.0.1
+2024-03-19 10:08:14,541|172.20.10.4|userservice.yaml|DEFAULT_GROUP|null|unknown|1710575227934|pull|ok|238866607|127.0.0.1
+2024-03-19 10:08:14,553|172.20.10.4|userservice-dev.yaml|DEFAULT_GROUP|null|unknown|1710574772292|pull|ok|239322261|127.0.0.1
+2024-03-19 10:08:16,525|172.20.10.4|userservice|DEFAULT_GROUP|null|unknown|-1|pull|not-found|-1|127.0.0.1
+2024-03-19 10:08:16,538|172.20.10.4|userservice.yaml|DEFAULT_GROUP|null|unknown|1710575227934|pull|ok|238868604|127.0.0.1
+2024-03-19 10:08:16,547|172.20.10.4|userservice-test.yaml|DEFAULT_GROUP|null|unknown|-1|pull|not-found|-1|127.0.0.1

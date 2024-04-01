@@ -66,7 +66,7 @@ Dependencies：Spring Web、Spring Security、Thymeleaf
 
 
 
-**1.2、创建IndexController**
+**2、创建IndexController**
 
 ![image-20240306101211415](assets/image-20240306101211415.png)
 
@@ -85,7 +85,7 @@ public class IndexController {
 
 
 
-**1.3、创建index.html**
+**3、创建index.html**
 
 在路径resources/templates中创建index.html
 
@@ -106,7 +106,7 @@ public class IndexController {
 
 
 
-**1.4、启动项目测试Controller**
+**4、启动项目测试Controller**
 
 浏览器中访问：http://localhost:8080/
 

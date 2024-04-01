@@ -1,0 +1,1291 @@
+2024-03-17 11:39:36,834 INFO GlobalConfig{taskDispatchPeriod=2000, batchSyncKeyCount=1000, syncRetryDelay=5000, dataWarmup=false, expireInstance=true, loadDataRetryDelayMillis=30000}
+
+2024-03-17 11:39:37,489 INFO open empty service auto clean job, initialDelay : 50000 ms, period : 30000 ms
+
+2024-03-17 11:39:37,489 INFO listen for service meta change
+
+2024-03-17 11:39:41,822 INFO [NACOS-DISTRO] healthy server list changed, old: [192.168.8.37:8848], new: [192.168.8.37:8848]
+
+2024-03-17 11:39:58,953 INFO creating empty service public:DEFAULT_GROUP@@userservice
+
+2024-03-17 11:39:59,130 INFO [NEW-SERVICE] {"name":"DEFAULT_GROUP@@userservice","protectThreshold":0.0,"groupName":"DEFAULT_GROUP","metadata":{},"finalizeCount":0,"owners":[],"resetWeight":false,"enabled":true,"selector":{"type":"none"},"namespaceId":"public","ipDeleteTimeout":30000,"lastModifiedMillis":1710646798955,"checksum":"319c99f1fd9fc68a849621d51306c603","clusterMap":{},"empty":true}
+
+2024-03-17 11:39:59,137 WARN cluster: SH not found, ip: {"instanceId":"192.168.8.37#8083#SH#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8083,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"SH","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710646798953,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}, will create new cluster with default configuration.
+
+2024-03-17 11:39:59,144 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8083#SH#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8083,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"SH","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710646798953,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}]}
+
+2024-03-17 11:39:59,528 INFO creating empty service public:DEFAULT_GROUP@@orderservice
+
+2024-03-17 11:39:59,530 INFO [NEW-SERVICE] {"name":"DEFAULT_GROUP@@orderservice","protectThreshold":0.0,"groupName":"DEFAULT_GROUP","metadata":{},"finalizeCount":0,"owners":[],"resetWeight":false,"enabled":true,"selector":{"type":"none"},"namespaceId":"public","ipDeleteTimeout":30000,"lastModifiedMillis":1710646799528,"checksum":"78bd57651674bfb44fe3816727639f6e","clusterMap":{},"empty":true}
+
+2024-03-17 11:39:59,555 WARN cluster: HZ not found, ip: {"instanceId":"192.168.8.37#8080#HZ#DEFAULT_GROUP@@orderservice","ip":"192.168.8.37","port":8080,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":false,"clusterName":"HZ","serviceName":"DEFAULT_GROUP@@orderservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710646799528,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}, will create new cluster with default configuration.
+
+2024-03-17 11:39:59,556 INFO cluster size, new: 0, old: 0
+
+2024-03-17 11:39:59,559 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.public##DEFAULT_GROUP@@orderservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8080#HZ#DEFAULT_GROUP@@orderservice","ip":"192.168.8.37","port":8080,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":false,"clusterName":"HZ","serviceName":"DEFAULT_GROUP@@orderservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710646799528,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}]}
+
+2024-03-17 11:39:59,560 WARN cluster: HZ not found, ip: {"instanceId":"192.168.8.37#8080#HZ#DEFAULT_GROUP@@orderservice","ip":"192.168.8.37","port":8080,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":false,"clusterName":"HZ","serviceName":"DEFAULT_GROUP@@orderservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710646799528,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}, will create new cluster with default configuration.
+
+2024-03-17 11:39:59,562 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.public##DEFAULT_GROUP@@orderservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8080#HZ#DEFAULT_GROUP@@orderservice","ip":"192.168.8.37","port":8080,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":false,"clusterName":"HZ","serviceName":"DEFAULT_GROUP@@orderservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710646799528,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}]}
+
+2024-03-17 11:40:01,525 WARN cluster: DEFAULT not found, ip: {"instanceId":"192.168.8.37#8081#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8081,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710646801524,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}, will create new cluster with default configuration.
+
+2024-03-17 11:40:01,525 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8083#SH#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8083,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"SH","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710646798953,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000},{"instanceId":"192.168.8.37#8081#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8081,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710646801524,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}]}
+
+2024-03-17 11:40:02,758 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8083#SH#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8083,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"SH","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710646798953,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000},{"instanceId":"192.168.8.37#8082#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8082,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710646802758,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000},{"instanceId":"192.168.8.37#8081#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8081,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710646801524,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}]}
+
+2024-03-17 11:47:57,488 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@orderservice, value: {"instanceList":[]}
+
+2024-03-17 11:48:08,164 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 11:48:08,229 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.public##DEFAULT_GROUP@@orderservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8080#HZ#DEFAULT_GROUP@@orderservice","ip":"192.168.8.37","port":8080,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":false,"clusterName":"HZ","serviceName":"DEFAULT_GROUP@@orderservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710647288228,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}]}
+
+2024-03-17 11:48:09,212 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 11:48:09,242 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:55:07,128 INFO [AUTO-DELETE-IP] service: DEFAULT_GROUP@@userservice, ip: {"instanceId":"192.168.8.37#8083#SH#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8083,"weight":1.0,"healthy":false,"enabled":true,"ephemeral":true,"clusterName":"SH","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710648978870,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}
+
+2024-03-17 12:55:07,332 INFO [AUTO-DELETE-IP] service: DEFAULT_GROUP@@userservice, ip: {"instanceId":"192.168.8.37#8082#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8082,"weight":1.0,"healthy":false,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710648977810,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}
+
+2024-03-17 12:55:07,342 INFO [AUTO-DELETE-IP] service: DEFAULT_GROUP@@userservice, ip: {"instanceId":"192.168.8.37#8081#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8081,"weight":1.0,"healthy":false,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710648976825,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}
+
+2024-03-17 12:55:07,367 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8083#SH#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8083,"weight":1.0,"healthy":false,"enabled":true,"ephemeral":true,"clusterName":"SH","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710648978870,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}]}
+
+2024-03-17 12:55:07,404 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[]}
+
+2024-03-17 12:55:08,725 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8081#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8081,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710651308724,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}]}
+
+2024-03-17 12:55:09,742 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8082#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8082,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710651309741,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000},{"instanceId":"192.168.8.37#8081#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8081,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710651308724,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}]}
+
+2024-03-17 12:55:10,761 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8083#SH#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8083,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"SH","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710651310761,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000},{"instanceId":"192.168.8.37#8082#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8082,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710651309741,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000},{"instanceId":"192.168.8.37#8081#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8081,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710651308724,"marked":false,"app":"unknown","instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ipDeleteTimeout":30000}]}
+
+2024-03-17 12:55:30,681 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:55:38,398 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:55:48,408 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:55:58,416 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:56:08,432 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:56:18,439 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:56:28,445 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:56:38,461 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:56:48,471 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:56:58,481 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:57:08,497 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:57:18,511 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:57:28,526 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:57:38,540 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:57:48,564 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:57:58,580 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:58:08,586 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:58:18,594 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:58:28,603 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:58:38,612 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:58:48,617 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:58:58,620 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:59:08,633 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:59:18,637 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:59:28,649 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:59:38,659 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:59:48,675 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 12:59:58,680 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:00:08,694 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:00:18,705 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:00:28,709 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:00:38,723 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:00:48,735 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:00:58,742 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:01:08,746 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:01:18,756 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:01:28,768 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:01:38,789 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:01:48,803 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:01:58,821 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:02:08,840 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:02:18,854 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:02:28,862 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:02:38,873 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:02:48,881 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:02:58,892 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:03:08,900 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:03:18,917 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:03:28,929 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:03:38,939 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:03:48,950 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:03:58,964 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:04:08,971 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:04:18,974 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:04:28,981 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:04:38,987 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:04:48,999 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:04:59,010 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:05:09,032 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:05:19,044 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:05:29,058 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:05:39,080 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:05:49,097 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:05:59,104 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:06:09,108 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:06:19,115 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:06:29,118 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:06:39,136 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:06:49,151 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:06:59,171 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:07:09,183 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:07:19,189 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:07:29,197 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:07:39,211 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:07:49,219 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:07:59,225 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:08:09,240 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:08:19,246 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:08:29,265 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:08:39,282 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:08:49,298 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:08:59,317 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:09:09,331 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:09:19,344 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:09:29,355 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:09:39,375 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:09:49,382 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:09:59,388 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:10:09,406 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:10:19,412 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:10:29,429 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:10:39,437 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:10:49,447 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:10:59,452 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:11:09,455 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:11:19,461 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:11:29,477 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:11:39,494 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:11:49,499 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:11:59,514 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:12:09,541 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:12:19,545 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:12:29,548 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:12:39,560 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:12:49,568 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:12:59,578 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:13:09,611 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:13:19,620 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:13:29,634 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:13:39,649 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:13:49,666 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:13:59,677 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:14:09,689 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:14:19,705 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:14:29,710 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:14:39,724 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:14:49,736 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:14:59,740 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:15:09,753 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:15:19,765 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:15:29,775 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:15:39,780 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:15:49,789 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:15:59,792 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:16:09,804 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:16:19,819 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:16:29,827 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:16:39,831 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:16:49,844 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:16:59,868 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:17:09,875 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:17:19,885 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:17:29,891 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:17:39,910 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:17:49,928 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:17:59,941 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:18:09,951 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:18:19,962 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:18:29,980 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:18:40,009 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:18:50,025 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:19:00,043 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:19:10,075 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:19:20,079 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:19:30,087 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:19:40,097 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:19:50,110 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:20:00,124 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:20:10,136 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:20:20,149 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:20:30,157 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:20:40,171 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:20:50,179 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:21:00,191 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:21:10,197 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:21:20,214 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:21:30,229 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:21:40,246 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:21:50,254 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:22:00,265 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:22:10,273 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:22:20,283 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:22:30,294 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:22:40,305 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:22:50,311 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:23:00,329 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:23:10,339 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:23:20,352 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:23:30,359 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:23:40,379 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:23:50,391 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:24:00,406 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:24:10,417 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:24:20,423 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:24:30,433 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:24:40,455 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:24:50,472 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:25:00,486 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:25:10,494 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:25:20,499 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:25:30,514 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:25:40,526 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:25:50,530 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:26:00,547 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:26:10,555 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:26:20,576 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:26:30,593 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:26:40,606 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:26:50,621 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:27:00,638 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:27:10,653 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:27:20,656 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:27:30,665 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:27:40,672 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:27:50,684 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:28:00,697 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:28:10,708 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:28:20,726 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:28:30,732 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:28:40,736 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:28:50,746 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:29:00,751 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:29:10,763 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:29:20,768 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:29:30,783 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:29:40,787 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:29:50,800 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:30:00,810 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:30:10,827 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:30:20,839 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:30:30,849 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:30:40,859 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:30:50,869 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:31:00,874 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:31:10,894 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:31:20,901 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:31:30,915 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:31:40,928 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:31:50,958 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:32:00,968 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:32:10,977 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:32:20,981 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:32:30,993 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:32:41,012 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:32:51,018 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:33:01,023 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:33:11,032 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:33:21,037 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:33:31,041 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:33:41,045 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:33:51,058 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:34:01,065 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:34:11,078 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:34:21,084 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:34:31,091 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:34:41,106 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:34:51,109 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:35:01,111 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:35:11,131 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:35:21,141 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:35:31,147 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:35:41,159 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:35:51,162 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:36:01,175 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:36:11,184 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:36:21,188 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:36:31,203 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:36:41,206 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:36:51,213 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:37:01,222 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:37:11,227 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:37:21,232 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:37:31,247 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:37:41,257 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:37:51,275 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:38:01,282 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:38:11,286 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:38:21,298 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:38:31,316 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:38:41,323 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:38:51,332 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:39:01,345 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:39:11,363 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:39:21,379 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:39:31,396 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:39:41,402 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:39:51,410 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:40:01,420 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:40:11,441 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:40:21,458 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:40:31,474 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:40:41,477 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:40:51,482 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:41:01,488 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:41:11,502 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:41:21,514 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:41:31,527 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:41:41,532 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:41:51,541 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:42:01,558 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:42:11,572 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:42:21,576 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:42:31,586 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:42:41,599 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:42:51,609 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:43:01,626 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:43:11,644 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:43:21,648 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:43:31,657 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:43:41,679 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:43:51,685 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:44:01,704 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:44:11,715 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:44:21,729 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:44:31,746 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:44:41,757 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:44:51,772 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:45:01,784 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:45:11,798 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:45:21,809 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:45:31,828 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:45:41,839 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:45:51,851 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:46:01,868 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:46:11,889 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:46:21,896 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:46:31,909 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:46:41,921 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:46:51,932 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:47:01,935 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:47:11,942 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:47:21,953 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:47:31,958 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:47:41,968 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:47:51,975 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:48:01,982 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:48:11,993 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:48:22,010 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:48:32,021 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:48:42,030 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:48:52,034 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:49:02,044 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:49:12,058 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:49:22,073 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:49:32,086 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:49:42,121 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:49:52,150 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:50:02,156 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:50:12,165 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:50:22,183 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:50:32,189 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:50:42,198 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:50:52,206 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:51:02,219 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:51:12,230 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:51:22,233 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:51:32,245 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:51:42,254 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:51:52,267 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:52:02,275 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:52:12,283 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:52:22,296 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:52:32,310 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:52:42,327 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:52:52,341 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:53:02,350 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:53:12,374 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:53:22,390 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:53:32,403 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:53:42,411 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:53:52,442 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:54:02,450 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:54:12,457 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:54:22,467 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:54:32,483 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:54:42,485 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:54:52,497 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:55:02,511 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:55:12,519 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:55:22,522 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:55:32,543 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:55:42,562 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:55:52,571 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:56:02,581 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:56:12,596 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:56:22,608 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:56:32,623 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:56:42,649 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:56:52,666 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:57:02,678 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:57:12,712 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:57:22,738 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:57:32,748 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:57:42,757 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:57:52,771 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:58:02,819 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:58:12,828 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:58:22,836 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:58:32,853 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:58:42,855 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 13:58:43,965 WARN [NamingServerHttpClientManager] Start destroying HTTP-Client
+
+2024-03-17 13:58:44,003 WARN [NamingServerHttpClientManager] Destruction of the end
+
+2024-03-17 13:58:44,313 WARN Exception while processing client beat time out.
+
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'serverMemberManager' defined in URL [jar:file:/D:/software/nacos/target/nacos-server.jar!/BOOT-INF/lib/nacos-core-1.4.1.jar!/com/alibaba/nacos/core/cluster/ServerMemberManager.class]: Unexpected exception during bean creation; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'javax.servlet.ServletContext' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:527)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:321)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:319)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:277)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1276)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1196)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:857)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolvePreparedArguments(ConstructorResolver.java:804)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:143)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1338)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1174)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:554)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:514)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:321)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:319)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:224)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveNamedBean(DefaultListableBeanFactory.java:1144)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveBean(DefaultListableBeanFactory.java:419)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBean(DefaultListableBeanFactory.java:348)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBean(DefaultListableBeanFactory.java:341)
+	at org.springframework.context.support.AbstractApplicationContext.getBean(AbstractApplicationContext.java:1124)
+	at com.alibaba.nacos.sys.utils.ApplicationUtils.getBean(ApplicationUtils.java:140)
+	at com.alibaba.nacos.naming.healthcheck.ClientBeatCheckTask.getDistroMapper(ClientBeatCheckTask.java:61)
+	at com.alibaba.nacos.naming.healthcheck.ClientBeatCheckTask.run(ClientBeatCheckTask.java:79)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.runAndReset(FutureTask.java:305)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:305)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:833)
+Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'javax.servlet.ServletContext' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.raiseNoMatchingBeanFound(DefaultListableBeanFactory.java:1685)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1242)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1196)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:857)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolvePreparedArguments(ConstructorResolver.java:804)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:143)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1338)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1174)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:554)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:514)
+	... 32 common frames omitted
+2024-03-17 13:58:53,647 ERROR [HEALTH-CHECK] error while processing NIO task
+
+java.lang.InterruptedException: null
+	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1679)
+	at java.base/java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:460)
+	at com.alibaba.nacos.naming.healthcheck.TcpSuperSenseProcessor.processTask(TcpSuperSenseProcessor.java:137)
+	at com.alibaba.nacos.naming.healthcheck.TcpSuperSenseProcessor.run(TcpSuperSenseProcessor.java:154)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:833)
+2024-03-17 13:59:19,759 INFO GlobalConfig{taskDispatchPeriod=2000, batchSyncKeyCount=1000, syncRetryDelay=5000, dataWarmup=false, expireInstance=true, loadDataRetryDelayMillis=30000}
+
+2024-03-17 13:59:20,343 INFO open empty service auto clean job, initialDelay : 50000 ms, period : 30000 ms
+
+2024-03-17 13:59:20,344 INFO listen for service meta change
+
+2024-03-17 13:59:20,344 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.public##DEFAULT_GROUP@@orderservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8080#HZ#DEFAULT_GROUP@@orderservice","ip":"192.168.8.37","port":8080,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":false,"clusterName":"HZ","serviceName":"DEFAULT_GROUP@@orderservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710647288228,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}]}
+
+2024-03-17 13:59:20,359 WARN cluster: HZ not found, ip: {"instanceId":"192.168.8.37#8080#HZ#DEFAULT_GROUP@@orderservice","ip":"192.168.8.37","port":8080,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":false,"clusterName":"HZ","serviceName":"DEFAULT_GROUP@@orderservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710647288228,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}, will create new cluster with default configuration.
+
+2024-03-17 13:59:20,411 INFO [NEW-SERVICE] {"name":"DEFAULT_GROUP@@orderservice","protectThreshold":0.0,"groupName":"DEFAULT_GROUP","metadata":{},"finalizeCount":0,"owners":[],"resetWeight":false,"enabled":true,"selector":{"type":"none"},"namespaceId":"public","ipDeleteTimeout":30000,"lastModifiedMillis":1710655160399,"checksum":"e49b8ebf7277b036ec51194e6868f503","clusterMap":{"HZ":{"serviceName":"DEFAULT_GROUP@@orderservice","name":"HZ","healthChecker":{"type":"TCP"},"defaultPort":80,"defaultCheckPort":80,"useIPPort4Check":true,"metadata":{},"sitegroup":"","defCkport":80,"empty":false,"defIPPort":80}},"empty":false}
+
+2024-03-17 13:59:20,788 INFO [CLUSTER-UPDATE] DEFAULT_GROUP@@orderservice:HZ, defIPPort: -1 -> 80
+
+2024-03-17 13:59:20,788 INFO cluster size, new: 1, old: 1
+
+2024-03-17 13:59:20,790 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.public##DEFAULT_GROUP@@orderservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8080#HZ#DEFAULT_GROUP@@orderservice","ip":"192.168.8.37","port":8080,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":false,"clusterName":"HZ","serviceName":"DEFAULT_GROUP@@orderservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710647288228,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}]}
+
+2024-03-17 13:59:20,790 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.public##DEFAULT_GROUP@@orderservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8080#HZ#DEFAULT_GROUP@@orderservice","ip":"192.168.8.37","port":8080,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":false,"clusterName":"HZ","serviceName":"DEFAULT_GROUP@@orderservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710647288228,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}]}
+
+2024-03-17 13:59:23,654 INFO creating empty service public:DEFAULT_GROUP@@userservice
+
+2024-03-17 13:59:23,655 INFO [NEW-SERVICE] {"name":"DEFAULT_GROUP@@userservice","protectThreshold":0.0,"groupName":"DEFAULT_GROUP","metadata":{},"finalizeCount":0,"owners":[],"resetWeight":false,"enabled":true,"selector":{"type":"none"},"namespaceId":"public","ipDeleteTimeout":30000,"lastModifiedMillis":1710655163654,"checksum":"319c99f1fd9fc68a849621d51306c603","clusterMap":{},"empty":true}
+
+2024-03-17 13:59:23,658 WARN cluster: DEFAULT not found, ip: {"instanceId":"192.168.8.37#8082#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8082,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655163653,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}, will create new cluster with default configuration.
+
+2024-03-17 13:59:23,666 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8082#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8082,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655163653,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}]}
+
+2024-03-17 13:59:24,225 WARN cluster: SH not found, ip: {"instanceId":"192.168.8.37#8083#SH#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8083,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"SH","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655164224,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}, will create new cluster with default configuration.
+
+2024-03-17 13:59:24,228 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8083#SH#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8083,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"SH","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655164224,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000},{"instanceId":"192.168.8.37#8082#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8082,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655163653,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}]}
+
+2024-03-17 13:59:24,741 INFO [NACOS-DISTRO] healthy server list changed, old: [192.168.137.1:8848], new: [192.168.137.1:8848]
+
+2024-03-17 13:59:27,036 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8083#SH#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8083,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"SH","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655164224,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000},{"instanceId":"192.168.8.37#8082#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8082,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655163653,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000},{"instanceId":"192.168.8.37#8081#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8081,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655167035,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}]}
+
+2024-03-17 13:59:33,255 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.public##DEFAULT_GROUP@@orderservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8080#HZ#DEFAULT_GROUP@@orderservice","ip":"192.168.8.37","port":8080,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":false,"clusterName":"HZ","serviceName":"DEFAULT_GROUP@@orderservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710647288228,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000},{"instanceId":"192.168.137.1#8080#HZ#DEFAULT_GROUP@@orderservice","ip":"192.168.137.1","port":8080,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":false,"clusterName":"HZ","serviceName":"DEFAULT_GROUP@@orderservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655173129,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}]}
+
+2024-03-17 14:00:05,407 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8082#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8082,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655203766,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000},{"instanceId":"192.168.8.37#8081#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8081,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655202160,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}]}
+
+2024-03-17 14:00:05,437 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.8.37#8082#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.8.37","port":8082,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655203766,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}]}
+
+2024-03-17 14:00:05,469 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[]}
+
+2024-03-17 14:00:16,246 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.137.1#8081#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.137.1","port":8081,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655216245,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}]}
+
+2024-03-17 14:00:17,503 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.137.1#8081#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.137.1","port":8081,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655216245,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000},{"instanceId":"192.168.137.1#8082#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.137.1","port":8082,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655217503,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}]}
+
+2024-03-17 14:00:18,596 INFO [NACOS-RAFT] datum is changed, key: com.alibaba.nacos.naming.iplist.ephemeral.public##DEFAULT_GROUP@@userservice, value: {"instanceList":[{"instanceId":"192.168.137.1#8081#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.137.1","port":8081,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655216245,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000},{"instanceId":"192.168.137.1#8082#DEFAULT#DEFAULT_GROUP@@userservice","ip":"192.168.137.1","port":8082,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"DEFAULT","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655217503,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000},{"instanceId":"192.168.137.1#8083#SH#DEFAULT_GROUP@@userservice","ip":"192.168.137.1","port":8083,"weight":1.0,"healthy":true,"enabled":true,"ephemeral":true,"clusterName":"SH","serviceName":"DEFAULT_GROUP@@userservice","metadata":{"preserved.register.source":"SPRING_CLOUD"},"lastBeat":1710655218596,"marked":false,"app":"unknown","ipDeleteTimeout":30000,"instanceHeartBeatTimeOut":15000,"instanceHeartBeatInterval":5000}]}
+
+2024-03-17 21:36:31,471 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:36:38,441 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:36:48,468 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:36:58,473 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:37:08,482 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:37:18,490 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:37:28,503 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:37:38,519 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:37:48,531 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:37:58,554 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:38:08,558 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:38:18,559 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:38:28,577 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:38:38,590 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:38:48,603 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:38:58,610 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:39:08,625 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:39:18,634 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:39:28,649 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:39:38,667 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:39:48,675 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:39:58,690 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:40:08,709 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:40:18,717 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:40:28,741 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:40:38,755 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:40:48,759 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:40:58,770 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:41:08,773 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:41:18,785 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:41:28,794 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:41:38,797 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:41:48,811 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:41:58,816 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:42:08,827 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:42:18,841 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:42:28,841 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:42:38,847 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:42:48,858 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:42:58,867 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:43:08,870 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:43:18,874 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:43:28,874 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:43:38,890 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:43:48,898 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:43:58,912 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:44:08,925 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:44:18,935 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:44:28,939 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:44:38,940 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:44:48,950 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:44:58,966 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:45:08,982 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:45:18,990 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:45:28,996 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:45:39,008 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:45:49,013 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:45:59,024 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:46:09,032 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:46:19,045 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:46:29,050 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:46:39,058 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:46:49,061 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:46:59,069 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:47:09,079 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:47:19,090 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:47:29,100 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:47:39,113 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:47:49,127 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:47:59,136 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:48:09,151 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:48:19,166 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:48:29,169 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:48:39,179 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:48:49,192 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:48:59,206 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:49:09,216 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:49:19,227 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:49:29,226 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:49:39,235 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:49:49,246 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:49:59,261 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:50:09,263 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:50:19,276 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:50:29,283 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:50:39,295 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:50:49,304 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:50:59,316 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:51:09,322 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:51:19,333 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:51:29,340 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:51:39,355 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:51:49,367 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:51:59,381 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:52:09,393 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:52:19,408 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:52:29,418 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:52:39,423 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:52:49,440 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:52:59,455 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:53:09,460 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:53:19,469 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:53:29,480 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:53:39,487 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:53:49,501 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:53:59,515 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:54:09,524 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:54:19,527 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:54:29,542 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:54:39,543 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:54:49,547 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:54:59,550 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:55:09,565 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:55:19,579 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:55:29,590 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:55:39,603 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:55:49,606 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:55:59,608 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:56:09,612 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:56:19,628 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:56:29,672 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:56:39,679 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:56:49,686 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:56:59,688 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:57:09,688 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:57:19,692 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:57:29,708 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:57:39,719 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:57:49,723 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:57:59,726 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:58:09,738 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:58:19,744 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:58:29,747 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:58:39,761 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:58:49,790 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:58:59,794 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:59:09,804 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:59:19,811 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:59:29,830 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:59:39,840 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:59:49,847 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 21:59:59,887 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:00:09,892 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:00:19,904 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:00:29,906 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:00:39,922 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:00:49,926 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:00:59,931 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:01:09,943 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:01:19,944 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:01:29,951 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:01:39,964 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:01:49,965 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:01:59,979 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:02:10,002 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:02:20,017 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:02:30,029 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:02:40,031 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:02:50,035 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:03:00,036 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:03:10,062 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:03:20,063 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:03:30,071 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:03:40,090 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:03:50,099 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:04:00,115 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:04:10,123 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:04:20,139 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:04:30,143 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:04:40,173 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:04:50,190 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:05:00,197 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:05:10,205 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:05:20,221 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:05:30,224 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:05:40,225 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+
+2024-03-17 22:05:50,227 WARN protect threshold reached, return all ips, service: DEFAULT_GROUP@@orderservice
+

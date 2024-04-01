@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Fri Sep 22 18:04:36 CST 2023
+commons-compress-1.23.0.jar>nexus-aliyun=
+commons-compress-1.23.0.jar>central=
+commons-compress-1.23.0.pom>central=
+commons-compress-1.23.0.pom>nexus-aliyun=

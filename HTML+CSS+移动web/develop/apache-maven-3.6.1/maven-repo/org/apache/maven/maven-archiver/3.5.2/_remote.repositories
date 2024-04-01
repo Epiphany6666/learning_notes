@@ -1,0 +1,8 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed Oct 25 21:41:32 CST 2023
+maven-archiver-3.5.2.jar>central=
+maven-archiver-3.5.2.pom>central=
+maven-archiver-3.5.2.pom>alimaven=
+maven-archiver-3.5.2.jar>alimaven=
+maven-archiver-3.5.2.jar>nexus-aliyun=
+maven-archiver-3.5.2.pom>nexus-aliyun=

@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Fri Sep 22 19:24:19 CST 2023
+micrometer-observation-1.11.3.pom>central=
+micrometer-observation-1.11.3.jar>central=
+micrometer-observation-1.11.3.jar>nexus-aliyun=
+micrometer-observation-1.11.3.pom>nexus-aliyun=

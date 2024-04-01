@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Mon Dec 11 19:11:24 CST 2023
+byte-buddy-1.12.13.jar>alimaven=
+byte-buddy-1.12.13.pom>alimaven=
+byte-buddy-1.12.13.jar>central=
+byte-buddy-1.12.13.pom>central=

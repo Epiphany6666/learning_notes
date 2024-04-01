@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/pro-web.iml" filepath="$PROJECT_DIR$/pro-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pro01-javaweb-begin/pro01-javaweb-begin.iml" filepath="$PROJECT_DIR$/pro01-javaweb-begin/pro01-javaweb-begin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pro02-javaweb-begin/pro02-javaweb-begin.iml" filepath="$PROJECT_DIR$/pro02-javaweb-begin/pro02-javaweb-begin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pro03-javaweb-begin/pro03-javaweb-begin.iml" filepath="$PROJECT_DIR$/pro03-javaweb-begin/pro03-javaweb-begin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pro08-javaweb-servlet/pro08-javaweb-servlet.iml" filepath="$PROJECT_DIR$/pro08-javaweb-servlet/pro08-javaweb-servlet.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pro09-fruit1.4-thymeleaf/pro09-fruit1.4-thymeleaf.iml" filepath="$PROJECT_DIR$/pro09-fruit1.4-thymeleaf/pro09-fruit1.4-thymeleaf.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pro10-fruit1.5-thymeleaf/pro10-fruit1.5-thymeleaf.iml" filepath="$PROJECT_DIR$/pro10-fruit1.5-thymeleaf/pro10-fruit1.5-thymeleaf.iml" />
+    </modules>
+  </component>
+</project>

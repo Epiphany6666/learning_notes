@@ -1,0 +1,120 @@
+2024-03-19 10:08:08,181 INFO DEFAULT_GROUP@@orderservice {SYNC} {IP-NEW} cluster: HZ, new ips size: 2, content: [192.168.8.37:8080:unknown:HZ_1.0_false_false_HZ, 192.168.137.1:8080:unknown:HZ_1.0_true_false_HZ]
+
+2024-03-19 10:08:08,188 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@orderservice, ips: 192.168.8.37:8080_false,192.168.137.1:8080_true,
+
+2024-03-19 10:08:12,158 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 1, msg: tcp:timeout
+
+2024-03-19 10:08:13,539 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: SH, new ips size: 1, content: [172.20.10.4:8083:unknown:SH_1.0_true_false_SH]
+
+2024-03-19 10:08:13,540 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 172.20.10.4:8083_true,
+
+2024-03-19 10:08:15,242 INFO DEFAULT_GROUP@@orderservice {SYNC} {IP-NEW} cluster: HZ, new ips size: 1, content: [172.20.10.4:8080:unknown:HZ_1.0_true_false_HZ]
+
+2024-03-19 10:08:15,242 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@orderservice, ips: 172.20.10.4:8080_true,192.168.8.37:8080_false,192.168.137.1:8080_true,
+
+2024-03-19 10:08:15,631 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 2, msg: tcp:timeout
+
+2024-03-19 10:08:17,042 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [172.20.10.4:8081:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 10:08:17,043 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 172.20.10.4:8083_true,172.20.10.4:8081_true,
+
+2024-03-19 10:08:19,408 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [172.20.10.4:8082:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 10:08:19,409 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 172.20.10.4:8083_true,172.20.10.4:8081_true,172.20.10.4:8082_true,
+
+2024-03-19 10:08:20,124 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 172.20.10.4:8080@HZ in 1, msg: tcp:ok+
+
+2024-03-19 10:08:20,629 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-DISABLED} invalid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:timeout
+
+2024-03-19 10:08:21,167 INFO DEFAULT_GROUP@@gateway {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [172.20.10.4:10010:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 10:08:21,168 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@gateway, ips: 172.20.10.4:10010_true,
+
+2024-03-19 10:08:25,137 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 172.20.10.4:8080@HZ in 2, msg: tcp:ok+
+
+2024-03-19 10:08:30,140 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-ENABLED} valid: 172.20.10.4:8080@HZ, region: unknown, msg: tcp:ok+
+
+2024-03-19 10:09:01,410 INFO DEFAULT_GROUP@@gateway {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [172.20.10.4:10010:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 10:09:01,410 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@gateway, ips: 
+
+2024-03-19 10:09:17,625 INFO DEFAULT_GROUP@@gateway {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [172.20.10.4:10010:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 10:09:17,625 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@gateway, ips: 172.20.10.4:10010_true,
+
+2024-03-19 11:40:23,221 INFO DEFAULT_GROUP@@gateway {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [172.20.10.4:10010:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 11:40:23,221 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@gateway, ips: 
+
+2024-03-19 11:40:39,455 INFO DEFAULT_GROUP@@gateway {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [172.20.10.4:10010:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 11:40:39,455 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@gateway, ips: 172.20.10.4:10010_true,
+
+2024-03-19 11:41:58,177 INFO DEFAULT_GROUP@@gateway {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [172.20.10.4:10010:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 11:41:58,177 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@gateway, ips: 
+
+2024-03-19 11:42:09,624 INFO DEFAULT_GROUP@@gateway {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [172.20.10.4:10010:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 11:42:09,624 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@gateway, ips: 172.20.10.4:10010_true,
+
+2024-03-19 11:43:03,810 INFO DEFAULT_GROUP@@gateway {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [172.20.10.4:10010:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 11:43:03,810 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@gateway, ips: 
+
+2024-03-19 11:43:18,941 INFO DEFAULT_GROUP@@gateway {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [172.20.10.4:10010:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 11:43:18,941 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@gateway, ips: 172.20.10.4:10010_true,
+
+2024-03-19 11:44:45,066 INFO DEFAULT_GROUP@@gateway {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [172.20.10.4:10010:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 11:44:45,066 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@gateway, ips: 
+
+2024-03-19 11:44:58,950 INFO DEFAULT_GROUP@@gateway {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [172.20.10.4:10010:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 11:44:58,950 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@gateway, ips: 172.20.10.4:10010_true,
+
+2024-03-19 12:37:59,333 INFO {POS} {IP-DISABLED} valid: 172.20.10.4:8083@SH@DEFAULT_GROUP@@userservice, region: unknown, msg: client timeout after 15000, last beat: 1710819981262
+
+2024-03-19 12:37:59,334 INFO {POS} {IP-DISABLED} valid: 172.20.10.4:10010@DEFAULT@DEFAULT_GROUP@@gateway, region: unknown, msg: client timeout after 15000, last beat: 1710819984126
+
+2024-03-19 12:37:59,334 INFO service: DEFAULT_GROUP@@userservice {POS} {IP-ENABLED} valid: 172.20.10.4:8083@SH, region: unknown, msg: client beat ok
+
+2024-03-19 12:37:59,533 INFO {POS} {IP-DISABLED} valid: 172.20.10.4:8081@DEFAULT@DEFAULT_GROUP@@userservice, region: unknown, msg: client timeout after 15000, last beat: 1710819984458
+
+2024-03-19 12:37:59,533 INFO {POS} {IP-DISABLED} valid: 172.20.10.4:8082@DEFAULT@DEFAULT_GROUP@@userservice, region: unknown, msg: client timeout after 15000, last beat: 1710819982234
+
+2024-03-19 12:37:59,758 INFO service: DEFAULT_GROUP@@userservice {POS} {IP-ENABLED} valid: 172.20.10.4:8082@DEFAULT, region: unknown, msg: client beat ok
+
+2024-03-19 12:37:59,857 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [172.20.10.4:8081:unknown:DEFAULT_1.0_false_false_DEFAULT]
+
+2024-03-19 12:37:59,857 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 172.20.10.4:8083_true,172.20.10.4:8082_true,
+
+2024-03-19 12:37:59,857 INFO DEFAULT_GROUP@@gateway {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [172.20.10.4:10010:unknown:DEFAULT_1.0_false_false_DEFAULT]
+
+2024-03-19 12:37:59,857 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@gateway, ips: 
+
+2024-03-19 12:38:01,666 INFO DEFAULT_GROUP@@gateway {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [172.20.10.4:10010:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 12:38:01,666 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@gateway, ips: 172.20.10.4:10010_true,
+
+2024-03-19 12:38:01,997 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [172.20.10.4:8081:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-19 12:38:01,997 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 172.20.10.4:8083_true,172.20.10.4:8081_true,172.20.10.4:8082_true,
+
+2024-03-19 12:38:13,629 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 172.20.10.4:8080@HZ in 1, msg: tcp:error:Connection reset
+
+2024-03-19 12:38:16,336 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 172.20.10.4:8080@HZ in 2, msg: tcp:timeout
+
+2024-03-19 12:38:19,859 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-DISABLED} invalid: 172.20.10.4:8080@HZ, region: unknown, msg: tcp:timeout
+
+2024-03-19 12:38:44,409 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 172.20.10.4:8080@HZ in 1, msg: tcp:ok+
+
+2024-03-19 12:38:49,417 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 172.20.10.4:8080@HZ in 2, msg: tcp:ok+
+
+2024-03-19 12:38:54,430 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-ENABLED} valid: 172.20.10.4:8080@HZ, region: unknown, msg: tcp:ok+
+
+2024-03-19 14:15:51,526 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: SH, dead ips size: 1, content: [172.20.10.4:8083:unknown:SH_1.0_true_false_SH]
+
+2024-03-19 14:15:51,527 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 172.20.10.4:8081_true,172.20.10.4:8082_true,
+

@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed Mar 13 14:55:17 CST 2024
+netty-transport-native-epoll-4.1.107.Final-linux-aarch_64.jar>alimaven=
+netty-transport-native-epoll-4.1.107.Final.pom>alimaven=
+netty-transport-native-epoll-4.1.107.Final-linux-x86_64.jar>alimaven=
+netty-transport-native-epoll-4.1.107.Final-linux-riscv64.jar>alimaven=

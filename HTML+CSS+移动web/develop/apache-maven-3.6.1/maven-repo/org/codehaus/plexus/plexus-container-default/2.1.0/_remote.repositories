@@ -1,0 +1,8 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Nov 02 09:01:46 CST 2023
+plexus-container-default-2.1.0.jar>nexus-aliyun=
+plexus-container-default-2.1.0.jar>central=
+plexus-container-default-2.1.0.pom>alimaven=
+plexus-container-default-2.1.0.pom>central=
+plexus-container-default-2.1.0.pom>nexus-aliyun=
+plexus-container-default-2.1.0.jar>alimaven=

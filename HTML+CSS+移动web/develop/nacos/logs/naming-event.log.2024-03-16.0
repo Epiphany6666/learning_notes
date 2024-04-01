@@ -1,0 +1,270 @@
+2024-03-16 11:43:36,829 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: SH, new ips size: 1, content: [192.168.137.1:8083:unknown:SH_1.0_true_false_SH]
+
+2024-03-16 11:43:36,837 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,
+
+2024-03-16 11:43:45,026 INFO DEFAULT_GROUP@@orderservice {SYNC} {IP-NEW} cluster: HZ, new ips size: 1, content: [192.168.137.1:8080:unknown:HZ_1.0_true_false_HZ]
+
+2024-03-16 11:43:45,026 INFO [IP-UPDATED] namespace: d0062db2-7864-418d-91aa-be3720059f07, service: DEFAULT_GROUP@@orderservice, ips: 192.168.137.1:8080_true,
+
+2024-03-16 11:43:48,237 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: HZ, new ips size: 1, content: [192.168.137.1:8081:unknown:HZ_1.0_true_false_HZ]
+
+2024-03-16 11:43:48,237 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8081_true,192.168.137.1:8083_true,
+
+2024-03-16 11:43:50,257 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: HZ, new ips size: 1, content: [192.168.137.1:8082:unknown:HZ_1.0_true_false_HZ]
+
+2024-03-16 11:43:50,257 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8081_true,192.168.137.1:8082_true,192.168.137.1:8083_true,
+
+2024-03-16 12:07:04,684 INFO DEFAULT_GROUP@@orderservice {SYNC} {IP-DEAD} cluster: HZ, dead ips size: 1, content: [192.168.137.1:8080:unknown:HZ_1.0_true_false_HZ]
+
+2024-03-16 12:07:04,684 INFO [IP-UPDATED] namespace: d0062db2-7864-418d-91aa-be3720059f07, service: DEFAULT_GROUP@@orderservice, ips: 
+
+2024-03-16 12:07:18,163 INFO DEFAULT_GROUP@@orderservice {SYNC} {IP-NEW} cluster: HZ, new ips size: 1, content: [192.168.137.1:8080:unknown:HZ_1.0_true_false_HZ]
+
+2024-03-16 12:07:18,163 INFO [IP-UPDATED] namespace: d0062db2-7864-418d-91aa-be3720059f07, service: DEFAULT_GROUP@@orderservice, ips: 192.168.137.1:8080_true,
+
+2024-03-16 12:07:19,008 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 1, msg: tcp:ok+
+
+2024-03-16 12:07:21,630 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 2, msg: tcp:ok+
+
+2024-03-16 12:07:23,603 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-ENABLED} valid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:ok+
+
+2024-03-16 12:07:41,195 INFO [IP-UPDATED] namespace: d0062db2-7864-418d-91aa-be3720059f07, service: DEFAULT_GROUP@@orderservice, ips: 192.168.137.1:8080_true,
+
+2024-03-16 12:07:41,838 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 1, msg: tcp:timeout
+
+2024-03-16 12:07:42,843 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 2, msg: tcp:timeout
+
+2024-03-16 12:07:44,100 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-DISABLED} invalid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:timeout
+
+2024-03-16 12:09:38,281 INFO [IP-UPDATED] namespace: d0062db2-7864-418d-91aa-be3720059f07, service: DEFAULT_GROUP@@orderservice, ips: 192.168.137.1:8080_false,
+
+2024-03-16 12:09:41,480 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 1, msg: tcp:ok+
+
+2024-03-16 12:09:46,495 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 2, msg: tcp:ok+
+
+2024-03-16 12:09:50,261 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-ENABLED} valid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:ok+
+
+2024-03-16 12:10:43,058 INFO [IP-UPDATED] namespace: d0062db2-7864-418d-91aa-be3720059f07, service: DEFAULT_GROUP@@orderservice, ips: 192.168.137.1:8080_true,
+
+2024-03-16 12:10:43,885 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 1, msg: tcp:timeout
+
+2024-03-16 12:10:44,900 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 2, msg: tcp:timeout
+
+2024-03-16 12:10:46,138 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-DISABLED} invalid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:timeout
+
+2024-03-16 12:12:18,611 INFO [IP-UPDATED] namespace: d0062db2-7864-418d-91aa-be3720059f07, service: DEFAULT_GROUP@@orderservice, ips: 192.168.137.1:8080_false,
+
+2024-03-16 12:12:23,417 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 1, msg: tcp:ok+
+
+2024-03-16 12:12:28,430 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 2, msg: tcp:ok+
+
+2024-03-16 12:12:32,188 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-ENABLED} valid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:ok+
+
+2024-03-16 15:11:40,035 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: SH, dead ips size: 1, content: [192.168.137.1:8083:unknown:SH_1.0_true_false_SH]
+
+2024-03-16 15:11:40,036 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8081_true,192.168.137.1:8082_true,
+
+2024-03-16 15:11:40,102 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: HZ, dead ips size: 1, content: [192.168.137.1:8081:unknown:HZ_1.0_true_false_HZ]
+
+2024-03-16 15:11:40,102 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8082_true,
+
+2024-03-16 15:11:40,160 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: HZ, dead ips size: 1, content: [192.168.137.1:8082:unknown:HZ_1.0_true_false_HZ]
+
+2024-03-16 15:11:40,160 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 
+
+2024-03-16 15:11:54,204 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: SH, new ips size: 1, content: [192.168.137.1:8083:unknown:SH_1.0_true_false_SH]
+
+2024-03-16 15:11:54,204 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,
+
+2024-03-16 15:11:56,513 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [192.168.137.1:8081:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:11:56,513 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,192.168.137.1:8081_true,
+
+2024-03-16 15:11:57,701 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [192.168.137.1:8082:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:11:57,701 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,192.168.137.1:8081_true,192.168.137.1:8082_true,
+
+2024-03-16 15:22:29,130 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: SH, dead ips size: 1, content: [192.168.137.1:8083:unknown:SH_1.0_true_false_SH]
+
+2024-03-16 15:22:29,130 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8081_true,192.168.137.1:8082_true,
+
+2024-03-16 15:22:29,172 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [192.168.137.1:8081:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:22:29,172 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8082_true,
+
+2024-03-16 15:22:29,220 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [192.168.137.1:8082:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:22:29,220 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 
+
+2024-03-16 15:22:43,580 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: SH, new ips size: 1, content: [192.168.137.1:8083:unknown:SH_1.0_true_false_SH]
+
+2024-03-16 15:22:43,580 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,
+
+2024-03-16 15:22:45,587 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [192.168.137.1:8081:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:22:45,587 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,192.168.137.1:8081_true,
+
+2024-03-16 15:22:46,607 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [192.168.137.1:8082:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:22:46,607 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,192.168.137.1:8081_true,192.168.137.1:8082_true,
+
+2024-03-16 15:37:01,086 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: SH, dead ips size: 1, content: [192.168.137.1:8083:unknown:SH_1.0_true_false_SH]
+
+2024-03-16 15:37:01,086 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8081_true,192.168.137.1:8082_true,
+
+2024-03-16 15:37:01,142 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [192.168.137.1:8081:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:37:01,142 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8082_true,
+
+2024-03-16 15:37:01,183 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [192.168.137.1:8082:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:37:01,183 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 
+
+2024-03-16 15:39:11,140 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: SH, new ips size: 1, content: [192.168.137.1:8083:unknown:SH_1.0_true_false_SH]
+
+2024-03-16 15:39:11,140 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,
+
+2024-03-16 15:39:12,888 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [192.168.137.1:8081:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:39:12,888 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,192.168.137.1:8081_true,
+
+2024-03-16 15:39:14,094 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [192.168.137.1:8082:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:39:14,094 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,192.168.137.1:8081_true,192.168.137.1:8082_true,
+
+2024-03-16 15:49:43,328 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: SH, dead ips size: 1, content: [192.168.137.1:8083:unknown:SH_1.0_true_false_SH]
+
+2024-03-16 15:49:43,329 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8081_true,192.168.137.1:8082_true,
+
+2024-03-16 15:49:43,411 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [192.168.137.1:8081:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:49:43,411 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8082_true,
+
+2024-03-16 15:49:43,458 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [192.168.137.1:8082:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:49:43,458 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 
+
+2024-03-16 15:51:20,541 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: SH, new ips size: 1, content: [192.168.137.1:8083:unknown:SH_1.0_true_false_SH]
+
+2024-03-16 15:51:20,541 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,
+
+2024-03-16 15:51:22,035 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [192.168.137.1:8081:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:51:22,035 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,192.168.137.1:8081_true,
+
+2024-03-16 15:51:23,135 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [192.168.137.1:8082:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:51:23,135 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,192.168.137.1:8081_true,192.168.137.1:8082_true,
+
+2024-03-16 15:59:59,166 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [192.168.137.1:8082:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 15:59:59,166 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,192.168.137.1:8081_true,
+
+2024-03-16 16:00:10,325 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-NEW} cluster: DEFAULT, new ips size: 1, content: [192.168.137.1:8082:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 16:00:10,325 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8083_true,192.168.137.1:8081_true,192.168.137.1:8082_true,
+
+2024-03-16 17:12:39,731 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 1, msg: tcp:timeout
+
+2024-03-16 17:12:39,882 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: SH, dead ips size: 1, content: [192.168.137.1:8083:unknown:SH_1.0_true_false_SH]
+
+2024-03-16 17:12:39,890 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8081_true,192.168.137.1:8082_true,
+
+2024-03-16 17:12:40,000 INFO [IP-UPDATED] namespace: d0062db2-7864-418d-91aa-be3720059f07, service: DEFAULT_GROUP@@orderservice, ips: 192.168.137.1:8080_true,
+
+2024-03-16 17:12:40,154 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [192.168.137.1:8082:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 17:12:40,154 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 192.168.137.1:8081_true,
+
+2024-03-16 17:12:40,156 INFO DEFAULT_GROUP@@userservice {SYNC} {IP-DEAD} cluster: DEFAULT, dead ips size: 1, content: [192.168.137.1:8081:unknown:DEFAULT_1.0_true_false_DEFAULT]
+
+2024-03-16 17:12:40,156 INFO [IP-UPDATED] namespace: public, service: DEFAULT_GROUP@@userservice, ips: 
+
+2024-03-16 17:12:40,706 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 2, msg: tcp:timeout
+
+2024-03-16 17:12:41,968 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-DISABLED} invalid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:timeout
+
+2024-03-16 17:12:54,307 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 1, msg: tcp:ok+
+
+2024-03-16 17:12:59,071 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 2, msg: tcp:ok+
+
+2024-03-16 17:13:28,446 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 0, msg: tcp:ok+
+
+2024-03-16 17:13:32,941 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 1, msg: tcp:ok+
+
+2024-03-16 17:13:36,835 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 2, msg: tcp:ok+
+
+2024-03-16 17:13:39,759 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-ENABLED} valid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:ok+
+
+2024-03-16 17:48:47,860 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 1, msg: tcp:timeout
+
+2024-03-16 17:48:48,870 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 2, msg: tcp:timeout
+
+2024-03-16 17:48:50,138 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-DISABLED} invalid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:timeout
+
+2024-03-16 17:49:17,268 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 1, msg: tcp:ok+
+
+2024-03-16 17:49:22,283 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 2, msg: tcp:ok+
+
+2024-03-16 17:49:26,043 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-ENABLED} valid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:ok+
+
+2024-03-16 17:51:06,920 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 1, msg: tcp:timeout
+
+2024-03-16 17:51:07,930 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 2, msg: tcp:timeout
+
+2024-03-16 17:51:09,188 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-DISABLED} invalid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:timeout
+
+2024-03-16 17:51:17,720 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 1, msg: tcp:ok+
+
+2024-03-16 17:51:21,547 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 2, msg: tcp:ok+
+
+2024-03-16 17:51:24,409 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-ENABLED} valid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:ok+
+
+2024-03-16 17:54:28,871 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 1, msg: tcp:timeout
+
+2024-03-16 17:54:29,881 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 2, msg: tcp:timeout
+
+2024-03-16 17:54:31,134 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-DISABLED} invalid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:timeout
+
+2024-03-16 17:54:39,665 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 1, msg: tcp:ok+
+
+2024-03-16 17:54:43,492 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 2, msg: tcp:ok+
+
+2024-03-16 17:54:46,351 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-ENABLED} valid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:ok+
+
+2024-03-16 17:56:02,562 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 1, msg: tcp:timeout
+
+2024-03-16 17:56:03,577 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 2, msg: tcp:timeout
+
+2024-03-16 17:56:04,827 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-DISABLED} invalid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:timeout
+
+2024-03-16 17:56:13,363 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 1, msg: tcp:ok+
+
+2024-03-16 17:56:17,176 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 2, msg: tcp:ok+
+
+2024-03-16 17:56:20,049 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-ENABLED} valid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:ok+
+
+2024-03-16 17:57:47,931 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 1, msg: tcp:error:Permission denied: connect
+
+2024-03-16 17:57:48,911 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 2, msg: tcp:error:Permission denied: connect
+
+2024-03-16 17:58:05,029 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 1, msg: tcp:timeout
+
+2024-03-16 17:58:06,024 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 2, msg: tcp:timeout
+
+2024-03-16 17:58:07,298 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-DISABLED} invalid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:timeout
+
+2024-03-16 20:31:31,765 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 1, msg: tcp:ok+
+
+2024-03-16 20:31:36,772 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-ENABLED} pre-valid: 192.168.137.1:8080@HZ in 2, msg: tcp:ok+
+
+2024-03-16 20:31:40,529 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-ENABLED} valid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:ok+
+
+2024-03-16 20:40:08,627 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 1, msg: tcp:error:Permission denied: connect
+
+2024-03-16 20:45:03,842 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 1, msg: tcp:timeout
+
+2024-03-16 20:45:04,853 INFO serviceName: DEFAULT_GROUP@@orderservice {OTHER} {IP-DISABLED} pre-invalid: 192.168.137.1:8080@HZ in 2, msg: tcp:timeout
+
+2024-03-16 20:45:06,101 INFO serviceName: DEFAULT_GROUP@@orderservice {POS} {IP-DISABLED} invalid: 192.168.137.1:8080@HZ, region: unknown, msg: tcp:timeout
+

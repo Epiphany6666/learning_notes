@@ -1,0 +1,8 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed Oct 25 17:28:37 CST 2023
+maven-aether-provider-3.0.pom>nexus-aliyun=
+maven-aether-provider-3.0.jar>nexus-aliyun=
+maven-aether-provider-3.0.jar>alimaven=
+maven-aether-provider-3.0.jar>central=
+maven-aether-provider-3.0.pom>alimaven=
+maven-aether-provider-3.0.pom>central=

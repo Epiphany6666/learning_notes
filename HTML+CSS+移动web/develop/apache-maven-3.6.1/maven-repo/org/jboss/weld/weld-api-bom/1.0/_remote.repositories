@@ -1,0 +1,5 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed Oct 25 21:40:59 CST 2023
+weld-api-bom-1.0.pom>central=
+weld-api-bom-1.0.pom>nexus-aliyun=
+weld-api-bom-1.0.pom>alimaven=

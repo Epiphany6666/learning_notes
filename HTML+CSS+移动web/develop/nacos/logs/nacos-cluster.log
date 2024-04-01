@@ -1,0 +1,6 @@
+2024-03-22 17:09:08,752 INFO Current addressing mode selection : StandaloneMemberLookup
+
+2024-03-22 17:09:08,757 WARN [serverlist] updated to : [Member{ip='192.168.8.44', port=8848, state=UP, extendInfo={raftPort=7848}}]
+
+2024-03-22 17:09:12,951 INFO This node is ready to provide external services
+

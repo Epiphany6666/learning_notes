@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Fri Sep 22 19:24:46 CST 2023
+jackson-databind-2.12.1.pom>central=
+jackson-databind-2.12.1.pom>nexus-aliyun=
+jackson-databind-2.12.1.jar>central=
+jackson-databind-2.12.1.jar>nexus-aliyun=

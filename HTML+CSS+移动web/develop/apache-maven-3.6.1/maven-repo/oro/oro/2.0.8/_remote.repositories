@@ -1,0 +1,8 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed Oct 25 17:28:38 CST 2023
+oro-2.0.8.jar>nexus-aliyun=
+oro-2.0.8.pom>alimaven=
+oro-2.0.8.pom>central=
+oro-2.0.8.jar>alimaven=
+oro-2.0.8.jar>central=
+oro-2.0.8.pom>nexus-aliyun=
