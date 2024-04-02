@@ -5786,11 +5786,11 @@ public class SkipLoppDemo2 {
 
 ---
 
-# 50.逢七过
+# 50.练习：逢七过
 
-朋友聚会的时候可能会玩一个游戏：逢7过
-        游戏规则：从任意一个数字开始报数，当你要报的数字是包含7或者是7的倍数时都要说过：过
-        需求：使用程序在控制台打印出1-100之间的满足逢七必过规则的数据
+朋友聚会的时候可能会玩一个游戏：逢7过。
+游戏规则：从任意一个数字开始报数，当你要报的数字是包含7或者是7的倍数时都要说过：过
+需求：使用程序在控制台打印出1-100之间的满足逢七必过规则的数据
 
 ~~~java
 package com.itheima.test;
@@ -5803,8 +5803,8 @@ public class LoopTest1 {
         //69 过 过 过 过 过 过... 80
 
         //1.得到1~100之间的每一个数字
-        //开始：1
-        //结束：100
+        //循环开始：1
+        //循环结束：100
         for (int i = 1; i <= 100; i++) {
         //2.判断每一个数字，如果符合规则，就打印过，如果不符合规则就打印真实的数字
             if(i % 10 == 7 || i / 10 % 10 == 7  ||  i % 7 == 0){
@@ -5817,15 +5817,318 @@ public class LoopTest1 {
 }
 ~~~
 
+---
+
+# 51.练习：求平方根
+
+需求：键盘录入一个大于等于2的整数 x ，计算并返回 x 的 平方根 。
+        结果只保留整数部分 ，小数部分将被舍去 。
+
+~~~java
+package com.itheima.test;
+
+import java.util.Scanner;
+
+public class LoopTest2 {
+    public static void main(String[] args) {
+        //分析：
+        //平方根   16的平方根4
+        //         4的平方根2
+
+
+        // 10
+        // 1 * 1 = 1 < 10
+        // 2 * 2 = 4 < 10
+        // 3 * 3 = 9 < 10
+        // 4 * 4 = 16 > 10
+        //推断：10的平方根是在3~4之间。
+
+
+        // 20
+        // 1 * 1 = 1 < 20
+        // 2 * 2 = 4 < 20
+        // 3 * 3 = 9 < 20
+        // 4 * 4 = 16 < 20
+        // 5 * 5 = 25 > 20
+        //推断：20的平方根是在4~5之间。
+
+
+        //在代码当中
+        //从1开始循环，拿着数字的平方跟原来的数字进行比较
+        //如果小于的，那么继续往后判断
+        //如果相等，那么当前数字就是平方根
+        //如果大于的，那么前一个数字就是平方跟的整数部分
+
+
+        //1.键盘录入一个整数
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请输入一个整数");
+        int number = sc.nextInt();
+        //2.从1开始循环判断
+        //开始：1 结束: number
+        for (int i = 1; i <= number; i++) {
+            //用i * i 再跟number进行比较
+            if(i * i == number){
+                System.out.println(i + "就是" + number + "的平方根");
+                //一旦找到了，循环就可以停止了，后面的数字就不需要再找了，提高代码的运行效率。
+                break;
+            }else if(i * i > number){
+                System.out.println((i - 1) + "就是" + number + "平方根的整数部分");
+                break;
+            }
+        }
+    }
+}
+~~~
+
+---
+
+# 52.判断是否为质数
+
+需求：键盘录入一个正整数 x ，判断该整数是否为一个质数。
+
+~~~java
+package com.itheima.test;
+
+import java.util.Scanner;
+
+public class LoopTest3 {
+    public static void main(String[] args) {
+       //质数：
+        //如果一个整数只能被1和本身整除，那么这个数就是质数。否则这个数叫做合数
+        //7 = 1 * 7 质数
+        //8 = 1 * 8  2 * 4 合数
+
+
+        //分析：
+        //1.键盘录入一个正整数
+        //number
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请输入一个正整数");
+        int number = sc.nextInt();//9
+
+        //定义一个变量，表示标记
+        //标记着number是否为一个质数
+        //true： 是一个质数
+        //false : 不是一个质数
+
+        //表示最初就认为number是一个质数
+        boolean flag = true;
+
+
+        //2.判断
+        //写一个循环，从2开始判断，一直判断到number-1为止
+        //看这个范围之内，有没有数字可以被number整除
+        for (int i = 2; i < number; i++) {
+            //i 依次表示这个范围之内的每一个数字
+            //看number是否能被i整除就可以了
+            if(number % i == 0){// 9 % 2 = 1
+                flag = false;
+                //System.out.println(number + "不是一个质数");
+                break;
+            }/*else{ // 肯定不能在else判断
+                System.out.println(number + "是一个质数");
+            }*/
+        }
+
+        //只有当这个循环结束了，表示这个范围之内所有的数字都判断完毕了
+        //此时才能断定number是一个质数
+        if(flag){
+            System.out.println(number + "是一个质数");
+        }else{
+            System.out.println(number + "不是一个质数");
+        }
+
+    }
+}
+~~~
+
+上面那种写法，如果数字很大，那么循环的次数就会很多，此时就需要简化
+
+~~~java
+package com.itheima.test;
+
+public class LoopTest4 {
+    public static void main(String[] args) {
+        // 100000
+        // 2 ~ 99999
+        //循环的次数：将近10万次
+
+        //推荐一个简化的思路
+        //81
+        //1 * 81
+        //3 * 27
+        //9 * 9
+
+
+        //以81的平方根9，为中心
+        //而且假设 a * b = 81
+        //那么a和b中，其中有一个必定是小于等于9（81的平方根）的。
+        //另一个是大于等于9（81的平方根）的。
+
+        //假设，都是大于9 --- 9.1 * 9.1 > 81
+        //假设，都是小于9 --- 8.9 * 8.9 < 81
+        //其中一个数字一定是小于等于平方根
+        //另外一个数字一定是大于等于平方根
+
+        int number = 100;
+        //如果这个范围之内，所有的数字都不能被number整除
+        //那么number就一定是一个质数。
+        for (int i = 2; i <= number的平方根; i++) {
+
+        }
+    }
+}
+~~~
 
 
 
+---
+
+# 53.猜数字小游戏
+
+## 一、获取随机数
+
+Java帮我们写好一个类叫Random，这个类可以生成一个随机数。这个类的学习可以参考以前Scanner学习步骤。
+
+![image-20240402192517756](./assets/image-20240402192517756.png)
+
+案例1：获取范围：0~10的随机数
+
+~~~java
+package com.itheima.test;
+
+//1.导包，IDEA会帮我们自动生成
+import java.util.Random;
+
+public class LoopTest5 {
+    public static void main(String[] args) {
+        //先获取一个随机数。范围：0~10
+
+        //2.创建对象
+        Random r = new Random();
+
+        //3.生成随机数
+        //判断技巧：
+        //在小括号中，书写的是生成随机数的范围
+        //这个范围一定是从0开始的。
+        //到这个数-1结束
+        //口诀：包头不包尾，包左不包右
+        for (int i = 0; i < 100; i++) {
+            int number = r.nextInt(10);// 表示0 ~ 9之间
+            System.out.println(number);
+        }
+    }
+}
+~~~
+
+案例2：生成随机数范围：1~100的数字
+
+~~~java
+package com.itheima.test;
+
+import java.util.Random;
+
+public class LoopTest6 {
+    public static void main(String[] args) {
+        //需求：
+        //随机数范围：1~100
+
+        //创建对象
+        Random r = new Random();
+        //生成随机数
+        int number = r.nextInt(100) + 1;//1  ~ 100
+        System.out.println(number);
+
+
+        //秘诀
+        //用来生成任意数到任意数之间的随机数 7 ~15
+        //1.让这个范围头尾都减去一个值，让这个范围从0开始  -7   0~8
+        //2.尾巴+1       8 + 1 = 9
+        //3.最终的结果，再加上第一步减去的值。
+
+        Random r = new Random();
+        int number = r.nextInt(9) + 7;// 7 ~ 15
+                //   0 ~ 8  + 7 => 7 ~ 15
+        System.out.println(number);
+
+    }
+}
+~~~
+
+---
+
+## 猜数字小游戏
+
+需求：程序自动生成一个1-100之间的随机数字，使用程序实现猜出这个数字是多少？
+
+~~~java
+package com.itheima.test;
+
+import java.util.Random;
+import java.util.Scanner;
+
+public class LoopTest7 {
+    public static void main(String[] args) {
+
+        //注意点：
+        //1.生成随机数的代码int number = r.nextInt(100) + 1;不能写在循环的里面的，否则每一次都会产生一个新的随机数
+
+        //2.抽奖机制
+        //用点券去抽水晶
+        //保底 360次，如果360次没中，就会送你个水晶
+
+        //扩展小需求：加一个保底机制，3次猜不中，直接提示猜中了。
+
+        //计数器
+        //用来统计当前已经猜了多少次。
+        int count = 0;
+        //分析
+        // 1. 生成一个1-100之间的随机数字
+        Random r = new Random();
+        int number = r.nextInt(100) + 1;
+        System.out.println(number);
+        // 2. 猜这个数字是多少
+        Scanner sc = new Scanner(System.in);
+        while(true){
+            System.out.println("请输入你要猜的数字");
+            int guessNumber = sc.nextInt();
+
+            //3 . 判断两个数字给出不同的提示
+            //猜的数字大了，提示 大了
+            //猜的数字小了，提示 小了
+            //猜的数字一样，提示猜中了
+            count++;
+            if(count == 3){
+                System.out.println("猜中了");
+                break;
+            }
+            if(guessNumber > number){
+                System.out.println("大了");
+            }else if(guessNumber < number){
+                System.out.println("小了");
+            }else{
+                System.out.println("猜中了");
+                break;
+            }
+        }
+
+
+    }
+}
+~~~
 
 
 
+---
 
+# 54.数组的概述和静态初始化
 
+## 一、什么是数组？
 
+数组指的是一种容器，可以用来存储**同种数据类型**的多个值。
+
+同种数据类型我们不能理解的太死
 
 
 
