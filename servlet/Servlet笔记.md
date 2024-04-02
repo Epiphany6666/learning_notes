@@ -664,11 +664,11 @@ B. 访问c2接口 http://localhost:8080/c2，此时浏览器会自动的将Cooki
 > 举例：
 >
 > 	http://192.168.150.200/login.html ----------> https://192.168.150.200/login   		[协议不同，跨域]
-> 	
+> 		
 > 	http://192.168.150.200/login.html ----------> http://192.168.150.100/login     		[IP不同，跨域]
-> 	
+> 		
 > 	http://192.168.150.200/login.html ----------> http://192.168.150.200:8080/login   [端口不同，跨域]
-> 	
+> 		
 > 	http://192.168.150.200/login.html ----------> http://192.168.150.200/login    		 [不跨域]   
 
 ---
@@ -968,23 +968,25 @@ web.xml
 
 # 29.服务器内部转发以及客户端重定向
 
-1. 服务器内部转发：request.getRequestDispatcher("...").forward(request, response);
+## 一、服务器内部转发：request.getRequestDispatcher("...").forward(request, response);
 
-   一次请求响应的过程，对于客户端而言，内部经过了多少次转发，客户端是不知道的。地址栏中的URL是不会变化的。
+一次请求响应的过程，对于客户端而言，内部经过了多少次转发，客户端是不知道的。地址栏中的URL是不会变化的。
 
-   内部经过3、4次跳转都是一次请求响应
+内部经过3、4次跳转都是一次请求响应。如图所示：
 
-   ![04.服务器内部转发(1)](assets/04.服务器内部转发(1).png)
+![image-20240402144534703](./assets/image-20240402144534703.png)
 
-2. 客户端重定向：response.sendRedirect("×××");
+---
 
-   两次请求响应的过程。客户端肯定知道请求URL有变化
+## 二、客户端重定向：response.sendRedirect("×××");
 
-   ![05.客户端重定向](assets/05.客户端重定向.png)
+两次请求响应的过程。客户端肯定知道请求URL有变化。如图所示：
 
+![image-20240402144623662](./assets/image-20240402144623662.png)
 
+---
 
-## 代码示例
+## 三、服务器内部转发代码示例
 
 **服务器内部转发**：证明可通过代码断点调试
 
@@ -1016,6 +1018,10 @@ public class Demo07Servlet extends HttpServlet {
 web.xml
 
 ~~~xml
+<servlet>
+    <servlet-name>Demo06Servlet</servlet-name>
+    <servlet-class>com.atguigu.servlets.Demo06Servlet</servlet-class>
+</servlet>
 <servlet-mapping>
     <servlet-name>Demo06Servlet</servlet-name>
     <url-pattern>/demo06</url-pattern>
@@ -1031,9 +1037,9 @@ web.xml
 </servlet-mapping>
 ~~~
 
+---
 
-
-**客户端重定向**
+## 四、客户端重定向代码示例
 
 Demo06Servlet.java
 
@@ -1092,13 +1098,19 @@ demo07的状态码则是200
 
 # 30.thymeleaf快速入门
 
+## 一、thymeleaf介绍
+
 Thymeleaf：视图模板技术
 
 在index.html页面上加载java内存中的fruitList数据，这个过程我们称之为渲染（render）。
 
 thymeleaf是用来帮助我们做视图渲染的一个技术。
 
-![06.水果库存系统首页实现思路(1)](assets/06.水果库存系统首页实现思路(1).png)
+![](./assets/202404021455287.png)
+
+---
+
+## 二、入门案例
 
 一般servlet都需要在web.xml中注册，但如果觉得标签很多，servlet从3.0开始，也支持注解方式注册：@WebServlet("/index")，所以我们的web.xml文件是可以删掉的。
 
@@ -1309,6 +1321,8 @@ public class IndexServlet extends ViewBaseServlet {
 
 如果需要判断数据库中的fruitList是否为空，需要使用到内置对象
 
+![image-20240402151832159](./assets/image-20240402151832159.png)
+
 访问session里的数据
 
 ![image-20240305174403196](assets/image-20240305174403196.png)
@@ -1321,7 +1335,7 @@ public class IndexServlet extends ViewBaseServlet {
 
 单元格循环及迭代
 
-> 让标记了th:if、th:unless的标签根据条件决定是否显示。
+> 让标记了 `th:if`、`th:unless`的标签根据条件决定是否显示。
 
 ~~~html
 <tr th:if="${#lists.isEmpty(session.fruitList)}">
@@ -1336,6 +1350,8 @@ public class IndexServlet extends ViewBaseServlet {
     <td><img src="imgs/del.jpg" class="delImg"/></td>
 </tr>
 ~~~
+
+
 
 ---
 
@@ -1361,11 +1377,15 @@ public class IndexServlet extends ViewBaseServlet {
 
 # 33.保存作用域
 
+## 一、引入
+
 原始情况下，保存作用域我们可以认为有四个：page（页面级别），request（一次请求响应范围），session（一次会话范围），application（整个应用程序范围）
 
 > page目前已经不用了，除非我们学的是之前老的jsp技术。
 
-1）request：一次请求响应范围
+---
+
+## 二、request：一次请求响应范围
 
 ![01.Request保存作用域](assets/01.Request保存作用域.png)
 
@@ -1401,13 +1421,13 @@ public class Demo02Servlet extends HttpServlet {
 }
 ~~~
 
+---
 
-
-2）session：一次会话范围内有效
+## 二、session：一次会话范围内有效
 
 ![02.Session保存作用域](assets/02.Session保存作用域.png)
 
-emo03Servlet.java
+Demo03Servlet.java
 
 ~~~java
 @WebServlet("/demo03")
@@ -1439,11 +1459,11 @@ public class Demo04Servlet extends HttpServlet {
 }
 ~~~
 
+---
 
+## 三、application：一次应用范围内有效
 
-
-
-3）application：一次应用范围内有效。除非tomcat停止掉，tomcat一停止，这个应用程序就结束了。
+除非tomcat停止掉，tomcat一停止，这个应用程序就结束了。
 
 ![03.Application保存作用域](assets/03.Application保存作用域.png)
 
@@ -1481,7 +1501,9 @@ public class Demo02Servlet extends HttpServlet {
 }
 ~~~
 
-## 删除工件的办法
+---
+
+## 四、删除工件的办法
 
 一般如果有多个artifact，用哪个项目就创建哪个项目的artifact，其他的artifact就可以删除了
 
@@ -1497,7 +1519,7 @@ public class Demo02Servlet extends HttpServlet {
 
 
 
-3）
+3）创建工件
 
 ![image-20240305212225135](assets/image-20240305212225135.png)
 
