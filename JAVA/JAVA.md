@@ -5341,13 +5341,178 @@ public class Test13 {
 
 # 46.for循环练习 — 累加思想和统计思想
 
+## 一、练习1：求和
+
+需求：在实际开发中，如果要获取一个范围中的每一个数据时，也会用到循环。
+        比如：求1-5之间的和
+
+~~~java
+package com.itheima.test;
+
+public class Test14 {
+    public static void main(String[] args) {
+        //分析：
+        //1.循环1~5得到里面的每一个数字
+        //开始条件：1
+        //结束条件：5
+
+        //用来进行累加的
+        int sum = 0;
+        for(int i = 1; i <= 5 ; i++){
+            
+            //int sum = 0;
+            //System.out.println(i);
+            //可以把得到的每一个数字累加到变量sum当中
+            sum = sum + i;// sum += i;
+            //System.out.println(sum);
+        }
+
+        //当循环结束之后，表示已经把1~5累加到变量sum当中了
+        System.out.println(sum);
+    }
+}
+~~~
+
+扩展小点：
+
+1. 求和的变量不能定义在循环的里面，因为变量只在所属的大括号中有效
+2. 如果我们把变量定义在循环的里面，那么当前变量只能在本次循环中有效。
+   当本次循环结束之后，变量就会从内存中消失。第二次循环开始的时候，又会重新定义一个新的变量。
+   结论：如果以后我们要写累加求和的变量。可以把变量定义在循环的外面。
+
+~~~java
+for(int i = 1; i <= 5 ; i++){
+    // 当本次循环结束之后，变量就会从内存中消失。第二次循环开始的时候，又会重新定义一个新的变量。
+    int sum = 0;
+    //可以把得到的每一个数字累加到变量sum当中
+    sum = sum + i;
+    System.out.println(sum);
+}
+~~~
+
+---
+
+## 二、练习2：求 1 - 100 之间的偶数求和
+
+求：在实际开发中，如果要获取一个范围中的每一个数据时，会用到循环。
+        但是此时，大多情况下，不会获取所有的数据，而是获取其中符合要求的数据。
+        此时就需要循环和其他语句结合使用了。
+        比如：求1-100之间的偶数和
+
+~~~java
+package com.itheima.test;
+
+public class Test15 {
+    public static void main(String[] args) {
+        //分析：
+        //1.获取1 ~100之间的每个数
+        int sum = 0;
+        // IDEA快捷方式：`循环次数.fori` 可以直接打印出for循环
+        for (int i = 1; i <= 100; i++) {
+            //2.累加求和（先判断，再求和）
+            if(i % 2 == 0){
+                sum = sum + i;
+            }
+        }
+        //打印sum
+        System.out.println(sum);
+    }
+}
+~~~
+
+----
+
+## 二、练习3：统计满足条件的数字
+
+需求：键盘录入两个数字，表示一个范围。统计这个范围中。既能被3整除，又能被5整除数字有多少个？
+
+~~~java
+package com.itheima.test;
+
+import java.util.Scanner;
+
+public class Test16 {
+    public static void main(String[] args) {
+        //分析：
+        //1.键盘录入两个数字
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请录入一个数字表示范围的开始");
+        int start = sc.nextInt();
+        System.out.println("请录入一个数字表示范围的结束");
+        int end = sc.nextInt();
+
+        //统计变量
+        //简单理解：统计符合要求的数字的个数
+        int count = 0;
+
+        //2.利用循环获取这个范围中的每一个数字
+        //开始条件：start
+        //结束条件：end
+        for (int i = start; i <= end; i++) {
+            //3.对每一个数字进行判断，统计有多少个满足要求的数字
+            if (i % 3 == 0 && i % 5 == 0) {
+               // System.out.println(i);
+                count++;
+            }
+        }
+
+        System.out.println(count);
+    }
+}
+~~~
 
 
 
+----
 
+# 47.while循环语句
 
+## 一、while循环语句和for循环语句格式对比
 
+![image-20240402141811503](./assets/image-20240402141811503.png)
 
+while循环的执行流程
+
+![image-20240402141859416](./assets/image-20240402141859416.png)
+
+---
+
+## 二、练习：利用while循环打印1~100
+
+需求：利用while循环打印1~100
+
+~~~java
+package com.itheima.loopdemo;
+
+public class WhileDemo1 {
+    public static void main(String[] args) {
+        //分析：
+        //开始条件：1
+        //结束条件：100
+
+        int i = 1;
+        while(i <= 100){
+            System.out.println(i);
+            i++;
+        }
+    }
+}
+~~~
+
+---
+
+## 三、for和while的对比
+
+相同点：运行规则是一样的。
+
+for 和 while 的区别：
+
+- for循环中，控制循环的变量，因为归属for循环的语法结构中，在for循环结束后，就不能再次被访问到了
+- while循环中，控制循环的变量，对于while循环来说不归属其语法结构中，在while循环结束后，该变量还可以继续使用。
+
+这种说法是很多书上的解释，但是这种说法并不是很绝对，因为for循环可以改写。
+
+![image-20240402142407518](./assets/image-20240402142407518.png)
 
 
 

@@ -13,5 +13,14 @@ public class ArithmeticOperatorDemo2 {
         System.out.println(a);
         System.out.println(b);
         System.out.println(c);
+
+        for (int i = 0; i < 110; i++) {
+            
+        }
+
+        for (int i = 0; i < 1100; i++) {
+
+
+        }
     }
 }
