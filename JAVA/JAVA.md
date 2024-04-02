@@ -5510,21 +5510,283 @@ for 和 while 的区别：
 - for循环中，控制循环的变量，因为归属for循环的语法结构中，在for循环结束后，就不能再次被访问到了
 - while循环中，控制循环的变量，对于while循环来说不归属其语法结构中，在while循环结束后，该变量还可以继续使用。
 
-这种说法是很多书上的解释，但是这种说法并不是很绝对，因为for循环可以改写。
+这种说法是很多书上的解释，但是这种说法并不是很绝对，因为for循环可以改写，for循环的初始化语句也可以写在for循环外面，小括号里初始化语句可以空着不写，此时两种循环就不会有任何区别了。
 
 ![image-20240402142407518](./assets/image-20240402142407518.png)
 
+所以以下会从实际开发的角度说一下这两种到底有什么区别。
+
+能用for循环的地方一定能用while循环进行改写，能用while循环的地方一定也能用while循环进行改写。这两个在语法当中其实是没有任何区别的，它们的区别在于使用习惯上。
+
+- for循环中：知道循环次数或者循环的范围
+- while循环：不知道循环的次数和范围， 只知道循环的结束条件
+
+### 练习
+
+需求：世界最高山峰是珠穆朗玛峰(8844.43米=8844430毫米)，假如我有一张足够大的纸，它的厚度是0.1毫米。请问，我折叠多少次，可以折成珠穆朗玛峰的高度?
+
+~~~java
+package com.itheima.test;
+
+public class Test17 {
+    public static void main(String[] args) {
+        //分析：折叠纸张：每一次折叠纸张的厚度都是原先的两倍
+        // double a = 0.1;
+        // a = a * 2;
+        // => a *= 2
+
+        //1.定义一个变量用来记录山峰的高度
+        double height = 8844430;
+        //2.定义一个变量用来记录纸张的初始厚度
+        double paper = 0.1;
+        //3.定义一个变量用来统计次数
+        int count = 0;
+        //4.循环折叠纸张，只要纸张的厚度小于山峰的高度，那么循环就继续
+        //每折叠一次，统计次数就要++
+        //选择while理由：此时我们不知道循环的次数也不知道循环的范围，只知道循环的结束条件，所以用while
+        while(paper < height){
+            //折叠纸张
+            paper = paper * 2;
+            //折叠一次，++一次
+            count++;
+        }
+        //当循环结束之后，count记录的值就是折叠的次数
+        System.out.println(count);
+
+    }
+}
+~~~
+
+---
+
+# 48.两道力扣算法题和do...while循环
+
+## 一、练习：回文数
+
+需求：给你一个整数 x 。
+        如果 x 是一个回文整数，打印 true ，否则，返回 false 。
+        解释：回文数是指正序（从左向右）和倒序（从右向左）读都是一样的整数。
+        例如，121 是回文，而 123 不是。
+
+~~~java
+package com.itheima.test;
+
+public class Test18 {
+    public static void main(String[] args) {
+        //分析：
+        //1.定义变量记录整数
+        int x = 12345;
+        //把x做一个临时存储，用来最后进行判断
+        int temp = x;
+        //2.定义变量记录最终的结果（反过来的数字）
+        int result = 0;
+        //3.利用循环从右往左获取x中的数字并拼接到result当中
+        //while
+        while(x != 0){
+            //获取到x最右边的数字
+            int ge = x % 10;
+            //获取一次数字之后，那么就要把当前最右边的数字给去掉
+            x = x / 10;
+            //拼接到result当中
+            result = result * 10 + ge;
+        }
+        System.out.println(result == temp);
 
 
 
+      /*  //1.如何获取到3
+        int ge = x % 10;
+        result = result + ge;
+        System.out.println(result);
+
+        //2.把十位2拼接到result里面
+        int shi = x / 10 % 10;
+        result = result * 10 + shi;
+        System.out.println(result);//32
+
+        //3.把百位拼接到result里面
+        int bai = x / 100 % 10;
+        result = result * 10 + bai;
+        System.out.println(result);//321*/
+    }
+}
+~~~
+
+---
+
+## 二、求商和余数
+
+需求：给定两个整数，被除数和除数（都是正数，且不超过int的范围） 。
+        将两数相除，要求不使用乘法、除法和 % 运算符。
+        得到商和余数。
+
+~~~java
+package com.itheima.test;
+
+public class Test19 {
+    public static void main(String[] args) {
+        /*
+        分析：
+            被除数 / 除数 = 商 ... 余数
+
+        int a = 100;
+        int b = 10;
+
+        100 - 10 = 90
+        90 - 10 = 80
+        80 - 10 = 70
+        70 - 10 = 60
+        ...
+        10 - 10 = 0 (余数)
+
+        */
+
+
+        //1.定义变量记录被除数
+        int dividend = 100;
+        //2.定义变量记录除数
+        int divisor = 37;
+        //3.定义一个变量用来统计相减了多少次
+        int count = 0;
+        //3.循环 while
+        //在循环中，不断的用被除数 - 除数
+        //只要被除数 是大于等于除数的，那么就一直循环
+        while(dividend >= divisor){
+            dividend = dividend - divisor;
+            //只要减一次，那么统计变量就自增一次
+            count++;
+        }
+       //当循环结束之后dividend变量记录的就是余数
+        System.out.println("余数为：" + dividend);
+        //当循环结束之后，count记录的值就是商
+        System.out.println("商为：" + count);
+    }
+}
+~~~
+
+---
+
+## 三、do....while循环
+
+语法和特点：先执行后判断
+
+![image-20240402172801328](./assets/image-20240402172801328.png)
+
+----
+
+# -------------------------------
+
+# Day5  循环高级
+
+# 49.无限循环和跳转控制语句
+
+## 一、引入
+
+无限循环：循环一直停不下来。
+
+for循环中，初始化语句可以空着不写，表示循环之前不做任何操作。中间的条件控制语句也可以空着不写，默认表示true，循环一直进行。最后的条件控制语句，也可以空着不写，表示每次循环之后不做任何的操作。
+
+while循环中true一定要写，否则会报错，此时就表示判断条件为真，不断打印大括号循环体里的内容。
+
+do...while循环中的true也一定要写，否则也会报错也表示不断打印大括号循环体里的内容。
+
+这三种中无限循环中while循环是最常用的。
+
+![image-20240402173005770](./assets/image-20240402173005770.png)
+
+---
+
+## 二、练习
+
+PS：无限循环的下面不能再写其他代码了，因为循环永远停不下来，那么下面的代码永远执行不到
+
+~~~java
+package com.itheima.infiniteloop;
+
+public class InfiniteloopDemo1 {
+    public static void main(String[] args) {
+        //for格式的无限循环
+        for(;;){
+            System.out.println("学习");
+        }
+
+        //while格式的无限循环
+        while(true){
+            System.out.println("学习");
+        }
+
+        //注意事项
+        //无限循环的下面不能再写其他代码了，因为循环永远停不下来，那么下面的代码永远执行不到，并且写了还会报错
+        while(true){
+            System.out.println("给女神表白");
+        }
+        //System.out.println("女神答应我了");
+    }
+}
+~~~
+
+无限循环永远都停不下来，如果想要手动将它停下来，可以用鼠标点击左边的红色小方块，这个小方块也叫作：程序运行指示灯，如果这个方块是亮着的，表示程序在运行。如果按一下，给它按灭了，表示程序停止了。
+
+![image-20240402174632499](./assets/image-20240402174632499.png)
+
+---
+
+## 三、跳转控制语句
+
+在实际开发当中，很少让循环一直运行，而是会在合适的时候把循环给结束，那怎么结束呢？接下来就来学习跳转控制语句。
+
+跳转控制语句：在循环的过程中，跳到其他语句上执行。
+
+- continue：跳过本次循环，继续执行下次循环。
+
+- break：结束整个循环。
+
+![image-20240402175258473](./assets/image-20240402175258473.png)
+
+案例一：小老虎吃包子，第三个包子有虫子，跳过
+
+~~~java
+package com.itheima.skiploop;
+
+public class SkipLoppDemo1 {
+    public static void main(String[] args) {
+        //1.跳过某一次循环
+        for (int i = 1; i <= 5; i++) {
+            if(i == 3){
+                //结束本次循环，继续下次循环。
+                continue;
+            }
+            System.out.println("小老虎在吃第" + i + "个包子");
+        }
+
+    }
+}
+~~~
+
+案例二：小老虎吃包子，吃完第三个就饱了。
+
+~~~java
+package com.itheima.skiploop;
+
+public class SkipLoppDemo2 {
+    public static void main(String[] args) {
+        //2.结束整个循环
+        for (int i = 1; i <= 5; i++) {
+            System.out.println("小老虎在吃第" + i + "个包子");
+            if(i == 3){
+                //结束整个循环
+                break;
+            }
+        }
+    }
+}
+~~~
 
 
 
+---
 
-
-
-
-
+# 50.逢七过
 
 
 
