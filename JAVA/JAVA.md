@@ -5045,7 +5045,7 @@ public class SwitchDemo4 {
         // 由于上面那种写法看上去有点乱，因为打印语句和break都比较多。所以在JDK12的时候，优化了语句体和break。
         int number = 10;
         switch (number) {
-            // 语法：直接写一个箭头，在箭头的后面写一对大括号，可以将要执行的语句体都写在大括号当中。用这种方式来写可以省略break，也不会出发case穿透现象。相当于利用了一个大括号，将break给优化了。
+            // 语法：省略冒号，直接写一个箭头，在箭头的后面写一对大括号，可以将要执行的语句体都写在大括号当中。用这种方式来写可以省略break，也不会出发case穿透现象。相当于利用了一个大括号，将break给优化了。
             case 0 -> {
 
             };
@@ -5096,17 +5096,250 @@ public class SwitchDemo5 {
 }
 ~~~
 
+----
+
+## 五、练习1：休息日和工作日
+
+需求：键盘录入星期数，输出工作日、休息日。(1-5) 工作日，(6-7)休息日。
+
+~~~java
+package com.itheima.test;
+
+import java.util.Scanner;
+
+public class Test10 {
+    public static void main(String[] args) {
+        //分析：
+        //1.键盘录入星期数
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请录入一个整数表示星期");
+        int week = sc.nextInt();
+        //2.利用switch语句来进行选择
+        /* switch (week) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                System.out.println("工作日");
+                break;
+            case 6:
+            case 7:
+                System.out.println("休息日");
+                break;
+            default:
+                System.out.println("没有这个星期");
+                break;
+        } */
+        // 简化
+        /* switch (week) {
+            case 1, 2, 3, 4, 5:
+                System.out.println("工作日");
+                break;
+            case 6, 7:
+                System.out.println("休息日");
+                break;
+            default:
+                System.out.println("没有这个星期");
+                break;
+        }*/ 
+        switch (week){
+            case 1,2,3,4,5 ->  System.out.println("工作日");
+            case 6,7 ->  System.out.println("休息日");
+            default -> System.out.println("没有这个星期");
+        }
+    }
+}
+~~~
+
+---
+
+## 六、练习2：用户选择
+
+~~~java
+package com.itheima.test;
+
+import java.util.Scanner;
+
+public class Test11 {
+    public static void main(String[] args) {
+       /* 在实际开发中，如果我们需要在多种情况下选择其中一个，就可以使用switch语句。
+        当我们拨打了某些服务电话时，一般都会有按键选择。
+        假设现在我们拨打了一个机票预定电话。
+        电话中语音提示：
+        1机票查询
+        2机票预订
+        3机票改签
+        4退出服务
+        其他按键也是退出服务。请使用swtich模拟该业务逻辑。*/
+
+
+        //分析：
+        //1.键盘录入一个整数表示我们的选择
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请输入您的选择");
+        int choose = sc.nextInt();
+        //2.根据选择执行不同的代码
+        switch (choose) {
+            case 1 -> System.out.println("机票查询");
+            case 2 -> System.out.println("机票预订");
+            case 3 -> System.out.println("机票改签");
+            // 由于case4 和default功能是一样的，直接不写 case 4 即可
+            //case 4 -> System.out.println("退出服务");
+            default -> System.out.println("退出服务");
+        }
+    }
+}
+~~~
+
+---
+
+# 45.for循环格式和练习
+
+## 一、什么是循环？
+
+- 重复的做某件事情
+- 具有明确的开始和停止标记
+
+例如下图电风扇，`open` 按钮就是开始标记，`stop` 按钮就是停止标记。
+
+<img src="assets/image-20240402130642190.png" alt="image-20240402130642190" style="zoom:50%;" />
+
+---
+
+## 二、循环的分类
+
+在Java中，循环一共分为三类：for、while、do...while
+
+---
+
+## 三、for循环
+
+格式
+
+~~~java
+for (初始化语句; 条件判断语句; 条件控制) {
+    循环体语句;
+}
+~~~
+
+代码示例
+
+~~~java
+for (int i = 1; i <= 10; i++) { // 每次循环变量i都会自增一次，所以这里一共是循环十次。
+    // 每次循环都会执行大括号中的循环体
+    System.out.println("HelloWorld");
+}
+~~~
+
+初始化语句只执行一次，判断语句为true，循环继续。判断语句为false，循环结束。
+
+![image-20240402131653410](./assets/image-20240402131653410.png)
+
+---
+
+## 四、练习：打印 5 次HelloWorld
+
+~~~java
+package com.itheima.loopdemo;
+
+public class ForDemo1 {
+    public static void main(String[] args) {
+        //1.需求：打印5次HelloWorld
+
+        //分析：
+        //i  1 ~ 5
+        /*for(初始化语句;条件判断语句;条件控制语句){
+            循环体；
+        }*/
+
+        for (int i = 1; i <= 5 ; i++){
+            System.out.println("HelloWorld");
+        }
+    }
+}
+~~~
+
+---
+
+## 五、练习：输出数字
+
+需求1：打印1-5
+
+~~~java
+package com.itheima.test;
+
+public class Test12 {
+    public static void main(String[] args) {
+        //需求1：打印1-5
+
+        //分析：
+        //开始条件：1
+        //结束条件：5
+        for (int i = 1 ; i <= 5; i++){
+            //第一次循环：i = 1
+            //第二次循环：i = 2
+            //i : 1 2 3 4 5
+            System.out.println(i);
+        }
+    }
+}
+~~~
+
+需求2：打印5-1
+
+~~~java
+package com.itheima.test;
+
+public class Test12 {
+    public static void main(String[] args) {
+        //需求2：打印5-1
+        //分析：
+        //开始条件: 5
+        //结束条件：1
+        for(int i = 5 ; i >= 1 ; i--){
+            System.out.println(i);
+        } 
+    }
+}
+~~~
+
+---
+
+## 六、练习：断线重连
+
+在实际开发中，需要重复执行的代码，会选择循环实现。
+        比如：如图所示。玩游戏的时候，如果网不好那么会经常断线重连。
+        那么断线重连这个业务逻辑就需要重复执行。
+        假设现在公司要求，断线重连的业务逻辑最多只写5次。
+        请用代码实现。
+        备注：断线重连的业务逻辑可以用输出语句替代。
+
+<img src="./assets/image-20240402132725384.png" alt="image-20240402132725384" style="zoom:50%;" />
+
+~~~java
+package com.itheima.test;
+
+public class Test13 {
+    public static void main(String[] args) {
+        //分析：
+        //1，因为我们需要重复执行某段代码，所以需要用循环解决
+        //循环的次数 5 次
+        //开始条件：1
+        //结束条件：5
+
+        for(int i = 1; i <= 5;i++){
+            System.out.println("第" + i + "次执行断线重连的业逻务辑");
+        }
+    }
+}
+~~~
 
 
 
+----
 
-
-
-
-
-
-
-
+# 46.for循环练习 — 累加思想和统计思想
 
 
 
