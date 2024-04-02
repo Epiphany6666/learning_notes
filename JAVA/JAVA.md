@@ -4342,7 +4342,7 @@ public class Test {
 
 从这一章节开始，每天要学习的内容会少一些，但是需要思考的东西就变的多了，所以从现在开始不仅要理解概念，更重要的是要分析题目的逻辑，多思考多联系。
 
-# 38.顺序结构
+# 39.顺序结构
 
 顺序结构语句是Java程序默认的执行流程，按照代码的先后顺序，从上到下依次执行。如下代码就是顺序结构
 
@@ -4361,7 +4361,7 @@ public class OrderDemo {
 
 ---
 
-# 39.分支结构
+# 40.分支结构
 
 分支结构包含了两种语句：if语句、switch语句
 
@@ -4373,7 +4373,9 @@ public class OrderDemo {
 
 if语句在程序中就是用来进行判断的。
 
-### if语句的第一种格式
+---
+
+## 二、if语句的第一种格式
 
 ~~~java
 if (关系表达式) {
@@ -4418,7 +4420,7 @@ public class IfDemo1 {
 
 ---
 
-### if 的注意点
+## 三、if 的注意点
 
 1. 大括号的开头可以另起一行书写，但是建议写在第一行的末尾，因为Java的发明者就是这样写的。
 
@@ -4431,23 +4433,702 @@ public class IfDemo1 {
        int a = 100;
    ~~~
 
-3. 如果对一个布尔类型的变量进行判断，不要用==号，直接把变量写在小括号即可。防止 `==` 跟 `=` 搞混
+3. 如果对一个布尔类型的变量进行判断，不要用 `==` 号，直接把变量写在小括号即可。防止 `==` 跟 `=` 搞混
 
    ~~~java
    boolean flag = true;
-   if (flag == true){
+   // if (flag == true){
    if (flag){
       System.out.println("flag的值为true");
    }
    ~~~
 
-   
+
+---
+
+## 四、练习：考试奖励
+
+小红对小明说：如果你这次考试全班第一，我就做你女朋友。
+
+<img src="assets/image-20240402103703003.png" alt="image-20240402103703003" style="zoom:50%;" />
+
+班上其他同学非常感动，所以其他同学决定一起交白卷。
+
+<img src="./assets/image-20240402103825997.png" alt="image-20240402103825997" style="zoom:50%;" />
+
+最后小红非常开心
+
+<img src="./assets/image-20240402103842530.png" alt="image-20240402103842530" style="zoom:50%;" />
+
+需求：把小红的心理活动做一个代码实现。
+
+**代码示例**
+
+~~~java
+package com.itheima.test;
+
+public class Test1 {
+    public static void main(String[] args) {
+        //小红：如果你这次考试全班第一，我就做你女朋友。
+
+        //分析：
+        //1.定义变量记录小明的名次
+        int ranking = 2;
+        //2.对小明的名次进行判断。
+        if(ranking == 1){
+            System.out.println("小红成为了小明的女朋友");
+        }
+    }
+}
+~~~
+
+---
+
+## 五、练习：自动驾驶
+
+当无人驾驶汽车行驶到十字路口遇到了红绿灯，如果红灯是亮的，它就会停止，如果绿灯是亮的，它就会继续前进。所以此时我们也可以使用 if语句 来进行模拟。
+
+~~~java
+package com.itheima.test;
+
+public class Test2 {
+    public static void main(String[] args) {
+        //汽车无人驾驶会涉及到大量的判断
+        //当汽车行驶的时候遇到了红绿灯，就会进行判断
+        //如果红灯亮，就停止
+        //如果黄灯亮，就减速
+        //如果绿灯亮，就行驶
+
+
+        //1.定义三个变量表示灯的状态
+        //true表示灯亮  false表示灯灭
+        boolean isLightGreen = false;
+        boolean isLightYellow = false;
+        boolean isLightRed = true;
+
+        //2.判断
+        //红灯亮，就停止
+        //黄灯亮，就减速
+        //绿灯亮，就行驶
+        if(isLightGreen){
+            System.out.println("GoGoGo!!!");
+        }
+
+        if(isLightYellow){
+            System.out.println("slow!!!");
+        }
+
+        if(isLightRed){
+            System.out.println("stop!!!");
+        }
+    }
+}
+~~~
+
+----
+
+# 41.if语句的第二种格式
+
+## 一、语法
+
+~~~java
+if (关系表达式) {
+    语句体1;
+} else {
+    语句体2;
+}
+~~~
+
+PS：如果代码执行了语句体1，它就不会再执行else里的语句体2了。当语句体1执行完后，整个if就会结束。
+
+<img src="./assets/image-20240402104811887.png" alt="image-20240402104811887" style="zoom:67%;" />
+
+---
+
+## 二、练习1：吃饭
+
+需求：键盘录入一个整数，表示身上的钱。如果大于等于100块，就是网红餐厅。否则，就吃经济实惠的沙县小吃。
+
+<img src="./assets/image-20240402104921252.png" alt="image-20240402104921252" style="zoom:50%;" />
+
+~~~java
+package com.itheima.test;
+
+import java.util.Scanner;
+
+public class Test3 {
+    public static void main(String[] args) {
+        //分析：
+        //1.键盘录入一个整数，表示身上的钱。
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请录入身上的钱");
+        int money = sc.nextInt();
+        //2.对钱进行判断（二选一）
+        if(money >= 100){
+            System.out.println("吃网红餐厅");
+        } else{
+            System.out.println("吃经济实惠的沙县小吃");
+        }
+    }
+}
+~~~
+
+---
+
+## 三、练习2：商品付款
+
+这道练习是美国斯坦福大学的一道Java入门练习。
+
+在实际开发中，如果要根据两种不同的情况来执行不同的代码，就需要用到if的第二种格式。
+需求：
+        假设，用户在超市实际购买，商品总价为：600元。
+        键盘录入一个整数表示用户实际支付的钱。
+        如果付款大于等于600，表示付款成功。否则付款失败。
+
+~~~java
+package com.itheima.test;
+
+import java.util.Scanner;
+
+public class Test4 {
+    public static void main(String[] args) {
+        //分析：
+        //1.键盘录入一个整数表示用户实际支付的钱。
+        Scanner sc = new Scanner(System.in);
+        System.out.println("录入一个整数表示实际支付的钱");
+        int money = sc.nextInt();
+        //2.判断
+        if(money >= 600){
+            System.out.println("付款成功");
+        }else{
+            System.out.println("付款失败");
+        }
+    }
+}
+~~~
+
+----
+
+## 四、练习4：影院选座
+
+这道练习是美国斯坦福大学的一道Java入门练习。
+
+在实际开发中，电影院选座也会使用到if判断。
+        假设某影院售卖了100张票，票的序号为1~100。
+        其中奇数票号坐左侧，偶数票号坐右侧。
+        键盘录入一个整数表示电影票的票号。
+        根据不同情况，给出不同的提示：
+        如果票号为奇数，那么打印坐左边
+        如果票号为偶数，那么打印坐右边。
+
+~~~java
+package com.itheima.test;
+
+
+import java.util.Scanner;
+
+public class Test5 {
+    public static void main(String[] args) {
+        //分析：
+        //1.键盘录入一个整数表示电影票的票号。
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请录入一个票号");
+        int ticket = sc.nextInt();
+        //只有当ticket在0 ~ 100之间，才是真实有效的票
+        //if的嵌套
+        if(ticket >= 0 && ticket <= 100){
+            //2.判断票号是奇数还是偶数
+            if(ticket % 2 == 1){
+                System.out.println("坐左边");
+            }else{
+                System.out.println("坐右边");
+            }
+        }
+    }
+}
+~~~
+
+
+
+---
+
+# 42.if语句的第三种格式
+
+## 一、语法
+
+~~~java
+if (关系表达式) {
+    语句体1;
+} else if (关系表达式2) {
+    语句体2;
+}
+...
+else {
+    语句体2;
+}
+~~~
+
+![image-20240402105903658](./assets/image-20240402105903658.png)
+
+---
+
+## 二、练习1：小明的礼物
+
+需求：根据不同的分数送不同的礼物。
+        如果是95~100分，送自行车一辆
+        如果是90~94分，游乐场玩一天
+        如果是80~89分，送变形金刚一个。
+        如果是80分，揍一顿。
+
+~~~java
+package com.itheima.test;
+
+
+import java.util.Scanner;
+
+public class Test6 {
+    public static void main(String[] args) {
+        //分析：
+        //1.键盘录入小明的考试成绩
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请录入一个整数表示小明的成绩");
+        int score = sc.nextInt();
+
+        //对异常数据进行判断校验
+        //0~100合理数据
+        if(score >0 && score <= 100){
+            //2.根据不同的考试成绩,给出不同的奖励
+            if(score >= 95 && score <= 100){
+                System.out.println("送自行车一辆");
+            }else if(score >= 90 && score <= 94){
+                System.out.println("游乐场玩一天");
+            }else if(score >= 80 && score <= 89){
+                System.out.println("送变形金刚一个");
+            }else{
+                System.out.println("揍一顿");
+            }
+        }else{
+            System.out.println("当前录入的成绩不合法");
+        }
+    }
+}
+~~~
+
+---
+
+## 三、练习2：商品的价格
+
+在实际开发中，多种情况判断时，会用到if的第三种格式：
+需求：
+            商场都会有VIP的会员制，根据不同的会员会有不同的折扣。
+            假设商品总价为1000。
+            键盘录入会员级别，并计算出实际支付的钱。
+            会员1级：打9折。
+            会员2级：打8折。
+            会员3级：打7折。
+            非会员：不打折，要打也是打骨折。
+
+~~~java
+package com.itheima.test;
+
+import java.util.Scanner;
+
+public class Test7 {
+    public static void main(String[] args) {
+        //分析：
+        //1.定义变量记录总价
+        int price = 1000;
+        //2.键盘录入会员的级别
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请录入会员的级别");
+        int vip = sc.nextInt();
+        //3.根据级别来计算实际要支付的钱
+        if(vip == 1){
+            System.out.println("实际支付的钱为" + (price * 0.9));
+        }else if(vip == 2){
+            System.out.println("实际支付的钱为" + (price * 0.8));
+        }else if(vip == 3){
+            System.out.println("实际支付的钱为" + (price * 0.7));
+        }else{
+            System.out.println("实际支付的钱为" + price);
+        }
+    }
+}
+~~~
+
+----
+
+## 四、练习3：自动驾驶
+
+之前都是使用三个 if 来对三个变量进行判断，但是如果是这种写法，三个if是三个互相独立的代码块，每一次我们都需要从上往下把三个代码块全都执行一遍，效率相对来讲有点低。
+
+<img src="./assets/image-20240402110454406.png" alt="image-20240402110454406" style="zoom:50%;" />
+
+此时我们就可以用if的第三种格式来进行优化，由于我现在只有三种情况，所以最下面的else可以省略不写。
+
+~~~java
+package com.itheima.test;
+
+public class Test8 {
+    public static void main(String[] args) {
+        //汽车无人驾驶会涉及到大量的判断
+        //当汽车行驶的时候遇到了红绿灯，就会进行判断
+        //如果红灯亮，就停止
+        //如果黄灯亮，就减速
+        //如果绿灯亮，就行驶
+
+        //1.定义三个变量表示灯的状态
+        //true 亮  false 灭
+        boolean isLightGreen = true;
+        boolean isLightYellow = false;
+        boolean isLightRed = false;
+
+        //2.判断
+        //红灯亮，就停止
+        //黄灯亮，就减速
+        //绿灯亮，就行驶
+        if(isLightGreen){ // 当isLightGreen为真时，直接打印 `GoGoGo!!!`，下面的代码块就不会再执行了，提高了程序的运行状态。
+            System.out.println("GoGoGo!!!");
+        }else  if(isLightYellow){
+            System.out.println("slow!!!");
+        }else if(isLightRed){
+            System.out.println("stop!!!");
+        }
+    }
+}
+~~~
+
+----
+
+## 总结
+
+第一种格式：单条件判断
+
+第二种格式：双条件判断
+
+第三种格式：多条件判断
+
+----
+
+# 43.switch语句和联系
+
+## 一、引入
+
+如果需要在多种条件中选择一个，就可以使用switch。
+
+![image-20240402111129641](./assets/image-20240402111129641.png)
+
+---
+
+## 二、语法
+
+case和值之间要用空格隔开，值的后面要加冒号。
+
+这个表达式就不是判断了，而是会得到一个具体的结果。然后将表达式计算出的结果，一次跟case后面的每个值进行比较。
+
+![image-20240402111843691](./assets/image-20240402111843691.png)
+
+格式说明，注意表达式里面不能是double也不能是long。
+
+case后面的值只能是字面量，不能是变量！
+
+![image-20240402112119948](./assets/image-20240402112119948.png)
+
+流程图
+
+![image-20240402112228373](./assets/image-20240402112228373.png)
+
+---
+
+## 三、练习1：吃面条
+
+~~~java
+package com.itheima.switchdemo;
+
+public class SwitchDemo1 {
+    public static void main(String[] args) {
+        //兰州拉面、武汉热干面、北京炸酱面、陕西油泼面
+
+        //1.定义变量记录我心里想吃的面
+        String noodles = "海鲜龙虾面";
+
+        //2.拿着这个面利用switch跟四种面条匹配
+        switch (noodles){
+            case "兰州拉面":
+                System.out.println("吃兰州拉面");
+                break;
+            case "武汉热干面":
+                System.out.println("吃武汉热干面");
+                break;
+            case "北京炸酱面":
+                System.out.println("吃北京炸酱面");
+                break;
+            case "陕西油泼面":
+                System.out.println("吃陕西油泼面");
+                break;
+            default:
+                System.out.println("吃方便面");
+                break;
+        }
+    }
+}
+~~~
+
+---
+
+## 四、练习2：运动计划
+
+需求：键盘录入星期数，显示今天的减肥活动。
+        周一：跑步
+        周二：游泳
+        周三：慢走
+        周四：动感单车
+        周五：拳击
+        周六：爬山
+        周日：好好吃一顿
+
+~~~java
+package com.itheima.test;
+
+import java.util.Scanner;
+
+public class Test9 {
+    public static void main(String[] args) {
+        //分析：
+        //1.键盘录入星期数
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请录入星期");
+        int week = sc.nextInt();
+        //2.利用switch对星期进行匹配
+        switch (week){
+            case 1:
+                System.out.println("跑步");
+                break;
+            case 2:
+                System.out.println("游泳");
+                break;
+            case 3:
+                System.out.println("慢走");
+                break;
+            case 4:
+                System.out.println("动感单车");
+                break;
+            case 5:
+                System.out.println("拳击");
+                break;
+            case 6:
+                System.out.println("爬山");
+                break;
+            case 7:
+                System.out.println("好好吃一顿");
+                break;
+            default:
+                System.out.println("没有这个星期");
+                break;
+        }
+    }
+}
+~~~
+
+
+
+----
+
+# 44.switch的扩展点和练习
+
+## 一、default的位置和省略
+
+1. 位置 ：defaule不一定是写在最下面的，我们可以写在任意位置。只不过习惯会写在最下面。
+
+2. 省略 : defaule可以省略，语法不会有问题，但是不建议省略。
+
+   因为如果省略的话，上面的代码如果都不匹配，那就没有可以执行的代码了。
+
+~~~java
+package com.itheima.switchdemo;
+
+/*
+    default的位置和省略
+*/
+public class SwitchDemo2 {
+    public static void main(String[] args) {
+        int number = 100;
+        switch (number){
+            case 1:
+                System.out.println("number的值为1");
+                break;
+            case 10:
+                System.out.println("number的值为10");
+                break;
+            case 20:
+                System.out.println("number的值为20");
+                break;
+            default:
+                System.out.println("number的值不是1,10或者20");
+                break;
+        }
+    }
+}
+~~~
+
+---
+
+## 二、case穿透
+
+case穿透：就是语句体中没有写break导致的。
+执行流程：首先还是会拿着小括号中表达式的值跟下面每一个case进行匹配。
+        	如果匹配上了，就会执行对应的语句体，如果此时发现了break，那么结束整个switch语句。
+        	如果没有发现break，那么程序会继续执行下一个case的语句体，一直遇到break或者右大括号为止。
+使用场景：如果多个case的语句体重复了，那么我们考虑利用case穿透去简化代码。
+
+~~~java
+package com.itheima.switchdemo;
+
+/*
+    case穿透
+*/
+public class SwitchDemo3 {
+    public static void main(String[] args) {
+        int number = 10;
+        switch (number){
+            case 1:
+                System.out.println("number的值为1");
+                break;
+            case 10:
+                System.out.println("number的值为10"); // 会打印
+                // break;
+            case 20:
+                System.out.println("number的值为20"); // 穿透，也会打印，遇到break停止
+                break;
+            default:
+                System.out.println("number的值不是1,10或者20");
+                // break;
+        }
+    }
+}
+~~~
+
+----
+
+## 三、switch新特性
+
+这个新特性是JDK12开始才有的。
+
+~~~java
+package com.itheima.switchdemo;
+
+/*
+    switch新特性
+        JDK12
+*/
+
+public class SwitchDemo4 {
+    public static void main(String[] args) {
+        //需求：
+        // 1 2 3  一 二  三
+        /*int number = 1;
+        switch (number){
+            case 1:
+                System.out.println("一");
+                break;
+            case 2:
+                System.out.println("二");
+                break;
+            case 3:
+                System.out.println("三");
+                break;
+            default:
+                System.out.println("没有这种选项");
+                break;
+        }*/
+
+        // 由于上面那种写法看上去有点乱，因为打印语句和break都比较多。所以在JDK12的时候，优化了语句体和break。
+        int number = 10;
+        switch (number) {
+            // 语法：直接写一个箭头，在箭头的后面写一对大括号，可以将要执行的语句体都写在大括号当中。用这种方式来写可以省略break，也不会出发case穿透现象。相当于利用了一个大括号，将break给优化了。
+            case 0 -> {
+
+            };
+            // 如果大括号里只有一行代码，大括号是可以省略的。
+            case 1 -> System.out.println("一");
+            case 2 -> System.out.println("二");
+            case 3 -> System.out.println("三");
+            default -> System.out.println("没有这种选项");
+        }
+    }
+}
+~~~
+
+如果switch中得到一个结果，可以使用变量去接收这个结果。
+
+~~~java
+变量 = switch (number) {
+            case 0 -> {
+
+            };
+            case 1 -> System.out.println("一");
+            case 2 -> System.out.println("二");
+            case 3 -> System.out.println("三");
+            default -> System.out.println("没有这种选项");
+        }
+~~~
+
+---
+
+## 四、switch和if第三种格式各自的使用场景
+
+`if` 的第三种格式：一般用于对范围的判断
+`switch`：把有限个数据一一列举出来，让我们任选其一
+
+~~~java
+package com.itheima.switchdemo;
+
+/*
+    switch和if第三种格式各自的使用场景
+*/
+public class SwitchDemo5 {
+    public static void main(String[] args) {
+        int score = 100;
+        if(score >= 90 && score <= 100){
+            System.out.println("送自行车");
+        }
+    }
+}
+~~~
 
 
 
 
 
-### if语句的第二种格式
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
