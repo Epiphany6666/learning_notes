@@ -7015,17 +7015,875 @@ public class ArrTest9 {
 
 ## 五、数组中的内存
 
+![image-20240403211104723](./assets/image-20240403211104723.png)
+
 由于这次有new关键字，所以我们即需要考虑栈，还需要考虑堆。
+
+![image-20240403205757176](./assets/image-20240403205757176.png)
 
 首先程序开始运行，main方法需要加载到栈中。
 
+![image-20240403205816394](./assets/image-20240403205816394.png)
+
 然后开始执行第一行代码：定义一个数组。但这行代码其实是由左右这两部分来组成的。
+
+![image-20240403205841810](./assets/image-20240403205841810.png)
 
 所以我们先来看等号左边。等号的左边就是在栈中定义了这样的一个变量，变量的名字叫做arr，类型限定 `int[]`。那就表示，当前的arr可以记录int类型数组的地址值。
 
+![image-20240403205922804](./assets/image-20240403205922804.png)
+
 然后再次执行到等号的右边。
 
-等号的右边因为有new关键字，所以它会在堆中开辟一块小空间。因为长度为2，素以它会有0和1两个索引。位置上所对应的元素就是0，因为数组是int类型的，它里面的默认初始化值就是0。
+![image-20240403205937107](./assets/image-20240403205937107.png)
+
+等号的右边因为有new关键字，所以它会在堆中开辟一块小空间。因为长度为2，所以它会有0和1两个索引。位置上所对应的元素就是0，因为数组是int类型的，它里面的默认初始化值就是0。
+
+![image-20240403210009516](./assets/image-20240403210009516.png)
+
+由于数组中存储的数据有很多很多，没办法将所有数据都存在arr变量中，所以Java在设计的时候就会把所有的数据放在另外一块空间里，而arr记录的就是另外一块空间的地址值。
+
+在堆里面的空间它是有地址值的，它会通过中间的等号运算符，将这个小空间的地址赋值给左边的变量arr。
+
+![image-20240403210031907](./assets/image-20240403210031907.png)
+
+arr通过地址值也可以找到右边堆里的小空间。
+
+![image-20240403210046526](./assets/image-20240403210046526.png)
+
+所以说代码往下，打印arr的时候，它打印的其实就是变量所记录的地址值。
+
+![image-20240403210113505](./assets/image-20240403210113505.png)
+
+但是这个地址值对我们来讲没有什么用，我们要用到的是数组里的数据。
+
+所以再往下，第三行代码：通过数组名 + 索引的方式进行获取。内存中它是通过arr找到了右边堆中的空间，然后再通过0索引找到了第一个数据。
+
+![image-20240403210301546](./assets/image-20240403210301546.png)
+
+所以在控制台中打印的就是0。
+
+![image-20240403210324730](./assets/image-20240403210324730.png)
+
+同理，打印索引1也是一样的，先通过arr找到右边这个空间。
+
+![image-20240403210343661](./assets/image-20240403210343661.png)
+
+通过1索引找到里面所对应的数据。在控制台中打印的就是数据0。
+
+![image-20240403210401203](./assets/image-20240403210401203.png)
+
+----
+
+## 六、在内存中如何给数组赋值？
+
+其实跟刚刚是一样的。看下面的代码，`arr[0] = 11` ，其实是就是将 11 赋值给 arr 的0索引。
+
+在此之前，它也要通过arr找到右边的这块小空间。
+
+![image-20240403210719204](./assets/image-20240403210719204.png)
+
+然后再把11赋值给0索引，此时0索引原来的元素就可以被覆盖了。
+
+![image-20240403210650414](./assets/image-20240403210650414.png)
+
+同样的道理，将22赋值给1索引也是把原来的元素给覆盖了。此时数组里面存储的就是新的元素。
+
+![image-20240403210743014](./assets/image-20240403210743014.png)
+
+再往下，如果现在再来获取数组里的元素。
+
+![image-20240403210803023](./assets/image-20240403210803023.png)
+
+由于数组中的0索引和1索引都被修改了，所以现在获取的就是修改之后的元素，通过0元素找到的元素是11，控制台打印的就是11。
+
+![image-20240403210821813](./assets/image-20240403210821813.png)
+
+通过1索引找到的就是22，所以控制台打印的就是22。
+
+![image-20240403210839037](./assets/image-20240403210839037.png)
+
+---
+
+## 七、两个数组的内存图
+
+第二个数组会对第一个数组产生影响吗。
+
+在代码中，又创建了第二个数组，虽然第二个数组里面没有new关键字，但是我们要知道，这个是简化的书写格式，它的完整书写格式里面还是有new关键字的。
+
+![image-20240403210852756](./assets/image-20240403210852756.png)
+
+因此它同样也会在堆中开辟一个空间。
+
+![image-20240403210904035](./assets/image-20240403210904035.png)
+
+而左边的arr2记录的就是第二个空间的地址值。此时在堆里就有两块空间了。这两块空间是互相独立的，两者之间是没有任何影响的。
+
+所以在打印arr2的时候，打印的就是arr2里记录的地址值。
+
+![image-20240403210927689](./assets/image-20240403210927689.png)
+
+再往下，我们在打印arr2的0索引，此时就是通过arr2来找到了右边的第2个空间。
+
+![image-20240403210940062](./assets/image-20240403210940062.png)
+
+再去打印里面的0索引，此时在控制台里面打印的就是33
+
+![image-20240403210953882](./assets/image-20240403210953882.png)
+
+同理，我们要打印1索引，同样通过arr2找到右边第2块空间，然后再找到1索引对应的44，此时在控制台打印的就是44。
+
+最后一个打印2索引，同样也是过arr2找到右边第2块空间，然后再找到2索引对应的55。
+
+![image-20240403211032444](./assets/image-20240403211032444.png)
+
+---
+
+## 八、总结
+
+1. 只要是new出来的一定是在堆里面开辟了一个小空间。并且堆里开辟的空间是有地址值的。
+2. 如果new了多次，那么在堆里面有多个小空间，每个小空间中都有各自的数据。
+
+---
+
+## 九、两个数组指向同一个空间的内存图
+
+在代码中定义了一个数组，在第二行代码中，并没有创建，而是把arr1赋值给了arr2，然后再在下面一顿操作。
+
+首先main方法需要先进栈。
+
+![image-20240403213221291](./assets/image-20240403213221291.png)
+
+然后再来往下执行第一行代码
+
+![image-20240403213233963](./assets/image-20240403213233963.png)
+
+第一行代码就是定义一个数组，所以在栈里面就会有一个arr1。
+
+![image-20240403213243930](./assets/image-20240403213243930.png)
+
+由于等号右边的完整格式中有new关键字，所以就在堆里面开辟了一段空间，里面要存储11 和 22。
+
+![image-20240403213301479](./assets/image-20240403213301479.png)
+
+然后再把这块空间的地址值 `0x0011`  赋值给arr1，此时arr1就可以通过这个地址找到右边的空间。
+
+![image-20240403213321697](./assets/image-20240403213321697.png)
+
+再来看这里面的第2行代码，等号的左边还是在栈里定义了一个arr2。但是你要注意，在等号的右边它是没有new关键字的，在等号的右边是arr1。它表示将arr1所记录的内容赋值给了arr2。
+
+![image-20240403213355101](./assets/image-20240403213355101.png)
+
+来看中间这块内存，现在arr1里记录的是0x0011地址值，所以它就会把这个地址值赋值给arr2。
+
+现在就形成了arr1和arr2都指向了同一块空间。
+
+![image-20240403213418211](./assets/image-20240403213418211.png)
+
+接下来打印arr1[0]，首先通过arr1找到 `0x0011`，然后找到里面的0索引，然后找到元素11。所以在控制台中打印的就是11。
+
+![image-20240403213432335](./assets/image-20240403213432335.png)
+
+然后再来执行下面的代码 `sout(arr2[0])` ，要注意，现在arr2记录的也是 `0x0011`，所以找的同样的也是右边的空间。找到0索引同样也是11。
+
+![image-20240403213448765](./assets/image-20240403213448765.png)
+
+所以在控制台中这两个语句在控制台中打印的都是11。
+
+![image-20240403213501200](./assets/image-20240403213501200.png)
+
+再往下，`arr[0] = 33`，相当于把33赋值给了arr2的0索引，arr2现在记录的是 `0x0011`，所以它找的就是右边这块空间的0索引里面的元素变成了33。
+
+![image-20240403213515729](./assets/image-20240403213515729.png)
+
+再往下，修改完后，再通过 `arr1` 和 `arr2` 再去访问0索引，此时打印的值应该打印的是一样的。都是33。
+
+![image-20240403213540874](./assets/image-20240403213540874.png)
+
+结论：当两个数组指向同一个小空间时，其中一个数组对小空间中的值发生了改变，那么其他数组再次访问的时候都是修改之后的结果了。
+
+
+
+---
+
+# Day6 方法
+
+## 1. 方法概述
+
+### 1.1 方法的概念
+
+​	方法（method）是程序中最小的执行单元
+
+* 注意：
+  * 方法必须先创建才可以使用，该过程成为方法定义
+  * 方法创建后并不是直接可以运行的，需要手动使用后，才执行，该过程成为方法调用
+
+## 2. 方法的定义和调用
+
+### 2.1 无参数方法定义和调用
+
+* 定义格式：
+
+  ```java
+  public static void 方法名 (   ) {
+  	// 方法体;
+  }
+  ```
+
+* 范例：
+
+  ```java
+  public static void method (    ) {
+  	// 方法体;
+  }
+  ```
+
+* 调用格式：
+
+  ```java
+  方法名();
+  ```
+
+* 范例：
+
+  ```java
+  method();
+  ```
+
+* 注意：
+
+  ​	方法必须先定义，后调用，否则程序将报错
+
+### 2.3 无参数方法的练习
+
+* 需求：设计一个方法用于打印两个数中的较大数 
+* 思路：
+  * ①定义一个方法，用于打印两个数字中的较大数，例如getMax() 
+  * ②方法中定义两个变量，用于保存两个数字 
+  * ③使用分支语句分两种情况对两个数字的大小关系进行处理 
+  * ④在main()方法中调用定义好的方法 
+* 代码：
+
+```java
+public class MethodTest {
+    public static void main(String[] args) {
+        //在main()方法中调用定义好的方法
+        getMax();
+    }
+
+    //定义一个方法，用于打印两个数字中的较大数，例如getMax()
+    public static void getMax() {
+        //方法中定义两个变量，用于保存两个数字
+        int a = 10;
+        int b = 20;
+
+        //使用分支语句分两种情况对两个数字的大小关系进行处理
+        if(a > b) {
+            System.out.println(a);
+        } else {
+            System.out.println(b);
+        }
+    }
+}
+```
+
+## 3. 带参数方法定义和调用
+
+### 3.1 带参数方法定义和调用
+
+* 定义格式：
+
+  参数：由数据类型和变量名组成 -  数据类型 变量名
+
+  参数范例：int a
+
+  ```java
+  public static void 方法名 (参数1) {
+  	方法体;
+  }
+  
+  public static void 方法名 (参数1, 参数2, 参数3...) {
+  	方法体;
+  }
+  ```
+
+* 范例：
+
+  ```java
+  public static void isEvenNumber(int number){
+      ...
+  }
+  public static void getMax(int num1, int num2){
+      ...
+  }
+  ```
+
+  * 注意：
+
+    	方法定义时，参数中的数据类型与变量名都不能缺少，缺少任意一个程序将报错
+    	
+    	方法定义时，多个参数之间使用逗号( ，)分隔
+
+* 调用格式：
+
+  ```java
+  方法名(参数)；
+  
+  方法名(参数1,参数2);
+  ```
+
+* 范例：
+
+  ```java
+  isEvenNumber(10);
+  
+  getMax(10,20);
+  ```
+
+  * 方法调用时，参数的数量与类型必须与方法定义中的设置相匹配，否则程序将报错 
+
+### 3.2 形参和实参
+
+1. 形参：方法定义中的参数
+
+​          等同于变量定义格式，例如：int number
+
+2. 实参：方法调用中的参数
+
+​          等同于使用变量或常量，例如： 10  number
+
+### 3.3 带参数方法练习
+
+* 需求：设计一个方法用于打印两个数中的较大数，数据来自于方法参数 }
+* 思路：
+  * ①定义一个方法，用于打印两个数字中的较大数，例如getMax() 
+  * ②为方法定义两个参数，用于接收两个数字 
+  * ③使用分支语句分两种情况对两个数字的大小关系进行处理 
+  * ④在main()方法中调用定义好的方法（使用常量）
+  * ⑤在main()方法中调用定义好的方法（使用变量） 
+* 代码：
+
+```java
+public class MethodTest {
+    public static void main(String[] args) {
+        //在main()方法中调用定义好的方法（使用常量）
+        getMax(10,20);
+        //调用方法的时候，人家要几个，你就给几个，人家要什么类型的，你就给什么类型的
+        //getMax(30);
+        //getMax(10.0,20.0);
+
+        //在main()方法中调用定义好的方法（使用变量）
+        int a = 10;
+        int b = 20;
+        getMax(a, b);
+    }
+
+    //定义一个方法，用于打印两个数字中的较大数，例如getMax()
+    //为方法定义两个参数，用于接收两个数字
+    public static void getMax(int a, int b) {
+        //使用分支语句分两种情况对两个数字的大小关系进行处理
+        if(a > b) {
+            System.out.println(a);
+        } else {
+            System.out.println(b);
+        }
+    }
+}
+```
+
+## 4. 带返回值方法的定义和调用
+
+### 4.1 带返回值方法定义和调用
+
+* 定义格式
+
+  ```java
+  public static 数据类型 方法名 ( 参数 ) { 
+  	return 数据 ;
+  }
+  ```
+
+* 范例
+
+  ```java
+  public static boolean isEvenNumber( int number ) {           
+  	return true ;
+  }
+  public static int getMax( int a, int b ) {
+  	return  100 ;
+  }
+  ```
+
+  * 注意：
+    * 方法定义时return后面的返回值与方法定义上的数据类型要匹配，否则程序将报错
+
+* 调用格式
+
+  ```java
+  方法名 ( 参数 ) ;
+  数据类型 变量名 = 方法名 ( 参数 ) ;
+  ```
+
+* 范例
+
+  ```java
+  isEvenNumber ( 5 ) ;
+  boolean  flag =  isEvenNumber ( 5 ); 
+  ```
+
+  * 注意：
+    * 方法的返回值通常会使用变量接收，否则该返回值将无意义
+
+### 4.2 带返回值方法练习1
+
+* 需求：设计一个方法可以获取两个数的较大值，数据来自于参数
+
+* 思路：
+
+  * ①定义一个方法，用于获取两个数字中的较大数 
+  * ②使用分支语句分两种情况对两个数字的大小关系进行处理 
+  * ③根据题设分别设置两种情况下对应的返回结果 
+  * ④在main()方法中调用定义好的方法并使用变量保存 
+  * ⑤在main()方法中调用定义好的方法并直接打印结果 
+
+* 代码：
+
+  ```java
+  public class MethodTest {
+      public static void main(String[] args) {
+          //在main()方法中调用定义好的方法并使用变量保存
+          int result = getMax(10,20);
+          System.out.println(result);
+  
+          //在main()方法中调用定义好的方法并直接打印结果
+          System.out.println(getMax(10,20));
+      }
+  
+      //定义一个方法，用于获取两个数字中的较大数
+      public static int getMax(int a, int b) {
+          //使用分支语句分两种情况对两个数字的大小关系进行处理
+          //根据题设分别设置两种情况下对应的返回结果
+          if(a > b) {
+              return a;
+          } else {
+              return b;
+          }
+      }
+  }
+  ```
+
+### 4.3 带返回值方法练习2
+
+需求：
+
+​	定义一个方法，求一家商场每个季度的营业额。根据方法结果再计算出全年营业额。
+
+代码示例：
+
+```java
+package com.itheima.demo;
+
+public class MethodDemo9 {
+    public static void main(String[] args) {
+        /*需求：定义一个方法，求一家商场每个季度的营业额。
+        根据方法结果再计算出全年营业额。*/
+        int sum1 = getSum(10, 20, 30);
+        int sum2 = getSum(10, 20, 30);
+        int sum3 = getSum(10, 20, 30);
+        int sum4 = getSum(10, 20, 30);
+
+        int sum = sum1 + sum2 + sum3 + sum4;
+        System.out.println(sum);
+
+    }
+
+    //心得：
+    //1.我要干嘛？  决定了方法体   每个季度的营业额
+    //2.我干这件事情，需要什么才能完成？ 决定了形参 需要三个月的营业额 a b c
+    //3.我干完这件事情，看调用处是否需要使用方法的结果。   决定了返回值
+    //如果需要使用，那么必须返回
+    //如果不需要使用，可以返回也可以不返回
+    public static int getSum(int month1,int month2,int month3){
+        int sum = month1 + month2 + month3;
+        //因为方法的调用处，需要继续使用这个结果
+        //所以我们必须要把sum返回
+        return sum;
+    }
+}
+
+```
+
+### 4.4 带返回值方法练习3
+
+需求：
+
+​	键盘录入两个圆的半径（整数），比较两个圆的面积。
+
+代码示例：
+
+```java
+import java.util.Scanner;
+
+public class MethodDemo10 {
+    public static void main(String[] args) {
+        //需求：键盘录入两个圆的半径（整数），比较两个圆的面积。
+        //键盘录入圆的半径
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请输入圆的半径");
+        int radii1 = sc.nextInt();
+
+        System.out.println("请输入第二个圆的半径");
+        int radii2 = sc.nextInt();
+        double area1 = getArea(radii1);
+        double area2 = getArea(radii2);
+        if(area1 > area2){
+            System.out.println("第一个圆更大");
+        }else{
+            System.out.println("第二个圆更大");
+        }
+    }
+
+    //心得：
+    //1.我要干嘛？   求圆的面积
+    //2.我干这件事情，需要什么才能完成？        半径
+    //3.方法的调用处，是否需要继续使用方法的结果    要比较
+    public static double getArea(int radii) {
+        double area = 3.14 * radii * radii;
+        return area;
+    }
+}
+```
+
+## 5. 方法的注意事项
+
+### 5.1 方法的注意事项
+
+* 方法不能嵌套定义
+
+  * 示例代码：
+
+    ```java
+    public class MethodDemo {
+        public static void main(String[] args) {
+    
+        }
+    
+        public static void methodOne() {
+    		public static void methodTwo() {
+           		// 这里会引发编译错误!!!
+        	}
+        }
+    }
+    ```
+
+* void表示无返回值，可以省略return，也可以单独的书写return，后面不加数据
+
+  * 示例代码：
+
+    ```java
+    public class MethodDemo {
+        public static void main(String[] args) {
+    
+        }
+        public static void methodTwo() {
+            //return 100; 编译错误，因为没有具体返回值类型
+            return;	
+            //System.out.println(100); return语句后面不能跟数据或代码
+        }
+    }
+    ```
+
+### 5.2 方法的通用格式
+
+* 格式：
+
+  ```java
+  public static 返回值类型 方法名(参数) {
+     方法体; 
+     return 数据 ;
+  }
+  ```
+
+* 解释：
+
+  * public static 	修饰符，目前先记住这个格式
+
+    返回值类型	方法操作完毕之后返回的数据的数据类型
+
+    ​			如果方法操作完毕，没有数据返回，这里写void，而且方法体中一般不写return
+
+     方法名		调用方法时候使用的标识
+
+     参数		由数据类型和变量名组成，多个参数之间用逗号隔开
+
+     方法体		完成功能的代码块
+
+     return		如果方法操作完毕，有数据返回，用于把数据返回给调用者
+
+* 定义方法时，要做到两个明确
+
+  * 明确返回值类型：主要是明确方法操作完毕之后是否有数据返回，如果没有，写void；如果有，写对应的数据类型
+  * 明确参数：主要是明确参数的类型和数量
+
+* 调用方法时的注意：
+
+  * void类型的方法，直接调用即可
+  * 非void类型的方法，推荐用变量接收调用
+
+## 6. 方法重载
+
+### 6.1 方法重载
+
+* 方法重载概念
+
+  方法重载指同一个类中定义的多个方法之间的关系，满足下列条件的多个方法相互构成重载
+
+  * 多个方法在同一个类中
+  * 多个方法具有相同的方法名
+  * 多个方法的参数不相同，类型不同或者数量不同
+
+* 注意：
+
+  * 重载仅对应方法的定义，与方法的调用无关，调用方式参照标准格式
+  * 重载仅针对同一个类中方法的名称与参数进行识别，与返回值无关，换句话说不能通过返回值来判定两个方法是否相互构成重载
+
+* 正确范例：
+
+  ```java
+  public class MethodDemo {
+  	public static void fn(int a) {
+      	//方法体
+      }
+      public static int fn(double a) {
+      	//方法体
+      }
+  }
+  
+  public class MethodDemo {
+  	public static float fn(int a) {
+      	//方法体
+      }
+      public static int fn(int a , int b) {
+      	//方法体
+      }
+  }
+  ```
+
+* 错误范例：
+
+  ```java
+  public class MethodDemo {
+  	public static void fn(int a) {
+      	//方法体
+      }
+      public static int fn(int a) { 	/*错误原因：重载与返回值无关*/
+      	//方法体
+      }
+  }
+  
+  public class MethodDemo01 {
+      public static void fn(int a) {
+          //方法体
+      }
+  } 
+  public class MethodDemo02 {
+      public static int fn(double a) { /*错误原因：这是两个类的两个fn方法*/
+          //方法体
+      }
+  }
+  ```
+
+### 6.2 方法重载练习
+
+* 需求：使用方法重载的思想，设计比较两个整数是否相同的方法，兼容全整数类型（byte,short,int,long） 
+
+* 思路：
+
+  * ①定义比较两个数字的是否相同的方法compare()方法，参数选择两个int型参数
+  * ②定义对应的重载方法，变更对应的参数类型，参数变更为两个long型参数
+  * ③定义所有的重载方法，两个byte类型与两个short类型参数 
+  * ④完成方法的调用，测试运行结果 
+
+* 代码：
+
+  ```java
+  public class MethodTest {
+      public static void main(String[] args) {
+          //调用方法
+          System.out.println(compare(10, 20));
+          System.out.println(compare((byte) 10, (byte) 20));
+          System.out.println(compare((short) 10, (short) 20));
+          System.out.println(compare(10L, 20L));
+      }
+  
+      //int
+      public static boolean compare(int a, int b) {
+          System.out.println("int");
+          return a == b;
+      }
+  
+      //byte
+      public static boolean compare(byte a, byte b) {
+          System.out.println("byte");
+          return a == b;
+      }
+  
+      //short
+      public static boolean compare(short a, short b) {
+          System.out.println("short");
+          return a == b;
+      }
+  
+      //long
+      public static boolean compare(long a, long b) {
+          System.out.println("long");
+          return a == b;
+      }
+  
+  }
+  ```
+
+### 7.3 数组遍历
+
+* 需求：设计一个方法用于数组遍历，要求遍历的结果是在一行上的。例如：[11, 22, 33, 44, 55] 
+
+* 思路：
+
+  * ①因为要求结果在一行上输出，所以这里需要在学习一个新的输出语句System.out.print(“内容”);
+
+    System.out.println(“内容”); 输出内容并换行
+
+    System.out.print(“内容”); 输出内容不换行
+
+    System.out.println(); 起到换行的作用
+
+  * ②定义一个数组，用静态初始化完成数组元素初始化
+
+  * ③定义一个方法，用数组遍历通用格式对数组进行遍历
+
+  * ④用新的输出语句修改遍历操作
+
+  * ⑤调用遍历方法
+
+* 代码：
+
+  ```java
+  public class Test1 {
+      public static void main(String[] args) {
+        /*  //先打印数据，再进行换行
+          System.out.println("aaa");
+          //只打印不换行
+          System.out.print("bbb");
+          System.out.print("ddd");
+          //不打印任何内容，只换行
+          System.out.println();
+          System.out.print("cc");*/
+          //设计一个方法用于数组遍历，要求遍历的结果是在一行上的。例如：[11, 22, 33, 44, 55]
+          int[] arr = {1,2,3,4,5};
+          printArr(arr);
+      }
+      //1.我要遍历数组
+      //2.需要什么？  数组
+      //3.调用处是否需要使用方法的结果。
+      public static void printArr(int[] arr){
+          System.out.print("[");
+          for (int i = 0; i < arr.length; i++) {
+              if(i == arr.length - 1){
+                  System.out.println(arr[i] + "]");
+              }else{
+                  System.out.print(arr[i] + ", ");
+              }
+          }
+      }
+  }
+  ```
+
+### 7.4 数组最大值
+
+* 需求：设计一个方法用于获取数组中元素的最大值 
+
+* 思路：
+
+  * ①定义一个数组，用静态初始化完成数组元素初始化
+  * ②定义一个方法，用来获取数组中的最大值，最值的认知和讲解我们在数组中已经讲解过了
+  * ③调用获取最大值方法，用变量接收返回结果
+  * ④把结果输出在控制台
+
+* 代码：
+
+  ```java
+  public class MethodTest02 {
+      public static void main(String[] args) {
+          //定义一个数组，用静态初始化完成数组元素初始化
+          int[] arr = {12, 45, 98, 73, 60};
+  
+          //调用获取最大值方法，用变量接收返回结果
+          int number = getMax(arr);
+  
+          //把结果输出在控制台
+          System.out.println("number:" + number);
+      }
+  
+      //定义一个方法，用来获取数组中的最大值
+      /*
+          两个明确：
+              返回值类型：int
+              参数：int[] arr
+       */
+      public static int getMax(int[] arr) {
+          int max = arr[0];
+  
+          for(int x=1; x<arr.length; x++) {
+              if(arr[x] > max) {
+                  max = arr[x];
+              }
+          }
+          return max;
+      }
+  }
+  ```
+
+### 7.6 获取索引
+
+需求：
+
+​	定义一个方法获取数字，在数组中的索引位置，将结果返回给调用处，如果有重复的，只要获取第一个即可。
+
+代码示例：
+
+```java
+package com.itheima.demo;
+
+public class Test4 {
+    public static void main(String[] args) {
+        //定义一个方法获取数字，在数组中的索引位置，将结果返回给调用处
+        //如果有重复的，只要获取第一个即可
+
+        int[] arr = {1,2,3,4,5};
+        int index = contains(arr, 3);
+        System.out.println(index);
+    }
+
+    //1. 我要干嘛？判断数组中的某一个数是否存在
+    //2. 需要什么？数组 数字
+    //3. 调用处是否需要继续使用？返回
+    //获取number在arr中的位置
+    public static int contains(int[] arr, int number) {
+        //遍历arr得到每一个元素
+        for (int i = 0; i < arr.length; i++) {
+            //拿着每一个元素跟number比较
+            if(arr[i] == number){
+                //如果相等，表示找到了
+                return i;
+            }
+        }
+        //当循环结束之后，如果还不能返回索引，表示数组中不存在该数据
+        //可以返回-1
+        return -1;
+    }
+}
+
+```
 
 
 
