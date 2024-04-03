@@ -5676,7 +5676,7 @@ public class Test19 {
 
 # -------------------------------
 
-# Day5  循环高级
+# Day5  循环高级和数组
 
 # 49.无限循环和跳转控制语句
 
@@ -6128,7 +6128,822 @@ public class LoopTest7 {
 
 数组指的是一种容器，可以用来存储**同种数据类型**的多个值。
 
-同种数据类型我们不能理解的太死
+同种数据类型我们不能理解的太死，例如现在定义了一个数组，限定以后能存double类型的小数。但现在有这样一堆数：有小数有整数，是否能存进去？
+
+![image-20240403091645894](./assets/image-20240403091645894.png)
+
+答案是可以的，之前学习过隐式转换，整数存进去后会自动转换成小数。
+
+---
+
+## 二、总结
+
+- 数组容器在存储数据的时候，需要结合隐式转换考虑。
+- 建议：容器的类型，和存储的数据类型保持一致
+
+----
+
+## 三、数组的定义
+
+数组的定义和之前学习变量的定义非常类似。例如 `int a = 0`，但这句话其实是做了两件事情：等号左边叫定义，等号右边叫赋值
+
+![image-20240403092120299](./assets/image-20240403092120299.png)
+
+而我们学习数组的定义是等号左边那部分。数组的定义一共有两种格式，比定义变量多了一个中括号。
+
+- 数据类型限定了数组以后能存什么类型的数据。
+- `[ ]` 表示我们现在定义的是一个数组，如果没写 `[ ]` 就表示你现在定义的是一个变量。
+- 数组名：就是一个名字，方便以后我们使用。
+- `[ ]` 跟 `数组名` 是没有先后顺序的。个人习惯是第一种格式。
+
+![image-20240403092213552](./assets/image-20240403092213552.png)
+
+----
+
+## 四、数组的初始化
+
+初始化：就是在内存中，为数组容器开辟空间，并将数据存入容器中的过程。
+
+数组初始化的两种方式：1、静态初始化；2、动态初始化
+
+### 1）静态初始化
+
+**完整格式**。在大括号中写上要存入数组中的多个元素就可以了，每个元素之间用逗号隔开。
+
+~~~java
+数据类型[] 数组名 = new 数据类型[] {元素1, 元素2, 元素3...};
+~~~
+
+示例：
+
+~~~java
+int[] arry = new int[] {11, 22, 33};
+double[] arry = new double[] {11.1, 22.2, 33.3};
+~~~
+
+由于完整格式书写起来不太方便，因为它比较长。所以以后实际开发的时候，一般不会用它的完整格式，而是使用它的简写格式。
+
+它的**简写格式**就是将 `new 数据类型[]` 直接省略，等号的右边直接写大括号。
+
+~~~java
+数据类型[] 数组名 = {元素1, 元素2, 元素3...};
+~~~
+
+示例：
+
+~~~java
+int[] arry = {11, 22, 33};
+double[] arry = {11.1, 22.2, 33.3};
+~~~
+
+当数组初始化执行完毕后，在内存中就会开辟一块大空间，例如我现在要在数组中存三个元素，所以就会把大空间里分成三个小格子，每一个格子里装一个元素。
+
+数组一旦创建完毕，长度就不能发生变化。
+
+![image-20240403095510250](./assets/image-20240403095510250.png)
+
+---
+
+### 代码示例
+
+~~~java
+package com.itheima.arraydemo;
+
+public class ArrayDemo1 {
+    public static void main(String[] args) {
+        //格式：
+        //静态初始化
+        //完整格式：
+        //数据类型 [] 数组名 = new 数据类型[]{元素1，元素2....};
+        //简化格式：
+        //数据类型 [] 数组名 = {元素1，元素2....};
+
+
+        //需求1：定义数组存储5个学生的年龄
+        int[] arr1 = new int[]{11, 12, 13, 14, 15};
+        int[] arr2 = {11, 12, 13, 14, 15};
+
+        //需求2：定义数组存储3个学生的姓名
+        String[] arr3 = new String[]{"zhangsan", "lisi", "wangwu"};
+        String[] arr4 = {"zhangsan", "lisi", "wangwu"};
+
+        //需求3：定义数组存储4个学生的身高 1.93
+        double[] arr5 = new double[]{1.93, 1.75, 1.73, 1.81};
+        double[] arr6 = {1.93,1.75,1.73,1.81};
+    }
+}
+~~~
+
+
+
+---
+
+# 55.数组的地址值和元素访问
+
+## 一、引入
+
+直接将刚刚写的数组打印出来，发现打印出来的东西我们并不认识
+
+~~~java
+int[] arr1 = new int[]{11, 12, 13, 14, 15};
+System.out.println(arr1); // [I@776ec8df
+~~~
+
+其实 `[I@776ec8df` 是数组容器在内存中的地址值，而并不是数组本身元素。
+
+----
+
+## 二、数组的地址值
+
+定义了一个数组，其实就是在内存中开辟一段空间。在空间中再存入 `1、2、3、4、5`。
+
+数组的地址值表示数组在内存中的位置。
+
+![image-20240403100514762](./assets/image-20240403100514762.png)
+
+----
+
+## 三、`[D@776ec8df` 详解
+
+~~~java
+int[] arr1 = new int[]{11, 12, 13, 14, 15};
+System.out.println(arr1);//[I@776ec8df
+double[] arr6 = {1.93,1.75,1.73,1.81};
+System.out.println(arr6);//[D@776ec8df  地址值
+//扩展：
+//解释一下地址值的格式含义  [D@776ec8df
+//[ ：表示当前是一个数组
+//D：表示当前数组里面的元素都是double类型的，I表示数组里面的元素都是int类型的。
+//@：表示一个间隔符号。（固定格式）
+//776ec8df：才是数组真正的地址值，它是一个十六进制的表现形式。
+//但是平时我们习惯性的会把这个整体叫做数组的地址值。但其实只有后半部分才是真正的地址值776ec8df
+~~~
+
+---
+
+## 四、元素访问
+
+由于直接打印数组名是不会直接打印数组里的元素的，出现的是地址值。这个时候我们就需要来学习元素访问了。
+
+格式：
+
+~~~java
+数组名[索引];
+~~~
+
+---
+
+## 五、索引
+
+假设现在有一个长度为5的数组，里面存了 `a 、b 、c 、d 、e` 这样的五个字母，按照正常人的理解，如果现在要获取第一个字母，直接说我们要拿第一个就行了。
+
+![image-20240403101415576](./assets/image-20240403101415576.png)
+
+计算机也是一样的，只不过计算机在数第几个的时候不会从1开始，而是从0开始。下面的 `0, 1, 2, 3, 4` 就是数组的索引。
+
+![image-20240403101839717](./assets/image-20240403101839717.png)
+
+索引：也叫作下标，角标。表示数组容器里每个小格子的编号。
+
+索引的特点：从0开始，逐个 + 1增长，连续不间断。
+
+我们可以通过索引把数组里的元素给获取出来，也可以通过索引把数据存储到数组当中。
+
+----
+
+### 代码示例
+
+利用索引对数组中的元素进行访问 & 把数据存储到数组当中
+
+~~~java
+package com.itheima.arraydemo;
+
+public class ArrayDemo2 {
+    public static void main(String[] args) {
+        //1.获取数组里面的元素
+        //  格式： 数组名[索引]
+
+
+        int[] arr = {1,2,3,4,5};
+        //获取数组中的第一个元素
+        //其实就是0索引上对应的元素
+        // 获取完元素后不能单独放在这里，需要使用，可以赋值给一个变量也可以打印
+        int number = arr[0];
+        System.out.println(number);//1
+        
+        //获取数组中1索引上对应的数据，并直接打印出来
+        System.out.println(arr[1]);//2
+
+
+        //2.把数据存储到数组当中
+        //格式：  数组名[索引] = 具体数据/变量；
+        //细节：一旦覆盖之后，原来的数据就不存在了。
+        arr[0] = 100;
+
+        System.out.println(arr[0]);//100
+    }
+}
+~~~
+
+
+
+----
+
+# 56.数组的遍历和三道综合练习
+
+## 一、引入
+
+数组遍历：将数组中所有的内容取出来，取出来之后可以（打印，求和，判断...）
+
+注意：遍历指的是取出数据的过程，不要局限的理解为：遍历就是打印！
+
+----
+
+## 二、代码示例
+
+~~~java
+package com.itheima.arraydemo;
+
+public class ArrayDemo3 {
+    public static void main(String[] args) {
+        //1.定义数组
+        int[] arr = {1,2,3,4,5};
+        //2.获取数组里面所有的元素
+        //格式： 数组名[索引]
+        System.out.println(arr[0]);
+        System.out.println(arr[1]);
+        System.out.println(arr[2]);
+        System.out.println(arr[3]);
+        System.out.println(arr[4]);
+
+        //利用循环改进代码
+        //开始条件：0
+        //结束条件：数组的长度 - 1（最大索引）
+        for (int i = 0; i < 5; i++) {
+            //i: 0 1 2 3 4
+            System.out.println(arr[i]);
+        }
+
+        //在Java当中，关于数组的一个长度属性，length
+        //调用方式：数组名.length
+        //System.out.println(arr.length);
+        for (int i = 0; i < arr.length; i++) { // 这个才是通用的代码
+            //i: 0 1 2 3 4
+            System.out.println(arr[i]);
+        }
+
+        //扩展：
+        //自动的快速生成数组的遍历方式
+        //idea提供的：数组名.fori
+        for (int i = 0; i < arr.length; i++) {
+            System.out.println(arr[i]);
+        }
+    }
+}
+~~~
+
+----
+
+## 三、练习1：求和
+
+定义一个数组，存储1,2,3,4,5，遍历数组得到每一个元素，求数组里面所有的数据和
+
+~~~java
+package com.itheima.test;
+
+public class ArrTest1 {
+    public static void main(String[] args) {
+        //分析：
+        //1.定义一个数组，并添加数据1,2,3,4,5
+        int[] arr = {1,2,3,4,5};
+
+        //求和变量
+        int sum = 0;
+        //2.遍历数组得到每一个数据，累加求和
+        for (int i = 0; i < arr.length; i++) {
+            //i 依次表示数组里面的每一个索引
+            //arr[i] 依次表示数组里面的每一个元素
+            sum = sum + arr[i];
+        }
+
+        //当循环结束之后，sum的值就是累加之后的结果
+        System.out.println(sum);
+    }
+}
+~~~
+
+----
+
+## 四、练习2：统计个数
+
+定义一个数组，存储1,2,3,4,5,6,7,8,9,10。遍历数组得到每一个元素，统计数组里面一共有多少个能被3整除的数字
+
+~~~java
+package com.itheima.test;
+
+public class ArrTest2 {
+    public static void main(String[] args) {
+        //分析：
+        //1.定义一个数组 存储1,2,3,4,5,6,7,8,9,10
+        int[] arr = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        //定义一个变量，用来统计次数
+        int count = 0;
+        //2.遍历数组得到每一个元素
+        for (int i = 0; i < arr.length; i++) {
+            //i 表示数组里面的每一个索引
+            //arr[i] 表示数组里面的每一个元素
+            //3.判断当前的元素是否为3的倍数，如果是那么统计变量就需要自增一次。
+            if(arr[i] % 3 == 0){
+               // System.out.println(arr[i]);
+                count++;
+            }
+        }
+        //当循环结束之后，就表示数组里面所有的数字都判断完毕了，直接打印count即可
+        System.out.println("数组中能被3整除的数字有" + count + "个");
+    }
+}
+~~~
+
+----
+
+## 五、练习3：变化数据
+
+定义一个数组，存储1,2,3,4,5,6,7,8,9,10
+遍历数组得到每一个元素。
+要求：
+1：如果是奇数，则将当前数字扩大两倍
+2：如果是偶数，则将当前数字变成二分之一
+
+~~~java
+package com.itheima.test;
+
+public class ArrTest3 {
+    public static void main(String[] args) {
+        //分析：
+        //1.定义一个数组，存1,2,3,4,5,6,7,8,9,10
+        int[] arr = {1,2,3,4,5,6,7,8,9,10};
+        //2.遍历数组得到每一个元素
+        for (int i = 0; i < arr.length; i++) {
+            //i 依次表示数组里面的每一个索引
+            //arr[i] 依次表示数组里面的每一个元素
+            //3.对每一个元素进行判断
+            if(arr[i] % 2 == 0){
+                //偶数 变成二分之一
+               arr[i] = arr[i] / 2;
+            }else{
+                //奇数 扩大两倍
+                arr[i] = arr[i] * 2;
+            }
+        }
+
+        //遍历数组
+        //注意：一个循环尽量只做一件事情。如果循环里做的事情多了，会混淆
+        for (int i = 0; i < arr.length; i++) {
+            System.out.println(arr[i]);
+        }
+    }
+}
+~~~
+
+
+
+----
+
+# 57.数组的动态初始化和常见问题
+
+## 一、为什么有数组动态初始化呢？
+
+如果一开始就知道数组里的数据，就可以使用静态初始化去完成。但是如果一开始就不知道要添加什么数据，那此时大括号中写什么呢？
+
+~~~java
+int[] arr = {1, 2, 3, 4, 5};
+int[] arr = {????}
+~~~
+
+是不是感觉写什么都不太合适。所以动态初始化和静态初始化的应用场景是不一样的。
+
+----
+
+## 二、动态初始化
+
+动态初始化：初始化时只指定数组长度，由系统为数组分配初始值。
+
+格式
+
+~~~java
+数据类型[] 数组名 = new 数据类型[数组长度];
+~~~
+
+示例：下述代码表示arr数组里只能存3个int类型的整数。
+
+~~~java
+int[] arr = new int[3];
+~~~
+
+----
+
+## 三、代码示例
+
+需求：定义一个数组，用来存班级中50个学生的姓名。姓名未知，等学生报道之后，再进行添加。
+
+~~~java
+package com.itheima.arraydemo;
+
+public class ArrayDemo4 {
+    public static void main(String[] args) {
+        //格式：
+        //数据类型[] 数组名 = new 数据类型[数组的长度];
+        //在创建的时候，由我们自己指定数组的长度，由虚拟机给出默认的初始化值
+
+        String[] arr = new String[50];
+        //添加学生
+        arr[0] = "zhangsan";
+        arr[1] = "lisi";
+        //获取
+        System.out.println(arr[0]);//zhangsan
+        System.out.println(arr[1]);//lisi
+        System.out.println(arr[2]);//打印出来的是默认初始化值null
+    }
+}
+~~~
+
+---
+
+## 四、数组默认初始化值的规律
+
+整数类型：默认初始化值0
+小数类型：默认初始化值0.0
+字符类型：默认初始化值'\u0000' 空格
+布尔类型：默认初始化值 false
+引用数据类型：默认初始化值 null，String就是一个引用数据类型
+
+~~~java
+int[] arr2 = new int[3];
+System.out.println(arr2[0]);//0
+System.out.println(arr2[1]);//0
+System.out.println(arr2[2]);//0
+~~~
+
+---
+
+## 五、数组动态初始化和静态初始化的区别
+
+1、动态初始化：手动指定数组长度，由系统给出默认初始化值。
+
+- 只明确元素个数，不明确具体数值，推荐使用动态初始化
+
+- 例如：使用数组容器来存储键盘录入的5个整数。
+
+  ~~~java
+  int[] arr = {????}; // 不明确数组中应该存储哪些
+  int[] arr = new int[5]; // 就使用动态初始化
+  ~~~
+
+
+
+2、静态初始化：手动指定数组元素，系统会根据元素个数，计算出数组的长度。
+
+- 需求中已经明确了要操作的具体数据，直接静态初始化即可。
+
+- 例如：将全班的学生成绩存入数组中：11，22 ，33
+
+  ~~~java
+  int[] arr = {11, 22, 33};
+  ~~~
+
+----
+
+## 六、数组常见问题：越界
+
+当访问了数组中不存在的索引，就会引发索引越界异常
+
+~~~java
+package com.itheima.arraydemo;
+
+public class ArrayDemo5 {
+    public static void main(String[] args) {
+        //1.定义一个数组
+        int[] arr = {1,2,3,4,5};
+        //长度：5
+        //最小索引：0
+        //最大索引：4（数组的长度 - 1）
+        //如果访问的数字不在这个范围（0 ~ 4）就会报索引越界异常
+        System.out.println(arr[2]);
+
+
+        //小结：
+        //索引越界异常
+        //原因：访问了不存在的索引
+        //避免：只要知道索引的范围就行了
+        //最小索引：0
+        //最大索引：（数组的长度 - 1）
+    }
+}
+~~~
+
+下图的红色就表示代码出现了问题，通常我们也会说代码报错了。
+
+阅读报错的信息：Exception：异常，异常在main里。`java.lang.ArrayIndexOutOfBoundsException` 是异常的名字，叫做：索引越界异常。后面就会紧接着异常出现的解释：`Index 10 out of bounds for length 5`，索引10已经超过了长度为5的数组。
+
+at：表示 `在`。`com.itheima.arraydemo` 是包名，`ArrayDemo5` 是类名。`main` 是方法名。`ArrayDemo5.java:10` 表示异常出现的位置，这里就表示在第10行出现了问题。![image-20240403110539506](./assets/image-20240403110539506.png)
+
+点一下，它就会自动跳转到第10行。
+
+![image-20240403111005902](./assets/image-20240403111005902.png)
+
+
+
+-----
+
+# 58.数组练习1：求最值
+
+~~~java
+package com.itheima.test;
+
+public class ArrTest4 {
+    public static void main(String[] args) {
+        //定义数组求最大值：33,5,22,44,55
+        
+        //1.定义数组用来存储5个值
+        int[] arr = {33,5,22,44,55};
+        //2.定义一个变量max用来存储最大值
+        //临时认为0索引的数据是最大的
+        int max = arr[0];
+        //3.循环获取数组中的每一个元素
+        //拿着每一个元素跟max进行比较
+        for (int i = 0; i < arr.length; i++) {
+            //i 索引  arr[i] 元素
+            if(arr[i] > max){
+                max = arr[i];
+            }
+        }
+        //4.当循环结束之后，max记录的就是数组中的最大值
+        System.out.println(max);//55
+    }
+}
+~~~
+
+**扩展问题**
+
+~~~java
+//1.根据求最大值的思路，自己改写一下求最小值
+//2.为什么max要记录为arr[0],默认值不能为0吗？
+//答案：不能写0。例如：如果数组里的值都是负数呢，那最大值就是0了，但数组里并没有0。
+//max的初始化值一定要是数组中的值。
+//3.循环中开始条件一定是0吗？
+//循环的开始条件如果为0，那么第一次循环的时候是自己跟自己比了一下，对结果没有任何影响，但是效率偏低
+//为了提高效率，减少一次循环的次数，循环开始条件可以写1.
+for (int i = 1; i < arr.length; i++) {
+    //i 索引  arr[i] 元素
+    if(arr[i] > max){
+        max = arr[i];
+    }
+}
+~~~
+
+
+
+----
+
+# 59.数组练习2：求和并统计个数
+
+需求：生成10个1~100之间的随机数存入数组。
+        1）求出所有数据的和
+        2）求所有数据的平均数
+        3）统计有多少个数据比平均值小
+
+~~~java
+package com.itheima.test;
+
+import java.util.Random;
+
+public class ArrTest5 {
+    public static void main(String[] args) {
+        //分析：
+        //1.定义数组，这里应该使用动态初始化，因为我们现在还不知道数组里面的值
+        int[] arr = new int[10];
+        //2.把随机数存入到数组当中
+        Random r = new Random();
+
+        for (int i = 0; i < arr.length; i++) {
+            //每循环一次，就会生成一个新的随机数
+            int number = r.nextInt(100) + 1;
+            //把生成的随机数添加的数组当中
+            //数组名[索引] = 数据;
+            arr[i] = number;
+        }
+
+
+        // 1）求出所有数据的和
+        //定义求和变量
+        int sum = 0;
+        for (int i = 0; i < arr.length; i++) {
+            //循环得到每一个元素
+            //并把元素累加到sum当中
+            sum = sum + arr[i];
+        }
+        System.out.println("数组中所有数据的和为：" + sum);
+
+
+        //2）求所有数据的平均数
+        int avg = sum / arr.length;
+        System.out.println("数组中平均数为：" + avg);
+
+
+
+        //3）统计有多少个数据比平均值小
+        int count = 0;
+        for (int i = 0; i < arr.length; i++) {
+            if(arr[i] < avg){
+                count++;
+            }
+        }
+
+        //当循环结束之后，就表示我已经找到了所有的比平均数小的数据
+        System.out.println("在数组中，一共有" + count + "个数据，比平均数小");
+
+
+
+        //遍历数组，验证答案
+        for (int i = 0; i < arr.length; i++) {
+            // println中删掉 ln ，表示在打印的时候就不会换行了
+            System.out.print(arr[i] + " ");
+        }
+    }
+}
+~~~
+
+
+
+-----
+
+# 60.数组练习3：交换数据
+
+需求：定义两个变量，交换两个变量记录的值
+
+~~~java
+package com.itheima.test;
+
+public class ArrTest6 {
+    public static void main(String[] args) {
+        int a = 10;
+        int b = 20;
+
+        // 错误解法：
+        //把变量b的值。赋值给了变量a。那么变量a原来的值就被覆盖了
+        a = b;//a = 20 b = 20
+
+        //把变量a的值，赋值给了变量b。
+        b = a;//a = 20 b = 20
+
+        System.out.println(a);//20
+        System.out.println(b);//20 // 这样做显然是不行的
+
+        // 正确做法：
+        //定义一个临时的第三方变量
+        //把变量a的值，赋值给了temp
+        int temp = a;
+        //把变量b的值，赋值给了a。那么变量a原来记录的值就被覆盖了
+        a = b;
+        //就是把变量a原来的值，赋值给了变量b
+        b = temp;
+        System.out.println(a);//20
+        System.out.println(b);//10
+    }
+}
+~~~
+
+需求：定义一个数组，将数组中0索引和最大索引出的值进行交换
+
+```java
+package com.itheima.test;
+
+public class ArrTest7 {
+    public static void main(String[] args) {
+        //1.定义一个数组
+        int[] arr = {1,2,3,4,5};
+        //2.将数组中0索引和最大索引出的值进行交换
+        //也是可以利用第三方变量进行交换
+        int temp = arr[0];
+        arr[0] = arr[4];
+        arr[4] = temp;
+
+        //3.遍历数组
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(arr[i] + " ");
+        }
+    }
+}
+```
+
+需求：定义一个数组，存入1,2,3,4,5。交换首尾索引对应的元素。
+交换前：1,2,3,4,5
+交换后：5,2,3,4,1
+
+~~~java
+package com.itheima.test;
+
+public class ArrTest8 {
+    public static void main(String[] args) {
+        //1.定义数组存储数据
+        int[] arr = {1,2,3,4,5};
+        //2.利用循环去交换数据
+        for(int i = 0,j = arr.length - 1; i < j; i++,j--){
+            //交换变量i和变量j指向的元素
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+        //当循环结束之后，那么数组中的数据就实现了头尾交换
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(arr[i] + " ");
+        }
+    }
+}
+~~~
+
+
+
+---
+
+# 61.数组练习4：打乱数据
+
+
+
+~~~java
+package com.itheima.test;
+
+import java.util.Random;
+
+public class ArrTest9 {
+    public static void main(String[] args) {
+        //需求：定义一个数组，存入1~5。要求打乱数组中所有数据的顺序。
+        //难点：
+        //如何获取数组中的随机索引
+       /* int[] arr = {1,2,3,4,5};
+        //索引范围：0 1 2 3 4
+        Random r = new Random();
+        int randomIndex = r.nextInt(arr.length);
+        System.out.println(randomIndex);*/
+
+
+        //1.定义数组存储1~5
+        int[] arr = {1, 2, 3, 4, 5};
+        //2.循环遍历数组，从0索引开始打乱数据的顺序
+        Random r = new Random();
+        for (int i = 0; i < arr.length; i++) {
+            //生成一个随机索引
+            int randomIndex = r.nextInt(arr.length);
+            //拿着随机索引指向的元素 跟 i 指向的元素进行交换
+            int temp = arr[i];
+            arr[i] = arr[randomIndex];
+            arr[randomIndex] = temp;
+        }
+        //当循环结束之后，那么数组中所有的数据已经打乱顺序了
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(arr[i] + " ");
+        }
+
+
+    }
+}
+~~~
+
+
+
+
+
+
+
+
+
+----
+
+# 62.数组的内存图
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
