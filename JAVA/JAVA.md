@@ -7498,7 +7498,6 @@ public class Test1 {
 
     }
 
-
     //1.我要干嘛？求长方形的周长
     //2.我干这件事情，需要什么才能完成？长 宽
     public static void getLength(double len, double width){
@@ -9346,6 +9345,966 @@ public static void main(String[] args) {
 ----
 
 # 81.面向对象介绍
+
+## 一、引入
+
+面向对象就是写程序的套路，从字面意思来理解。
+
+- 面向：拿、找
+- 对象：能干活的东西
+- 面向对象编程：拿东西过来做对应的事情
+
+例如，之前我们要获取随机数的时候，我们找的就是 `Random` 来解决的。当我们要在控制台上输出内容的时候，就找了 `System` 来解决。当我们要获取键盘输入的数据的时候，就找了 `Scanner` 来解决。
+
+在这个代码中我们要做对应的事情，都是找对应的东西来解决的。这种找东西来解决的思路就叫做面向对象编程。
+
+![image-20240404193724864](./assets/image-20240404193724864.png)
+
+----
+
+## 二、为什么Java会采取面向对象这种方式来编程？
+
+其实它跟我们现实当中采取的套路是一模一样的。
+
+在现实生活中，我们会找一个洗衣机来帮我们做这件事情；如果我们要扫地，就会找一个扫地机器人帮我们做；如果我们要跟女朋友聊天，也是通过手机来做这件事的。
+
+![image-20240404194509344](./assets/image-20240404194509344.png)
+
+在生活中想干什么，都是找一个个东西来解决的。我们在程序中想干什么，也是找一个个东西来解决的，那有没有觉得，这种方式更符合人类思维习惯，编程更简单，更好理解。
+
+----
+
+## 三、面向对象重点学习什么？
+
+**1、学习获取已有对象并使用**
+
+例如之前获取随机数的 `Random`，键盘录入的 `Scanner`。
+
+<img src="./assets/image-20240404194704356.png" alt="image-20240404194704356" style="zoom:67%;" />
+
+**2、学习如何自己设计对象并使用**
+
+如果要解决的东西是没有已有的东西帮你做的，此时就需要自己设计东西来解决了。
+
+
+
+---
+
+# 82.类和对象
+
+## 一、引入
+
+对象就是一个又一个能帮助我们解决问题的东西，但是这些东西都不是凭空出现的，在我们造对象的时候是需要根据设计图才能造出来的。在Java中的设计图其实就叫做 `类`。
+
+类（设计图）：是对象共同特征的描述。
+
+对象：是真实存在的具体实例。
+
+在Java中，必须先设计类，才能获得对象。例如我们定义一个Phone类，它就表示是一个手机的设计图。它里面暂时写什么我们不管，但是可以通过new关键字就可以获取到一部真正的手机。
+
+![image-20240404200200698](./assets/image-20240404200200698.png)
+
+----
+
+## 二、如何定义类
+
+~~~java
+public class 类名 {
+    1、成员变量（代表属性，一般是名词）
+    2、成员方法（代表行为，一般是动词）
+    3、构造器
+    4、代码块
+    5、内部类
+}
+~~~
+
+* 属性：在类中通过成员变量来体现（类中方法外的变量）
+
+  例如手机的品牌、价格、颜色。
+
+* 行为：在类中通过成员方法来体现（和前面的方法相比去掉static关键字即可）
+
+  例如手机能打电话、发短信、玩游戏等等。
+
+类的定义步骤：
+
+① 定义类，类名使用大驼峰命名
+
+② 编写类的成员变量。要注意的是，类是表示手机这类事务，并不表示一部真正的手机，所以这里的变量只定义，不给值。
+
+③ 编写类的成员方法
+
+```java
+public class 类名 {
+	// 成员变量
+	变量1的数据类型 变量1；
+	变量2的数据类型 变量2;
+	…
+	// 成员方法
+	方法1;
+	方法2;	
+}
+```
+
+示例代码：
+
+```java
+/*
+    手机类：
+        类名：
+        手机(Phone)
+
+        成员变量：
+        品牌(brand)
+        价格(price)
+
+        成员方法：
+        打电话(call)
+        发短信(sendMessage)
+ */
+public class Phone {
+    //成员变量
+    String brand;
+    int price;
+
+    //成员方法
+    public void call() {
+        System.out.println("打电话");
+    }
+
+    public void sendMessage() {
+        System.out.println("发短信");
+    }
+}
+```
+
+----
+
+## 三、对象的使用
+
+创建对象的格式：`类名 对象名 = new 类名();`
+
+调用成员的格式：
+
+* 对象名.成员变量
+* 对象名.成员方法();
+
+编写Phone类
+
+```java
+package com.itheima.test1;
+
+public class Phone {
+
+    //属性
+    String brand;
+    double price;
+
+
+    //行为：
+    public void call(){
+        System.out.println("手机在打电话");
+    }
+
+    public void playGame(){
+        System.out.println("手机在玩游戏");
+    }
+}
+```
+
+创建Phone对象
+
+~~~java
+package com.itheima.test1;
+
+public class PhoneTest {
+    public static void main(String[] args) {
+        //创建手机的对象
+        Phone p = new Phone();
+
+        //叫做给手机赋值
+        p.brand = "小米";
+        p.price = 1999.98;
+
+        //获取手机对象中的值
+        System.out.println(p.brand);
+        System.out.println(p.price);
+
+
+        //调用手机中的方法即可
+        p.call();
+        p.playGame();
+
+        // 创建第2部手机
+        Phone p2 = new Phone();
+        p2.brand = "苹果";
+        p2.price = 8999;
+
+        p2.call();
+        p2.playGame();
+    }
+}
+~~~
+
+---
+
+## 四、定义类的补充注意事项
+
+### 1）Javabean类
+
+- 用来描述一类事物的类，专业叫做：Javabean类。
+
+  在Javabean类中，是不写main方法的。
+
+- 在以前我们写的类是编写main方法的，这样的类我们会称做：测试类。
+
+  我们可以在测试类中创建javabean类的对象并进行赋值调用。
+
+Javabean类中，我们是可以编写属性跟行为去描述一类事务的。其中属性是由成员变量的形式体现的，而行为是由成员方法的形式体现的。
+
+例如我们可以定义一个Student类来描述学生这类群体，学生会有很多属性，例如姓名、身高......行为就是学习和睡觉，我们可以定义两个方法来进行表示。在编写这个类的时候会有以下注意点：
+
+- **类名首字母建议大写、英文、有意义，需要见名知意，大驼峰命名，满足标识符固定。**
+
+- **一个Java文件中可以定义多个class类，且只能一个类是public修饰的，而且public修饰的类名必须成为代码文件名。**
+
+  但由于在一个Java文件中写多个类一般没什么实际的意义，所以实际开发中建议还是一个文件定义一个class类。
+
+- **成员变量的完整定义格式是：`修饰符 数据类型 变量名称 = 初始化值`，在代码中一般只定义，不给值，存在默认值。**
+
+  这是因为Student类并不是特指某一个具体的学生，Student这个类只是用来描述学生这个群体的，而每个学生的姓名、身高都是不一样的，所以在这里我们一般都是只定义，不给值的。如果强行赋值 `String name = "张三";`，代码的语法也没有错，但是它就表示所有的人都叫做张三了。
+
+  **因此我们赋值并不是在类中赋值，而是当创建了对象之后，才可以赋值**，因为我创建的对象才可以表示某个特定的学生，因此在这里我就可以给这个特定的学生赋它的姓名、身高等等。
+
+  这是因为右边创建出的对象才表示某个特定的学生，因此在这里我们就可以对这个特定的学生赋它的身高、姓名等。
+
+  ![image-20240404203751849](./assets/image-20240404203751849.png)
+
+----
+
+### 2）对象的成员变量的默认值规则
+
+| 数据类型 |          明细          | 默认值 |
+| :------: | :--------------------: | :----: |
+| 基本类型 | byte、short、int、long |   0    |
+|          |     float、double      |  0.0   |
+|          |        boolean         | false  |
+| 引用类型 | 类、接口、数组、String |  null  |
+
+----
+
+## 五、练习：女朋友类
+
+编写女朋友类，创建女朋友类的对象。给女朋友的属性赋值并调用女朋友类中的方法。
+
+GirlFriend.java
+
+~~~java
+package com.itheima.test2;
+
+public class GirlFriend {
+    //属性
+    String name;
+    int age;
+    String gender;
+
+    //行为
+    public void sleep(){
+        System.out.println("女朋友在睡觉");
+    }
+
+    public void eat(){
+        System.out.println("女朋友在吃饭");
+    }
+}
+~~~
+
+GirlFriendTest.java
+
+~~~java
+package com.itheima.test2;
+
+public class GirlFriendTest {
+    public static void main(String[] args) {
+        //创建女朋友的对象
+        GirlFriend gf1 = new GirlFriend();
+        gf1.name = "小诗诗";
+        gf1.age = 18;
+        gf1.gender = "萌妹子";
+
+        System.out.println(gf1.name);
+        System.out.println(gf1.age);
+        System.out.println(gf1.gender);
+
+        gf1.eat();
+        gf1.sleep();
+
+
+        System.out.println("===================");
+        // 如果要拥有第二个女朋友
+        GirlFriend gf2 = new GirlFriend();
+        gf2.name = "小丹丹";
+        gf2.age = 19;
+        gf2.gender = "萌妹子";
+
+        System.out.println(gf2.name);
+        System.out.println(gf2.age);
+        System.out.println(gf2.gender);
+
+        gf2.eat();
+        gf2.sleep();
+    }
+}
+~~~
+
+
+
+----
+
+# 83.封装
+
+## 一、引入
+
+如果在一个需求中有多个事物，有的行为不知道归属于哪个类了，该怎么办呢？
+
+例如 `人画圆` ，是把画圆写到人这个类中，还是写到圆这个类中呢？此时就用到了我们现在学习的知识点 —— 封装
+
+<img src="./assets/image-20240404210347113.png" alt="image-20240404210347113" style="zoom:67%;" />
+
+封装是面向对象三大特征之一。
+
+面向对象三大特征：封装、继承、多态。
+
+----
+
+##  二、概念
+
+封装：告诉我们，拿到一个需求之后，该如何正确设计对象的属性和方法。
+
+例如：现在拿到一个需求，要求我们定义一个类描述人。属性有：姓名、年龄。行为有：吃饭、睡觉。
+
+~~~java
+public class Person {
+    //属性
+    String name;
+    int age;
+    
+    public void eat(){
+        System.out.println("吃饭");
+    }
+
+    //行为
+    public void sleep(){
+        System.out.println("睡觉");
+    }
+}
+~~~
+
+但是，在实际开发中需求不会这么简单的，经常会涉及到多个对象。例如：人画圆，请针对这个需求进行面向对象设计。
+
+人画圆涉及到两个对象，定义 `Person` 类代表人，定义 `Circle` 类代表圆。由于画圆是一个行为，我肯定要定义一个 `draw` 方法来进行表示，请问 `draw` 方法我应该设计在人这个对象中，还是应该设计在原这个对象中呢？
+
+![image-20240404212002924](./assets/image-20240404212002924.png)
+
+大部分人在接触到这个问题时会这么想：人画圆，画圆的方法当然是属于人的，但是这个是错误的理解！
+
+人画圆，应该属于圆的方法。
+
+![image-20240404212219033](./assets/image-20240404212219033.png)
+
+如果想要知道为什么，就需要讲到封装思想里一个非常重要的原则：对象代表什么，就得封装对应的数据，并提供数据对应的行为。
+
+结合我们的案例就是：我们既然是定义了一个类来代表圆，肯定会涉及一些属性来封装圆的信息。例如：圆的半径。画圆就需要根据半径来画。应我们刚刚那句话：Circle代表圆，封装了圆的半径，那就得提供和半径相关的画圆方法。因此画圆这个方法当然是属于圆的。
+
+----
+
+## 三、示例：人关门
+
+这个门是人关的，还是门自己关的？答案是自己关的，因为人只是给门一个作用力，然后门就自己把自己关起来了。
+
+因此关门这个方法一定是门的方法，而不是人的。
+
+<img src="./assets/image-20240404212943135.png" alt="image-20240404212943135" style="zoom:50%;" />
+
+~~~java
+public class Door {
+    boolean flag = true; // 门的状态数据
+    
+    public void open() {
+        ...
+    }
+    
+    public void close() {
+        ...
+    }
+}
+~~~
+
+我们也同样用到我们上面的思想来理解这个场景：对象代表什么，就得封装对应的数据，并提供数据对应的行为。
+
+门是开还是关，是门的状态数据，既然门封装了这个数据，那么和这个数据相关的开门、关门的方法就是门这个对象的方法了。
+
+---
+
+## 四、封装的好处
+
+Sun公司为了Java能在市场上胜出，它基本上把我们程序员要干的事情全都提前想好了，并且设计了很多很多对象给我们用。因为比较多，这些东西我们也不会背，Java都会汇总到一个文档当中。这个文档就叫 `JDK-API文档.CHM`。
+
+![image-20240404213812530](./assets/image-20240404213812530.png)
+
+
+
+
+
+### 1.4 学生对象-练习
+
+* 需求：首先定义一个学生类，然后定义一个学生测试类，在学生测试类中通过对象完成成员变量和成员方法的使用
+* 分析：
+  * 成员变量：姓名，年龄…
+  * 成员方法：学习，做作业…
+* 示例代码：
+
+```java
+public class Student {
+    //成员变量
+    String name;
+    int age;
+
+    //成员方法
+    public void study() {
+        System.out.println("好好学习，天天向上");
+    }
+
+    public void doHomework() {
+        System.out.println("键盘敲烂，月薪过万");
+    }
+}
+/*
+    学生测试类
+ */
+public class StudentDemo {
+    public static void main(String[] args) {
+        //创建对象
+        Student s = new Student();
+
+        //使用对象
+        System.out.println(s.name + "," + s.age);
+
+        s.name = "林青霞";
+        s.age = 30;
+
+        System.out.println(s.name + "," + s.age);
+
+        s.study();
+        s.doHomework();
+    }
+}
+```
+
+## 2. 对象内存图
+
+### 2.1 单个对象内存图
+
+* 成员变量使用过程
+
+![1](./assets/1-1712230397809-3.png)
+
+* 成员方法调用过程
+
+![2](./assets/2-1712230397809-4.png)
+
+### 2.2 多个对象内存图
+
+* 成员变量使用过程
+
+![3](./assets/3-1712230397809-5.png)
+
+* 成员方法调用过程
+
+![4](./assets/4-1712230397809-6.png)
+
+* 总结：
+
+  多个对象在堆内存中，都有不同的内存划分，成员变量存储在各自的内存区域中，成员方法多个对象共用的一份
+
+## 3. 成员变量和局部变量
+
+### 3.1 成员变量和局部变量的区别
+
+* 类中位置不同：成员变量（类中方法外）局部变量（方法内部或方法声明上）
+* 内存中位置不同：成员变量（堆内存）局部变量（栈内存）
+* 生命周期不同：成员变量（随着对象的存在而存在，随着对象的消失而消失）局部变量（随着方法的调用而存在，醉着方法的调用完毕而消失）
+* 初始化值不同：成员变量（有默认初始化值）局部变量（没有默认初始化值，必须先定义，赋值才能使用）
+
+## 4. 封装
+
+### 4.1 封装思想
+
+1. 封装概述
+   是面向对象三大特征之一（封装，继承，多态）
+
+   **对象代表什么，就得封装对应的数据，并提供数据对应的行为** 
+
+2. 封装代码实现
+   将类的某些信息隐藏在类内部，不允许外部程序直接访问，而是通过该类提供的方法来实现对隐藏信息的操作和访问
+   成员变量private，提供对应的getXxx()/setXxx()方法
+
+### 4.2 private关键字
+
+private是一个修饰符，可以用来修饰成员（成员变量，成员方法）
+
+* 被private修饰的成员，只能在本类进行访问，针对private修饰的成员变量，如果需要被其他类使用，提供相应的操作
+
+  * 提供“get变量名()”方法，用于获取成员变量的值，方法用public修饰
+  * 提供“set变量名(参数)”方法，用于设置成员变量的值，方法用public修饰
+
+* 示例代码：
+
+  ```java
+  /*
+      学生类
+   */
+  class Student {
+      //成员变量
+      String name;
+      private int age;
+  
+      //提供get/set方法
+      public void setAge(int a) {
+          if(a<0 || a>120) {
+              System.out.println("你给的年龄有误");
+          } else {
+              age = a;
+          }
+      }
+  
+      public int getAge() {
+          return age;
+      }
+  
+      //成员方法
+      public void show() {
+          System.out.println(name + "," + age);
+      }
+  }
+  /*
+      学生测试类
+   */
+  public class StudentDemo {
+      public static void main(String[] args) {
+          //创建对象
+          Student s = new Student();
+          //给成员变量赋值
+          s.name = "林青霞";
+          s.setAge(30);
+          //调用show方法
+          s.show();
+      }
+  }
+  ```
+
+### 4.3 private的使用
+
+* 需求：定义标准的学生类，要求name和age使用private修饰，并提供set和get方法以及便于显示数据的show方法，测试类中创建对象并使用，最终控制台输出  林青霞，30 
+
+* 示例代码：
+
+  ```java
+  /*
+      学生类
+   */
+  class Student {
+      //成员变量
+      private String name;
+      private int age;
+  
+      //get/set方法
+      public void setName(String n) {
+          name = n;
+      }
+  
+      public String getName() {
+          return name;
+      }
+  
+      public void setAge(int a) {
+          age = a;
+      }
+  
+      public int getAge() {
+          return age;
+      }
+  
+      public void show() {
+          System.out.println(name + "," + age);
+      }
+  }
+  /*
+      学生测试类
+   */
+  public class StudentDemo {
+      public static void main(String[] args) {
+          //创建对象
+          Student s = new Student();
+  
+          //使用set方法给成员变量赋值
+          s.setName("林青霞");
+          s.setAge(30);
+  
+          s.show();
+  
+          //使用get方法获取成员变量的值
+          System.out.println(s.getName() + "---" + s.getAge());
+          System.out.println(s.getName() + "," + s.getAge());
+  
+      }
+  }
+  ```
+
+### 4.4 this关键字
+
+* this修饰的变量用于指代成员变量，其主要作用是（区分局部变量和成员变量的重名问题）
+  * 方法的形参如果与成员变量同名，不带this修饰的变量指的是形参，而不是成员变量
+  * 方法的形参没有与成员变量同名，不带this修饰的变量指的是成员变量
+
+```java
+public class Student {
+    private String name;
+    private int age;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void show() {
+        System.out.println(name + "," + age);
+    }
+}
+```
+
+## 5. 构造方法
+
+### 5.1 构造方法概述
+
+构造方法是一种特殊的方法
+
+* 作用：创建对象   Student stu = **new Student();**
+
+* 格式：
+
+  public class 类名{
+
+  ​        修饰符 类名( 参数 ) {
+
+  ​        }
+
+  }
+
+* 功能：主要是完成对象数据的初始化
+
+* 示例代码：
+
+```java
+class Student {
+    private String name;
+    private int age;
+
+    //构造方法
+    public Student() {
+        System.out.println("无参构造方法");
+    }
+
+    public void show() {
+        System.out.println(name + "," + age);
+    }
+}
+/*
+    测试类
+ */
+public class StudentDemo {
+    public static void main(String[] args) {
+        //创建对象
+        Student s = new Student();
+        s.show();
+    }
+}
+```
+
+### 5.2 构造方法的注意事项
+
+* 构造方法的创建
+
+如果没有定义构造方法，系统将给出一个默认的无参数构造方法
+如果定义了构造方法，系统将不再提供默认的构造方法
+
+* 构造方法的重载
+
+如果自定义了带参构造方法，还要使用无参数构造方法，就必须再写一个无参数构造方法
+
+* 推荐的使用方式
+
+无论是否使用，都手工书写无参数构造方法
+
+* 重要功能！
+
+可以使用带参构造，为成员变量进行初始化
+
+* 示例代码
+
+```java
+/*
+    学生类
+ */
+class Student {
+    private String name;
+    private int age;
+
+    public Student() {}
+
+    public Student(String name) {
+        this.name = name;
+    }
+
+    public Student(int age) {
+        this.age = age;
+    }
+
+    public Student(String name,int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public void show() {
+        System.out.println(name + "," + age);
+    }
+}
+/*
+    测试类
+ */
+public class StudentDemo {
+    public static void main(String[] args) {
+        //创建对象
+        Student s1 = new Student();
+        s1.show();
+
+        //public Student(String name)
+        Student s2 = new Student("林青霞");
+        s2.show();
+
+        //public Student(int age)
+        Student s3 = new Student(30);
+        s3.show();
+
+        //public Student(String name,int age)
+        Student s4 = new Student("林青霞",30);
+        s4.show();
+    }
+}
+```
+
+### 5.3 标准类制作
+
+① 类名需要见名知意
+
+② 成员变量使用private修饰
+
+③ 提供至少两个构造方法 
+
+* 无参构造方法
+* 带全部参数的构造方法
+
+④ get和set方法 
+
+​	提供每一个成员变量对应的setXxx()/getXxx()
+
+⑤ 如果还有其他行为，也需要写上
+
+### 5.4 练习1
+
+需求：
+
+​	定义标准学生类，要求分别使用空参和有参构造方法创建对象，空参创建的对象通过setXxx赋值，有参创建的对象直接赋值，并通过show方法展示数据。 
+
+* 示例代码：
+
+```java
+class Student {
+    //成员变量
+    private String name;
+    private int age;
+
+    //构造方法
+    public Student() {
+    }
+
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    //成员方法
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void show() {
+        System.out.println(name + "," + age);
+    }
+}
+/*
+    创建对象并为其成员变量赋值的两种方式
+        1:无参构造方法创建对象后使用setXxx()赋值
+        2:使用带参构造方法直接创建带有属性值的对象
+*/
+public class StudentDemo {
+    public static void main(String[] args) {
+        //无参构造方法创建对象后使用setXxx()赋值
+        Student s1 = new Student();
+        s1.setName("林青霞");
+        s1.setAge(30);
+        s1.show();
+
+        //使用带参构造方法直接创建带有属性值的对象
+        Student s2 = new Student("林青霞",30);
+        s2.show();
+    }
+}
+```
+
+### 5.4 练习2
+
+![111](./assets/111-1712230397809-7.jpg)
+
+```java
+public class User {
+    //1.私有化全部的成员变量
+    //2.空参构造
+    //3.带全部参数的构造
+    //4.针对于每一个私有化的成员变量都要提供其对应的get和set方法
+    //5.如果当前事物还有其他行为，那么也要写出来，比如学生的吃饭，睡觉等行为
+
+    private String username;//用户名
+    private String password;//密码
+    private String email;//邮箱
+    private char gender;//性别
+    private int age;//年龄
+
+    //空参构造方法
+    public User() {
+    }
+
+    //带全部参数的构造
+    public User(String username, String password, String email, char gender, int age) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.gender = gender;
+        this.age = age;
+    }
+
+    //get和set
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public char getGender() {
+        return gender;
+    }
+
+    public void setGender(char gender) {
+        this.gender = gender;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public void eat(){
+        System.out.println(username + "在吃饭");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        //写一个标准的javabean类
+        //咱们在课后只要能把这个标准的javabean能自己写出来，那么就表示今天的知识点就ok了
+
+
+        //利用空参构造创建对象
+        User u1 = new User();
+        //如果利用空参创建对象，还想赋值只能用set方法赋值
+        u1.setUsername("zhangsan");
+        u1.setPassword("1234qwer");
+        u1.setEmail("itheima@itcast.cn");
+        u1.setGender('男');
+        u1.setAge(23);
+        //获取属性的值并打印
+        System.out.println(u1.getUsername() + ", " + u1.getPassword()
+                + ", " + u1.getEmail() + ", " + u1.getGender() + ", " + u1.getAge());
+        u1.eat();
+
+        System.out.println("=============================");
+
+        //简单的办法
+        //利用带全部参数的构造来创建对象
+        //快捷键:ctrl + p
+        User u2 = new User("lisi","12345678","lisi@itcast.cn",'女',24);
+        System.out.println(u2.getUsername() + ", " + u2.getPassword()
+                + ", " + u2.getEmail() + ", " + u2.getGender() + ", " + u2.getAge());
+        u2.eat();
+    }
+}
+
+```
 
 
 
