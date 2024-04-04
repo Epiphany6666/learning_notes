@@ -7236,685 +7236,831 @@ main方法中的两条代码是一起执行的，它并不能拆开，所以说�
 
 ## 三、实际开发中方法的应用场景
 
-例如植物大战僵尸，在这个游戏中，很多植物都是可以发子弹的。
+例如植物大战僵尸，在这个游戏中，很多植物都是可以发子弹的。假设有个程序员在编写代码，第一个豌豆植物，发射子弹的代码写了20行。然后第二个植物寒冰射手，发射子弹的代码也写了20行，此时已经写了40行代码了。现在又出现了第三个植物，大头菜，想让它发射子弹还需要写20行代码。
+
+<img src="./assets/image-20240404091346825.png" alt="image-20240404091346825" style="zoom:50%;" />
+
+注意到，只要发射子弹，就需要写20行代码，这样代码的重复度太高。
+
+一般我们会把相同的代码进行打包，把发射炮弹的二十行代码进行打包。如果当前的植物有发射的功能，此时重复的代码就不需要再写一遍了，直接去调用就可以了。假如此时又来了第四个植物，它也是有发射炮弹功能的，同样的重复代码也不需要再写，直接再次调用就行了。
+
+<img src="./assets/image-20240404091614329.png" alt="image-20240404091614329" style="zoom:50%;" />
+
+并且在以后，就算代码有问题，我们也只需要修改方法里面的代码，调用方法的地方是不需要修改的。
+
+----
+
+## 四、总结
+
+**1、什么是方法？**
+
+方法是程序中最小的执行单元。
+
+**2、实际开发中，什么时候用到方法？**
+
+重复的代码、具有独立功能的代码可以抽取到方法中。
+
+**3、方法的好处**
+
+- 提高代码的复用性
+- 提高代码的可维护性
 
 
 
+----
 
+# 64.最简单的方法定义和调用
 
-注意：
+## 一、概念
 
-* 方法必须先创建才可以使用，该过程成为方法定义
-* 方法创建后并不是直接可以运行的，需要手动使用后，才执行，该过程成为方法调用
+方法就是把一些代码打包在一起，用到的时候就调用。
 
-## 2. 方法的定义和调用
+**方法定义**：把一些代码打包在一起，该过程称为方法定义。
 
-### 2.1 无参数方法定义和调用
+**方法调用**：方法定义后并不是直接运行的，需要手动调用才能执行，该过程称为方法调用。
 
-* 定义格式：
+----
 
-  ```java
-  public static void 方法名 (   ) {
-  	// 方法体;
-  }
-  ```
+## 二、方法的定义格式
 
-* 范例：
+方法的定义是写在main方法外面，类的里面
 
-  ```java
-  public static void method (    ) {
-  	// 方法体;
-  }
-  ```
+~~~java
+public static 返回值类型 方法名（参数） {
+    方法体;
+    return 返回值;
+}
+~~~
 
-* 调用格式：
+方法的定义格式只有一种，但是这种格式相对来讲比较复杂，所以为了让大家更好的吸收，我们会把这种格式拆成三部分，还有各自的调用方式，由浅入深的进行学习。
 
-  ```java
-  方法名();
-  ```
+<img src="./assets/image-20240404092735460.png" alt="image-20240404092735460" style="zoom:50%;" />
 
-* 范例：
+----
 
-  ```java
-  method();
-  ```
+## 三、最简单的方法定义格式
 
-* 注意：
+将打包起来的代码放入一个方法里，打包起来的整体我们称之为方法体。
 
-  ​	方法必须先定义，后调用，否则程序将报错
+在起方法名的时候要见名知意，遵循小驼峰命名。
 
-### 2.3 无参数方法的练习
-
-* 需求：设计一个方法用于打印两个数中的较大数 
-* 思路：
-  * ①定义一个方法，用于打印两个数字中的较大数，例如getMax() 
-  * ②方法中定义两个变量，用于保存两个数字 
-  * ③使用分支语句分两种情况对两个数字的大小关系进行处理 
-  * ④在main()方法中调用定义好的方法 
-* 代码：
+定义格式：
 
 ```java
-public class MethodTest {
+public static void 方法名 (   ) {
+	// 方法体;
+}
+```
+
+范例：
+
+```java
+public static void playGame (    ) {
+	// 方法体;
+}
+```
+
+调用格式：
+
+```java
+方法名();
+```
+
+范例：
+
+```java
+playGame();
+```
+
+注意：方法必须先定义，后调用，否则程序将报错
+
+<img src="./assets/image-20240404093048196.png" alt="image-20240404093048196" style="zoom:67%;" />
+
+----
+
+## 四、无参数方法的练习
+
+### 1）展示女朋友的信息
+
+需求：定义一个方法，在方法内部打印你女朋友的所有信息。
+
+~~~java
+package com.itheima.methoddemo;
+
+public class MethodDemo2 {
     public static void main(String[] args) {
-        //在main()方法中调用定义好的方法
-        getMax();
+        //目标：利用方法最简单的格式完成当前练习
+
+        //调用方法
+        printGFInfo();
+
     }
 
-    //定义一个方法，用于打印两个数字中的较大数，例如getMax()
-    public static void getMax() {
-        //方法中定义两个变量，用于保存两个数字
-        int a = 10;
-        int b = 20;
+    public static void printGFInfo(){
+        System.out.println("小惠惠");
+        System.out.println("萌妹子");
+        System.out.println("18岁");
+    }
+}
+~~~
 
-        //使用分支语句分两种情况对两个数字的大小关系进行处理
-        if(a > b) {
-            System.out.println(a);
-        } else {
-            System.out.println(b);
-        }
+----
+
+### 2）看代码说结果
+
+目标：能说出方法调用时的执行过程。
+
+程序在刚开始运行的时候肯定是从main方法的第一行代码开始运行的，所以首先打印a。
+
+![image-20240404094646429](./assets/image-20240404094646429.png)
+
+然后 method() 方法开始调用了，此时就需要进入到方法里面
+
+![image-20240404100342363](./assets/image-20240404100342363.png)
+
+执行完方法后，就需要回到调用处，继续往下执行，打印b。
+
+![image-20240404100431455](./assets/image-20240404100431455.png)
+
+
+
+----
+
+# 65.带参数方法定义和调用
+
+## 一、引入
+
+当方法要计算的数据不明确的时候，就可以把参数定义在小括号中，在调用方法的时候根据实际情况来传入不同的值。
+
+小括号中有几个，在调用的时候就必须传几个。多一个少一个都是不行的，它的个数和数据类型都要对应起来。
+
+<img src="./assets/image-20240404100959332.png" alt="image-20240404100959332" style="zoom:50%;" />
+
+----
+
+## 二、带参数方法定义和调用
+
+定义格式：
+
+参数：由数据类型和变量名组成 -  数据类型 变量名
+
+参数范例：int a
+
+```java
+public static void 方法名 (参数1) {
+	方法体;
+}
+
+public static void 方法名 (参数1, 参数2, 参数3...) {
+	方法体;
+}
+```
+
+范例：
+
+```java
+public static void isEvenNumber(int number){
+    ...
+}
+public static void getMax(int num1, int num2){
+    ...
+}
+```
+
+调用格式：
+
+```java
+方法名(参数)；
+
+方法名(参数1,参数2);
+```
+
+范例：
+
+```java
+isEvenNumber(10);
+
+getMax(10,20);
+```
+
+注意：方法调用时，参数的数量与类型必须与方法定义中小括号里面的变量一一对应，否则程序将报错。
+
+----
+
+## 三、代码示例
+
+~~~java
+package com.itheima.methoddemo;
+
+public class MethodDemo4 {
+    public static void main(String[] args) {
+        //目标：掌握带参数方法定义的格式和调用的格式
+
+        getSum(10,20);
+    }
+
+    public static void getSum(int num1, int num2){
+        int result = num1 + num2;
+        System.out.println(result);
+    }
+}
+~~~
+
+----
+
+## 四、形参和实参
+
+刚刚，我们将方法调用时里的值会叫做参数。下面方法定义时，小括号里写的，也会叫做参数。
+
+![image-20240404101857696](./assets/image-20240404101857696.png)	![image-20240404101908152](./assets/image-20240404101908152.png)
+
+这两个重复了，肯定不行，所以我们需要将它们俩分开，一个叫形参，另一个叫实参。
+
+**形参**：方法定义中的参数。等同于变量定义格式，例如：int number
+
+**实参**：方法调用中的参数。等同于使用变量或常量，例如： 10  number
+
+例如我们刚刚的注意就可以简化了：方法调用时，形参和实参必须一一对应，否则程序将报错。
+
+----
+
+## 五、带参数方法练习
+
+需求：定义一个方法，求长方形的周长，将结果在方法中进行打印。
+
+```java
+package com.itheima.test;
+
+public class Test1 {
+    public static void main(String[] args) {
+        //目标：根据不同的需求，选择定义无参的方法，还是带参数的方法
+        getLength(5.2,1.3);
+
+    }
+
+
+    //1.我要干嘛？求长方形的周长
+    //2.我干这件事情，需要什么才能完成？长 宽
+    public static void getLength(double len, double width){
+        double result = (len + width) * 2;
+        System.out.println(result);
     }
 }
 ```
 
-## 3. 带参数方法定义和调用
+----
 
-### 3.1 带参数方法定义和调用
+需求：定义一个方法，求圆的面积，将结果在方法中进行打印。
 
-* 定义格式：
+~~~java
+package com.itheima.test;
 
-  参数：由数据类型和变量名组成 -  数据类型 变量名
+public class Test2 {
+    public static void main(String[] args) {
+        //目标：根据不同的需求，选择定义无参的方法，还是带参数的方法
 
-  参数范例：int a
+        getArea(1.5);
+    }
 
-  ```java
-  public static void 方法名 (参数1) {
-  	方法体;
-  }
-  
-  public static void 方法名 (参数1, 参数2, 参数3...) {
-  	方法体;
-  }
-  ```
+    //1.我要干嘛？求圆的面积
+    //2.我干这件事情，需要什么才能完成？ 半径的平方
+    public static void getArea(double radius){
+        double result = radius * radius * 3.14;
+        System.out.println(result);
+    }
 
-* 范例：
+}
+~~~
 
-  ```java
-  public static void isEvenNumber(int number){
-      ...
-  }
-  public static void getMax(int num1, int num2){
-      ...
-  }
-  ```
 
-  * 注意：
 
-    	方法定义时，参数中的数据类型与变量名都不能缺少，缺少任意一个程序将报错
-    	
-    	方法定义时，多个参数之间使用逗号( ，)分隔
+-----
 
-* 调用格式：
+# 66.带返回值方法的定义和调用
 
-  ```java
-  方法名(参数)；
-  
-  方法名(参数1,参数2);
-  ```
+## 一、引入
 
-* 范例：
+方法的返回值就是方法的最终运行结果。
 
-  ```java
-  isEvenNumber(10);
-  
-  getMax(10,20);
-  ```
+调用处拿到方法的结果后，才能根据结果进行下一步操作。
 
-  * 方法调用时，参数的数量与类型必须与方法定义中的设置相匹配，否则程序将报错 
+- 如果在调用处要根据方法的结果，去编写另外一段代码逻辑。
+- 为了在调用处拿到方法产生的结果，就需要定义带有返回值的方法。
 
-### 3.2 形参和实参
+---
 
-1. 形参：方法定义中的参数
+## 二、定义格式
 
-​          等同于变量定义格式，例如：int number
-
-2. 实参：方法调用中的参数
-
-​          等同于使用变量或常量，例如： 10  number
-
-### 3.3 带参数方法练习
-
-* 需求：设计一个方法用于打印两个数中的较大数，数据来自于方法参数 }
-* 思路：
-  * ①定义一个方法，用于打印两个数字中的较大数，例如getMax() 
-  * ②为方法定义两个参数，用于接收两个数字 
-  * ③使用分支语句分两种情况对两个数字的大小关系进行处理 
-  * ④在main()方法中调用定义好的方法（使用常量）
-  * ⑤在main()方法中调用定义好的方法（使用变量） 
-* 代码：
+定义格式
 
 ```java
-public class MethodTest {
-    public static void main(String[] args) {
-        //在main()方法中调用定义好的方法（使用常量）
-        getMax(10,20);
-        //调用方法的时候，人家要几个，你就给几个，人家要什么类型的，你就给什么类型的
-        //getMax(30);
-        //getMax(10.0,20.0);
-
-        //在main()方法中调用定义好的方法（使用变量）
-        int a = 10;
-        int b = 20;
-        getMax(a, b);
-    }
-
-    //定义一个方法，用于打印两个数字中的较大数，例如getMax()
-    //为方法定义两个参数，用于接收两个数字
-    public static void getMax(int a, int b) {
-        //使用分支语句分两种情况对两个数字的大小关系进行处理
-        if(a > b) {
-            System.out.println(a);
-        } else {
-            System.out.println(b);
-        }
-    }
+public static 数据类型 方法名 ( 参数 ) { 
+	return 数据 ;
 }
 ```
 
-## 4. 带返回值方法的定义和调用
-
-### 4.1 带返回值方法定义和调用
-
-* 定义格式
-
-  ```java
-  public static 数据类型 方法名 ( 参数 ) { 
-  	return 数据 ;
-  }
-  ```
-
-* 范例
-
-  ```java
-  public static boolean isEvenNumber( int number ) {           
-  	return true ;
-  }
-  public static int getMax( int a, int b ) {
-  	return  100 ;
-  }
-  ```
-
-  * 注意：
-    * 方法定义时return后面的返回值与方法定义上的数据类型要匹配，否则程序将报错
-
-* 调用格式
-
-  ```java
-  方法名 ( 参数 ) ;
-  数据类型 变量名 = 方法名 ( 参数 ) ;
-  ```
-
-* 范例
-
-  ```java
-  isEvenNumber ( 5 ) ;
-  boolean  flag =  isEvenNumber ( 5 ); 
-  ```
-
-  * 注意：
-    * 方法的返回值通常会使用变量接收，否则该返回值将无意义
-
-### 4.2 带返回值方法练习1
-
-* 需求：设计一个方法可以获取两个数的较大值，数据来自于参数
-
-* 思路：
-
-  * ①定义一个方法，用于获取两个数字中的较大数 
-  * ②使用分支语句分两种情况对两个数字的大小关系进行处理 
-  * ③根据题设分别设置两种情况下对应的返回结果 
-  * ④在main()方法中调用定义好的方法并使用变量保存 
-  * ⑤在main()方法中调用定义好的方法并直接打印结果 
-
-* 代码：
-
-  ```java
-  public class MethodTest {
-      public static void main(String[] args) {
-          //在main()方法中调用定义好的方法并使用变量保存
-          int result = getMax(10,20);
-          System.out.println(result);
-  
-          //在main()方法中调用定义好的方法并直接打印结果
-          System.out.println(getMax(10,20));
-      }
-  
-      //定义一个方法，用于获取两个数字中的较大数
-      public static int getMax(int a, int b) {
-          //使用分支语句分两种情况对两个数字的大小关系进行处理
-          //根据题设分别设置两种情况下对应的返回结果
-          if(a > b) {
-              return a;
-          } else {
-              return b;
-          }
-      }
-  }
-  ```
-
-### 4.3 带返回值方法练习2
-
-需求：
-
-​	定义一个方法，求一家商场每个季度的营业额。根据方法结果再计算出全年营业额。
-
-代码示例：
+范例
 
 ```java
-package com.itheima.demo;
+public static boolean isEvenNumber( int number ) {           
+	return true ;
+}
+public static int getMax( int a, int b ) {
+	return  100 ;
+}
+```
 
-public class MethodDemo9 {
+注意：方法定义时return后面的返回值与方法定义上的数据类型要匹配，否则程序将报错
+
+调用格式
+
+```java
+// 1.直接调用
+方法名 ( 参数 ) ; // 表示对返回值不做任何处理
+// 2.赋值调用
+数据类型 变量名 = 方法名 ( 参数 ) ; // 表示把方法运行的结果赋值给左边的变量
+// 3.输出调用
+System.out.println(方法名 (实参)); // 将方法的返回结果直接进行输出
+```
+
+范例
+
+```java
+isEvenNumber ( 5 ) ;
+boolean  flag =  isEvenNumber ( 5 ); 
+```
+
+注意：方法的返回值通常会使用变量接收，否则该返回值将无意义
+
+----
+
+## 三、练习：人肉计算机
+
+需求：定义一个方法，求一家商场每个季度的营业额。根据方法结果再算出全年营业额。
+
+~~~java
+package com.itheima.methoddemo;
+
+public class MethodDemo5 {
     public static void main(String[] args) {
-        /*需求：定义一个方法，求一家商场每个季度的营业额。
-        根据方法结果再计算出全年营业额。*/
-        int sum1 = getSum(10, 20, 30);
-        int sum2 = getSum(10, 20, 30);
-        int sum3 = getSum(10, 20, 30);
-        int sum4 = getSum(10, 20, 30);
+        //目标：掌握带返回值方法的定义和调用格式
 
+        //直接调用，一般会用在没有返回值的方法中
+        //getSum(10,20,30);
+
+        //赋值调用，这个是
+        //int sum = getSum(10,20,30);
+        //System.out.println(sum);
+
+        //输出调用
+        //System.out.println(getSum(10,20,30));
+
+
+        //先计算第一个季度的营业额
+        int sum1 = getSum(10,20,30);
+        //再来计算第二个季度的营业额
+        int sum2 = getSum(20,30,40);
+        //计算第三个季度的营业额
+        int sum3 = getSum(20,30,40);
+        //计算第四个季度的营业额
+        int sum4 = getSum(20,30,40);
+
+        //求全年的总营业额
         int sum = sum1 + sum2 + sum3 + sum4;
-        System.out.println(sum);
 
+        System.out.println(sum);
     }
 
-    //心得：
-    //1.我要干嘛？  决定了方法体   每个季度的营业额
-    //2.我干这件事情，需要什么才能完成？ 决定了形参 需要三个月的营业额 a b c
-    //3.我干完这件事情，看调用处是否需要使用方法的结果。   决定了返回值
-    //如果需要使用，那么必须返回
-    //如果不需要使用，可以返回也可以不返回
-    public static int getSum(int month1,int month2,int month3){
-        int sum = month1 + month2 + month3;
-        //因为方法的调用处，需要继续使用这个结果
-        //所以我们必须要把sum返回
-        return sum;
+    public static int getSum(int num1,int num2,int num3){
+        int result = num1 + num2 + num3;
+        return result;//返回给方法的调用处
     }
 }
+~~~
 
-```
+----
 
-### 4.4 带返回值方法练习3
+## 四、练习：比较两个长方形的面积
 
-需求：
+需求：定义方法，比较两个长方形的面积
 
-​	键盘录入两个圆的半径（整数），比较两个圆的面积。
+~~~java
+package com.itheima.test;
 
-代码示例：
-
-```java
-import java.util.Scanner;
-
-public class MethodDemo10 {
+public class Test3 {
     public static void main(String[] args) {
-        //需求：键盘录入两个圆的半径（整数），比较两个圆的面积。
-        //键盘录入圆的半径
-        Scanner sc = new Scanner(System.in);
-        System.out.println("请输入圆的半径");
-        int radii1 = sc.nextInt();
+        //目标：要能区分出什么时候使用带返回值的方法
 
-        System.out.println("请输入第二个圆的半径");
-        int radii2 = sc.nextInt();
-        double area1 = getArea(radii1);
-        double area2 = getArea(radii2);
+        //调用方法获取长方形的面积，再进行比较
+        double area1 = getArea(5.3, 1.7);
+        double area2 = getArea(2.4, 2.7);
+
         if(area1 > area2){
-            System.out.println("第一个圆更大");
+            System.out.println("第一个长方形更大");
         }else{
-            System.out.println("第二个圆更大");
+            System.out.println("第二个长方形更大");
         }
     }
 
-    //心得：
-    //1.我要干嘛？   求圆的面积
-    //2.我干这件事情，需要什么才能完成？        半径
-    //3.方法的调用处，是否需要继续使用方法的结果    要比较
-    public static double getArea(int radii) {
-        double area = 3.14 * radii * radii;
+
+    //1.我要干嘛？比较两个长方形的面积
+    //2.需要什么？两个长 两个宽
+/*    public static void compare(double len1, double width1, double len2, double width2){
+        double area1 = len1 * width1;
+        double area2 = len2 * width2;
+
+        if(area1 > area2){
+            System.out.println("第一个长方形更大");
+        }else{
+            System.out.println("第二个长方形更大");
+        }
+    }*/
+    
+    
+    //在以后实际开发当中，我们一般是把重复的代码或者具有独立功能的代码抽取到方法当中。
+    //以后我们直接调用就可以了
+    //定义一个方法求长方形的面积
+    //1.我要干嘛？求长方形的面积
+    //2.需要什么？长 和 宽
+    //3.方法的调用处，是否需要继续使用方法的结果。
+    //如果要用，那么方法必须有返回值
+    //如果不要用，方法可以写返回值，也可以不写返回值。
+    public static double getArea(double len, double width){
+        double area = len * width;
         return area;
     }
 }
-```
+~~~
 
-## 5. 方法的注意事项
 
-### 5.1 方法的注意事项
 
-* 方法不能嵌套定义
+----
 
-  * 示例代码：
+# 67.方法的小结
 
-    ```java
-    public class MethodDemo {
-        public static void main(String[] args) {
-    
-        }
-    
-        public static void methodOne() {
-    		public static void methodTwo() {
-           		// 这里会引发编译错误!!!
-        	}
-        }
-    }
-    ```
+## 一、方法的完整写法
 
-* void表示无返回值，可以省略return，也可以单独的书写return，后面不加数据
-
-  * 示例代码：
-
-    ```java
-    public class MethodDemo {
-        public static void main(String[] args) {
-    
-        }
-        public static void methodTwo() {
-            //return 100; 编译错误，因为没有具体返回值类型
-            return;	
-            //System.out.println(100); return语句后面不能跟数据或代码
-        }
-    }
-    ```
-
-### 5.2 方法的通用格式
-
-* 格式：
-
-  ```java
-  public static 返回值类型 方法名(参数) {
-     方法体; 
-     return 数据 ;
-  }
-  ```
-
-* 解释：
-
-  * public static 	修饰符，目前先记住这个格式
-
-    返回值类型	方法操作完毕之后返回的数据的数据类型
-
-    ​			如果方法操作完毕，没有数据返回，这里写void，而且方法体中一般不写return
-
-     方法名		调用方法时候使用的标识
-
-     参数		由数据类型和变量名组成，多个参数之间用逗号隔开
-
-     方法体		完成功能的代码块
-
-     return		如果方法操作完毕，有数据返回，用于把数据返回给调用者
-
-* 定义方法时，要做到两个明确
-
-  * 明确返回值类型：主要是明确方法操作完毕之后是否有数据返回，如果没有，写void；如果有，写对应的数据类型
-  * 明确参数：主要是明确参数的类型和数量
-
-* 调用方法时的注意：
-
-  * void类型的方法，直接调用即可
-  * 非void类型的方法，推荐用变量接收调用
-
-## 6. 方法重载
-
-### 6.1 方法重载
-
-* 方法重载概念
-
-  方法重载指同一个类中定义的多个方法之间的关系，满足下列条件的多个方法相互构成重载
-
-  * 多个方法在同一个类中
-  * 多个方法具有相同的方法名
-  * 多个方法的参数不相同，类型不同或者数量不同
-
-* 注意：
-
-  * 重载仅对应方法的定义，与方法的调用无关，调用方式参照标准格式
-  * 重载仅针对同一个类中方法的名称与参数进行识别，与返回值无关，换句话说不能通过返回值来判定两个方法是否相互构成重载
-
-* 正确范例：
-
-  ```java
-  public class MethodDemo {
-  	public static void fn(int a) {
-      	//方法体
-      }
-      public static int fn(double a) {
-      	//方法体
-      }
-  }
-  
-  public class MethodDemo {
-  	public static float fn(int a) {
-      	//方法体
-      }
-      public static int fn(int a , int b) {
-      	//方法体
-      }
-  }
-  ```
-
-* 错误范例：
-
-  ```java
-  public class MethodDemo {
-  	public static void fn(int a) {
-      	//方法体
-      }
-      public static int fn(int a) { 	/*错误原因：重载与返回值无关*/
-      	//方法体
-      }
-  }
-  
-  public class MethodDemo01 {
-      public static void fn(int a) {
-          //方法体
-      }
-  } 
-  public class MethodDemo02 {
-      public static int fn(double a) { /*错误原因：这是两个类的两个fn方法*/
-          //方法体
-      }
-  }
-  ```
-
-### 6.2 方法重载练习
-
-* 需求：使用方法重载的思想，设计比较两个整数是否相同的方法，兼容全整数类型（byte,short,int,long） 
-
-* 思路：
-
-  * ①定义比较两个数字的是否相同的方法compare()方法，参数选择两个int型参数
-  * ②定义对应的重载方法，变更对应的参数类型，参数变更为两个long型参数
-  * ③定义所有的重载方法，两个byte类型与两个short类型参数 
-  * ④完成方法的调用，测试运行结果 
-
-* 代码：
-
-  ```java
-  public class MethodTest {
-      public static void main(String[] args) {
-          //调用方法
-          System.out.println(compare(10, 20));
-          System.out.println(compare((byte) 10, (byte) 20));
-          System.out.println(compare((short) 10, (short) 20));
-          System.out.println(compare(10L, 20L));
-      }
-  
-      //int
-      public static boolean compare(int a, int b) {
-          System.out.println("int");
-          return a == b;
-      }
-  
-      //byte
-      public static boolean compare(byte a, byte b) {
-          System.out.println("byte");
-          return a == b;
-      }
-  
-      //short
-      public static boolean compare(short a, short b) {
-          System.out.println("short");
-          return a == b;
-      }
-  
-      //long
-      public static boolean compare(long a, long b) {
-          System.out.println("long");
-          return a == b;
-      }
-  
-  }
-  ```
-
-### 7.3 数组遍历
-
-* 需求：设计一个方法用于数组遍历，要求遍历的结果是在一行上的。例如：[11, 22, 33, 44, 55] 
-
-* 思路：
-
-  * ①因为要求结果在一行上输出，所以这里需要在学习一个新的输出语句System.out.print(“内容”);
-
-    System.out.println(“内容”); 输出内容并换行
-
-    System.out.print(“内容”); 输出内容不换行
-
-    System.out.println(); 起到换行的作用
-
-  * ②定义一个数组，用静态初始化完成数组元素初始化
-
-  * ③定义一个方法，用数组遍历通用格式对数组进行遍历
-
-  * ④用新的输出语句修改遍历操作
-
-  * ⑤调用遍历方法
-
-* 代码：
-
-  ```java
-  public class Test1 {
-      public static void main(String[] args) {
-        /*  //先打印数据，再进行换行
-          System.out.println("aaa");
-          //只打印不换行
-          System.out.print("bbb");
-          System.out.print("ddd");
-          //不打印任何内容，只换行
-          System.out.println();
-          System.out.print("cc");*/
-          //设计一个方法用于数组遍历，要求遍历的结果是在一行上的。例如：[11, 22, 33, 44, 55]
-          int[] arr = {1,2,3,4,5};
-          printArr(arr);
-      }
-      //1.我要遍历数组
-      //2.需要什么？  数组
-      //3.调用处是否需要使用方法的结果。
-      public static void printArr(int[] arr){
-          System.out.print("[");
-          for (int i = 0; i < arr.length; i++) {
-              if(i == arr.length - 1){
-                  System.out.println(arr[i] + "]");
-              }else{
-                  System.out.print(arr[i] + ", ");
-              }
-          }
-      }
-  }
-  ```
-
-### 7.4 数组最大值
-
-* 需求：设计一个方法用于获取数组中元素的最大值 
-
-* 思路：
-
-  * ①定义一个数组，用静态初始化完成数组元素初始化
-  * ②定义一个方法，用来获取数组中的最大值，最值的认知和讲解我们在数组中已经讲解过了
-  * ③调用获取最大值方法，用变量接收返回结果
-  * ④把结果输出在控制台
-
-* 代码：
-
-  ```java
-  public class MethodTest02 {
-      public static void main(String[] args) {
-          //定义一个数组，用静态初始化完成数组元素初始化
-          int[] arr = {12, 45, 98, 73, 60};
-  
-          //调用获取最大值方法，用变量接收返回结果
-          int number = getMax(arr);
-  
-          //把结果输出在控制台
-          System.out.println("number:" + number);
-      }
-  
-      //定义一个方法，用来获取数组中的最大值
-      /*
-          两个明确：
-              返回值类型：int
-              参数：int[] arr
-       */
-      public static int getMax(int[] arr) {
-          int max = arr[0];
-  
-          for(int x=1; x<arr.length; x++) {
-              if(arr[x] > max) {
-                  max = arr[x];
-              }
-          }
-          return max;
-      }
-  }
-  ```
-
-### 7.6 获取索引
-
-需求：
-
-​	定义一个方法获取数字，在数组中的索引位置，将结果返回给调用处，如果有重复的，只要获取第一个即可。
-
-代码示例：
+方法名需要见名知意，采用小驼峰命名。
 
 ```java
-package com.itheima.demo;
+public static 返回值类型 方法名(参数) {
+   方法体; 
+   return 数据 ;
+}
+```
 
-public class Test4 {
+----
+
+##  二、方法的注意事项
+
+### 1）方法不调用就不执行
+
+---
+
+### 2）方法与方法之间是平级关系，方法不能嵌套定义
+
+方法与方法之间是平级关系：即方法在定义的时候是没有上下顺序的，我们甚至可以把自己写的代码定义在main方法上面。只不过为了程序阅读性，第一个一般都是main方法，表示程序的出入口，下面才是我们自己写的方法。
+
+![image-20240404105059387](./assets/image-20240404105059387.png)
+
+方法不能嵌套定义，示例代码：
+
+```java
+public class MethodDemo {
     public static void main(String[] args) {
-        //定义一个方法获取数字，在数组中的索引位置，将结果返回给调用处
-        //如果有重复的，只要获取第一个即可
 
-        int[] arr = {1,2,3,4,5};
-        int index = contains(arr, 3);
-        System.out.println(index);
     }
 
-    //1. 我要干嘛？判断数组中的某一个数是否存在
-    //2. 需要什么？数组 数字
-    //3. 调用处是否需要继续使用？返回
-    //获取number在arr中的位置
-    public static int contains(int[] arr, int number) {
-        //遍历arr得到每一个元素
-        for (int i = 0; i < arr.length; i++) {
-            //拿着每一个元素跟number比较
-            if(arr[i] == number){
-                //如果相等，表示找到了
-                return i;
-            }
-        }
-        //当循环结束之后，如果还不能返回索引，表示数组中不存在该数据
-        //可以返回-1
-        return -1;
+    public static void methodOne() {
+		public static void methodTwo() {
+       		// 这里会引发编译错误!!!
+    	}
+    }
+}
+```
+
+----
+
+### 3）方法的编写顺序和执行顺序是没有关系的
+
+方法的编写顺序和执行顺序是没有关系的，执行顺序看的应该是调用顺序，谁先调用谁就先执行。
+
+<img src="./assets/image-20240404105226241.png" alt="image-20240404105226241" style="zoom: 67%;" />
+
+---
+
+### 4）void表示无返回值，可以省略return，也可以单独的书写return，后面不加数据
+
+示例代码：
+
+```java
+public class MethodDemo {
+    public static void main(String[] args) {
+
+    }
+    public static void methodTwo() {
+        //return 100; 编译错误，因为没有具体返回值类型
+        return;	// 后面不加数据
+    }
+}
+```
+
+---
+
+### 5）return后面不能编写其他代码
+
+return语句下面，不能编写代码，因为永远执行不到，属于无效的代码。
+
+~~~java
+public class MethodDemo {
+    public static void main(String[] args) {
+
+    }
+    public static void methodTwo() {
+        return;	 // return表示结束方法，方法都结束了，下面的代码肯定执行不到了 
+        System.out.println(100); // 这里会报错
+    }
+}
+~~~
+
+----
+
+## 三、return关键字
+
+1、方法没有返回值：可以省略不写。如果书写，表示结束方法。
+
+2、方法又返回值：return必须要写。表示结束方法和返回结果。
+
+
+
+----
+
+# 68.方法的重载
+
+## 一、引入
+
+如下图，相似的需求每个方法名却都不相同，这样对取名的人和调用方法的人都很困扰。因为调用的人还需要查清楚方法名叫什么他才能调用。
+
+![image-20240404110712270](./assets/image-20240404110712270.png)
+
+所以Java为了减轻我们的痛苦，它做了一个规定：这些相同功能的方法可以取同一个名字，都可以叫做sum，但是方法的形参不能一样，这个就叫做方法的重载。
+
+![image-20240404110936925](./assets/image-20240404110936925.png)
+
+----
+
+## 二、概念
+
+方法重载概念：方法重载指同一个类中定义的多个方法之间的关系，满足下列条件的多个方法相互构成重载
+
+- 在同一个类中，定义了多个同名的方法，这些同名的方法具有同种的功能。
+- 每个方法具有不同的参数类型或参数个数，这些同名的方法，就构成了重载关系。
+
+**简单记：同一个类中，方法名相同，参数不同的方法。与返回值无关**
+
+参数不同：个数不同、类型不同、顺序不同
+
+> 顺序不同可以构成重载，但是不建议！
+
+示例：下面这两个方法是构成重载关系的。1、在同一个类里，并且方法名相同；2、参数不一样（上面有两个参数，下面有三个参数）
+
+<img src="./assets/image-20240404111610165.png" alt="image-20240404111610165" style="zoom:67%;" />
+
+我们在调用方法的时候，Java虚拟机会 **通过参数的不同** 来区分 **同名的方法**。这个就对应了我们之前学的一个知识点：在调用方法的时候，实参要和形参一一对应。
+
+![image-20240404112223688](./assets/image-20240404112223688.png)
+
+----
+
+## 三、代码示例
+
+正确范例
+
+```java
+public class MethodDemo {
+	public static void fn(int a) {
+    	//方法体
+    }
+    public static int fn(double a) {
+    	//方法体
     }
 }
 
+public class MethodDemo {
+	public static float fn(int a) {
+    	//方法体
+    }
+    public static int fn(int a , int b) {
+    	//方法体
+    }
+}
+
+public class MethodDemo { // 形参顺序不同
+	public static int fn(int a , double b) {
+    	//方法体
+    }
+    public static int fn(double a , int b) {
+    	//方法体
+    }
+}
 ```
 
+错误范例
 
+```java
+public class MethodDemo {
+	public static void fn(int a) {
+    	//方法体
+    }
+    public static int fn(int a) { 	/*错误原因：重载与返回值无关*/
+    	//方法体
+    }
+}
+
+public class MethodDemo01 {
+    public static void fn(int a) {
+        //方法体
+    }
+} 
+public class MethodDemo02 {
+    public static int fn(double a) { /*错误原因：这是两个类的两个fn方法*/
+        //方法体
+    }
+}
+```
+
+---
+
+## 四、方法重载练习
+
+需求：使用方法重载的思想，设计比较两个整数是否相同的方法，兼容全整数类型（byte,short,int,long） 
+
+> PS：IDEA中，定义一个变量 / 方法没有被用到，就会是灰色的
+
+代码：
+
+```java
+public class MethodTest {
+    public static void main(String[] args) {
+        //调用方法
+        System.out.println(compare(10, 20));
+        System.out.println(compare((byte) 10, (byte) 20)); // 值不能写10，因为整数默认是int类型，如果需要变成byte类型，需要做一个强转。
+        System.out.println(compare((short) 10, (short) 20));
+        System.out.println(compare(10L, 20L));
+    }
+
+    //把相同功能的方法名起成一样的名字
+    //好处1：定义方法的时候可以不用那么多的单词了
+    //好处2：调用方法的时候也不需要那么麻烦了。
+    //int
+    public static boolean compare(int a, int b) {
+        System.out.println("int");
+        return a == b;
+    }
+
+    //byte
+    public static boolean compare(byte a, byte b) {
+        System.out.println("byte");
+        return a == b;
+    }
+
+    //short
+    public static boolean compare(short a, short b) {
+        System.out.println("short");
+        return a == b;
+    }
+
+    //long
+    public static boolean compare(long a, long b) {
+        System.out.println("long");
+        return a == b;
+    }
+
+}
+```
+
+----
+
+# 69.方法的三个练习
+
+## 一、数组遍历
+
+需求：设计一个方法用于数组遍历，要求遍历的结果是在一行上的。例如：[11, 22, 33, 44, 55] 
+
+代码：
+
+```java
+public class Test1 {
+    public static void main(String[] args) {
+      /*  //先打印数据，再进行换行
+        System.out.println("aaa");
+        //只打印不换行
+        System.out.print("bbb");
+        System.out.print("ddd");
+        //不打印任何内容，只换行
+        System.out.println();
+        System.out.print("cc");*/
+        //设计一个方法用于数组遍历，要求遍历的结果是在一行上的。例如：[11, 22, 33, 44, 55]
+        int[] arr = {1,2,3,4,5};
+        printArr(arr);
+    }
+    
+    //定义方法用于数组的遍历
+    //1.我要遍历数组
+    //2.需要什么？  数组
+    //3.调用处是否需要使用方法的结果。 不需要返回值
+    public static void printArr(int[] arr){
+        System.out.print("[");
+        for (int i = 0; i < arr.length; i++) {
+            if(i == arr.length - 1){
+                System.out.println(arr[i]);
+            }else{
+                System.out.print(arr[i] + ", ");
+            }
+        }
+        System.out.print("]");
+    }
+}
+```
+
+---
+
+## 二、数组最大值
+
+需求：设计一个方法用于获取数组中元素的最大值 
+
+代码：
+
+```java
+public class MethodTest02 {
+    public static void main(String[] args) {
+        //定义一个数组，用静态初始化完成数组元素初始化
+        int[] arr = {12, 45, 98, 73, 60};
+
+        //调用获取最大值方法，用变量接收返回结果
+        int number = getMax(arr);
+
+        //把结果输出在控制台
+        System.out.println("number:" + number);
+    }
+
+    //定义一个方法，用来获取数组中的最大值
+    /*
+        两个明确：
+            返回值类型：int
+            参数：int[] arr
+     */
+    public static int getMax(int[] arr) {
+        int max = arr[0];
+
+        for(int x=1; x<arr.length; x++) {
+            if(arr[x] > max) {
+                max = arr[x];
+            }
+        }
+        return max;
+    }
+}
+```
+
+-----
+
+## 三、return 和 break关键字的区别
+
+return：跟循环没有什么关系，跟方法有关，表示1、结束方法；2、返回结果。如果方法执行到return，那么整个方法全部结束，里面的循环也会随之结束。
+
+break：跟方法没有什么关系，是用来结束循环或者switch的。
+
+~~~java
+// 需求：判断 number 是否存在
+public static boolean contains(int[] arr, int number) {
+    for (int i = 0; i < arr.length; i++) {
+        if (arr[i] == number) {
+            // 这里用return就很好
+            return true;
+        }
+    }
+    return false;
+}
+~~~
+
+
+
+----
+
+# 70.拷贝数组
+
+需求：定义一个方法 `copyOfRange(int[] arr, int from, int to)`。
+
+功能：将数组arr中从索引from（包含from）开始。到索引to结束（不包含to）的元素复制到新数组中，将新数组返回。
+
+![image-20240404115608787](./assets/image-20240404115608787.png)
+
+
+
+----
+
+# 71.方法的基本内存原理
 
 
 

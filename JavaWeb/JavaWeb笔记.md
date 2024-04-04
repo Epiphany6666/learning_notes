@@ -12119,7 +12119,7 @@ public class UploadController {
 
 > 表单提交的三项数据(姓名、年龄、文件)，分别存储在不同的临时文件中：
 
-![image-20221216223300846](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day11-SpringBootWeb案例/讲义/assets/image-20221216223300846.png)
+![image-20221216223300846](./assets/image-20221216223300846.png)
 
 > 当我们程序运行完毕之后，这个临时文件会自动删除。 
 >
