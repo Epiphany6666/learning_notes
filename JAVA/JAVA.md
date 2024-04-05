@@ -9748,9 +9748,269 @@ public class Door {
 
 ## 四、封装的好处
 
-Sun公司为了Java能在市场上胜出，它基本上把我们程序员要干的事情全都提前想好了，并且设计了很多很多对象给我们用。因为比较多，这些东西我们也不会背，Java都会汇总到一个文档当中。这个文档就叫 `JDK-API文档.CHM`。
+### 1）对象代表什么，就得封装对应的数据，并提供对应的行为
 
-![image-20240404213812530](./assets/image-20240404213812530.png)
+Sun公司为了Java能在市场上胜出，它基本上把我们程序员要干的事情全都提前想好了，并且设计了很多很多对象给我们用。![image-20240404213812530](./assets/image-20240404213812530.png)
+
+因为比较多，这些东西我们也不会背，Java都会汇总到一个文档当中。这个文档就叫 `JDK-API文档.CHM`。
+
+![image-20240405100318278](./assets/image-20240405100318278.png)
+
+可以看见这里有很多很多Java已经写好的类，Sun公司设计的每个对象都是用来代表一个事物的，在设计的时候都会按照我们之前讲的原则进行设计，因此它在设计的时候，不仅会提供相应的属性来封装对应的数据，还会根据我们程序员可能会涉及到的需求来涉及对数据进行相应处理的方法。
+
+这意味着我们以后要干什么事情，我们只需要找到Sun公司给你提供的对象，然后把处理的数据交给它，调用它的方法进行操作就行了，而不需要自己去写，这样就极大降低了我们编程的门槛。
+
+![image-20240405100515894](./assets/image-20240405100515894.png)
+
+例如：Sun公司知道我们对字符串的处理是非常常见的，因此它提供了一个代表字符串的 `String` 对象。Sun公司既然提供了一个String类代表字符串，它一定会设计相应的属性来封装我们要处理的字符串，并且会提供字符串处理的所有的方法。那就意味着我们程序员将来想对字符串进行操作的话，就不需要自己写代码了，只需要使用String去封装处理的字符串，然后去找String对应的方法就行了。
+
+![image-20240405110809429](./assets/image-20240405110809429.png)
+
+~~~java
+public class StringTest {
+    public static void main(String[] args) {
+
+        // 用String去记录我想要处理的字符串
+        String s  = "wefipuhweiduhwiuehd";
+
+        int len = s.length(); // 调用里面的方法
+        System.out.println(len);
+        
+        // 调用toUpperCase方法，结果就是转为大写之后的
+        String ss = s.toUpperCase();
+        System.out.println(ss);
+    }
+}
+~~~
+
+
+
+例如：Sun公司提供了一个 `Socket` 对象代表网络连接，如果我们想要做网络编程，想要连别人的电脑，就可以使用这个对象。
+
+Socket既然代表一个网络连接，就必须有一个属性要记住连接谁。既然有这个属性，那就一定会提供相应的连接方法，和对应的发送数据的方法。因此用Java做网络编程就很简单，创建对象，调用方法，就可以完成我们想做的事情。
+
+----
+
+### 2）降低我们的学习成本，可以少学、少记，或者说压根不用学，不用记对象有哪些方法，有需要时去找就行了。
+
+这是因为Sun公司为了简化我们的开发，提供了很多很多的对象给我们用，每个对象又会有很多很多的方法。
+
+---
+
+## 五、private引入
+
+例如之前写的女朋友类，如果按照之前的去写，就会不安全。原因如下：
+
+~~~java
+public class GirlFriend {
+    //属性
+    String name;
+    int age;
+    String gender;
+}
+~~~
+
+我们创建一个女朋友对象，然后给age赋值，赋值18是正常的操作。
+
+~~~java
+GirlFriend gf1 = new GirlFriend();
+gf1.age = 18;
+~~~
+
+但是如果有其他的人，小手一抖，赋了一个 `-18`。代码的语法是没有问题的，但是跟我们的实际情况就不符合了。
+
+~~~java
+GirlFriend gf1 = new GirlFriend();
+gf1.age = -18;
+~~~
+
+这时候我们就需要来学习`private关键字`了。
+
+----
+
+## 六、private关键字
+
+private是一个权限修饰符，可以修饰成员（成员变量和成员方法）。被 `private` 修饰的成员只能在本类中才能访问。
+
+例如我们刚刚的代码，直接这么写是不安全的，因为别人在使用的时候它可以赋一些不合理的值。
+
+~~~java
+public class GirlFriend {
+    //属性
+    String name;
+    int age;
+    String gender;
+}
+~~~
+
+所以我们在它的前面就需要加上 `private` 私有关键字，一旦成员变量用 `private` 修饰后，那就表示当前的成员变量已经变成私有的了，只能在本类（GirlFriend）中使用，其他类中就不能用了。
+
+~~~java
+public class GirlFriend {
+    //属性
+    String name;
+    int age;
+    String gender;
+}
+~~~
+
+例如下面代码就会报错
+
+~~~java
+GirlFriend gf1 = new GirlFriend();
+gf1.age = -18; // ×
+~~~
+
+现在数据安全的问题已经解决了，但是与此同时，又带来了一个新的问题：如果我给age赋了一个正确的18岁，但是代码依旧会报错，因为所有的成员变量都统一用private来修饰了，因此在其他类中都不能够像下面这样直接去调用了。
+
+~~~java
+GirlFriend gf1 = new GirlFriend();
+gf1.age = 18;
+~~~
+
+那这不行，这不是我想要的，我们真正想要的是：正确的可以正常赋值，但是错误的数据无法赋值。那应该怎么办呢？
+
+有人就会说，在左边的时候不加 `private`，然后在右边赋值的时候判断一下。这样写代码是不行的，因为
+
+- 如果我有3000个女朋友，那每一次赋值都要判断，太麻烦了！
+
+- 我们之前学习过封装，在封装中说过：对象代表什么，就得封装对应的数据，并提供数据对应的行为。
+
+  而现在GirlFriend类就代表女朋友，它里面封装了女朋友所有的属性，那么对这些属性进行校验的方法，就必须也写在GirlFriend类中。
+
+![image-20240405113749682](./assets/image-20240405113749682.png)
+
+----
+
+## 七、`set` & `age`
+
+因此，最为标准的代码应该如下去写：
+
+所有的属性都加上 `private` 关键字，不让外界直接去访问。与此同时，每个属性我们都要提供由 `public` 修饰的 `get` 和 `set` 方法。
+
+`public`也是一个权限修饰符，它跟`private`是反过来的，`public`表示公共的，公开的，它表示在所有的类中都可以使用它修饰的成员。
+
+针对 `age` 属性来讲，我们就需要提供 `setAge`、`getAge` 这两个方法，其中 `setAge` 是给 `age` 赋值的，在赋值的时候就可以对传递过来的数据进行一些校验。`getAge` 就是对外提供 `age` 这个属性的值。
+
+![image-20240405114049663](./assets/image-20240405114049663.png)
+
+----
+
+## 八、`set` & `age` 练习
+
+1、首先在所有成员变量前面都加上 `private` 修饰符，一旦加上，测试类中就不能直接使用里面的成员变量了。
+
+2、针对每一个私有化的成员变量，都要提供 `get` 和 `set` 方法。
+
+GirlFriend.java
+
+~~~java
+package com.itheima.test3;
+
+public class GirlFriend {
+    //属性
+    private String name;
+    private int age;
+    private String gender;
+
+
+    //针对于每一个私有化的成员变量，都要提供get和set方法
+    //set方法：给成员变量赋值
+    //get方法：对外提供成员变量的值
+
+    //作用：给成员变量name进行赋值的
+    public void setName(String name){
+        //局部变量表示测试类中调用方法传递过来的数据
+        //等号的左边：就表示成员位置的name
+        this.name = name;
+    }
+
+    //作用：对外提供name属性的
+    public String getName(){
+        return name;
+    }
+
+
+    //age
+    //setAge:给成员变量age进行赋值的
+    //getAge：对外提供成员变量age的值
+    public void setAge(int age){
+        if(age >= 18 && age <= 50){
+            this.age = age;
+        }else{
+            System.out.println("非法参数");
+        }
+    }
+
+    public int getAge(){
+        return age;
+    }
+
+
+    //gender
+    public void setGender(String gender){
+        this.gender = gender;
+    }
+
+    public String getGender(){
+        return gender;
+    }
+
+
+    //行为
+    public void sleep() {
+        System.out.println("女朋友在睡觉");
+    }
+
+    public void eat() {
+        System.out.println("女朋友在吃饭");
+    }
+}
+~~~
+
+GirlFriendTest.test 
+
+~~~java
+public class GirlFriendTest {
+    public static void main(String[] args) {
+        //创建女朋友的对象
+        GirlFriend gf1 = new GirlFriend();
+        //赋值
+        gf1.setName("小诗诗");
+        gf1.setAge(-18); // 赋值失败，此时会打印出 “非法参数”，下面获取值的时候获取的还是age的默认值 0
+        gf1.setGender("女");
+
+        System.out.println(gf1.getName());
+        System.out.println(gf1.getAge()); 
+        System.out.println(gf1.getGender());
+
+        gf1.eat();
+        gf1.sleep();
+    }
+}
+~~~
+
+---
+
+## 九、private总结
+
+1、private关键字是一个权限修饰符
+
+2、可以修饰成员（成员变量和成员方法）
+
+3、被private修饰的成员只能在本类中才能访问
+
+4、针对private修饰的成员变量，如果需要被其他类使用，需要提供相应的操作
+
+5、提供 “setXXX(参数)“ 方法，用于给成员变量赋值，方法用 public 修饰
+
+6、提供 “getXXX() ” 方法，用于获取成员变量的值，方法用public修饰，返回值的数据类型 需要 与成员变量的数据类型对应
+
+
+
+----
+
+# 84.this关键字
 
 
 
