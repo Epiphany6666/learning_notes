@@ -6925,15 +6925,15 @@ public class ArrTest9 {
 
 其中有一块空间需要单独说，那就是方法区。
 
-在JDK以前，方法区跟堆空间它们两个是连在一起的，在真实的物理内存当中也是一块连续的空间，但是这种设计方式并不是很好。
+在JDK7以前，方法区跟堆空间它们两个是连在一起的，在真实的物理内存当中也是一块连续的空间，但是这种设计方式并不是很好。
 
 <img src="./assets/image-20240403170838621.png" alt="image-20240403170838621" style="zoom:50%;" />
 
-到了JDK8的时候，就改进了这种设计，取消了方法区，新增了一块元空间的区域，把它跟堆空间分开了，把原来方法区要做的很多的事情都进行拆分，有的功能放到了堆当中，有的功能放到了堆中，有的功能放到了元空间中。
+到了JDK8的时候，就改进了这种设计，取消了方法区，新增了一块元空间的区域，把它跟堆空间分开了，把原来方法区要做的很多的事情都进行拆分，有的功能放到了堆当中，有的功能放到了堆中，有的功能放到了元空间中，而现在加载字节码文件的功能在JDK8以后就归属于元空间了。
 
 <img src="./assets/image-20240403170257736.png" alt="image-20240403170257736" style="zoom: 50%;" />
 
-为了方便大家理解，我们暂时将这块区域仍叫做方法区。
+但是它具体叫什么名字不重要，重要的是它加载完后，代码该如何运行。为了方便大家理解，我们暂时将这块区域仍叫做方法区。
 
 我们要知道程序在内存当中怎么运行的，首先我们就需要知道这五块内存空间它各自的作用。
 
@@ -9921,7 +9921,7 @@ public class GirlFriend {
     //作用：给成员变量name进行赋值的
     public void setName(String name){
         //局部变量表示测试类中调用方法传递过来的数据
-        //等号的左边：就表示成员位置的name
+        //等号的左边：就表示成员位置的name，将局部变量的值赋值给成员变量
         this.name = name;
     }
 
@@ -10010,375 +10010,300 @@ public class GirlFriendTest {
 
 ----
 
-# 84.this关键字
+# 84.就近原则和this关键字
+
+this关键字的作用：可以区分成员变量和局部变量。
+
+## 一、引入
+
+先来看一段代码，这个是将传过来的 n 赋值给 name成员变量。但是之前我们讲过，起名字的时候需要见名知意，因此这里的 `n` 就不符合规矩了，对于姓名来讲，`name` 更合适。
+
+~~~java
+public void setName(String n){
+    name = n;
+}
+~~~
+
+但是形参改为 `name`，就会发生一个问题：它跟成员变量的 `name` 重复了
+
+~~~java
+private String name;
+public void setName(String name){
+    name = name;
+}
+~~~
+
+重新执行获取姓名的代码，结果为 `null`。这是因为 `setName` 的时候没有赋值成功。
+
+~~~java
+System.out.println(gf1.getName());
+~~~
+
+要解释为什么没有赋值成功，就需要先解释两个专业名词：成员变量和局部变量。
+
+----
+
+## 二、成员变量和局部变量
+
+按顺序看解说
+
+~~~java
+public class GirlFriend {
+    private int age; // 2.如果将变量定义在方法的外面，类的里面，这个变量就叫做成员变量
+    public void method() {
+        int age = 10; // 1.将变量定义在方法中，就叫做局部变量
+        System.out.println(age); // 3. 当成员变量和局部变量重名的时候，打印出来的是局部变量的10
+    }
+}
+~~~
+
+上面打印结果涉及到一个理论：就近原则 —— 谁离我近，我就用谁。
+
+针对上述代码，局部变量离它更近，因此打印的就是局部变量的10。
+
+那如果我就是想打印成员变量的age，该怎么办呢？此时就需要在age前面加一个 `this` 关键字，此时它就不会用方法里面的 `age`，而是直接使用成员变量的 `age`。
+
+~~~java
+public class GirlFriend {
+    private int age;
+    public void method() {
+        int age = 10; 
+        // 谁离我近，我就用谁
+        System.out.println(age);  // 由于这行代码age前没有this，它就会先去局部位置找age，如果局部位置有，使用的就是局部位置的age；但如果局部位置没有，它就会去成员变量的位置去找
+        System.out.println(this.age);  // 不会到局部位置找，而是直接使用成员变量的age
+    }
+}
+~~~
+
+但如果只有成员变量，没有局部变量，此时的 `this` 就可以省略不写。
+
+~~~java
+public class GirlFriend {
+    private int age;
+    public void method() {
+        // int age = 10; 
+        System.out.println(age); // this省略不写
+    }
+}
+~~~
 
 
 
+----
 
+# 85. 构造方法
 
-### 1.4 学生对象-练习
+## 一、概述
 
-* 需求：首先定义一个学生类，然后定义一个学生测试类，在学生测试类中通过对象完成成员变量和成员方法的使用
-* 分析：
-  * 成员变量：姓名，年龄…
-  * 成员方法：学习，做作业…
-* 示例代码：
+构造方法也叫作构造器、构造函数。但是我们平时习惯上还是会叫做构造方法。
 
-```java
+作用：在创建对象的时候给成员变量进行初始化。
+
+> 这里的 `初始化` 是一个专业名字，其实就是赋值的意思。
+>
+> 因此构造方法简单理解，就是在创建对象的时候给成员变量进行赋值的。
+
+在以前的代码中，小括号中都是空着的，什么也不写。此时就表示我们调用的是空参的构造方法。
+
+<img src="./assets/image-20240405142757180.png" alt="image-20240405142757180" style="zoom:67%;" />
+
+----
+
+## 二、构造方法格式
+
+### 1）格式
+
+~~~java
 public class Student {
-    //成员变量
-    String name;
-    int age;
-
-    //成员方法
-    public void study() {
-        System.out.println("好好学习，天天向上");
-    }
-
-    public void doHomework() {
-        System.out.println("键盘敲烂，月薪过万");
+    修饰符 类名(参数) {
+        方法体;
     }
 }
-/*
-    学生测试类
- */
-public class StudentDemo {
-    public static void main(String[] args) {
-        //创建对象
-        Student s = new Student();
+~~~
 
-        //使用对象
-        System.out.println(s.name + "," + s.age);
+----
 
-        s.name = "林青霞";
-        s.age = 30;
+### 2）特点
 
-        System.out.println(s.name + "," + s.age);
+1. 方法名与类名必须完全一样，大小写也要一致。
+2. 构造方法它虽然叫做方法，但是它是没有返回值类型的，连void都不能写。
+3. 因为构造方法没有返回值，因此在大括号里面是不能写return的，一旦写了，代码就会报错。
 
-        s.study();
-        s.doHomework();
-    }
-}
-```
+---
 
-## 2. 对象内存图
+### 3）示例
 
-### 2.1 单个对象内存图
+第一个是 `空参构造`（空参构造一般是空的，什么也不写），利用空参构造来创建对象的时候，成员变量都是默认初始化值。
 
-* 成员变量使用过程
+第二个是 `带全部参数构造方法`，在方法里面就可以给所有的成员变量进行赋值了。这样我们在创建对象的时候，name 和 age就有值了，就省的我们再去调用 `set方法` 进行赋值了，可以让我们的代码变得更加的简单。
 
-![1](./assets/1-1712230397809-3.png)
+---
 
-* 成员方法调用过程
+### 4）执行时机
 
-![2](./assets/2-1712230397809-4.png)
+1. 创建对象的时候由虚拟机调用，不能手动调用构造方法
+2. 每创建一次对象，构造方法就会被调用一次
 
-### 2.2 多个对象内存图
+----
 
-* 成员变量使用过程
+## 三、代码示例
 
-![3](./assets/3-1712230397809-5.png)
+Student.java
 
-* 成员方法调用过程
+~~~java
+package com.itheima.test5;
 
-![4](./assets/4-1712230397809-6.png)
-
-* 总结：
-
-  多个对象在堆内存中，都有不同的内存划分，成员变量存储在各自的内存区域中，成员方法多个对象共用的一份
-
-## 3. 成员变量和局部变量
-
-### 3.1 成员变量和局部变量的区别
-
-* 类中位置不同：成员变量（类中方法外）局部变量（方法内部或方法声明上）
-* 内存中位置不同：成员变量（堆内存）局部变量（栈内存）
-* 生命周期不同：成员变量（随着对象的存在而存在，随着对象的消失而消失）局部变量（随着方法的调用而存在，醉着方法的调用完毕而消失）
-* 初始化值不同：成员变量（有默认初始化值）局部变量（没有默认初始化值，必须先定义，赋值才能使用）
-
-## 4. 封装
-
-### 4.1 封装思想
-
-1. 封装概述
-   是面向对象三大特征之一（封装，继承，多态）
-
-   **对象代表什么，就得封装对应的数据，并提供数据对应的行为** 
-
-2. 封装代码实现
-   将类的某些信息隐藏在类内部，不允许外部程序直接访问，而是通过该类提供的方法来实现对隐藏信息的操作和访问
-   成员变量private，提供对应的getXxx()/setXxx()方法
-
-### 4.2 private关键字
-
-private是一个修饰符，可以用来修饰成员（成员变量，成员方法）
-
-* 被private修饰的成员，只能在本类进行访问，针对private修饰的成员变量，如果需要被其他类使用，提供相应的操作
-
-  * 提供“get变量名()”方法，用于获取成员变量的值，方法用public修饰
-  * 提供“set变量名(参数)”方法，用于设置成员变量的值，方法用public修饰
-
-* 示例代码：
-
-  ```java
-  /*
-      学生类
-   */
-  class Student {
-      //成员变量
-      String name;
-      private int age;
-  
-      //提供get/set方法
-      public void setAge(int a) {
-          if(a<0 || a>120) {
-              System.out.println("你给的年龄有误");
-          } else {
-              age = a;
-          }
-      }
-  
-      public int getAge() {
-          return age;
-      }
-  
-      //成员方法
-      public void show() {
-          System.out.println(name + "," + age);
-      }
-  }
-  /*
-      学生测试类
-   */
-  public class StudentDemo {
-      public static void main(String[] args) {
-          //创建对象
-          Student s = new Student();
-          //给成员变量赋值
-          s.name = "林青霞";
-          s.setAge(30);
-          //调用show方法
-          s.show();
-      }
-  }
-  ```
-
-### 4.3 private的使用
-
-* 需求：定义标准的学生类，要求name和age使用private修饰，并提供set和get方法以及便于显示数据的show方法，测试类中创建对象并使用，最终控制台输出  林青霞，30 
-
-* 示例代码：
-
-  ```java
-  /*
-      学生类
-   */
-  class Student {
-      //成员变量
-      private String name;
-      private int age;
-  
-      //get/set方法
-      public void setName(String n) {
-          name = n;
-      }
-  
-      public String getName() {
-          return name;
-      }
-  
-      public void setAge(int a) {
-          age = a;
-      }
-  
-      public int getAge() {
-          return age;
-      }
-  
-      public void show() {
-          System.out.println(name + "," + age);
-      }
-  }
-  /*
-      学生测试类
-   */
-  public class StudentDemo {
-      public static void main(String[] args) {
-          //创建对象
-          Student s = new Student();
-  
-          //使用set方法给成员变量赋值
-          s.setName("林青霞");
-          s.setAge(30);
-  
-          s.show();
-  
-          //使用get方法获取成员变量的值
-          System.out.println(s.getName() + "---" + s.getAge());
-          System.out.println(s.getName() + "," + s.getAge());
-  
-      }
-  }
-  ```
-
-### 4.4 this关键字
-
-* this修饰的变量用于指代成员变量，其主要作用是（区分局部变量和成员变量的重名问题）
-  * 方法的形参如果与成员变量同名，不带this修饰的变量指的是形参，而不是成员变量
-  * 方法的形参没有与成员变量同名，不带this修饰的变量指的是成员变量
-
-```java
 public class Student {
     private String name;
     private int age;
 
-    public void setName(String name) {
+
+    // 如果我们自己没有写任何的构造方法
+    // 那么虚拟机给我们加一个空参构造方法
+    /* public Student(){
+        System.out.println("看看我执行了吗？");
+    } */
+
+    // 有参构造
+    public Student(String name,int age){
         this.name = name;
+        this.age = age;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setAge(int age) {
-        this.age = age;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getAge() {
         return age;
     }
 
-    public void show() {
-        System.out.println(name + "," + age);
+    public void setAge(int age) {
+        this.age = age;
     }
 }
-```
+~~~
 
-## 5. 构造方法
+StudentTest.java
 
-### 5.1 构造方法概述
+~~~java
+package com.itheima.test5;
 
-构造方法是一种特殊的方法
+public class StudentTest {
+    public static void main(String[] args) {
+        //创建对象
+        //调用的空参构造 tudent ss = new Student();
 
-* 作用：创建对象   Student stu = **new Student();**
+        Student ss = new Student("zhangsan",23);
+        System.out.println(ss.getName());
+        System.out.println(ss.getAge());
+    }
+}
+~~~
 
-* 格式：
+----
 
-  public class 类名{
+## 四、赋值的原理
 
-  ​        修饰符 类名( 参数 ) {
+在我们创建对象的时候，会自动根据后面的参数去调用对应的构造方法。
 
-  ​        }
+因为我这里传了两个参数，一个是 String，一个是 int，所以它会调用这里的有参构造。
 
-  }
+~~~java
+Student ss = new Student("zhangsan",23);
+~~~
 
-* 功能：主要是完成对象数据的初始化
+一般写代码的时候有参构造和无参构造我们一般都是会写上的。因为在实际开发中，有的时候我们创建对象时，是不知道属性值的。例如：对象的属性值不是直接写死的，而是由键盘录入来的，此时我创建对象的时候，就不知道对象里的属性是什么了，此时我只能先用空参构造先把对象创建出来，然后等用户键盘录入了，此时再通过 `s.setName"";`，把用户键盘录入的数据进行复制。
 
-* 示例代码：
+----
 
-```java
-class Student {
+## 五、构造方法注意事项
+
+### 1、构造方法的定义
+
+- 如果没有定义构造方法，系统将给出一个默认的无参数构造方法
+- 如果定义了构造方法，系统将不再提供默认的构造方法
+
+Student.java
+
+~~~java
+package com.itheima.test5;
+
+public class Student {
     private String name;
     private int age;
 
-    //构造方法
-    public Student() {
-        System.out.println("无参构造方法");
-    }
-
-    public void show() {
-        System.out.println(name + "," + age);
-    }
-}
-/*
-    测试类
- */
-public class StudentDemo {
-    public static void main(String[] args) {
-        //创建对象
-        Student s = new Student();
-        s.show();
-    }
-}
-```
-
-### 5.2 构造方法的注意事项
-
-* 构造方法的创建
-
-如果没有定义构造方法，系统将给出一个默认的无参数构造方法
-如果定义了构造方法，系统将不再提供默认的构造方法
-
-* 构造方法的重载
-
-如果自定义了带参构造方法，还要使用无参数构造方法，就必须再写一个无参数构造方法
-
-* 推荐的使用方式
-
-无论是否使用，都手工书写无参数构造方法
-
-* 重要功能！
-
-可以使用带参构造，为成员变量进行初始化
-
-* 示例代码
-
-```java
-/*
-    学生类
- */
-class Student {
-    private String name;
-    private int age;
-
-    public Student() {}
-
-    public Student(String name) {
-        this.name = name;
-    }
-
-    public Student(int age) {
-        this.age = age;
-    }
-
-    public Student(String name,int age) {
+    // 有参构造
+    public Student(String name,int age){
         this.name = name;
         this.age = age;
     }
-
-    public void show() {
-        System.out.println(name + "," + age);
-    }
 }
-/*
-    测试类
- */
-public class StudentDemo {
-    public static void main(String[] args) {
-        //创建对象
-        Student s1 = new Student();
-        s1.show();
+~~~
 
-        //public Student(String name)
-        Student s2 = new Student("林青霞");
-        s2.show();
+由于在 `Student` 类中已经定义了一个有参构造，系统将不再提供默认的构造方法，下述代码就会报错。
 
-        //public Student(int age)
-        Student s3 = new Student(30);
-        s3.show();
+~~~java
+// 会调用Student的无参构造
+Student s = new Student(); // 报错
+~~~
 
-        //public Student(String name,int age)
-        Student s4 = new Student("林青霞",30);
-        s4.show();
-    }
-}
-```
+----
 
-### 5.3 标准类制作
+### 2、构造方法的重载
+
+带参构造方法，和无参构造方法，两者方法名相同，但是参数不同，这叫做构造方法的重载。
+
+推荐的使用方式：**无论是否使用，都手动书写无参数构造方法，和带全部参数的构造方法**。这是因为在以后的实际开发，基本上不是你一个人写一个项目，而是很多人一起开发的。假设现在自己只用到了有参构造，但是别人却可能使用无参构造。因此无论是否使用，都手动书写无参数构造方法，和带全部参数的构造方法，这已经成为了一个习惯了。
+
+----
+
+## 六、总结
+
+**1、构造方法的作用？**
+
+创建对象的时候，由虚拟机自动调用，给成员变量进行初始化的。
+
+**2、构造方法有几种，各自的作用是什么？**
+
+- 无参数构造方法（空参构造方法）：初始化对象时，成员变量的数据均采用默认值。
+- 有参数构造方法：在初始化对象的时候，同时可以为对象进行赋值。
+
+**3、构造方法有哪些注意事项？**
+
+- 任何类定义出来，默认就自带了无参数构造器，写不写都有。
+- 一旦定义了有参数构造器，无参数构造器就没了，此时就需要自己写无参数构造器了。
+- 建议在任何时候都手动写上空参和带全部参数的构造方法。
+
+----
+
+## 七、构造方法扫盲
+
+有很多资料书都这么解释：构造方法就是用来创建对象的。其实这句话是错误的。
+
+真正创建对象其实是 `new` 关键字干的。虚拟机在创建对象的时候其实是有很多很多步骤的，其中调用构造方法只是创建对象的其中一步而已，这一步就是为了给成员变量进行初始化的。
+
+![image-20240405155248518](./assets/image-20240405155248518.png)
+
+因此真正构造方法的作用就是：在创建对象的时候，虚拟机会自动调用构造方法，它的作用是给成员变量进行初始化的。
+
+
+
+----
+
+# 86.标准的Javabean类
+
+## 一、标准的Javabean类定义标准
 
 ① 类名需要见名知意
 
-② 成员变量使用private修饰
+例如老师就加 `Teacher`，学生就叫 `Student`
+
+② 为了保证数据的安全性，所有的成员变量都要 `private` 修饰
 
 ③ 提供至少两个构造方法 
 
@@ -10387,98 +10312,39 @@ public class StudentDemo {
 
 ④ get和set方法 
 
-​	提供每一个成员变量对应的setXxx()/getXxx()
+提供每一个成员变量对应的setXxx()/getXxx()
 
-⑤ 如果还有其他行为，也需要写上
+如果题目还有其他行为，也需要写上。例如学生还有学习、吃饭、睡觉；老师还有上课、教书等等方法。
 
-### 5.4 练习1
+----
 
-需求：
+## 二、代码示例
 
-​	定义标准学生类，要求分别使用空参和有参构造方法创建对象，空参创建的对象通过setXxx赋值，有参创建的对象直接赋值，并通过show方法展示数据。 
+如下是某个网站的注册页面，现在就写一个标准的Javabean去描述用户。
 
-* 示例代码：
+![image-20240405160351517](./assets/image-20240405160351517.png)
 
-```java
-class Student {
-    //成员变量
-    private String name;
+既然要描述用户，类名就叫做 `User`。成员变量就是：用户名、密码、确认密码、邮箱、性别、年龄。
+
+User.java
+
+~~~java
+package com.itheima.test6;
+
+public class User {
+    //属性
+    private String username;
+    private String password;
+    private String email;
+    private String gender;
     private int age;
 
-    //构造方法
-    public Student() {
-    }
-
-    public Student(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    //成员方法
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void show() {
-        System.out.println(name + "," + age);
-    }
-}
-/*
-    创建对象并为其成员变量赋值的两种方式
-        1:无参构造方法创建对象后使用setXxx()赋值
-        2:使用带参构造方法直接创建带有属性值的对象
-*/
-public class StudentDemo {
-    public static void main(String[] args) {
-        //无参构造方法创建对象后使用setXxx()赋值
-        Student s1 = new Student();
-        s1.setName("林青霞");
-        s1.setAge(30);
-        s1.show();
-
-        //使用带参构造方法直接创建带有属性值的对象
-        Student s2 = new Student("林青霞",30);
-        s2.show();
-    }
-}
-```
-
-### 5.4 练习2
-
-![111](./assets/111-1712230397809-7.jpg)
-
-```java
-public class User {
-    //1.私有化全部的成员变量
-    //2.空参构造
-    //3.带全部参数的构造
-    //4.针对于每一个私有化的成员变量都要提供其对应的get和set方法
-    //5.如果当前事物还有其他行为，那么也要写出来，比如学生的吃饭，睡觉等行为
-
-    private String username;//用户名
-    private String password;//密码
-    private String email;//邮箱
-    private char gender;//性别
-    private int age;//年龄
-
-    //空参构造方法
+    // 空参
     public User() {
     }
 
-    //带全部参数的构造
-    public User(String username, String password, String email, char gender, int age) {
+    // 带全部参数的构造
+    public User(String username, String password, String email, String gender, int age) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -10486,87 +10352,501 @@ public class User {
         this.age = age;
     }
 
-    //get和set
-
+    // 快捷键：alt + insert，如果按没反应，就按 alt + Fn + insert
+    /**
+     * 获取
+     * @return username
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * 设置
+     * @param username
+     */
     public void setUsername(String username) {
         this.username = username;
     }
 
+    /**
+     * 获取
+     * @return password
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * 设置
+     * @param password
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
+    /**
+     * 获取
+     * @return email
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     * 设置
+     * @param email
+     */
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public char getGender() {
+    /**
+     * 获取
+     * @return gender
+     */
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(char gender) {
+    /**
+     * 设置
+     * @param gender
+     */
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
+    /**
+     * 获取
+     * @return age
+     */
     public int getAge() {
         return age;
     }
 
+    /**
+     * 设置
+     * @param age
+     */
     public void setAge(int age) {
         this.age = age;
     }
 
-    public void eat(){
-        System.out.println(username + "在吃饭");
-    }
+
+    
+
+    //插件PTG 1秒生成标准Javabean
 }
+~~~
 
-public class Test {
-    public static void main(String[] args) {
-        //写一个标准的javabean类
-        //咱们在课后只要能把这个标准的javabean能自己写出来，那么就表示今天的知识点就ok了
+---
+
+## 三、快捷键
+
+### 1）生成构造、get、set方法的快捷键设置
+
+快捷键：<kbd>alt + insert</kbd>，如果按没反应，就按 <kbd>alt + Fn + insert</kbd>，可以创建构造、get、set方法。
+
+但是我们不使用这个默认的快捷键，而是将它修改为 <kbd>ctrl + g</kbd>。
+
+settings —> Keymap ——> 搜索 `Generate` ——> 右击`Generate...` ——> Remove Alt+Insert
+
+![image-20240405161631836](./assets/image-20240405161631836.png)
+
+然后再右击，选择 `Add Keyboard Shortcut`。
+
+![image-20240405161723225](./assets/image-20240405161723225.png)
+
+然后在键盘上输入 <kbd>ctrl + G</kbd>，点击OK，点击Apply，点击OK即可。
+
+![image-20240405161824796](./assets/image-20240405161824796.png)
+
+如果出现警告，直接点击 `Remove` 即可。
+
+![image-20240405161852554](./assets/image-20240405161852554.png)
+
+----
+
+### 2）生成构造
+
+输入快捷键 <kbd>ctrl + g</kbd>，然后点击 `Constructor`
+
+![image-20240405162117828](./assets/image-20240405162117828.png)
+
+它默认选中的是第一个参数：username
+
+<img src="./assets/image-20240405162201302.png" alt="image-20240405162201302" style="zoom:67%;" />
+
+这个时候还不能点ok，因为一旦点了ok，它就会对第一个参数 `username` 来生成构造，但这并不是我们想要的。如果需要选中全部参数，只需要点击下方的 `Select None`，表示什么属性都不选
+
+![image-20240405162341610](./assets/image-20240405162341610.png)
+
+点击完成后，它就会直接生成无参构造。
+
+![image-20240405162758127](./assets/image-20240405162758127.png)
+
+如果需要生成带全部参数的构造方法，重新按住快捷键<kbd>ctrl + g</kbd>，重新点击 `Constructor`。这次需要按住 `shift` 不松开，再点击最下面的 `age`，相当于将所有的属性全选了，当然也可以按快捷键 <kbd>ctrl + a</kbd> 全选，再点击下面的ok即可。
+
+<img src="./assets/image-20240405162655926.png" alt="image-20240405162655926" style="zoom:67%;" />
+
+此时就会生成带有全部参数的构造方法。
+
+![image-20240405162748637](./assets/image-20240405162748637.png)
+
+----
+
+### 3）get、set方法的生成
+
+使用快捷键<kbd>ctrl + g</kbd>，然后选中第四个 `Getter and Setter`
+
+![image-20240405162908629](./assets/image-20240405162908629.png)
+
+同样的，我们也可以<kbd>ctrl + A</kbd>全选，然后点击OK。
+
+<img src="./assets/image-20240405163025792.png" alt="image-20240405163025792" style="zoom:67%;" />
+
+此时都给每个成员变量提供了对应的`get`跟`set`方法，非常的快。
+
+---
+
+### 4）PTG插件
+
+PTG插件可以1秒生成标准Javabean。
+
+首先进入下载插件的地方：settings ——> Plugins ——> Marketplace
+
+`Marketplace`：表示下载页面。`Installed`：表示在电脑当中已经安装了的插件。
+
+![image-20240405163415467](./assets/image-20240405163415467.png)
+
+在插件市场搜索 `ptg`，然后直接点击 `Install` 即可。
+
+![image-20240405163517257](./assets/image-20240405163517257.png)
+
+此时就可以右键点击空白处，选择 `Ptg To JavaBean`，也就是利用 `ptg` 插件去生成Javabean。
+
+![image-20240405164012042](./assets/image-20240405164012042.png)
+
+点击后发现，它将空参构造、全参构造、get跟set方法全都自动生成了。更爽的是，它连注释都帮我们自动生成了。
+
+<img src="./assets/image-20240405164156875.png" alt="image-20240405164156875" style="zoom:67%;" />
+
+----
+
+# 87.对象内存图
+
+## 一、简单回顾内存
+
+在之前我们讲过，每款软件在运行的时候都是要占用一块内存区域的，Java也不例外。在运行的时候，虚拟机也会占用一块内存空间。
+
+只不过为了更好地去利用这块内存，JVM把它分成了五个部分，每个部分都有它自己的作用。
+
+![image-20240404125855146](./assets/image-20240404125855146.png)
+
+现在我们要知道的就是里面的三块：栈、堆、方法区
+
+<img src="./assets/image-20240405164717457.png" alt="image-20240405164717457" style="zoom:67%;" />
+
+这个里面的方法区我们要额外单独来说一下。方法区本身有很多作用、很多功能。其中，当我们要运行一个类的时候，这个类字节码文件就会被加载到方法区中临时存储。
+
+在JDK7以前，方法区跟堆空间它们两个是连在一起的，在真实的物理内存当中也是一块连续的空间，但是这种设计方式并不是很好。
+
+<img src="./assets/image-20240403170838621.png" alt="image-20240403170838621" style="zoom:50%;" />
+
+到了JDK8的时候，就改进了这种设计，取消了方法区，新增了一块元空间的区域，把它跟堆空间分开了，把原来方法区要做的很多的事情都进行拆分，有的功能放到了堆当中，有的功能放到了堆中，有的功能放到了元空间中，而现在加载字节码文件的功能在JDK8以后就归属于元空间了。
+
+<img src="./assets/image-20240403170257736.png" alt="image-20240403170257736" style="zoom: 50%;" />
+
+但是它具体叫什么名字不重要，重要的是它加载完后，代码该如何运行。为了方便大家理解，我们暂时将这块区域仍叫做方法区。
+
+当运行一个类的时候，这个类的字节码文件就会加载到方法区中临时存储。比如说，这里有个`HelloWorld.class`、`Test.class`，在运行的时候都会加载到方法区中临时存储。
+
+![image-20240405165350962](./assets/image-20240405165350962.png)
+
+----
+
+## 二、回顾栈和堆
+
+栈：当方法被调用的时候，需要进栈执行，而方法里面所定义的变量其实也是在这里面的。当方法执行完毕后，它就需要出栈。
+
+堆：只要是 `new` 出来的就会在堆中开辟一个小空间。堆里还有一个特点，就是堆里面开辟的空间都会有自己的地址值。
+
+----
+
+## 三、一个对象的内存图
+
+### 1）创建变量的步骤
+
+当我们在创建一个对象的时候，比如
+
+~~~java
+Student s = new Student();
+~~~
+
+在创建 `Student` 对象的时候，内存里面至少会做以下7件事情。
+
+**1、加载class文件**
+
+其实也就是把Student类的字节码文件加载到内存。
+
+**2、声明局部变量**
+
+其实就是对等号左边的 `s` 来进行声明。
+
+**3、在堆内存中开辟一个空间**
+
+这句话说的就是等号的右边，有一个 `new` 关键字，所以在堆里就会开辟一个小空间。而这个小空间其实也就是我们平时所说的对象。
+
+**4、默认初始化**
+
+**5、显示初始化**
+
+**6、构造方法初始化**
+
+这里的4、5、6三步，其实都是对第3步中的变量来进行赋值的。
+
+**7、将堆内存中的地址值赋值给左边的局部变量**
+
+----
+
+### 2）画图解释
+
+#### 创建变量前的代码
+
+首先来看一下要画图的代码：写了一个很简单的`Student类`，这里面有两个属性 —— name、age，然后还有一个 `study` 学习方法。
+
+然后在测试类中创建对象。测试类名字叫做 `TestStudent`，在这里面首先创建了它的对象，然后打印 `s`，再使用 `s` 对 name 和 age 进行打印。然后再对 name 和 age 进行赋值，赋完值之后，再获取并打印，最后再调用 `s` 的 `study` 方法。
+
+![image-20240405170554690](./assets/image-20240405170554690.png)
+
+接下来看看这些代码在内存当中到底干了那些事。
+
+首先程序肯定先从main方法开始执行的，所以说第一步，它要将 `StudentTest类` 的字节码文件（StudentTest.class）加载到方法区里，这里面就会把main方法进行临时存储。
+
+![image-20240405171048683](./assets/image-20240405171048683.png)
+
+然后虚拟机会自动调用程序的主入口 `main方法`，所以此时main方法会被加载到栈里。
+
+![image-20240405171215816](./assets/image-20240405171215816.png)
+
+然后我们就要开始执行main方法中的代码了。第一句就是创建一个对象 `Student s = new Student();`。
+
+刚才我们说了，创建对象的代码，虚拟机至少做了以下的7步。
+
+![image-20240405171655557](./assets/image-20240405171655557.png)
+
+----
+
+#### 按步骤创建变量
+
+**① 加载class文件**
+
+由于`Student s = new Student()` 中用到了Student类，所以在方法区里面，它会把 `Student.class` 加载到这里面，临时存储。在 `Student.class` 中会有 `Student` 类的所有信息。例如所有的成员变量，还有所有的成员方法。
+
+![image-20240405174253462](./assets/image-20240405174253462.png)
+
+**② 声明局部变量**
+
+其实就是在创建对象等号左边的这个代码，在main方法中，它就会开辟一个空间，这个空间的名字就叫做 `s`，这个空间以后能存储 `Student` 这个类对象的地址值。
+
+![image-20240405174235668](./assets/image-20240405174235668.png)
+
+**③ 在堆内存中开辟一个空间**
+
+其实也就是在创建对象等号右边的代码。因为有 `new` 关键字，所以此时在堆里就会有一个这样的小空间。而堆里的这些空间都是有地址值的。
+
+所以现在假设这块空间的地址值是 `001`，那么这块空间里面，就会把Student里面所有成员变量拿过来，拷贝一份放过来。除此之外，它还会有所有成员方法的地址，存储方法的地址是为了以后对象调方法的时候，我们能找到对应的方法。
+
+此时堆里 `001` 的空间其实就是我们平时说的对象，但是现在这个对象还没有创建完毕，因为这里的 name 跟 age 都还没有值。
+
+![image-20240405174915799](./assets/image-20240405174915799.png)
+
+此时就需要4、 5、 6这三步。
+
+![image-20240405174847164](./assets/image-20240405174847164.png)
+
+首先它会进行默认初始化。
+
+**④ 默认初始化**
+
+这里 name 默认初始化就是 null，age默认初始化值就是 0。
+
+![image-20240405175030961](./assets/image-20240405175030961.png)
+
+**⑤ 显示初始化**
+
+如果我们在Student类中定义成员变量的时候是直接给值了，这个就叫做显示初始化。
+
+如果你这么写了，在显示初始化这一步，默认初始化值 null 跟 0，就会被 “张三” 和 23 所覆盖。
+
+![image-20240405175243353](./assets/image-20240405175243353.png)
+
+但是此时我们在代码当中并没有写这个代码，所以显示初始化我们可以忽略。
+
+**⑥ 构造方法初始化**
+
+在代码当中，由于小括号里什么都没写，所以就表示我现在调用的是空参构造。空参构造里也没有写代码，所以构造方法初始化我们也可以忽略。
+
+![image-20240405175504773](./assets/image-20240405175504773.png)
+
+但是假如此时，你用的是有参构造来创建对象，那么此时 name 跟 age 就会有值了。
+
+因此，构造方法就是创建对象中的一步而已。
+
+**⑦ 将堆内存中的地址赋值给左边的局部变量**
+
+其实也就是把这里的 `001` 通过中间的 等号运算符 赋值给了左边的变量 s，此时s这个变量里就会存储地址值 `001`。
+
+s也可以通过 `001` 这个地址值找到右边的这个空间。
+
+到目前为止，一个对象才创建完毕。
+
+![image-20240405175706398](./assets/image-20240405175706398.png)
+
+-----
+
+#### 创建变量后的代码
+
+所以说在下面，如果我们直接打印 `s` 的话，其实就是打印s中记录的地址值，此时在控制台中看到的其实也就是它的地址值。
+
+但是这个地址值对我们来讲没有用，我们需要的是获取里面的属性。
+
+因此在代码当中我们要通过 `s` 调用 `name`， `s` 调用 `age` 。要注意的是，现在的 `s` 记录的是 `001` 地址值。
+
+所以下面这个代码我们也可以理解为：我现在要打印 `001` 里面的 `name`，还有 `001` 里面的 `age`。`001` 找到的就是右边的这块空间。
+
+所以就会把里面的 null 和 0 获取到了，在控制台中打印的也就是 null 和 0。
+
+![image-20240405180641306](./assets/image-20240405180641306.png)
+
+再往下就是通过 `s.name` 去给它赋值了。相当于就是把 `"阿强"` 赋值给了 `001` 的 `name`，把 `23` 赋值给了 `001` 的 `age`。此时它同样的也是找到了右边的这块空间。将原来的 null 和 0 给覆盖了。
+
+赋值成功之后再获取，`001` 的 `name` 和 `001` 的 `age` 就变成了 `阿强` 和 `23`。所以在控制台中打印的就是 `阿强` 和 `23`。
+
+![image-20240405180925479](./assets/image-20240405180925479.png)
+
+最后一步 `s.study()` ，即用 s 调用 study，它也会先去找s中存储的，也就是 `001` 这个空间。
+
+在 `001` 空间中，会有成员方法的地址，然后就找到下面的 `study()` 方法，这个时候study方法就会被加载进栈。
+
+这个方法里的代码很简单，就是一句打印 “好好学习”。
+
+![image-20240405181143470](./assets/image-20240405181143470.png)
+
+当这句话打印完后，study方法就执行完毕，所以它就要从栈里面出去。
+
+当study方法执行完毕后，整个main方法也执行完毕了，所以main方法也出栈了。
+
+既然main方法都出去了，main中的变量也就随之消失了。所以 `s` 就会跟着消失。
+
+当变量 `s` 消失的时候，变量指向的箭头，也就没有了。
+
+![image-20240405181352212](./assets/image-20240405181352212.png)
+
+针对右边的对象来讲，就没有人再去用这个对象了，专业是叫做：没有变量指向这个空间了。这个空间也会消失变成垃圾。
+
+-----
+
+## 四、两个对象的内存图
+
+两个对象的内存图 其实就是将刚刚的 一个对象创建的过程 重复了两次而已。
+
+![image-20240405181858001](./assets/image-20240405181858001.png)
+
+由于前面的内存图解释都是一样的，我们直接跳到创建第2个对象的时候的内存图。
+
+但是在正式的画内存图之前，问你一个问题：这一次 `.class` 字节码文件是否要再加载一次？
+
+答案是不需要，因为在刚刚这个 class文件 已经加载过了，所以第二次在创建对象的时候，class文件不需要再加载了，直接用就可以了。
+
+这个时候它还是在等号的左边来声明了一个局部变量，这个局部变量的名字叫做 `s2`，它以后能存储 `Student类` 对象的地址值。
+
+再到了等号右边，因为有 `new` 关键字，所以同样也是在堆里面开辟了一块空间，这个里面也有 `name` 跟 `age`，下面也会有成员方法的地址，此时还会给里面的变量进行默认初始化、显示初始化、构造方法初始化。
+
+最后将堆空间中的地址赋值给 `s2`。第二个对象的地址为 `002`。`s2` 通过 `002` 这个地址能找到第二块空间。
+
+所以在下面，我直接打印 `s2` 的话，它打印的其实是 `s2` 记录的地址 `002`。
+
+![image-20240405182644677](./assets/image-20240405182644677.png)
+
+再往下赋值，是将 “阿珍” 赋值给了 `s2` 的 name ！而 `s2` 记录的地址值是 `002`，所以  “阿珍” 就赋值给了 `002` 的 name，24
+
+ 就是赋值给了 `002` 的 age。`002` 里面 null 跟 0 就被覆盖了。
+
+要注意的是我现在操作的仅仅是 `002` 的这块空间，对 `001` 空间里面的值没有任何影响。它们是两个互相独立的空间、
+
+![image-20240405182708728](./assets/image-20240405182708728.png)
+
+再往下获取的是 `s2` 的 name 和 `s2` 的 age，而 `s2` 记录的是 `002` ，所以 `s2.name` 就是获取 `002` 里面的name，`s2.age` 获取的就是 `002` 里面的 `age`。
+
+因此打印出来的就是 阿珍 和 24。
+
+![image-20240405182859491](./assets/image-20240405182859491.png)
+
+最后一步，它是通过 `s2` 去调用的 `study()` 方法。所以我们需要先通过 `s2` 去找到 `002` 这块空间，再通过 `002` 找到下面的 study方法，再把这个 study加载到栈里，打印里面的好好学习。
+
+![image-20240405183251481](./assets/image-20240405183251481.png)
+
+当study方法执行完毕，它就要出去。
+
+当study方法执行完毕后，main方法也执行完毕，也要出去了。一旦main方法出去，变量 `s1` 跟 `s2` 也就没有了。针对于右边堆中的两个对象而言，就没有人再去使用这两个对象了。一旦没有人用它们，它们也就变成垃圾，这两个对象也就使用不了了。
+
+![image-20240405183352885](./assets/image-20240405183352885.png)
+
+----
+
+## 五、两个引用指向同一个对象
+
+由于 `Student stu2 = stu1;` 前面的代码和之前的代码都是一样的。
+
+![image-20240405183644311](./assets/image-20240405183644311.png)
+
+我们直接跳到 `Student stu2 = stu1;` 的地方。
+
+这句话相当于把 `stu1` 变量里记录的东西赋值给 `stu2`。
+
+在内存是这样的，它首先会去栈中声明一个 `stu2` 的小空间，这块空间的名字就叫做 `stu2`，这个类以后也能存储 `Student` 对象的地址值。此时它就将 `stu1` 记录的 `001` 赋值给了 `stu2`，所以一旦赋值完后，`stu2` 里面存的也就是 `001` 了。
+
+此时 `stu2` 通过 `001` 也能找到右边的空间，这个就相当于两个变量都指向了同一个对象。
+
+![image-20240405184105675](./assets/image-20240405184105675.png)
+
+再往下看，`stu2.name = "阿珍"`，“阿珍”赋值给了 `stu2` 的 name，但此时 `stu2` 中记录的是 `001` ，所以这句话可以理解成：“阿珍” 赋值给了 `001` 的 name。`001` 里面 name 中存储的 阿强 就被 阿珍 给覆盖了。
+
+![image-20240405184340410](./assets/image-20240405184340410.png)
+
+此时再来执行最后一句话，由于 `stu1` 和 `stu2` 记录的都是 `001`，所以这句话就相当于在获取 `001` 的 `name` 和 `001` 的 `name`，即将 `001` 的 `name` 获取了两次，这个时候在代码中打印的就是 `阿珍...阿珍`。
+
+![image-20240405184355932](./assets/image-20240405184355932.png)
+
+代码继续往下，在代码当中有一些其他的情况需要考虑，那就是 `stu1 = null`。
+
+`null` 就表示一个不存在的空间，相当于将 `stu1` 里面的 `001` 给覆盖了，这个时候这根线就断掉了。
+
+![image-20240405184651808](./assets/image-20240405184651808.png)
+
+再往下，再使用 `stu1.name` 再去获取的时候，`stu1`就已经找不到 `001` 了，因为中间的这个连接已经断开了。
+
+所以此时在程序中就会触发 `NullPointerException` 异常。（空指针异常）
+
+再往下获取 `stu2.name` ，`stu2`里是`001`，它没有被任何东西给覆盖，它还能获取到 `001` 的空间，找到里的阿珍并进行打印。
+
+最后一行，再把 null 获取给 stu2 ，这就表示 stu2 里记录的地址也没有了，那么中间这根黑色的连接也就断开了。
+
+![image-20240405185032881](./assets/image-20240405185032881.png)
+
+一旦断开之后，右边的这个对象就没有人去用它了，一旦没有人用它，这个对象就会变成垃圾，以后就用不了了。
+
+当这行代码执行完毕后，main方法所有代码就执行完毕了，main方法就会从栈中出去。
+
+总结：当两个变量指向同一个对象时，只要有一个变量对这个空间里的值发生了改变，那么其他变量再次访问的时候，就是改变之后的结果了。
 
 
-        //利用空参构造创建对象
-        User u1 = new User();
-        //如果利用空参创建对象，还想赋值只能用set方法赋值
-        u1.setUsername("zhangsan");
-        u1.setPassword("1234qwer");
-        u1.setEmail("itheima@itcast.cn");
-        u1.setGender('男');
-        u1.setAge(23);
-        //获取属性的值并打印
-        System.out.println(u1.getUsername() + ", " + u1.getPassword()
-                + ", " + u1.getEmail() + ", " + u1.getGender() + ", " + u1.getAge());
-        u1.eat();
 
-        System.out.println("=============================");
+----
 
-        //简单的办法
-        //利用带全部参数的构造来创建对象
-        //快捷键:ctrl + p
-        User u2 = new User("lisi","12345678","lisi@itcast.cn",'女',24);
-        System.out.println(u2.getUsername() + ", " + u2.getPassword()
-                + ", " + u2.getEmail() + ", " + u2.getGender() + ", " + u2.getAge());
-        u2.eat();
-    }
-}
-
-```
-
-
+# 88.基本数据类型和引用数据类型
 
 
 

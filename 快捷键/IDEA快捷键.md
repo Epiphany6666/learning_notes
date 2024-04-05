@@ -52,9 +52,99 @@ IDEA快捷键：ctrl + alt + M 自动抽取方法 首先选中要抽取的代码
 
 ![image-20240404205200916](./assets/image-20240404205200916.png)
 
+----
 
 
 
+### 1）生成构造、get、set方法的快捷键设置
+
+快捷键：<kbd>alt + insert</kbd>，如果按没反应，就按 <kbd>alt + Fn + insert</kbd>，可以创建构造、get、set方法。
+
+但是我们不使用这个默认的快捷键，而是将它修改为 <kbd>ctrl + g</kbd>。
+
+settings —> Keymap ——> 搜索 `Generate` ——> 右击`Generate...` ——> Remove Alt+Insert
+
+![image-20240405161631836](./assets/image-20240405161631836.png)
+
+然后再右击，选择 `Add Keyboard Shortcut`。
+
+![image-20240405161723225](./assets/image-20240405161723225.png)
+
+然后在键盘上输入 <kbd>ctrl + G</kbd>，点击OK，点击Apply，点击OK即可。
+
+![image-20240405161824796](./assets/image-20240405161824796.png)
+
+如果出现警告，直接点击 `Remove` 即可。
+
+![image-20240405161852554](./assets/image-20240405161852554.png)
+
+----
+
+### 2）生成构造
+
+输入快捷键 <kbd>ctrl + g</kbd>，然后点击 `Constructor`
+
+![image-20240405162117828](./assets/image-20240405162117828.png)
+
+它默认选中的是第一个参数：username
+
+<img src="./assets/image-20240405162201302.png" alt="image-20240405162201302" style="zoom:67%;" />
+
+这个时候还不能点ok，因为一旦点了ok，它就会对第一个参数 `username` 来生成构造，但这并不是我们想要的。如果需要选中全部参数，只需要点击下方的 `Select None`，表示什么属性都不选
+
+![image-20240405162341610](./assets/image-20240405162341610.png)
+
+点击完成后，它就会直接生成无参构造。
+
+![image-20240405162758127](./assets/image-20240405162758127.png)
+
+如果需要生成带全部参数的构造方法，重新按住快捷键<kbd>ctrl + g</kbd>，重新点击 `Constructor`。这次需要按住 `shift` 不松开，再点击最下面的 `age`，相当于将所有的属性全选了，当然也可以按快捷键 <kbd>ctrl + a</kbd> 全选，再点击下面的ok即可。
+
+<img src="./assets/image-20240405162655926.png" alt="image-20240405162655926" style="zoom:67%;" />
+
+此时就会生成带有全部参数的构造方法。
+
+![image-20240405162748637](./assets/image-20240405162748637.png)
+
+----
+
+### 3）get、set方法的生成
+
+使用快捷键<kbd>ctrl + g</kbd>，然后选中第四个 `Getter and Setter`
+
+![image-20240405162908629](./assets/image-20240405162908629.png)
+
+同样的，我们也可以<kbd>ctrl + A</kbd>全选，然后点击OK。
+
+<img src="./assets/image-20240405163025792.png" alt="image-20240405163025792" style="zoom:67%;" />
+
+此时都给每个成员变量提供了对应的`get`跟`set`方法，非常的快。
+
+---
+
+### 4）PTG插件
+
+PTG插件可以1秒生成标准Javabean。
+
+首先进入下载插件的地方：settings ——> Plugins ——> Marketplace
+
+`Marketplace`：表示下载页面。`Installed`：表示在电脑当中已经安装了的插件。
+
+![image-20240405163415467](./assets/image-20240405163415467.png)
+
+在插件市场搜索 `ptg`，然后直接点击 `Install` 即可。
+
+![image-20240405163517257](./assets/image-20240405163517257.png)
+
+此时就可以右键点击空白处，选择 `Ptg To JavaBean`，也就是利用 `ptg` 插件去生成Javabean。
+
+![image-20240405164012042](./assets/image-20240405164012042.png)
+
+点击后发现，它将空参构造、全参构造、get跟set方法全都自动生成了。更爽的是，它连注释都帮我们自动生成了。
+
+![image-20240405164329752](./assets/image-20240405164329752.png)
+
+----
 
 
 
