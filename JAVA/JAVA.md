@@ -13495,7 +13495,7 @@ public class StringDemo9 {
 
 ## 一、substring字符串截取
 
-字符串截取：`String substring(int beginIndex, int endIndex)`，它可以从一个大的字符串中把字符串的一部分给截取出来。括号里面传递的就是索引，从 `beginIndex`（开始索引） 开始截取，截取到 `endIndex`（结束索引）。
+1、字符串截取：`String substring(int beginIndex, int endIndex)`，它可以从一个大的字符串中把字符串的一部分给截取出来。括号里面传递的就是索引，从 `beginIndex`（开始索引） 开始截取，截取到 `endIndex`（结束索引）。
 
 > PS：
 >
@@ -13503,7 +13503,7 @@ public class StringDemo9 {
 >
 > 2、只有返回值才是截取的小串，它对原来的字符串是没有任何影响的，因为字符串本身是不能发生变化的。
 
-`substring` 还有一个重载的方法，就是一个参数的，我们只需要传入一个 `beginIndex` ，默认截取到末尾。
+2、`substring` 还有一个重载的方法，就是一个参数的，我们只需要传入一个 `beginIndex` ，默认截取到末尾。
 
 ----
 
@@ -13536,9 +13536,9 @@ public class StringDemo10 {
 
 ----
 
-### 2.14 身份证信息查看
+## 三、身份证信息查看
 
-​	身份证的每一位都是有固定的含义：
+身份证的每一位都是有固定的含义：
 
 * 1、2位：省份 
 * 3、4位：城市 
@@ -13587,7 +13587,9 @@ public class StringDemo11 {
         //'8' --->  56
         //'9' --->  57
 
-       int num = gender - 48;
+        // 如果忘记了'0'在ASCII码表中对应的数字，可以通过 System.out.println('0' + 0); 获得
+        // 也可以直接 int num = gender - '0';
+        int num = gender - 48;
         if(num % 2 == 0){
             System.out.println("性别为:女");
         }else{
@@ -13597,26 +13599,37 @@ public class StringDemo11 {
 }
 ```
 
-### 2.13 敏感词替换 
+----
+
+## 四、replace替换
+
+`String replace(旧值, 新值)` ——   替换。
+
+旧值：你要把谁进行替换；新值：替换成的内容。
+
+注意点：字符串本身是不能发生变化的，只有返回值才是替换之后的结果。
+
+---
+
+## 五、敏感词替换 
 
 需求1：键盘录入一个 字符串，如果字符串中包含（TMD），则使用***替换 
 
 ```java
-public class Test9敏感词替换 {
+package com.itheima.stringdemo;
+
+public class StringDemo12 {
     public static void main(String[] args) {
-        //1.定义一个变量表示骂人的话
-        String talk = "后裔你玩什么啊，TMD";
+        //1.获取到说的话
+        String talk = "你玩的真好，以后不要再玩了，TMD";
 
-
-        //2.把这句话中的敏感词进行替换
+        //2.把里面的敏感词TMD替换为***
         String result = talk.replace("TMD", "***");
 
-        //3.打印
-        System.out.println(talk);
-        System.out.println(result);
+        //3.打印结果
+        System.out.println(result); // 你玩的真好，以后不要再玩了，***
     }
 }
-
 ```
 
 需求2：如果要替换的敏感词比较多怎么办？
@@ -13644,17 +13657,78 @@ public class Test10多个敏感词替换 {
 
         //4.打印结果
         System.out.println(talk);//后裔你玩什么啊，***,***,***,***
-
     }
 }
-
 ```
 
-### 
+----
+
+## 六、查询String类帮助文档
+
+String类 定义在 `java.lang` 包是Java的核心包。所以我们在使用 `String` 这个类的包是不需要导包的。
+
+![](./assets/202404072323018.png)
+
+再看下面对类的描述，Java 程序中的所有字符串字面值（如 `"abc"` ）都作为此类的实例实现，示例就是对象，在Java里面凡是有双引号的都是String这个类的对象。
+
+字符串是常量：它们的值在创建之后不能更改。
+
+![image-20240407232558523](./assets/image-20240407232558523.png)
+
+关于它的版本，是 `JDK1.0` 出现的，因此在所有版本当中，都是可以使用的。
+
+<img src="./assets/image-20240407232829661.png" alt="image-20240407232829661" style="zoom: 67%;" />
+
+再往下，看它的构造
+
+![image-20240407233032601](./assets/image-20240407233032601.png)
+
+再往下，看它的成员方法，它的成员方法有很多很多，这些方法千万不要去背，以后用到了就到API文档来找就行了。
+
+![image-20240407233146647](./assets/image-20240407233146647.png)
+
+---
+
+## 七、操作字符串其他的类
+
+第一个类在这里拼接了1000000个字符串，右键运行。
+
+它虽然说也能拼接，但是程序一直没有结果，需要等很久很久才能等到结果。
+
+因此当数据量比较大的时候，一般是不会用字符串直接去拼接的。
+
+~~~java
+public class StringBuilderDemo1 {
+    public static void main(String[] args) {
+        String s = "";
+        for (int i = 0; i < 1000000; i++) {
+            s = s + "abc";
+        }
+        System.out.println(s);
+    }
+}
+~~~
+
+而是使用下列代码的方式，右键运行，‘刷’ 以下结果就出来了。
+
+~~~java
+public class StringBuilderDemo2 {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < 1000000; i++) {
+            sb.append("abc");
+        }
+        System.out.println(sb);
+    }
+}
+~~~
 
 
 
-## 3.StringBuilder
+----
+
+# 105.StringBuilder的基本操作
 
 StringBuilder 可以看成是一个容器，创建之后里面的内容是可变的。
 
