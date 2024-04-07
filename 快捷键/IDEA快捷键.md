@@ -18,7 +18,9 @@ shift + alt + f：全面查找
 
 
 
-`循环次数.fori` 可以直接打印出for循环
+`循环次数.fori` 可以直接正序打印出for循环，`循环次数.forr` 倒叙遍历。是倒叙遍历我们需要修改变量的名字，可以在出现for循环的时候直接修改，也可以按快捷键<kbd>shift + F6</kbd>批量修改，并且需要将 `length > 0` 改为 `length >= 0`'。
+
+![image-20240407204820041](./assets/image-20240407204820041.png)
 
 `数组名.fori` 直接打印出 `0 - 数组.length` 的fou循环
 
@@ -166,5 +168,5 @@ PTG插件可以1秒生成标准Javabean。
 
 
 
-
+快捷键：<kbd>ctrl + alt + T</kbd> 使用语句包裹
 

@@ -13003,7 +13003,7 @@ System.out.println(s1 == s2); // false
 
   例如我们需要比较 `验证码` 的时候就可以忽略大小写，此时就可以使用 `equalsIgnoreCase` 。
 
-**代码示例**
+**代码示例1**
 
 ~~~java
 package com.itheima.stringdemo;
@@ -13025,312 +13025,312 @@ public class StringDemo2 {
         System.out.println(result1);
 
         //4.比较字符串对象中的内容是否相等，忽略大小写
-        //1 一 壹 这不行
-        //忽略大小写只能是英文状态下的a A
+        //忽略大小写只能是英文状态下的a A，涉及到英文就不行了，例如：1 一 壹 这不行
         boolean result2 = s1.equalsIgnoreCase(s2);
         System.out.println(result2);//true
     }
 }
 ~~~
 
+**代码示例2**
 
+~~~java
+package com.itheima.stringdemo;
 
+import java.util.Scanner;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#### 2equals方法的作用
-
-- 方法介绍
-
-  ```java
-  public boolean equals(String s)     比较两个字符串内容是否相同、区分大小写
-  ```
-
-- 示例代码
-
-  ```java
-  public class StringDemo02 {
-      public static void main(String[] args) {
-          //构造方法的方式得到对象
-          char[] chs = {'a', 'b', 'c'};
-          String s1 = new String(chs);
-          String s2 = new String(chs);
-  
-          //直接赋值的方式得到对象
-          String s3 = "abc";
-          String s4 = "abc";
-  
-          //比较字符串对象地址是否相同
-          System.out.println(s1 == s2);
-          System.out.println(s1 == s3);
-          System.out.println(s3 == s4);
-          System.out.println("--------");
-  
-          //比较字符串内容是否相同
-          System.out.println(s1.equals(s2));
-          System.out.println(s1.equals(s3));
-          System.out.println(s3.equals(s4));
-      }
-  }
-  ```
-
-### 2.6用户登录案例
-
-#### 2.6.1案例需求
-
-​	已知用户名和密码，请用程序实现模拟用户登录。总共给三次机会，登录之后，给出相应的提示
-
-#### 2.6.2代码实现
-
-```java
-public class Test1登录案例 {
+public class StringDemo3 {
     public static void main(String[] args) {
-        //1.定义两个变量用来记录正确的用户名和密码
-        String rightUsername = "itheima";
-        String rightPassword = "1234qwer";
+        //1.假设我现在键盘录入一个abc
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请输入一个字符串");
+        String str1 = sc.next();//abc，键盘录入得到的这个字符串是 `new` 出来的！
+        //2.代码中再定义一个字符串abc
+        String str2 = "abc";
+        //3.用==比较，这两者能一样吗？
+        System.out.println(str1 == str2);//4.答案为false，一个是在堆中，一个是在串池中，肯定地址不一样！
+    }
+}
+~~~
 
+
+
+---
+
+# 100.练习——登录
+
+## 一、查看 `Scanner类中next()方法` 的原码
+
+看源码前要知道，Java的原码写的非常非常的复杂，我们千万不要自己一个人去看，自己一个人去看会看抑郁的。
+
+现在带着大家一点一点去找，找到 `next` 里的核心代码，后面随着我们学的东西渐渐深入，我们再一点一点加大难度。
+
+选中 `next` 方法
+
+![image-20240407191943779](./assets/image-20240407191943779.png)
+
+<kbd>ctrl + b</kbd> 跟进源码，方法返回一个 `token`，这个 `token` 其实就是我们键盘录入的数据。
+
+<img src="./assets/image-20240407192224233.png" alt="image-20240407192224233" style="zoom:80%;" />
+
+这个数据是通过 `getCompleteTokenInBuffer()` 方法得到的，所以我们最终还是要看这个方法。选中它，<kbd>ctrl + b</kbd>。这个方法里的代码就非常非常多了，但是不用慌。
+
+继续往下看，返回的是 `s`，而 `s` 又是通过这里的 `group()` 方法得到的。
+
+![image-20240407192459832](./assets/image-20240407192459832.png)
+
+<kbd>ctrl + b</kbd>进入 `group()`，所以要找这里的 `group`。
+
+![image-20240407192633701](./assets/image-20240407192633701.png)
+
+它又调用了 `group(0)`，继续<kbd>ctrl + b</kbd>。最终，它return的是下面选中的这一堆。
+
+![image-20240407192737423](./assets/image-20240407192737423.png)
+
+接下来我们选中 `getSubSequence()` 再来 <kbd>ctrl + b</kbd> ，
+
+![image-20240407192815579](./assets/image-20240407192815579.png)
+
+选中 `subSequence` 再来<kbd>ctrl + b</kbd>，进入 `subSequence` 方法后，发现这个方法没有方法体
+
+![image-20240407192926592](./assets/image-20240407192926592.png)
+
+此时我们需要回到上一步，选中 `ubSequence` ——> Go To ——> Implementation(s)，快捷键是<kbd>Ctrl + Alt + B</kbd>
+
+![image-20240407193105588](./assets/image-20240407193105588.png)
+
+然后选中一个有方法体的，例如我们可以选择 `String`。
+
+![image-20240407193339658](./assets/image-20240407193339658.png)
+
+然后再选择这里的 `substring`
+
+![image-20240407193438803](./assets/image-20240407193438803.png)
+
+此时我们需要找到这里的 `newString`，<kbd>ctrl + b</kbd>
+
+![image-20240407193521592](./assets/image-20240407193521592.png)
+
+此时我们就可以发现，通过刚刚一大堆洋洋洒洒的跟进，终于找到了它的核心代码。此时我们就会发现，它是 `new` 出来的！
+
+因此关于刚刚找的过程其实并不重要，我们只需要知道一个核心点：键盘录入得到的这个字符串是 `new` 出来的！
+
+**结论：以后只要想比较字符串的内容，就必须要用String里面的方法！**
+
+----
+
+## 二、用户登录
+
+需求：已知正确的用户名和密码，请用程序实现模拟用户登录。总共给三次机会，登录之后，给出相应的提示。
+
+快捷键：<kbd>ctrl + alt + T</kbd> 使用语句包裹，但是这个如果选择的是 `for`，出现的for语句就需要我们自己手动去补里面的语句。
+
+![image-20240407194913495](./assets/image-20240407194913495.png)
+
+因此在这里就可以直接输入 `3.fori` 然后回车，直接将需要放入的语句 <kbd>ctrl + X </kbd>、<kbd>ctrl + V</kbd> 粘贴过来。
+
+~~~java
+package com.itheima.stringdemo;
+
+import java.util.Scanner;
+
+public class StringDemo4 {
+    public static void main(String[] args) {
+        //读题拆解法
+
+        //1.定义两个变量记录正确的用户名和密码
+        String rightUsername = "zhangsan";
+        String rightPassword = "123456";
+
+
+        Scanner sc = new Scanner(System.in);
         //2.键盘录入用户名和密码
-        //ctrl + alt + T 选择包裹方式
-
-        for (int i = 0; i < 3; i++) {//0 1 2
-            Scanner sc = new Scanner(System.in);
+        for (int i = 0; i < 3; i++) {// 0 1 2，由于在这里，已经明确的知道了循环的此时，因此我们在这里需要使用 for循环
             System.out.println("请输入用户名");
             String username = sc.next();
             System.out.println("请输入密码");
             String password = sc.next();
 
-            //3.判断比较
+            //3.比较
             if (username.equals(rightUsername) && password.equals(rightPassword)) {
-                System.out.println("登录成功");
-                //如果正确，循环结束
+                System.out.println("用户登录成功");
                 break;
             } else {
-                //最后一次机会
                 if(i == 2){
-                    System.out.println("账户" + username + "被锁定，请联系黑马程序员官方小姐姐：XXXXXXX");
+                    //最后一次机会也输入错误，此时要提示账号被锁定
+                    System.out.println("账号" + username + "被锁定，请联系黑马程序员官方客服小姐姐:XXX-XXXXX");
                 }else{
-                    //不是最后一次机会
-                    System.out.println("用户名或密码错误，登录失败,还剩下" + (2 - i) + "次机会");//2 1 0
+                    System.out.println("用户登录失败，用户名或密码有误,您还剩下" + (2 - i) + "次机会");//2 1 0
                 }
             }
         }
-
     }
 }
+~~~
 
-```
 
-### 2.7遍历字符串案例
 
-#### 2.7.1案例需求
+----
 
-​	键盘录入一个字符串，使用程序实现在控制台遍历该字符串
+# 101.遍历字符串和统计字符个数
 
-#### 2.7.2直接遍历字符串
+## 一、引入
 
-```java
-public class Test2字符串直接遍历 {
+在之前我们遍历过数组，所谓遍历就是将数组中每一个元素都给获取出来。
+
+现在遍历字符串也是一样的，就是我们需要将字符串里的每一个字符都给拿出来。
+
+----
+
+## 二、涉及到的方法
+
+- `public char charAt(int index)` ：根据索引返回对应的字符
+
+字符串也是有索引的，例如`"钢门123吹小雪"` 为例，对应的索引分别为 `0 1 2 3 4 5 6 7`，可以发现，这个跟我们之前数组索引的规则一模一样！
+
+- `public int length()`：返回此字符串的长度
+
+区分 —— 数组的长度：`数组名.length`，数组的长度是一个属性，所以我们在调用的时候 `length` 后面是不加小括号的。而字符串的长度是一个方法，方法在调用的时候 `length` 是需要加小括号的。
+
+**代码示例**
+
+~~~java
+package com.itheima.stringdemo;
+import java.util.Scanner;
+
+public class StringDemo5 {
     public static void main(String[] args) {
-        //两个方法：
-        //charAt()：会根据索引获取对应的字符
-        //length(): 会返回字符串的长度
-
-
         //1.键盘录入一个字符串
         Scanner sc = new Scanner(System.in);
-        System.out.println("请输入字符串");
+        System.out.println("请输入一个字符串");
         String str = sc.next();
-        System.out.println(str);
-
-        //2.遍历
+        //2.进行遍历
         for (int i = 0; i < str.length(); i++) {
             //i 依次表示字符串的每一个索引
-            //索引的范围：0 ~  长度-1
-
-            //根据索引获取字符串里面的每一个字符
-            //ctrl + alt + V 自动生成左边的接受变量
             char c = str.charAt(i);
             System.out.println(c);
         }
     }
 }
+~~~
 
-```
+---
 
-### 2.8统计字符次数案例
+## 三、练习：统计字符串个数
 
-#### 2.8.1案例需求
+需求：键盘录入一个字符串，统计该字符串中大写字母字符，小写字母字符，数字字符出现的次数（不考虑其他字符）
 
-​	键盘录入一个字符串，统计该字符串中大写字母字符，小写字母字符，数字字符出现的次数(不考虑其他字符)
+~~~java
+package com.itheima.stringdemo;
 
-#### 2.8.2代码实现
+import java.util.Scanner;
 
-```java
-public class Test4统计个数 {
+public class StringDemo6 {
     public static void main(String[] args) {
-        //键盘录入一个字符串，统计大写，小写，数字出现的次数
-
-
         //1.键盘录入一个字符串
         Scanner sc = new Scanner(System.in);
         System.out.println("请输入一个字符串");
         String str = sc.next();
-
-
-        //2.统计 --- 计数器count
-        //此时我要统计的有3样东西，所以要定义3个计数器分别进行统计
+        //2.统计--- 计数器思想
+        //定义三个计数器
         int bigCount = 0;
         int smallCount = 0;
         int numberCount = 0;
-        //得到这个字符串里面每一个字符
+        // 如果还需要统计其他字符，只需要再加一个 otherCount 即可
         for (int i = 0; i < str.length(); i++) {
-            //i 表示字符串中的索引
-            //c 表示字符串中的每一个字符
+            //i 依次表示字符串中的每一个索引
             char c = str.charAt(i);
-
-            //对c进行判断
-            if (c >= 'a' && c <= 'z') {
+            if(c >= 'a' && c <= 'z'){
+                //char类型的变量在参与计算的时候自动类型提升为int，在提升的时候就会自动查询ascii码表，变成对应的数字，然后再去进行比较
                 smallCount++;
             }else if(c >= 'A' && c <= 'Z'){
                 bigCount++;
+            // 注：如果写成 "c >= 0 && c <= 9" 就会出问题，因为在ASCII码表中，字符 '0' 所对应的数字其实是 48 ，字符 '9' 所对应的数字其实是57。
             }else if(c >= '0' && c <= '9'){
                 numberCount++;
             }
         }
 
-        //3.当循环结束之后，三个变量记录的就是对应的个数
-        System.out.println("大写字符有:" + bigCount + "个");
-        System.out.println("小写字符有:" + smallCount + "个");
-        System.out.println("数字字符有:" + numberCount + "个");
+        //3.输出打印
+        System.out.println("小写字母有：" + smallCount + "个");
+        System.out.println("大写字母有：" + bigCount + "个");
+        System.out.println("数字字母有：" + numberCount + "个");
     }
 }
+~~~
 
-```
 
-### 2.9字符串拼接案例
 
-#### 2.9.1案例需求
+----
 
-​	定义一个方法，把 int 数组中的数据按照指定的格式拼接成一个字符串返回，调用该方法，
+# 102.练习：字符串拼接和反转
 
-​	并在控制台输出结果。例如，数组为 int[] arr = {1,2,3}; ，执行方法后的输出结果为：[1, 2, 3]
+## 一、拼接字符串
 
-#### 2.9.2代码实现
+定义一个方法，把 int 数组中的数据按照指定的格式拼接成一个字符串返回，调用该方法，
 
-```java
-public class Test5数组拼接成字符串 {
+并在控制台输出结果。例如，数组为 int[] arr = {1,2,3}; ，执行方法后的输出结果为：[1, 2, 3]
+
+PS：不要忘记特判！
+
+~~~java
+package com.itheima.stringdemo;
+
+public class StringDemo7 {
     public static void main(String[] args) {
-        //定义一个方法，把 int 数组中的数据按照指定的格式拼接成一个字符串返回，调用该方法，
-        //并在控制台输出结果。例如，数组为 int[] arr = {1,2,3};
-        //执行方法后的输出结果为：[1, 2, 3]
-
-
-        int[] arr = {1, 2, 3, 4, 5};
+        int[] arr = {1,2,3};
 
         String str = arrToString(arr);
-        System.out.println(str);
-
+        System.out.println(str);//[123
     }
 
 
-    //作用：把一个数组变成字符串
-    public static String arrToString(int[] arr) {
-        String s = "";
-        //拼接左括号
-        s = s + "["; //此时是拿着长度为0的字符串，跟[进行拼接，产生一个新的字符串。
-        //把新的字符串再赋值给s，此时变量s记录的就是新的字符串"["的地址值
-
-        //下面我想得到数组里面的每一个元素并进行拼接
-        //那么就需要遍历数组，得到每一个元素才行
-        for (int i = 0; i < arr.length; i++) {
-            //假设第一次循环:i = 0 获取的就是0索引上的元素
-            //在拼接的时候："[" + 1 + ", " 拼接完毕之后产生一个新的字符串 "[1, "
-            //第二次循环：i = 1 获取的就是1索引上的元素
-            //在拼接的时候： 此时s就是第一次循环结束后拼接完毕的结果："[1, "
-            //在拼接的时候："[1, " + 2 + ", " 拼接完毕之后产生一个新的字符串 "[1, 2, "
-            //...
-           if(i == arr.length - 1){
-               //如果是最后一个元素，那么不需要拼接逗号空格
-               s = s + arr[i];
-           }else{
-               //如果不是最后一个元素，需要拼接元素和逗号空格
-               s = s + arr[i] + ", ";
-           }
+    //1.我要干嘛？ --- 遍历数组并把数组拼接成一个字符串
+    //2.我干这件事情需要什么才能完成？ --- 数组
+    //3.我干完了是否要把结果返回给调用处 --- 返回一个拼接之后的字符串
+    //如果调用处需要继续使用，那么必须返回
+    //如果调用处不需要继续使用，那么可以返回也可以不返回
+    public static String arrToString(int[] arr){
+        if(arr == null){
+            return "";
         }
 
-        //等循环结束之后，再拼接最后一个右括号
-        s = s + "]";
+        if(arr.length == 0){
+            return "[]";
+        }
 
-        return s;
-
-    }
-
-
-    //用来遍历数组
-    public static void printArr(int[] arr) {
-        System.out.print("[");
+        String result = "[";
+        //当代码执行到这里表示什么？
+        //表示数组不是null，也不是长度为0的
         for (int i = 0; i < arr.length; i++) {
-            if (i == arr.length - 1) {
-                System.out.print(arr[i]);
-            } else {
-                System.out.print(arr[i] + ", ");
+            //i表示的是索引，arr[i]表示的是元素
+            result = result + arr[i];
+            if (i != arr.length - 1) {
+                result += ", ";
             }
         }
-        System.out.println("]");
-
-        //[1, 2, 3, 4, 5]
-        //我们现在要知道，这个最终结果是怎么来的？
-        //从到右依次打印得来的。
+        //此时拼接右括号
+        result = result + "]";
+        return result;
     }
 }
+~~~
 
-```
+----
 
-### 2.10字符串反转案例
+## 二、练习：字符串反转
 
-#### 2.10.1案例需求
+定义一个方法，实现字符串反转。键盘录入一个字符串，调用该方法后，在控制台输出结果。例如，键盘录入 abc，输出结果 cba
 
-​	定义一个方法，实现字符串反转。键盘录入一个字符串，调用该方法后，在控制台输出结果
-
-​	例如，键盘录入 abc，输出结果 cba
-
-#### 2.10.2代码实现
+> IDEA快捷键：fori :正着遍历 ，forr：倒着遍历。但是倒叙遍历我们需要修改变量的名字，可以在出现for循环的时候直接修改，也可以按快捷键<kbd>shift + F6</kbd>批量修改，并且需要将 `length > 0` 改为 `length >= 0`'。
+>
+> ![image-20240407204804568](./assets/image-20240407204804568.png)
 
 ```java
 public class Test6反转字符串 {
     public static void main(String[] args) {
         /*定义一个方法，实现字符串反转。键盘录入一个字符串，调用该方法后，在控制台输出结果
         例如，键盘录入 abc，输出结果 cba*/
-
 
 
         //1.定义一个字符串
@@ -13342,15 +13342,13 @@ public class Test6反转字符串 {
         //可以把字符串倒着遍历，再拼接
         String result = reverse(str);
         System.out.println(result);
-
-
     }
 
     //注释：方法的作用就是反转字符串
     //把传递进来的字符串进行反转
     public static String reverse(String str){//abc
         //核心思想：倒着遍历并进行拼接就可以了
-        //fori :正着遍历  forr：倒着遍历
+        //IDEA快捷键：fori :正着遍历  forr：倒着遍历
         String s = "";
         for (int i = str.length() - 1; i >= 0; i--) {
             //i 依次表示字符串里面的每一个索引（倒着的）
@@ -13360,21 +13358,55 @@ public class Test6反转字符串 {
 
         //把倒着拼接之后的结果返回即可
         return s;
-
     }
 }
-
 ```
 
-### 2.11 金额转换
 
-#### 2.11.1 案例需求
 
-​	把2135变成：零佰零拾零万贰仟壹佰叁拾伍元 
+----
 
-​	把789变成：零佰零拾零万零仟柒佰捌拾玖元
+# 103.练习：金额转换
 
-#### 2.11.2 代码实现
+## 一、介绍
+
+金额转换在不同的业务场景当中会有不同的逻辑，现在我们的业务场景是针对于发票上的金额转换，我们需要将左下角输入的整数转为大写的汉字。注意，这里的总长度它是7位的。
+
+![image-20240407205254947](./assets/image-20240407205254947.png)
+
+案例需求：把 `2135` 变成：`零佰零拾零万贰仟壹佰叁拾伍元`。把 `789` 变成：`零佰零拾零万零仟柒佰捌拾玖元`。
+
+这个就需要用到我们之前说的：反向逆推法。反向逆推法需要从后往前推，我们可以将 `零佰零拾零万贰仟壹佰叁拾伍元` 先去掉单位变成 `零零零贰壹叁伍`，这样来看就稍微简单一些。然后我们可以再将前面的 `零` 去掉，变成 `贰壹叁伍`，然后再将大写的 `贰壹叁伍` 变成整数 `2135` 就是题目一开始的最初数据了。
+
+<img src="./assets/image-20240407205622234.png" alt="image-20240407205622234" style="zoom:67%;" />
+
+那么我们在写代码的时候将刚刚的思路反过来写，一步一步从上往下就好了。
+
+<img src="./assets/image-20240407205655533.png" alt="image-20240407205655533" style="zoom:67%;" />
+
+---
+
+## 二、思路
+
+### 1、将 `2135` 变成大写的 `贰壹叁伍`
+
+一开始我们可以遍历 `2135` 获取到里面的每一个数字，得到数字之后我们再进行转换就可以了。
+
+在转换的时候我们可以把大写的内容存到一个数组当中，让 `大写的中文` 跟 `索引` 去一一对应。然后我们就可以把金额里面的每一个数字当做索引去数组里面找大写的中文就可以了。例如我拿到数字 `2`，把 `2` 当做索引到数组中去找大写的 `贰` 就行。
+
+这种思路就是我们变成思想中的 `查表法`，所谓 `表` 其实就是下面的这个数组，组数中把数据跟索引产生一个一一对应的关系。
+
+![image-20240407212546779](./assets/image-20240407212546779.png)
+
+这种思路在很多地方都能用到，例如 `星期跟数字`，`1` 对应 `星期一`，`2` 对应 `星期二`，`3` 对应 `星期三` 等等。
+
+### 2、补零，补齐7位即可
+
+### 3、在中间插入单位
+
+----
+
+## 三、代码
 
 ```java
 package com.itheima.stringdemo;
@@ -13385,10 +13417,10 @@ public class StringDemo9 {
     public static void main(String[] args) {
         //1.键盘录入一个金额
         Scanner sc = new Scanner(System.in);
-        int money;
+        int money; // money需要定义在循环的外面，这个地方叫做定义
         while (true) {
             System.out.println("请录入一个金额");
-            money = sc.nextInt();
+            money = sc.nextInt(); // 这里就是给变量进行赋值
             if (money >= 0 && money <= 9999999) {
                 break;
             } else {
@@ -13429,7 +13461,7 @@ public class StringDemo9 {
         String[] arr = {"佰","拾","万","仟","佰","拾","元"};
         //               零    零   零   贰   壹   叁   伍
 
-        //遍历moneyStr，依次得到 零    零   零   贰   壹   叁   伍
+        //做法：遍历moneyStr，依次得到 零    零   零   贰   壹   叁   伍
         //然后把arr的单位插入进去
 
         String result = "";
@@ -13441,112 +13473,68 @@ public class StringDemo9 {
 
         //5.打印最终结果
         System.out.println(result);
-
     }
 
-
     //定义一个方法把数字变成大写的中文
-    //1 -- 壹
+    //如果传进来的是 1 -- 就将大写的壹
+    // Capital：大写字母
     public static String getCapitalNumber(int number) {
         //定义数组，让数字跟大写的中文产生一个对应关系
         String[] arr = {"零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖"};
         //返回结果
         return arr[number];
     }
-
 }
-
 ```
 
-### 2.12 手机号屏蔽
 
-需求：以字符串的形式从键盘接受一个手机号，将中间四位号码屏蔽
 
-最终效果为：`131****9468`
+---
 
-代码实现：
+# 104.练习：手机号屏蔽、身份证信息查看、敏感词替换
+
+## 一、substring字符串截取
+
+字符串截取：`String substring(int beginIndex, int endIndex)`，它可以从一个大的字符串中把字符串的一部分给截取出来。括号里面传递的就是索引，从 `beginIndex`（开始索引） 开始截取，截取到 `endIndex`（结束索引）。
+
+> PS：
+>
+> 1、包头不包尾，包左不包右。
+>
+> 2、只有返回值才是截取的小串，它对原来的字符串是没有任何影响的，因为字符串本身是不能发生变化的。
+
+`substring` 还有一个重载的方法，就是一个参数的，我们只需要传入一个 `beginIndex` ，默认截取到末尾。
+
+----
+
+## 二、手机号屏蔽
+
+需求：以字符串的形式从键盘接受一个手机号，将中间四位号码屏蔽，最终效果为：`131****9468`。
 
 ```java
-public class Test8手机号屏蔽 {
+package com.itheima.stringdemo;
+
+public class StringDemo10 {
     public static void main(String[] args) {
-        /*以字符串的形式从键盘接受一个手机号，将中间四位号码屏蔽
-        最终效果为：131****9468*/
+        //1.获取一个手机号码
+        String phoneNumber = "13112349468";
 
-        //1.键盘录入一个手机号码
-        Scanner sc = new Scanner(System.in);
-        System.out.println("请输入手机号码");
-        String phoneNumber = sc.next();//13112349408
+        //2.截取手机号码前面三位，注意 “phoneNumber.substring(0, 3)” 一定要复制给新的变量，原字符串是不改变的！
+        String start = phoneNumber.substring(0, 3);
 
-        //2.截取手机号码中的前三位
-        String star = phoneNumber.substring(0, 3);
-
-        //3.截取手机号码中的最后四位
-        //此时我用substring方法，是用1个参数的，还是两个参数的？1个参数的会更好
-        //因为现在我要截取到最后，所以建议使用1个参数的。
+        //3.截取手机号码后面四位
         String end = phoneNumber.substring(7);
 
         //4.拼接
-        String result = star + "****" + end;
+        String result = start + "****" + end;
 
-        System.out.println(result);
-
-    }
-}
-
-```
-
-### 2.13 敏感词替换 
-
-需求1：键盘录入一个 字符串，如果字符串中包含（TMD），则使用***替换 
-
-```java
-public class Test9敏感词替换 {
-    public static void main(String[] args) {
-        //1.定义一个变量表示骂人的话
-        String talk = "后裔你玩什么啊，TMD";
-
-
-        //2.把这句话中的敏感词进行替换
-        String result = talk.replace("TMD", "***");
-
-        //3.打印
-        System.out.println(talk);
+        //5.打印
         System.out.println(result);
     }
 }
-
 ```
 
-需求2：如果要替换的敏感词比较多怎么办？
-
-```java
-public class Test10多个敏感词替换 {
-    public static void main(String[] args) {
-        //实际开发中，敏感词会有很多很多
-
-        //1.先键盘录入要说的话
-        Scanner sc = new Scanner(System.in);
-        System.out.println("请输入要说的话");
-        String talk = sc.next();//后裔你玩什么啊，TMD,GDX,ctmd,ZZ
-
-        //2.定义一个数组用来存多个敏感词
-        String[] arr = {"TMD","GDX","ctmd","ZZ","lj","FW","nt"};
-
-        //3.把说的话中所有的敏感词都替换为***
-
-        for (int i = 0; i < arr.length; i++) {
-            //i 索引
-            //arr[i] 元素 --- 敏感词
-            talk = talk.replace(arr[i],"***");
-        }
-
-        //4.打印结果
-        System.out.println(talk);//后裔你玩什么啊，***,***,***,***
-
-    }
-}
-
-```
+----
 
 ### 2.14 身份证信息查看
 
@@ -13608,6 +13596,63 @@ public class StringDemo11 {
     }
 }
 ```
+
+### 2.13 敏感词替换 
+
+需求1：键盘录入一个 字符串，如果字符串中包含（TMD），则使用***替换 
+
+```java
+public class Test9敏感词替换 {
+    public static void main(String[] args) {
+        //1.定义一个变量表示骂人的话
+        String talk = "后裔你玩什么啊，TMD";
+
+
+        //2.把这句话中的敏感词进行替换
+        String result = talk.replace("TMD", "***");
+
+        //3.打印
+        System.out.println(talk);
+        System.out.println(result);
+    }
+}
+
+```
+
+需求2：如果要替换的敏感词比较多怎么办？
+
+```java
+public class Test10多个敏感词替换 {
+    public static void main(String[] args) {
+        //实际开发中，敏感词会有很多很多
+
+        //1.先键盘录入要说的话
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请输入要说的话");
+        String talk = sc.next();//后裔你玩什么啊，TMD,GDX,ctmd,ZZ
+
+        //2.定义一个数组用来存多个敏感词
+        String[] arr = {"TMD","GDX","ctmd","ZZ","lj","FW","nt"};
+
+        //3.把说的话中所有的敏感词都替换为***
+
+        for (int i = 0; i < arr.length; i++) {
+            //i 索引
+            //arr[i] 元素 --- 敏感词
+            talk = talk.replace(arr[i],"***");
+        }
+
+        //4.打印结果
+        System.out.println(talk);//后裔你玩什么啊，***,***,***,***
+
+    }
+}
+
+```
+
+### 
+
+
 
 ## 3.StringBuilder
 
