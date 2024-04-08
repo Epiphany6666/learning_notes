@@ -170,3 +170,19 @@ PTG插件可以1秒生成标准Javabean。
 
 快捷键：<kbd>ctrl + alt + T</kbd> 使用语句包裹
 
+快捷键<kbd>ctrl + N</kbd> ，就会出现一个搜索的界面
+
+![image-20240408172336795](./assets/image-20240408172336795.png)
+
+然后输入 `StringBuilder`，点开右上角的 `Project Files` 默认情况下会选择 `Project Files` ，表示是在你当前项目中去找 `StringBuilder`，但我当前项目肯定没有，`StringBuilder` 是Java提供的。
+
+![image-20240408172514999](./assets/image-20240408172514999.png)
+
+因此我们需要将右上角选择成 `All Places`，表示在所有的地方都进行查询。
+
+此时在下面就会出现 `StringBuilder` 相关所出现的所有的类。
+
+按快捷键 <kbd>ctrl + F12</kbd>，我们需要来找一个 `toString()` 方法，直接输入 `toString`，然后点进去即可。
+
+![image-20240408173002318](./assets/image-20240408173002318.png)
+
