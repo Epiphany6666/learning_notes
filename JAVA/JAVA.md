@@ -930,7 +930,7 @@ C语言就是标准的编译型语言，它会将C/C++代码根据不同的操�
 
 3、**开发工具**：例如：javac 编译工具、java 运行工具、jdb 调试工具、jhat内存分析工具 ......
 
-它们三个组成的整体，就叫JDK。JDK（Java Development Kit）称为Java开发工具包，包含了JRE和开发工具。
+它们三个组成的整体，就叫**JDK**。**JDK（Java Development Kit）称为Java开发工具包，包含了JRE和开发工具**。
 
 所以说简单理解程序员想要编写代码并且能成功运行，我们需要安装一个JDK就可以了。
 
@@ -13730,27 +13730,99 @@ public class StringBuilderDemo2 {
 
 # 105.StringBuilder的基本操作
 
+## 一、引入
+
+如果我们用以前的方式去拼接 `10000万` 个字符串，代码也能写，但是拼起来之后速度非常非常慢。
+
+但我想要的是速度非常非常快，所以就可以使用我们今天所学的 `StringBuilder` 开始拼接，这种方式 `刷` 一下就拼接完毕了。
+
+![image-20240408150635616](./assets/image-20240408150635616.png)
+
 StringBuilder 可以看成是一个容器，创建之后里面的内容是可变的。
 
-当我们在拼接字符串和反转字符串的时候会使用到
+**因此它的作用就是用来提高字符串的操作效率。它只是操作字符串的一个工具，并不是真的字符串。**
 
-### 3.1 基本使用
+例如以下代码，`String s6 = s1 + s2 + s3 + s4 + s5;` 在拼接的过程中产生了很多没用的字符串，每一次通过 `+` 的拼接都会产生一个新的字符串，但这些东西非常影响内存和运行效率，这并不是我们想要的结果，我想要的是一种快捷的方式。
 
-```java
+~~~java
+String s1 = "aaa";
+String s2 = "bbb";
+String s3 = "ccc";
+String s4 = "ddd";
+String s5 = "eee";
+String s6 = s1 + s2 + s3 + s4 + s5;
+~~~
+
+此时就可以使用 `StringBuilder` ，StringBuilder可以看做是一个容器，里面的内容是可以发生变化的，因此当 `s6` 在变化的时候都是在一个容器里发生变化的，并不会产生那么多没有用的字符串。
+
+![image-20240408151407094](./assets/image-20240408151407094.png)
+
+----
+
+## 二、StringBuilder 的构造方法
+
+`StringBuilder` 一共有两个构造。
+
+| 方法名                             | 说明                                       |
+| :--------------------------------- | :----------------------------------------- |
+| `public StringBuilder()`           | 创建一个空白可变字符串对象，不包含任何内容 |
+| `public StringBuilder(String str)` | 根据字符串的内容，来创建可变字符串对象     |
+
+![image-20240408151734748](./assets/image-20240408151734748.png)
+
+----
+
+## 三、`StringBuilder` 常用方法
+
+| 方法名                                  | 说明                                                    |
+| --------------------------------------- | ------------------------------------------------------- |
+| `public StringBuilder append(任意类型)` | 添加数据，并返回对象本身                                |
+| `public StringBuilder reverse()`        | 反转容器中的内容                                        |
+| `public int length()`                   | 返回长度（字符出现的个数）                              |
+| `public String toString()`              | 通过 `toString()` 就可以把`StringBuilder`转换为`String` |
+
+**代码示例**
+
+PS：在Java中起名字的时候会有个小习惯，如果变量名不知道起什么，就可以用类型的首字母来做变量名。而 `StringBuilder` 类型是两个单词，第一个单词首字母是 `s`，第二个单词首字母是 `b`，所以合起来就是 `sb`。同样我们也可以通过查阅 `API帮助文档`，看看它上的示例命名是什么。
+
+![image-20240408152453115](./assets/image-20240408152453115.png)
+
+下述代码很奇怪，`sb` 是 `new` 出来的对象，我打印一个对象应该是地址值才对，为什么这里什么都没有。
+
+这是因为 `StringBuilder` 不是我们写的，而是Java已经写好的一个类。Java在底层对它做了一些特殊处理：打印对象不是地址值，而是属性值。
+
+~~~java
+StringBuilder sb = new StringBuilder();
+System.out.println(sb); // 结果是什么也没有
+~~~
+
+既然打印出来的是属性值，那下面代码打印结果就很好解释了。
+
+~~~java
+StringBuilder sb = new StringBuilder("abc");
+System.out.println(sb); // abc
+~~~
+
+调用其方法
+
+~~~java
+package com.itheima.stringbuilderdemo;
+
 public class StringBuilderDemo3 {
     public static void main(String[] args) {
         //1.创建对象
         StringBuilder sb = new StringBuilder("abc");
 
         //2.添加元素
-        /*sb.append(1);
+        sb.append(1);
         sb.append(2.3);
-        sb.append(true);*/
+        sb.append(true); // 将这些进行字符串拼接，只不过这种拼接是在单个容器内部的拼接，而不是产生新的字符串
 
-        //反转
+        //3.反转
+        // PS：它是在容器内部直接做了反转。它跟字符串不一样，字符串本身是不能变化的，只有返回值才是截取、替换之后的结果；而 StringBuilder容器 里的内容是可以发生变化的，一旦调用 reverse() 方法后，容器内的数据就直接被反转过来了。
         sb.reverse();
 
-        //获取长度
+        //4.获取长度
         int len = sb.length();
         System.out.println(len);
 
@@ -13763,34 +13835,85 @@ public class StringBuilderDemo3 {
         System.out.println(sb);
     }
 }
-```
+~~~
 
-### 3.2 链式编程
+使用 `toString()`
 
-```java
+~~~java
+package com.itheima.stringbuilderdemo;
+
 public class StringBuilderDemo4 {
     public static void main(String[] args) {
         //1.创建对象
         StringBuilder sb = new StringBuilder();
 
         //2.添加字符串
-        sb.append("aaa").append("bbb").append("ccc").append("ddd");
+        sb.append("aaa");
+        sb.append("bbb");
+        sb.append("ccc");
+        sb.append("ddd");
 
-        System.out.println(sb);//aaabbbcccddd
+        System.out.println(sb);//aaabbbcccddd，但是这个 sb 并不能直接被当做字符串，因为 sb 是StringBuilder类型的，这个 sb 只是一个容器，是来帮助我们操作字符串的工具。因此在我们拼接完后，还需要再把 StringBuilder 变回字符串才可以。
 
         //3.再把StringBuilder变回字符串
         String str = sb.toString();
         System.out.println(str);//aaabbbcccddd
+    }
+}
+~~~
 
+----
+
+## 四、链式编程
+
+链式编程：表示当我们在调用一个方法的时候，不需要用变量接收它的结果，可以继续调用其他方法。
+
+```java
+package com.itheima.stringbuilderdemo;
+
+import java.util.Scanner;
+
+public class StringBuilderDemo5 {
+    public static void main(String[] args) {
+        // getString() 得到的是一个字符串，我们就可以使用这个字符串去调用字符串中的 substring 方法。
+        // substring 截取完后得到的又是一个新的字符串，此时我们还可以继续对这个新的字符串进行操作，例如 replace("A", "Q") ，将大写 A 替换成大写 Q 。
+        // 替换完后再去调用 length() 获取它的长度，而 length() 方法获取的是一个整数，此时它就不能再去调用字符串的方法了。
+        int len = getString().substring(1).replace("A", "Q").length();
+        System.out.println(len);
+    }
+
+    public static String getString(){ // 获取键盘里的字符串，然后把字符串做一个返回
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请输入一个字符串");
+        String str = sc.next();
+        return str;
     }
 }
 ```
 
-### 3.3 练习1：对称字符串 
+学习完链式编程之后，我们就可以对刚刚的代码进行一个简化。
 
-需求：
+这是因为当我们调用 `append()` 方法之后它会返回一个 `StringBuilder` 对象，也就是所它把调用者的容器进行了一个返回，因此每一次的 `append()` 都会将容器进行返回，因此 `append()` 方法的结果还是 `StringBuilder` 对象，即这里的 `sb`。
 
-​	键盘接受一个字符串，程序判断出该字符串是否是对称字符串，并在控制台打印是或不是
+![image-20240408154424595](./assets/image-20240408154424595.png)
+
+~~~java
+sb.append("aaa");
+sb.append("bbb");
+sb.append("ccc");
+sb.append("ddd");
+
+// 可直接写成
+sb.append("aaa").append("bbb").append("ccc").append("ddd");
+~~~
+
+----
+
+## 五、练习一：对称字符串 
+
+需求：键盘接受一个字符串，程序判断出该字符串是否是对称字符串，并在控制台打印是或不是
+
+例如：
 
   	对称字符串：123321、111
   	
@@ -13799,6 +13922,10 @@ public class StringBuilderDemo4 {
 代码示例：
 
 ```java
+package com.itheima.stringbuilderdemo;
+
+import java.util.Scanner;
+
 public class StringBuilderDemo6 {
     //使用StringBuilder的场景：
     //1.字符串的拼接
@@ -13819,23 +13946,17 @@ public class StringBuilderDemo6 {
         }else{
             System.out.println("当前字符串不是对称字符串");
         }
-
     }
 }
-
 ```
 
+----
 
-
-### 3.4 练习2：拼接字符串 
+## 六、练习2：拼接字符串 
 
 需求：定义一个方法，把 int 数组中的数据按照指定的格式拼接成一个字符串返回。
 
-​          调用该方法，并在控制台输出结果。
-
-​          例如：数组为int[] arr = {1,2,3}; 
-
-​          执行方法后的输出结果为：[1, 2, 3]
+调用该方法，并在控制台输出结果。例如：数组为`int[] arr = {1,2,3}`; 。执行方法后的输出结果为：`[1, 2, 3]`。
 
 代码示例:
 
@@ -13854,7 +13975,6 @@ public class StringBuilderDemo7 {
 
     }
 
-
     public static String arrToString(int[] arr){
         StringBuilder sb = new StringBuilder();
         sb.append("[");
@@ -13867,44 +13987,327 @@ public class StringBuilderDemo7 {
             }
         }
         sb.append("]");
-
         return sb.toString();
     }
 }
-
 ```
 
-## 4. StringJoiner
+
+
+----
+
+# 106. StringJoiner
+
+## 一、引入
+
+在之前我们拼接 `1000000` 个字符串的时候，用的是字符串直接拼接的方式。这种拼接的方式速度太慢了，因此我们使用 `StringBuilder` 进行替代，提高了代码的运行速度。
+
+![image-20240408155235714](./assets/image-20240408155235714.png)
+
+但是 `StringBuilder` 书写的代码还是比较麻烦的，例如当我们想要将数组拼接成指定字符串的时候就有点慢了。
+
+在循环的开始去拼接左括号，在循环的结束去拼接右括号。在循环的过程中，对中间的 `, `（逗号和空格）还需要做判断
+
+![image-20240408155449146](./assets/image-20240408155449146.png)
+
+但如果我们想偷个懒，这是程序员的品格，正是因为有这样的品格，程序员才会创造很多很多一劳永逸的方法去解决问题。
+
+那有没有一种拼接速度快，代码又简单的方式呢？这正是我们现在要学习的 `StringJoiner`。
+
+我们现在先来体验一下 `StringJoiner`。在创建对象的时候我们可以指定中间的间隔符号，用逗号分隔，可以指定开始的符号：左括号，还可以指定结束的符号：右括号，一旦指定完后，在添加元素的时候我们就不需要进行判断了。我们在下面代码遍历到的每一个数组里的元素，直接将它扔给 `StringJoiner` 就行了。
+
+代码非常简单，最终打印的就是我们想要的效果，所以 `StringJoiner`，用起来真的是非常方便
+
+![image-20240408160254884](./assets/image-20240408160254884.png)
+
+----
+
+## 二、`StringJoiner` 概述
 
 * StringJoiner跟StringBuilder一样，也可以看成是一个容器，创建之后里面的内容是可变的。
+
 * 作用：提高字符串的操作效率，而且代码编写特别简洁，但是目前市场上很少有人用。 
-* JDK8出现的
 
-基本使用：
+  因为它是从JDK8才出现的。他们之前一直在用 `StringBuider` 用熟了就懒得改了。
 
-```java
-//1.创建一个对象，并指定中间的间隔符号
-StringJoiner sj = new StringJoiner("---");
-//2.添加元素
-sj.add("aaa").add("bbb").add("ccc");
-//3.打印结果
-System.out.println(sj);//aaa---bbb---ccc
-```
+----
 
-```java
-//1.创建对象
-StringJoiner sj = new StringJoiner(", ","[","]");
-//2.添加元素
-sj.add("aaa").add("bbb").add("ccc");
-int len = sj.length();
-System.out.println(len);//15
-//3.打印
-System.out.println(sj);//[aaa, bbb, ccc]
-String str = sj.toString();
-System.out.println(str);//[aaa, bbb, ccc]
-```
+## 三、构造方法
 
-## 关于字符串的小扩展：
+它的构造方法是没有空参的，它有两个带参的构造需要我们掌握。
+
+| 方法名                                              | 说明                                                         |
+| --------------------------------------------------- | ------------------------------------------------------------ |
+| `public StringJoiner(间隔符号)`                     | 创建一个 `StringJoiner` 对象，指定拼接时的间隔符号           |
+| `public StringJoiner(间隔符号, 开始符号, 结束符号)` | 创建一个 `StringJoiner` 对象，指定拼接时的间隔符号、开始符号、结束符号 |
+
+ ![image-20240408160724430](./assets/image-20240408160724430.png)
+
+----
+
+## 四、成员方法
+
+PS：`add` 目前为止只能添加字符串。
+
+| 方法名                                  | 说明                                               |
+| --------------------------------------- | -------------------------------------------------- |
+| `public StringJoiner add(添加的字符串)` | 添加数据，并返回对象本身，因此这里可以使用链式编程 |
+| `public int length()`                   | 返回长度（字符出现的个数）                         |
+| `public String toString()`              | 返回一个字符串（改字符串就是拼接之后的结果）       |
+
+----
+
+## 五、代码示例
+
+`public StringJoiner(间隔符号)`
+
+~~~java
+package com.itheima.stringjoinerdemo;
+
+import java.util.StringJoiner;
+
+public class StringJoinerDemo1 {
+    public static void main(String[] args) {
+        //1.创建一个对象，并指定中间的间隔符号
+        StringJoiner sj = new StringJoiner("---");
+        
+        //2.添加元素
+        sj.add("aaa").add("bbb").add("ccc");
+
+        //3.打印结果
+        System.out.println(sj);//aaa---bbb---ccc
+    }
+}
+~~~
+
+`public StringJoiner(间隔符号, 开始符号, 结束符号)`，可以通过快捷键 <kbd>ctrl + p</kbd> 查看所对应的参数。
+
+`delimiter`：间隔符号。
+
+`prefix`：开始符号。
+
+`suffix`：结束符号。
+
+![image-20240408162526748](./assets/image-20240408162526748.png)
+
+或者你先随便写，然后打印运行拼接后的结果，可以就可以区分出来参数的顺序了。
+
+~~~java
+package com.itheima.stringjoinerdemo;
+
+import java.util.StringJoiner;
+
+public class StringJoinerDemo2 {
+    public static void main(String[] args) {
+        //1.创建对象
+        StringJoiner sj = new StringJoiner(", ","[","]");
+
+        //2.添加元素
+        sj.add("aaa").add("bbb").add("ccc");
+
+        int len = sj.length();
+        System.out.println(len);//15，PS：sj.length() 求的是字符的个数，除了我们添加的内容以外，还有上面的间隔符号、开始标记、结束标记也是需要算进来的。
+
+        //3.打印
+        System.out.println(sj);//[aaa, bbb, ccc]
+
+        String str = sj.toString();
+        System.out.println(str);//[aaa, bbb, ccc]
+    }
+}
+~~~
+
+---
+
+## 六、总结
+
+1、String：表示字符串的类，定义了很多操作字符串的方法
+
+2、StringBuilder：一个可变的操作字符串的容器。它可以帮助我们快速的去操作字符串。
+
+我们一般会用它的两个功能：拼接字符串、将容器里面的内容进行反转
+
+3、StringJoiner：JDK8出现的一个可变的操作字符串的容器，可以高效，方便的拼接字符串
+
+所以在以后，你在拼接字符串的时候，如果你要指定开始标记、结束标记、中间的间隔符号，此时你可以使用 `StringBuilder`。但是 `StringBuilder` 代码写起来有点麻烦，此时就可以使用 `StringJoiner`。
+
+
+
+----
+
+# 107.字符串相关类的底层原理
+
+## 一、需要学习的知识点
+
+1、字符串存储的内存原理
+
+2、`==` 号比较的到底是什么
+
+3、字符串拼接的底层原理
+
+4、`StringBuilder` 提高效率原理图
+
+5、`StringBuilder` 提高效率原理图
+
+----
+
+## 二、回顾已学知识
+
+### 1）字符串存储的内存原理
+
+字符串在存储的时候会有两种情况：
+
+- 直接赋值：会复用字符串常量池中的东西
+
+  因此直接赋值的方式代码更简单，更节省空间
+
+- new出来的：不会复用，而是开辟一个新空间
+
+----
+
+### 2）`==` 号比较的到底是什么？
+
+- 基本类型：比较的是数据值是否相同
+- 引用数据类型：比较的是地址值是否相同
+
+因此，我们以后不管是比较字符串也好，还是比较其他的引用数据类型也好，都不会使用 `==` 号，而是使用 `equals` 方法来进行比较。
+
+---
+
+## 三、`StringBuilder` 的 `toString()` 方法的源码分析
+
+快捷键<kbd>ctrl + N</kbd> ，就会出现一个搜索的界面
+
+![image-20240408172336795](./assets/image-20240408172336795.png)
+
+然后输入 `StringBuilder`，点开右上角的 `Project Files` 默认情况下会选择 `Project Files` ，表示是在你当前项目中去找 `StringBuilder`，但我当前项目肯定没有，`StringBuilder` 是Java提供的。
+
+![image-20240408172514999](./assets/image-20240408172514999.png)
+
+因此我们需要将右上角选择成 `All Places`，表示在所有的地方都进行查询。
+
+此时在下面就会出现 `StringBuilder` 相关所出现的所有的类。我们需要找到 `java.lang` 包下的 `StringBuilder`，用鼠标点击一下就可以了。
+
+![image-20240408172834709](./assets/image-20240408172834709.png)
+
+然后按快捷键 <kbd>ctrl + F12</kbd>，我们需要来找一个 `toString()` 方法，直接输入 `toString`，然后回车即可。
+
+![image-20240408173002318](./assets/image-20240408173002318.png)
+
+此时我们就可以可以通过这个方法查看 `StringBuilder` 是怎么变成一个字符串的。
+
+这里它会调用一个 `newString()` 的方法。
+
+![image-20240408173206400](./assets/image-20240408173206400.png)
+
+选中它，然后 <kbd>ctrl + B</kbd> 跟进。
+
+此时就知道了，它在底层变回字符串的时候，它是 `new` 出来的。
+
+![image-20240408173247520](./assets/image-20240408173247520.png)
+
+通过刚刚的源码分析，我们就可以得出一个结论：字符串和变量一次性加，在内存当中至少会有两个对象。一个是 `StringBuilder` 对象，还有一个是 `string` 字符串对象。
+
+---
+
+## 四、字符串拼接的底层原理
+
+这个拼接是怎么拼接的，直接 `+` 就可以了吗，其实不是这样的。它会有两种情况
+
+左边的情况：等号的右边没有变量参与。
+
+右边的情况：等号的右边有变量参与。
+
+![image-20240408170024508](./assets/image-20240408170024508.png)
+
+---
+
+### 1）情况一：等号的右边没有变量参与
+
+例如以下代码
+
+~~~java
+String s = "a" + "b" + "c";
+System.out.println(s); // "abc"
+~~~
+
+等号右边没有变量参与，都是字符串。这种情况相对来讲比较简单，它会触发字符串的一个优化机制，在编译的时候就已经是最终的结果了。
+
+在书写代码的时候肯定要先书写Java文件，这个文件是我们自己书写的。然后我们可以通过 `javac` 命令把它编译成 `.class` 文件，也就是字节码文件。在编译的时候Java会做一个检查，检查在拼接的时候是否有变量参与。如果没有，在编译的时候就已经是拼接完之后的结果了。
+
+![image-20240408170600363](./assets/image-20240408170600363.png)
+
+因此，当我们在用Java命令去执行运行代码的时候，真正运行的其实就是 `String s = "a" + "b" + "c";`，跟我们之前直接赋值的写法是完全一模一样的。
+
+----
+
+### 2）情况二：如果在拼接的时候有变量参与
+
+#### ① 在JDK8以前，会使用 `StringBuilder` 来进行拼接
+
+例如下面代码，`s2`、`s3` 在拼接的时候都有变量参与了，接下来就看看拼接的时候的内存图。
+
+![image-20240408170840298](./assets/image-20240408170840298.png)
+
+首先main方法先进栈，因为虚拟机在运行的时候会自动调用main方法。
+
+然后执行main方法中的第一行代码 `String s1 = "a";`，这种方式是直接赋值的，所以在栈中它有个变量叫 `s1`，因此会在栈中的main方法中定一个 `s1`，并且在右边的串池中会生成一个 `"a"`。
+
+现在 `s1` 记录的就是字符串 `"a"` 的地址值。
+
+![image-20240408171217106](./assets/image-20240408171217106.png)
+
+再来看第二行代码 `String s2 = s1 + "b";`。这个 `"b"` 也会在串池中生成，然后重点来了。
+
+它在拼接的时候有变量参与，在内存中，它首先会创建一个 `StringBuilder` 对象，然后通过 `append()` 方法把 `s1` 的内容和 `"b"` 都放到 `StringBuilder` 当中，但它现在仅仅只是一个 `StringBuilder` 而已，它还不是个字符串。
+
+因此在底层它还会通过 `tostring()` 方法将它变回字符串，因此在这个字符串里的内容就是 `"ab"` 了。
+
+所以第二行 `String s2 = s1 + "b";` 相当于 `new StringBuilder().append(s1).append("b").toString();` 这行代码。
+
+而通过上面 `StringBuilder` 的 `toString()` 方法的源码分析 可知，字符串和变量一次性加，在内存当中至少会有两个对象。一个是 `StringBuilder` 对象，还有一个是 `string` 字符串对象。
+
+![image-20240408171840862](./assets/image-20240408171840862.png)
+
+再来看第三行代码 `String s3 = s2 + "c";`，这行代码其实跟刚刚的过程是一样的，在内存中它还会创建一个新的 `StringBuilder` 对象，注意，这是第二个 `StringBuilder` 对象，然后把 `s2` 的内容还有`"C"` 全部放进去，最后通过 `toString` 再创建一个新的字符串对象，最终 `s3` 中装的就是 `"abc"`。
+
+![image-20240408174015920](./assets/image-20240408174015920.png)
+
+通过刚刚的图解我们知道了，在JDK8以前，如果我们直接使用变量跟字符串进行拼接：一个加号，在堆内存中之上会有两个对象。
+
+所以说非常的浪费性能，而且速度也非常的慢。
+
+说到这里，有部分同学思考：这里不是也是用 `StringBuilder` 来拼接的吗，`StringBuilder` 不是可以用来提高效率吗？
+
+能想到这个问题代表你思考了，但是你的格局要大，你不能光看一行代码，而是看两行。
+
+例如这个案例的代码，每一行代码都创建了一个新的 `StringBuilder` 对象，所以说它的效率会比较慢；而我们只能说 `StringBuilder` 能提高效率，是因为我们在内存中只有一个 `StringBuilder` 对象，所有的字符串都往同一个 `StringBuilder` 对象里面放，这样才不会反复创建新的。
+
+----
+
+#### ② JDK8以后
+
+随着JDK版本不断升高，到了JDK8的时候，它对字符串的拼接做了一个优化。
+
+代码还是上一个案例的代码。在JDK8的时候，它做了一个优化，在拼接的时候有很多方案，但是默认是我们现在所说的这个方案。
+
+首先它会先去预估这个字符串所需要的长度，并创建一个数组。因为现在 `s1`、`s2`、`s3` 的长度都是 1，所以它预估的总长度就是3，然后就创建一个长度为3的数组，把数组村上了 `["a", "b", "c"]`，最后再把这一个整体变成一个字符串，这个就是JDK8以后字符串的拼接方式。
+
+![image-20240408174910506](./assets/image-20240408174910506.png)
+
+如果我是在用JDK7包括7以前的版本去进行拼接，这里的 `s1 + s2 + s3` 至少会创建4个对象。
+
+首先它在拼接的时候肯定是先拼 `s1 + s2`，首先需要创建一个 `StringBuilder`，然后把 `s1` 放进去，再把 `s2` 放进去，最后再 `toString()` 创建一个 `String` 对象，因此，这一步至少会有两个对象。
+
+然后拿着拼接之后的结果，再去跟 `s3` 进行拼接，它又创建了一个 `StringBuilder`，然后把前面的结果放到新的 `StringBuilder` 对象中，最后再把 `s3` 放进去，拼接完毕后，再调用`toString()` 创建一个 `String` 对象，因此这一步又会创建两个新对象。
+
+但是在JDK8的时候，它做了一个预估，这一行拼接的代码只需要一个数组，然后再去创建字符串对象就可以了。
+
+
+
+
+
+##     关于字符串的小扩展：
 
 1. 字符串存储的内存原理
 
