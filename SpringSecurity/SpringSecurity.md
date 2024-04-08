@@ -2,9 +2,11 @@
 
 # 2.Spring Security基本功能
 
-**官方文档：**
+## 一、Spring Security介绍
 
-https://docs.spring.io/spring-security/reference/index.html
+**官方文档：**https://docs.spring.io/spring-security/reference/index.html
+
+官网解释：Spring Security 是一个提供[身份验证](https://docs.spring.io/spring-security/reference/features/authentication/index.html)、[授权](https://docs.spring.io/spring-security/reference/features/authorization/index.html)和[针对常见攻击的保护](https://docs.spring.io/spring-security/reference/features/exploits/index.html)的框架。 它为保护[命令](https://docs.spring.io/spring-security/reference/servlet/index.html)式和[反应式](https://docs.spring.io/spring-security/reference/reactive/index.html)应用程序提供了一流的支持，是保护基于 Spring 的应用程序的事实标准。
 
 ![image-20240228215906984](.\assets\image-20240228215906984.png)
 
@@ -14,19 +16,13 @@ https://docs.spring.io/spring-security/reference/index.html
 - 授权（authorization）
 - 防御常见攻击（protection against common attacks）
 
+----
 
+## 二、功能介绍
 
-**身份认证：**
+**身份认证**：身份认证是验证`谁正在访问系统资源`，判断用户是否为合法用户。认证用户的常见方式是要求用户输入用户名和密码。
 
-- 身份认证是验证`谁正在访问系统资源`，判断用户是否为合法用户。认证用户的常见方式是要求用户输入用户名和密码。
-
-
-
-**授权：**
-
-- 用户进行身份认证后，系统会控制`谁能访问哪些资源`，这个过程叫做授权。用户无法访问没有权限的资源。
-
-
+**授权**：用户进行身份认证后，系统会控制`谁能访问哪些资源`，这个过程叫做授权。用户无法访问没有权限的资源。
 
 **防御常见攻击：**
 
@@ -34,9 +30,13 @@ https://docs.spring.io/spring-security/reference/index.html
 - HTTP Headers
 - HTTP Requests
 
+
+
+----
+
 # 3.实现最简单的身份验证
 
-**1、身份认证（authentication）**
+## 一、找到官网的身份认证（authentication）示例代码
 
 官方代码示例：[GitHub - spring-projects/spring-security-samples](https://github.com/spring-projects/spring-security-samples/tree/main)
 
@@ -44,11 +44,15 @@ https://docs.spring.io/spring-security/reference/index.html
 
 ![image-20240228220706330](.\assets\image-20240228220706330.png)
 
+按如下图顺序找到官方Demo
+
 ![image-20240228220904244](.\assets\image-20240228220904244.png)
 
+----
 
+## 二、实现最简单的身份验证
 
-## 创建Spring Boot项目
+### 1、创建Spring Boot项目
 
 项目名：security-demo
 
@@ -64,9 +68,9 @@ Dependencies：Spring Web、Spring Security、Thymeleaf
 
 ![image-20240306100216226](assets/image-20240306100216226.png)
 
+---
 
-
-**2、创建IndexController**
+### 2、创建IndexController
 
 ![image-20240306101211415](assets/image-20240306101211415.png)
 
@@ -83,9 +87,9 @@ public class IndexController {
 }
 ```
 
+---
 
-
-**3、创建index.html**
+### 3、创建index.html
 
 在路径resources/templates中创建index.html
 
@@ -104,9 +108,9 @@ public class IndexController {
 </html>
 ```
 
+----
 
-
-**4、启动项目测试Controller**
+### 4、启动项目测试Controller
 
 浏览器中访问：http://localhost:8080/
 
@@ -116,17 +120,11 @@ public class IndexController {
 
 ![image-20230410140908841](assets/image-20230410140908841.png)
 
-
-
-输入用户名：user
-
-输入密码：在控制台的启动日志中查找初始的默认密码
+输入用户名：user，输入密码：在控制台的启动日志中查找初始的默认密码
 
 ![image-20240306102818710](assets/image-20240306102818710.png)
 
-点击"Sign in"进行登录，浏览器就跳转到了index页面
-
-此时可以点击 Log Out 退出
+点击"Sign in"进行登录，浏览器就跳转到了index页面。此时可以点击 Log Out 退出
 
 ![image-20240306102936785](assets/image-20240306102936785.png)
 
@@ -136,9 +134,9 @@ public class IndexController {
 
 ![image-20240306105124570](assets/image-20240306105124570.png)
 
----
+区别：如果我们的应用程序发布在不同的应用程序下，那么thymeleaf这个标签会做自动的相对路径的处理，而普通的a标签不会，下一章我们会具体讲解 `@{/logout}` 的作用。
 
-> 如果我们的应用程序发布在不同的应用程序下，那么thymeleaf这个标签会做自动的相对路径的处理，而普通的a标签不会
+----
 
 # 4.@{/logout}的作用
 
@@ -173,7 +171,7 @@ server.servlet.context-path=/demo
 
 # 6.Spring Security默认做了什么
 
-- 保护应用程序URL，一旦访问我们程序中任何一个地址的时候，都要进行省份认证。要求对应用程序的任何交互进行身份验证。
+- 保护应用程序URL，一旦访问我们程序中任何一个地址的时候，都要进行身份认证。要求对应用程序的任何交互进行身份验证。
 - 程序启动时生成一个默认用户“user”。
 - 生成一个默认的随机密码，并将此密码记录在控制台上。
 - 生成默认的登录表单和注销页面。
@@ -191,9 +189,13 @@ server.servlet.context-path=/demo
 
 # 7.Spring Security 的底层原理
 
+## 一、引入
+
 **官方文档：**[Spring Security的底层原理](https://docs.spring.io/spring-security/reference/servlet/architecture.html)
 
 Architecture：整个SpringSecurity的基础架构
+
+官方解释：本节讨论 Spring Security 在基于 Servlet 的应用程序中的高级体系结构。 我们在参考的[“身份验证](https://docs.spring.io/spring-security/reference/servlet/authentication/index.html#servlet-authentication)、[授权](https://docs.spring.io/spring-security/reference/servlet/authorization/index.html#servlet-authorization)和[防范漏洞利用](https://docs.spring.io/spring-security/reference/servlet/exploits/index.html#servlet-exploits)”部分中基于这种高层次的理解。
 
 ![image-20240306110334111](assets/image-20240306110334111.png)
 
@@ -205,9 +207,9 @@ Spring Security之所以默认帮助我们做了那么多事情，它的底层�
 
 在正常情况下这些过滤器在应用程序启动的时候就要被注册在servlet容器里才能工作，但为了更灵活的在应用程序当中配置这些过滤器，其实我们的应用程序采用的是SpringBoot形式，而SpringBoot里的本质是spring、springMVC这些基础框架，也就意味着，其实在spring这种环境下，希望把这些Filter对象当做spring容器中的bean对象来管理。这些过滤器在添加、删除、启用和禁用的过程中就会更灵活。
 
+----
 
-
-### Filter
+## 二、Filter
 
 下图展示了处理一个Http请求时，过滤器和Servlet的工作流程：
 
@@ -215,9 +217,9 @@ Spring Security之所以默认帮助我们做了那么多事情，它的底层�
 
 因此我们可以在过滤器中对请求进行修改或增强。
 
+----
 
-
-### DelegatingFilterProxy
+### 1）DelegatingFilterProxy
 
 DelegatingFilterProxy（委托过滤器代理） 是 Spring Security 提供的一个 Filter 实现，可以在 Servlet 容器和 Spring 容器之间建立桥梁。通过使用 DelegatingFilterProxy，这样就可以将Servlet容器中的 Filter 实例放在 Spring 容器中管理。
 
@@ -225,9 +227,9 @@ filter先以bean对象的形式注册在spring容器中，DelegatingFilterProxy�
 
 ![delegatingfilterproxy](assets/delegatingfilterproxy.png)
 
+----
 
-
-### FilterChainProxy
+### 2）FilterChainProxy
 
 复杂的业务中不可能只有一个过滤器。因此FilterChainProxy是Spring Security提供的一个特殊的Filter，它允许通过SecurityFilterChain将过滤器的工作委托给多个Bean Filter实例。
 
@@ -235,29 +237,27 @@ filter先以bean对象的形式注册在spring容器中，DelegatingFilterProxy�
 
 ![filterchainproxy](assets/filterchainproxy.png)
 
+----
 
-
-### SecurityFilterChain
+### 3）SecurityFilterChain
 
 SecurityFilterChain 被 FilterChainProxy 使用，负责查找当前的请求需要执行的Security Filter列表。
 
 ![securityfilterchain](assets/securityfilterchain.png)
 
+----
 
+### 4）Multiple SecurityFilterChain
 
-### Multiple SecurityFilterChain
-
-为了让应用程序更灵活。可以有多个SecurityFilterChain的配置，FilterChainProxy决定使用哪个SecurityFilterChain，用于处理更复杂的应用程序。如果请求的URL是/api/messages/，它首先匹配SecurityFilterChain0的模式/api/\*\*，因此只调用SecurityFilterChain 0，一直从SecurityFilterChain 0找到SecurityFilterChain n - 1。假设没有其他SecurityFilterChain实例匹配，那么将调用SecurityFilterChain n，它匹配的是/**，也就是所有客户端的请求。
+为了让应用程序更灵活。可以有多个SecurityFilterChain的配置，FilterChainProxy决定使用哪个SecurityFilterChain，用于处理更复杂的应用程序。如果请求的URL是` /api/messages/`，它首先匹配SecurityFilterChain0的模式`/api/**`，因此只调用SecurityFilterChain 0，一直从SecurityFilterChain 0找到SecurityFilterChain n - 1。假设没有其他SecurityFilterChain实例匹配，那么将调用SecurityFilterChain n，它匹配的是/**，也就是所有客户端的请求。
 
 ![multi securityfilterchain](assets/multi-securityfilterchain-17016804731631.png)
 
 ---
 
-# 3、程序的启动和运行
-
 # 8.DefaultSecurityFilterChain
 
-首先在源代码中找到这个类
+首先在源代码中找到这个类，<kbd>shift + shift</kbd> 可进行全局搜索
 
 ![image-20240306113159465](assets/image-20240306113159465.png)
 
@@ -333,8 +333,6 @@ org.springframework.security.web.access.intercept.AuthorizationFilter@25f61c2c
 
 ![image-20240306125151944](assets/image-20240306125151944.png)
 
-
-
 我们也可以将用户名、密码配置在SpringBoot的配置文件中：在application.properties中配置自定义用户名和密码
 
 ```properties
@@ -360,11 +358,11 @@ spring.security.user.password=123
 
 ![image-20240306125520060](assets/image-20240306125520060.png)
 
-**UserDetailsService**用来管理用户信息，**InMemoryUserDetailsManager**是UserDetailsService的一个实现，用来管理基于内存的用户信息。
+**UserDetailsService**用来管理用户信息，`InMemoryUserDetailsManager`是UserDetailsService的一个实现，用来管理基于内存的用户信息。
 
-创建一个java/com.atguigu/securitydemo.WebSecurityConfig类：
+创建一个 `java/com.atguigu/securitydemo.WebSecurityConfig` 类：
 
-SpringBootWebSecurityConfiguration这个类就是在SpringBoot环境下，针对于SpringSecurity做的一个默认的配置了。
+`SpringBootWebSecurityConfiguration` 这个类就是在SpringBoot环境下，针对于` SpringSecurity` 做的一个默认的配置了。
 
 红框框起来的意思就是，整个应用程序当中，只要EnableWebSecurity这个类被加载到了应用程序的上下文当中，那么@EnableWebSecurity注解就会生效。
 
