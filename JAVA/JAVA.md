@@ -5062,15 +5062,19 @@ public class SwitchDemo4 {
 如果switch中得到一个结果，可以使用变量去接收这个结果。
 
 ~~~java
-变量 = switch (number) {
-            case 0 -> {
-
-            };
-            case 1 -> System.out.println("一");
-            case 2 -> System.out.println("二");
-            case 3 -> System.out.println("三");
-            default -> System.out.println("没有这种选项");
-        }
+String str = switch (number) {
+    case '0' -> ""; // 如果number传递过来的是字符'0'，就将 "" 赋值给str
+    case '1' -> "Ⅰ"; // 如果number传递过来的是字符'1'，就将 "Ⅰ" 赋值给str
+    case '2' -> "Ⅱ";
+    case '3' -> "Ⅲ";
+    case '4' -> "Ⅳ";
+    case '5' -> "Ⅴ";
+    case '6' -> "Ⅵ";
+    case '7' -> "Ⅶ";
+    case '8' -> "Ⅷ";
+    case '9' -> "Ⅸ";
+    default -> str = "";
+}; // 这种写法需要在最后加一个分号
 ~~~
 
 ---
@@ -14368,7 +14372,7 @@ public class Test4 {
 
 ### 1）字符串拼接的底层原理
 
-- 如果没有变量参与，都是字符串直接相加，编译之后就是拼接之后的结果，会复用串池中的字符串。
+- 如果没有变量参与，都是字符串直接相加，编译成class文件之后就已经是拼接之后的结果，会复用串池中的字符串。
 - 如果有变量参与，每一行拼接的代码都会在内存中创建新的字符串，浪费内存。
 
 ### 2）`StringBuilder` 提高效率原理图
@@ -14476,7 +14480,7 @@ public class Test4 {
 
 ---
 
-## 九、`StringBuilder` 源码分析
+## 九、`StringBuilder` 的扩容机制
 
 ### 1）空参构造
 
@@ -14498,7 +14502,7 @@ public class Test4 {
 
 ----
 
-### 2）
+### 2）append的方法原码分析
 
 选中 `StringBuilder.java` 这个类，然后按 <kbd>ctrl + F12</kbd> 找一下这里的 `append` 方法，`append` 方法它有很多重载的，我们来看一下 `append(string):StringBuilder` 这个（添加字符串的）。
 
@@ -14517,6 +14521,1149 @@ public class Test4 {
 一开始我们什么都没存，`count` 就是 0 ，n会放到数组的0索引位置上，存完了之后，`count++`。`u`会放到数组的1索引位置上，存完了之后，`count++`。以此类推。
 
 ![image-20240409135648640](./assets/image-20240409135648640.png)
+
+<kbd>Ctrl + alt + ←</kbd> 回到上一步，如果你要添加的元素不是 `null` 就会继续走下面一段。 
+
+第 `581` 行，先获取到你现在添加的字符串的长度。
+
+`count + len` 中的 `count` 其实就是长度。验证：<kbd>ctrl + F12</kbd>，搜索 `length()` 方法，它就是将 `count` 给返回，因此这里的 `count` 就是 `length` （长度）。
+
+`count + len` 就表示 `minimumCapacity`，意思就是现在要的最小的容量。
+
+![image-20240409143333415](./assets/image-20240409143333415.png)
+
+点进 `ensureCapacity` ，在 `ensureCapacity` 方法里会做很多判断。
+
+如果 `minimumCapacity - oldCapacity` 小于等于 0 ，即老容量还够放，就不走大括号，这个方法就会直接结束。
+
+大括号里的代码其实就是扩容。
+
+如果 `minimumCapacity - oldCapacity` 大于 0，它就会满足它的扩容机制。
+
+假设这次我将 `a ~ z` 长度为26的字符串添加进去。此时传进`ensureCapacity` 方法中的  `minimumCapacity` 最小容量就是 26。
+
+扩容的时候调用了 `newCapacity` 方法，在扩容的时候将 `minimumCapacity` 最小容量 26 传递了过去。
+
+![image-20240409144157743](./assets/image-20240409144157743.png)
+
+点进 `newCapacity`，这个 `coder` 如果是 0 ，`2 << coder` 相当于不左移，因此它还是2，因此 `ArraysSupport.newLength` 传递的参数实际是：`oldLength, grouth, oldLength + 2`。
+
+![image-20240409144352321](./assets/image-20240409144352321.png)
+
+点进 `newLength` 方法。637 行中，`minGrowth, prefGrowth` 是拿着最小新增的，和老的 + 2，做一个比较。一个是 (26 - 16)，另一个是 18 。
+
+`Math.max()` 点进去后，其实就是一个三元运算符。 <img src="./assets/image-20240409144728729.png" alt="image-20240409144728729" style="zoom:67%;" />
+
+因此那肯定是 18 比较大，这里就是拿着18去加上前面的16，那就是相当于：`老容量 * 2 + 2`，即：34 。
+
+此时将`老容量 * 2 + 2` 的结果赋值给前面的变量 `prefLength`，这个变量就表示我们现在要新建的数组的长度。
+
+再来看 `第637行` 中：`int prefLength = oldLength + Math.max(minGrowth, prefGrowth);`
+
+如果 新增的（minGrowth） 要比默认添加的（prefGrowth） 方式更大，就以我们现在新增的这个为准。
+
+![image-20240409144612622](./assets/image-20240409144612622.png)
+
+再回到上一步，现在我们知道了，通过 `257行代码`，就已经能计算出要创建的数组的长度了。
+
+在下面它还做了一个判断 `if (length == Integer.MAX_VALUE)`，`Integer.MAX_VALUE` 是 `int` 的最大值。将鼠标放到上面，它会显示这个数值为多少。因此通过这一行代码也就知道了，它的容量是有上线的，最大也就是到 `Integer.MAX_VALUE`
+
+![image-20240409152311797](./assets/image-20240409152311797.png)
+
+如果长度小于 `Integer.MAX_VALUE` ，它就会将新增的长度返回。
+
+![image-20240409152120226](./assets/image-20240409152120226.png)
+
+再回到上一步，完事后，`ensureCapacityInternal` 方法调了一个 `copyOf` 的方法
+
+![image-20240409152448041](./assets/image-20240409152448041.png)
+
+点进 `copyof` 方法，此时它就会根据新的长度创建一个新的字节数组，然后通过 `System.arraycopy` ，这个方法是将原来数组里的东西拷贝到新数组中
+
+![image-20240409152537559](./assets/image-20240409152537559.png)
+
+再回到上两步，`ensureCapacityInternal(count + len);` 就相当于是对 `StringBuilder` 来做了一个扩容。
+
+![image-20240409152730285](./assets/image-20240409152730285.png)
+
+扩容完毕后，调用 `putStringAt` 方法，将我现在要添加的字符串添加到 `StringBuilder` 容器中，添加完毕后修改一下 `StringBuilder` 中常用的单位。
+
+---
+
+### 3）总结
+
+看源码是我们作为程序员所必备的技能。
+
+----
+
+## 十、字符串原理小结
+
+**1、字符串存储的内存原理**
+
+- 直接赋值：会复用字符串常量池中的
+- new出来的：是不会复用的，而是开辟了一个新的小空间
+
+**2、`==` 号比的到底是什么？**
+
+- 基本数据类型：比较的是真实的数据值
+- 引用数据类型：比较的是地址值
+
+**3、字符串拼接的底层原理**
+
+- 如果没有变量参与，都是字符串直接相加，编译成class文件之后就已经是拼接之后的结果，会复用串池中的字符串。
+- 如果有变量参与，每一行拼接的代码都会在内存中创建新的字符串，浪费内存。
+
+因此如果已经想要对字符串进行拼接，不要直接 `+` ，用 `StringBuilder` /  `StringJoiner` 就可以了。
+
+**4、`StringBuilder ` 提高效率原理图**
+
+- 所有要拼接的内容都会往 `StringBuilder` 中放，不会创建很多无用的空间，节约内存。
+
+**5、`StringBuilder` 的扩容机制**
+
+- 默认创建一个长度为16的字节数组
+- 添加内容长度小于16，直接存，不会扩容
+- 添加的内容大于16就会扩容，扩容到：原来的容量 * 2 + 2
+- 但如果我们添加的内容太多，已经超出了它默认的扩容容量了，此时它就会以实际的长度为准。
+
+
+
+---
+
+# 108.练习：罗马数字的两种写法
+
+键盘录入一个字符串
+
+要求1：长度为小于等于9
+
+要求2：只能是数字，将内容变成罗马数字
+
+下面是阿拉伯数字跟罗马数字的对比关系：
+
+Ⅰ－1、Ⅱ－2、Ⅲ－3、Ⅳ－4、Ⅴ－5、Ⅵ－6、Ⅶ－7、Ⅷ－8、Ⅸ－9
+        注意点：
+        罗马数字里面是没有0的
+        如果键盘录入的数字包含0，可以变成""(长度为0的字符串)
+
+快捷方式，将光标放到等号两边的任意一边，然后 <kbd>alt + 回车</kbd> 就可以将语句进行分隔
+
+![image-20240409170940050](./assets/image-20240409170940050.png)
+
+然后 <kbd>shift + alt + 回车</kbd> 就可以将分隔出来的代码进行上下移动了
+
+## 解法一
+
+~~~java
+package com.itheima.test;
+
+import java.util.Scanner;
+
+public class Test1Case1 {
+    public static void main(String[] args) {
+        //1.键盘录入一个字符串
+        //书写Scanner的代码
+        Scanner sc = new Scanner(System.in);
+        String str;
+        while (true) {
+            System.out.println("请输入一个字符串");
+            str = sc.next();
+            //2.校验字符串是否满足规则
+            boolean flag = checkStr(str);
+            if (flag) {
+                break;
+            } else {
+                System.out.println("当前的字符串不符合规则，请重新输入");
+                continue;
+            }
+        }
+
+        //将内容变成罗马数字
+        //下面是阿拉伯数字跟罗马数字的对比关系：
+        //Ⅰ－1、Ⅱ－2、Ⅲ－3、Ⅳ－4、Ⅴ－5、Ⅵ－6、Ⅶ－7、Ⅷ－8、Ⅸ－9
+        //查表法：数字跟数据产生一个对应关系
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            int number = c - 48; // 1 2 3 4 5
+            String s = changeLuoMa(number);
+            sb.append(s);
+        }
+
+        System.out.println(sb);
+
+    }
+
+    public static String changeLuoMa(int number) {
+        //定义一个数组，让索引跟罗马数字产生一个对应关系
+        String[] arr = {"", "Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ", "Ⅸ"};
+        return arr[number];
+
+    }
+
+
+    public static boolean checkStr(String str) {//123456
+        //要求1：长度为小于等于9
+        if (str.length() > 9) {
+            return false;
+        }
+
+        //要求2：只能是数字
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);//0~9
+            if (c < '0' || c > '9') {
+                return false;
+            }
+        }
+
+        //只有当字符串里面所有的字符全都判断完毕了，我才能认为当前的字符串是符合规则
+        return true;
+    }
+}
+~~~
+
+----
+
+## 解法二
+
+快捷键 <kbd>ctrl + d</kbd> ：向下复制一行
+
+~~~java
+package com.itheima.test;
+
+import java.util.Scanner;
+
+public class Test1Case2 {
+    public static void main(String[] args) {
+        //1.键盘录入一个字符串
+        //书写Scanner的代码
+        Scanner sc = new Scanner(System.in);
+        String str;
+        while (true) {
+            System.out.println("请输入一个字符串");
+            str = sc.next();
+            //2.校验字符串是否满足规则
+            boolean flag = checkStr(str);
+            if (flag) {
+                break;
+            } else {
+                System.out.println("当前的字符串不符合规则，请重新输入");
+                continue;
+            }
+        }
+
+        //将内容变成罗马数字
+        //下面是阿拉伯数字跟罗马数字的对比关系：
+        //Ⅰ－1、Ⅱ－2、Ⅲ－3、Ⅳ－4、Ⅴ－5、Ⅵ－6、Ⅶ－7、Ⅷ－8、Ⅸ－9
+        //查表法：数字跟数据产生一个对应关系
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            String s = changeLuoMa(c);
+            sb.append(s);
+        }
+
+        System.out.println(sb);
+
+    }
+
+    //利用switch进行匹配
+    public static String changeLuoMa(char number) {
+        String str = switch (number) {
+            case '0' -> "";
+            case '1' -> "Ⅰ";
+            case '2' -> "Ⅱ";
+            case '3' -> "Ⅲ";
+            case '4' -> "Ⅳ";
+            case '5' -> "Ⅴ";
+            case '6' -> "Ⅵ";
+            case '7' -> "Ⅶ";
+            case '8' -> "Ⅷ";
+            case '9' -> "Ⅸ";
+            default -> str = "";
+        };
+        return str;
+    }
+
+
+    public static boolean checkStr(String str) {//123456
+        //要求1：长度为小于等于9
+        if (str.length() > 9) {
+            return false;
+        }
+
+        //要求2：只能是数字
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);//0~9
+            if (c < '0' || c > '9') {
+                return false;
+            }
+        }
+
+        //只有当字符串里面所有的字符全都判断完毕了，我才能认为当前的字符串是符合规则
+        return true;
+    }
+}
+~~~
+
+
+
+----
+
+# 109.练习：调整字符串的内容并比较
+
+给定两个字符串, A和B。
+        A的旋转操作就是将A 最左边的字符移动到最右边。
+        例如, 若A = 'abcde'，在移动一次之后结果就是'bcdea'
+        如果在若干次调整操作之后，A能变成B，那么返回True。
+        如果不能匹配成功，则返回false
+
+## 解法一
+
+~~~java
+package com.itheima.test;
+
+public class Test2Case1 {
+    public static void main(String[] args) {
+        //1.定义两个字符串
+        String strA = "abcde";
+        String strB = "ABC";
+
+
+        //2.调用方法进行比较
+        boolean result = check(strA, strB);
+
+        //3.输出
+        System.out.println(result);
+
+
+    }
+
+    public static boolean check(String strA, String strB) {
+        for (int i = 0; i < strA.length(); i++) {
+            strA = rotate(strA);
+            if(strA.equals(strB)){
+                return true;
+            }
+        }
+        //所有的情况都比较完毕了，还不一样那么直接返回false
+        return false;
+    }
+
+
+    //作用：旋转字符串，把左侧的字符移动到右侧去
+    //形参：旋转前的字符串
+    //返回值：旋转后的字符串
+    public static String rotate(String str) {
+        //套路：
+        //如果我们看到要修改字符串的内容
+        //可以有两个办法：
+        //1.用subString进行截取，把左边的字符截取出来拼接到右侧去
+        //2.可以把字符串先变成一个字符数组，然后调整字符数组里面数据，最后再把字符数组变成字符串。
+
+
+        //截取思路
+        //获取最左侧那个字符
+        char first = str.charAt(0);
+        //获取剩余的字符
+        String end = str.substring(1);
+
+        return end + first;
+    }
+}
+~~~
+
+---
+
+## 解法二
+
+`toCharArray()` 方法将字符串变成字符数组
+
+~~~java
+package com.itheima.test;
+
+public class Test2Case2 {
+    public static void main(String[] args) {
+       /* 给定两个字符串, A和B。
+        A的旋转操作就是将A 最左边的字符移动到最右边。
+        例如, 若A = 'abcde'，在移动一次之后结果就是'bcdea'
+        如果在若干次调整操作之后，A能变成B，那么返回True。
+        如果不能匹配成功，则返回false*/
+
+        //1.定义两个字符串
+        String strA = "abcde";
+        String strB = "ABC";
+
+
+        //2.调用方法进行比较
+        boolean result = check(strA, strB);
+
+        //3.输出
+        System.out.println(result);
+    }
+
+    public static boolean check(String strA, String strB) {
+        for (int i = 0; i < strA.length(); i++) {
+            strA = rotate(strA);
+            if (strA.equals(strB)) {
+                return true;
+            }
+        }
+        //所有的情况都比较完毕了，还不一样那么直接返回false
+        return false;
+    }
+
+
+    //作用：旋转字符串，把左侧的字符移动到右侧去
+    //形参：旋转前的字符串        
+    //返回值：旋转后的字符串
+    public static String rotate(String str) {
+        //套路：
+        //如果我们看到要修改字符串的内容
+        //可以有两个办法：
+        //1.用subString进行截取，把左边的字符截取出来拼接到右侧去
+        //2.可以把字符串先变成一个字符数组，然后调整字符数组里面数据，最后再把字符数组变成字符串。
+
+        //可以把字符串先变成一个字符数组，然后调整字符数组里面数据，最后再把字符数组变成字符串。
+
+
+        //"ABC"   ['A','B','C']  ['B','C','A']   new String(字符数组);
+        char[] arr = str.toCharArray();
+        //拿到0索引上的字符
+        char first = arr[0];
+        //把剩余的字符依次往前挪一个位置
+        for (int i = 1; i < arr.length; i++) {
+            arr[i - 1] = arr[i];
+        }
+        //把原来0索引上的字符放到最后一个索引
+        arr[arr.length - 1] = first;
+
+        //利用字符数组创建一个字符串对象
+        String result = new String(arr);
+        return result;
+    }
+}
+~~~
+
+
+
+---
+
+# 110.四道字符串练习题思路
+
+## 练习一：键盘输入任意字符串，打乱里面的内容
+
+**思路**
+
+~~~java
+package com.itheima.test;
+
+public class Test3 {
+    public static void main(String[] args) {
+        //键盘输入任意字符串，打乱里面的内容
+
+        //1.键盘输入任意字符串
+        String str = "abcdefg";
+
+
+        //2.打乱里面的内容
+        //修改字符串里面的内容：
+        //1.subString
+        //2.变成字符数组
+        char[] arr = str.toCharArray();//['a','b','c','d','e','f','g']
+
+        //3.打乱数组里面的内容
+        //从0索引开始，跟一个随机索引进行位置的交换
+        //当数组里面的每一个元素都跟一个随机索引进行交换完毕之后，那么内容就打乱了
+
+        //4.把字符数组再变回字符串
+        String result = new String(arr);
+
+        System.out.println(result);
+    }
+}
+
+~~~
+
+---
+
+## 练习二：生成验证码
+
+生成验证码
+内容：可以是小写字母，也可以是大写字母，还可以是数字
+规则：
+长度为5
+内容中是四位字母，1位数字。
+其中数字只有1位，但是可以出现在任意的位置。
+
+**思路**
+
+~~~java
+package com.itheima.test;
+
+public class Test4 {
+    public static void main(String[] args) {
+        //1.可以把所有的大写字母，小写字母都放到一个数组当中
+        char[] arr = new char[52];
+        //a-z  A-Z
+
+        //2.从数组中随机获取4次
+
+        //3.生成一个0~9之间的随机数拼接到最后
+        //例如ACFG7
+        //思考，我们把7放到前面，修改了字符串的内容
+        //把生成的验证码先变成一个字符数组
+        //再让最后一个元素跟前面的随机位置的元素进行交换
+        //交换完毕之后再变成字符串就可以了。
+    }
+}
+~~~
+
+----
+
+## 练习三：字符串相乘
+
+给定两个以字符串形式表示的非负整数num1和num2，返回num1和num2的乘积，它们的乘积也表示为字符串形式。
+注意：需要用已有的知识完成。
+
+~~~java
+package com.itheima.test;
+
+public class Test5 {
+    public static void main(String[] args) {
+        //PS：不需要考虑乘积过大之后的结果，就认为乘积一定是小于int的最大值的
+
+
+        String num1 = "123456789";
+        String num2 = "12345";
+
+        //1.把num1和num2变成对应的整数才可以
+        //"123456789"
+        //先遍历字符串依次得到每一个字符 '1'  '2'  '3'  '4'  '5'  '6'  '7'  '8'  '9'
+        //再把字符变成对应的数字即可     1    2    3     4    5    6    7    8    9
+        //把每一个数字组合到一起 123456789
+
+        //2.利用整数进行相乘
+
+
+        //3.可以把整数变成字符串
+        //+ ""
+    }
+}
+~~~
+
+---
+
+练习四：
+
+给你一个字符串 s，由若干单词组成，单词前后用一些空格字符隔开。
+        返回字符串中最后一个单词的长度。
+        单词是指仅由字母组成、不包含任何空格字符的最大子字符串。
+
+​    示例 1：输入：s = "Hello World“	输出：5
+​    解释：最后一个单词是“World”，长度为5。
+
+​    示例 2：输入：s = "   fly me   to   the moon"	输出：4
+​    解释：最后一个单词是“moon”，长度为4。
+
+​    示例 3：输入：s = "luffy is still joyboy"	输出：6
+​    解释：最后一个单词是长度为6的“joyboy”。
+
+~~~java
+package com.itheima.test;
+
+public class Test6 {
+    public static void main(String[] args) {
+        //倒着遍历
+        //直到遇到空格为止
+        //那么遍历的次数就是单词的长度
+    }
+}
+~~~
+
+
+
+----
+
+# ------------------------------------
+
+# Day 11 集合
+
+## 1.ArrayList
+
+### 集合和数组的优势对比：
+
+1. 长度可变
+2. 添加数据的时候不需要考虑索引，默认将数据添加到末尾
+
+### 1.1 ArrayList类概述
+
+- 什么是集合
+
+  ​	提供一种存储空间可变的存储模型，存储的数据容量可以发生改变
+
+- ArrayList集合的特点
+
+  ​	长度可以变化，只能存储引用数据类型。
+
+- 泛型的使用
+
+  ​	用于约束集合中存储元素的数据类型
+
+### 1.2 ArrayList类常用方法
+
+#### 1.2.1 构造方法
+
+| 方法名             | 说明                 |
+| ------------------ | -------------------- |
+| public ArrayList() | 创建一个空的集合对象 |
+
+#### 1.2.2 成员方法
+
+| 方法名                                | 说明                                   |
+| ------------------------------------- | -------------------------------------- |
+| public boolean add(要添加的元素)      | 将指定的元素追加到此集合的末尾         |
+| public boolean remove(要删除的元素)   | 删除指定元素,返回值表示是否删除成功    |
+| public E  remove(int   index)         | 删除指定索引处的元素，返回被删除的元素 |
+| public E   set(int index,E   element) | 修改指定索引处的元素，返回被修改的元素 |
+| public E   get(int   index)           | 返回指定索引处的元素                   |
+| public int   size()                   | 返回集合中的元素的个数                 |
+
+#### 1.2.3 示例代码
+
+```java
+public class ArrayListDemo02 {
+    public static void main(String[] args) {
+        //创建集合
+        ArrayList<String> array = new ArrayList<String>();
+
+        //添加元素
+        array.add("hello");
+        array.add("world");
+        array.add("java");
+
+        //public boolean remove(Object o)：删除指定的元素，返回删除是否成功
+        //        System.out.println(array.remove("world"));
+        //        System.out.println(array.remove("javaee"));
+
+        //public E remove(int index)：删除指定索引处的元素，返回被删除的元素
+        //        System.out.println(array.remove(1));
+
+        //IndexOutOfBoundsException
+        //        System.out.println(array.remove(3));
+
+        //public E set(int index,E element)：修改指定索引处的元素，返回被修改的元素
+        //        System.out.println(array.set(1,"javaee"));
+
+        //IndexOutOfBoundsException
+        //        System.out.println(array.set(3,"javaee"));
+
+        //public E get(int index)：返回指定索引处的元素
+        //        System.out.println(array.get(0));
+        //        System.out.println(array.get(1));
+        //        System.out.println(array.get(2));
+        //System.out.println(array.get(3)); //？？？？？？ 自己测试
+
+        //public int size()：返回集合中的元素的个数
+        System.out.println(array.size());
+
+        //输出集合
+        System.out.println("array:" + array);
+    }
+}
+```
+
+### 1.3 ArrayList存储字符串并遍历
+
+#### 1.3.1 案例需求
+
+​	创建一个存储字符串的集合，存储3个字符串元素，使用程序实现在控制台遍历该集合
+
+#### 1.3.2 代码实现
+
+```java
+public class ArrayListDemo3 {
+    public static void main(String[] args) {
+        //1.创建集合对象
+        ArrayList<String> list = new ArrayList<>();
+
+        //2.添加元素
+        list.add("aaa");
+        list.add("bbb");
+        list.add("ccc");
+        list.add("ddd");
+
+        //3.遍历
+        //快捷键: list.fori 正向遍历
+        //list.forr 倒着遍历
+        System.out.print("[");
+        for (int i = 0; i < list.size(); i++) {
+            //i 依次表示集合里面的每一个索引
+
+            if(i == list.size() - 1){
+                //最大索引
+                System.out.print(list.get(i));
+            }else{
+                //非最大索引
+                System.out.print(list.get(i) + ", ");
+            }
+        }
+        System.out.print("]");
+    }
+}
+
+```
+
+### 1.4 ArrayList存储学生对象并遍历
+
+#### 1.4.1 案例需求
+
+​	创建一个存储学生对象的集合，存储3个学生对象，使用程序实现在控制台遍历该集合
+
+#### 1.4.2 代码实现
+
+```java
+public class ArrayListDemo4 {
+    public static void main(String[] args) {
+        //1.创建集合对象，用来存储数据
+        ArrayList<Student> list = new ArrayList<>();
+
+        //2.创建学生对象
+        Student s1 = new Student("zhangsan",16);
+        Student s2 = new Student("lisi",15);
+        Student s3 = new Student("wangwu",18);
+
+        //3.把学生对象添加到集合中
+        list.add(s1);
+        list.add(s2);
+        list.add(s3);
+
+        //4.遍历
+        for (int i = 0; i < list.size(); i++) {
+            //i 依次表示集合中的每一个索引
+            Student stu = list.get(i);
+            System.out.println(stu.getName() + ", " + stu.getAge());
+        }
+
+
+
+    }
+}
+
+```
+
+### 1.5 查找用户的索引
+
+需求： 
+
+1，main方法中定义一个集合，存入三个用户对象。 
+
+   用户属性为：id，username，password    
+
+2，要求：定义一个方法，根据id查找对应的学生信息。
+
+   如果存在，返回索引
+
+   如果不存在，返回-1
+
+代码示例：
+
+```java
+public class ArrayListDemo6 {
+    public static void main(String[] args) {
+        /*需求：
+        1，main方法中定义一个集合，存入三个用户对象。
+        用户属性为：id，username，password
+        2，要求：定义一个方法，根据id查找对应的学生信息。
+        如果存在，返回索引
+        如果不存在，返回-1*/
+
+
+        //1.创建集合对象
+        ArrayList<User> list = new ArrayList<>();
+
+        //2.创建用户对象
+        User u1 = new User("heima001", "zhangsan", "123456");
+        User u2 = new User("heima002", "lisi", "1234");
+        User u3 = new User("heima003", "wangwu", "1234qwer");
+
+        //3.把用户对象添加到集合当中
+        list.add(u1);
+        list.add(u2);
+        list.add(u3);
+
+        //4.调用方法，通过id获取对应的索引
+        int index = getIndex(list, "heima001");
+
+        System.out.println(index);
+
+    }
+
+
+    //1.我要干嘛？  根据id查找对应的学生信息
+    //2.我干这件事情需要什么才能完成？   集合 id
+    //3.方法的调用处是否需要继续使用方法的结果？
+    //要用必须返回，不要用可以返回也可以不返回
+    //明确说明需要有返回值 int
+    public static int getIndex(ArrayList<User> list, String id) {
+        //遍历集合得到每一个元素
+        for (int i = 0; i < list.size(); i++) {
+            User u = list.get(i);
+            String uid = u.getId();
+            if(uid.equals(id)){
+                return i;
+            }
+        }
+        //因为只有当集合里面所有的元素都比较完了，才能断定id是不存在的。
+        return -1;
+    }
+}
+
+```
+
+### 1.6 判断用户的是否存在
+
+```java
+public class ArrayListDemo5 {
+    public static void main(String[] args) {
+       /* 需求：
+        1，main方法中定义一个集合，存入三个用户对象。
+        用户属性为：id，username，password
+        2，要求：定义一个方法，根据id查找对应的学生信息。
+        如果存在，返回true
+        如果不存在，返回false*/
+
+        //1.定义集合
+        ArrayList<User> list = new ArrayList<>();
+
+        //2.创建对象
+        User u1 = new User("heima001","zhangsan","123456");
+        User u2 = new User("heima002","lisi","12345678");
+        User u3 = new User("heima003","wangwu","1234qwer");
+
+        //3.把用户对象添加到集合当中
+        list.add(u1);
+        list.add(u2);
+        list.add(u3);
+
+        //4.调用方法，查询id是否存在
+        boolean result = contains(list, "heima001");
+        System.out.println(result);
+
+    }
+
+    //定义在测试类中的方法需要加static
+    //1.我要干嘛？ 我要根据id查询学生是否存在
+    //2.我干这件事情，需要什么才能完成？ 集合 id
+    //3.方法的调用处是否需要使用方法的结果？
+    //如果要用，必须返回，如果不用，可以返回也可以不返回
+    //但是本题明确说明需要返回
+    public static boolean contains(ArrayList<User> list, String id){
+        //循环遍历集合，得到集合里面的每一个元素
+        //再进行判断
+
+        for (int i = 0; i < list.size(); i++) {
+            //i 索引  list.get(i); 元素
+            User u = list.get(i);
+            //判断id是否存在，我是拿着谁跟谁比较
+            //需要把用户对象里面的id拿出来再进行比较。
+            String uid = u.getId();
+            if(id.equals(uid)){
+                return true;//return 关键字：作用就是结束方法。
+            }
+        }
+        //只有当集合里面所有的元素全部比较完毕才能认为是不存在的。
+        return false;
+    }
+
+}
+
+```
+
+## 2.学生管理系统
+
+### 2.1学生管理系统实现步骤
+
+- 案例需求
+
+  ​	针对目前我们的所学内容，完成一个综合案例：学生管理系统。该系统主要功能如下：
+
+  ​	添加学生：通过键盘录入学生信息，添加到集合中
+
+  ​	删除学生：通过键盘录入要删除学生的学号，将该学生对象从集合中删除
+
+  ​	修改学生：通过键盘录入要修改学生的学号，将该学生对象其他信息进行修改
+
+  ​	查看学生：将集合中的学生对象信息进行展示
+
+  ​	退出系统：结束程序
+
+- 实现步骤
+
+  1. 定义学生类，包含以下成员变量
+
+     ​       private String sid            // 学生id
+
+     ​       private String name       // 学生姓名
+
+     ​       private String age          // 学生年龄
+
+     ​       private String address   // 学生所在地
+
+  2. 学生管理系统主界面的搭建步骤
+
+     2.1 用输出语句完成主界面的编写
+     2.2 用Scanner实现键盘输入
+     2.3 用switch语句完成选择的功能
+     2.4 用循环完成功能结束后再次回到主界面
+
+  3. 学生管理系统的添加学生功能实现步骤
+
+     3.1 定义一个方法，接收ArrayList<Student>集合
+     3.2 方法内完成添加学生的功能
+     ​         ①键盘录入学生信息
+     ​         ②根据录入的信息创建学生对象
+     ​         ③将学生对象添加到集合中
+     ​         ④提示添加成功信息
+     3.3 在添加学生的选项里调用添加学生的方法
+
+  4. 学生管理系统的查看学生功能实现步骤
+
+     4.1 定义一个方法，接收ArrayList<Student>集合
+     4.2 方法内遍历集合，将学生信息进行输出
+     4.3 在查看所有学生选项里调用查看学生方法
+
+  5. 学生管理系统的删除学生功能实现步骤
+
+     5.1 定义一个方法，接收ArrayList<Student>集合
+     5.2 方法中接收要删除学生的学号
+     5.3 遍历集合，获取每个学生对象
+     5.4 使用学生对象的学号和录入的要删除的学号进行比较,如果相同，则将当前学生对象从集合中删除
+     5.5 在删除学生选项里调用删除学生的方法
+
+  6. 学生管理系统的修改学生功能实现步骤
+
+     6.1 定义一个方法，接收ArrayList<Student>集合
+     6.2 方法中接收要修改学生的学号
+     6.3 通过键盘录入学生对象所需的信息，并创建对象
+     6.4 遍历集合，获取每一个学生对象。并和录入的修改学生学号进行比较.如果相同，则使用新学生对象替换当前学生对象
+     6.5 在修改学生选项里调用修改学生的方法
+
+  7. 退出系统
+
+     使用System.exit(0);退出JVM
+
+### 2.2学生类的定义
+
+```java
+package com.itheima.studentsystem;
+
+public class Student {
+    private String id;
+    private String name;
+    private int age;
+    private String address;
+
+ 	//下面是空参，有参，get和set方法
+}
+
+```
+
+### 2.3测试类的定义
+
+```java
+public class StudentSystem {
+    public static void main(String[] args) {
+        ArrayList<Student> list = new ArrayList<>();
+        loop:
+        while (true) {
+            System.out.println("-----------------欢迎来到黑马学生管理系统-------------------");
+            System.out.println("1:添加学生");
+            System.out.println("2:删除学生");
+            System.out.println("3:修改学生");
+            System.out.println("4:查询学生");
+            System.out.println("5:退出");
+            System.out.println("请输入您的选择：");
+            Scanner sc = new Scanner(System.in);
+            String choose = sc.next();
+            switch (choose) {
+                case "1" -> addStudent(list);
+                case "2" -> deleteStudent(list);
+                case "3" -> updateStudent(list);
+                case "4" -> queryStudent(list);
+                case "5" -> {
+                    System.out.println("退出");
+                    //break loop;
+                    System.exit(0);//停止虚拟机运行
+                }
+                default -> System.out.println("没有这个选项");
+            }
+        }
+    }
+
+    //添加学生
+    public static void addStudent(ArrayList<Student> list) {
+        //利用空参构造先创建学生对象
+        Student s = new Student();
+
+        Scanner sc = new Scanner(System.in);
+        String id = null;
+        while (true) {
+            System.out.println("请输入学生的id");
+            id = sc.next();
+            boolean flag = contains(list, id);
+            if(flag){
+                //表示id已经存在，需要重新录入
+                System.out.println("id已经存在，请重新录入");
+            }else{
+                //表示id不存在，表示可以使用
+                s.setId(id);
+                break;
+            }
+        }
+
+        System.out.println("请输入学生的姓名");
+        String name = sc.next();
+        s.setName(name);
+
+        System.out.println("请输入学生的年龄");
+        int age = sc.nextInt();
+        s.setAge(age);
+
+        System.out.println("请输入学生的家庭住址");
+        String address = sc.next();
+        s.setAddress(address);
+
+
+        //把学生对象添加到集合当中
+        list.add(s);
+
+        //提示一下用户
+        System.out.println("学生信息添加成功");
+    }
+
+    //删除学生
+    public static void deleteStudent(ArrayList<Student> list) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请输入要删除的id");
+        String id = sc.next();
+        //查询id在集合中的索引
+        int index = getIndex(list, id);
+        //对index进行判断
+        //如果-1，就表示不存在，结束方法，回到初始菜单
+        if(index >= 0){
+            //如果大于等于0的，表示存在，直接删除
+            list.remove(index);
+            System.out.println("id为：" + id + "的学生删除成功");
+        }else{
+            System.out.println("id不存在，删除失败");
+        }
+    }
+
+    //修改学生
+    public static void updateStudent(ArrayList<Student> list) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请输入要修改学生的id");
+        String id = sc.next();
+
+        int index = getIndex(list, id);
+
+        if(index == -1){
+            System.out.println("要修改的id" + id + "不存在，请重新输入");
+            return;
+        }
+
+        //当代码执行到这里，表示什么？表示当前id是存在的。
+        //获取要修改的学生对象
+        Student stu = list.get(index);
+
+        //输入其他的信息并修改
+        System.out.println("请输入要修改的学生姓名");
+        String newName = sc.next();
+        stu.setName(newName);
+
+        System.out.println("请输入要修改的学生年龄");
+        int newAge = sc.nextInt();
+        stu.setAge(newAge);
+
+        System.out.println("请输入要修改的学生家庭住址");
+        String newAddress = sc.next();
+        stu.setAddress(newAddress);
+
+        System.out.println("学生信息修改成功");
+
+
+    }
+
+
+    //查询学生
+    public static void queryStudent(ArrayList<Student> list) {
+        if (list.size() == 0) {
+            System.out.println("当前无学生信息，请添加后再查询");
+            //结束方法
+            return;
+        }
+
+        //打印表头信息
+        System.out.println("id\t\t姓名\t年龄\t家庭住址");
+        //当代码执行到这里，表示集合中是有数据的
+        for (int i = 0; i < list.size(); i++) {
+            Student stu = list.get(i);
+            System.out.println(stu.getId() + "\t" + stu.getName() + "\t" + stu.getAge() + "\t" + stu.getAddress());
+        }
+    }
+
+
+    //判断id在集合中是否存在
+    public static boolean contains(ArrayList<Student> list, String id) {
+        //循环遍历集合得到里面的每一个学生对象
+        /*for (int i = 0; i < list.size(); i++) {
+            //拿到学生对象后，获取id并进行判断
+            Student stu = list.get(i);
+            String sid = stu.getId();
+            if(sid.equals(id)){
+                //存在，true
+                return true;
+            }
+        }
+        // 不存在false
+        return false;*/
+       return getIndex(list,id) >= 0;
+    }
+
+    //通过id获取索引的方法
+    public static int getIndex(ArrayList<Student> list, String id){
+        //遍历集合
+        for (int i = 0; i < list.size(); i++) {
+            //得到每一个学生对象
+            Student stu = list.get(i);
+            //得到每一个学生对象的id
+            String sid = stu.getId();
+            //拿着集合中的学生id跟要查询的id进行比较
+            if(sid.equals(id)){
+                //如果一样，那么就返回索引
+                return i;
+            }
+        }
+        //当循环结束之后还没有找到，就表示不存在，返回-1.
+        return -1;
+    }
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
