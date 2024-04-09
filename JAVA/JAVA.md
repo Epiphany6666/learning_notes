@@ -14366,73 +14366,157 @@ public class Test4 {
 
 ## 七、字符串原理小结
 
+### 1）字符串拼接的底层原理
 
+- 如果没有变量参与，都是字符串直接相加，编译之后就是拼接之后的结果，会复用串池中的字符串。
+- 如果有变量参与，每一行拼接的代码都会在内存中创建新的字符串，浪费内存。
 
+### 2）`StringBuilder` 提高效率原理图
 
+- 所有要拼接的内容都会往 `StringBuilder` 中放，不会创建很多无用的内存，节约内存。
 
+接下来就是要看 `StringBuilder` 的源码了。
 
+---
 
+## 八、`StringBuilder` 整体设计
 
+### 1）分析
 
-##     关于字符串的小扩展：
+由于我们直接看源码会非常恶心，所以我们先看 `StringBuilder` 整体的设计，给大家过一下，然后再去看源码。
 
-1. 字符串存储的内存原理
+`StringBuilder` 在开始设计的时候，底层会创建一个字节数组，默认的容量是为 `16`。这不是长度，是容量。
 
-   String s = “abc”；直接赋值
+容量表示最多能装多少，而长度表示我们实际装了多少。
 
-   特点：
+![](./assets/202404091052532.png)
 
-   ​	此时字符串abc是存在字符串常量池中的。
+当我们现在把 `"abc"` 添加到 `StringBuilder` 当中的时候，实际上存的是 `"abc"` 在  ASCII码表上所对应的值，其他没有存的地方还是默认为0。此时它的容量还是 16，但是长度就已经变成了 3。
 
-   ​	先检查字符串常量池中有没有字符串abc，如果有，不会创建新的，而是直接复用。如果没有abc，才会创建一个新的。
+![image-20240409132002351](./assets/image-20240409132002351.png)
 
-   所以，直接赋值的方式，代码简单，而且节约内存。
+但如果我现在添加的元素比较多，超过了 16怎么办，例如我现在要添加的是 `a ~ z`，一共26个英文字母，此时 16 容量就不够了。
 
-2. new出来的字符串
+`StringBuilder` 会扩容，它会创建一个新的数组 `新数组容量 = 老容量 * 2 + 2`，原来的容量是 16，乘2再加2就是34，因此就会创建一个这样长度为34的数组。但实际的长度是24，后面还有8个空余。
 
-   看到new关键字，一定是在堆里面开辟了一个小空间。
+![image-20240409132333426](./assets/image-20240409132333426.png)
 
-   String s1 = new String（“abc”）；
+如果一次性添加的数据比34还多，例如这次添加的元素为 `a ~ z、0 ~ 9`，此时就有 36 个了。
 
-   String s2 = “abc”；
+如果添加的数据已经超出了默认扩容的机制，这个时候它就会创建一个长度为 36 的数组再添加数据。
 
-   s1记录的是new出来的，在堆里面的地址值。
+此时 `StringBuilder` 的容量是 36，长度也是 36。
 
-   s2是直接赋值的，所以记录的是字符串常量池中的地址值。
+前面的 26 个存 `0~z`，后面的 10 个存 `0 ~ 9`。
 
-3. ==号比较的到底是什么？
+![image-20240409132700142](./assets/image-20240409132700142.png)
 
-   如果比较的是基本数据类型：比的是具体的数值是否相等。
+---
 
-   如果比较的是引用数据类型：比的是地址值是否相等。
+### 2）总结
 
-   结论：==只能用于比较基本数据类型。不能比较引用数据类型。
+- 默认创建一个长度为16的字节数组
+- 添加的内容长度小于16，直接存
+- 添加的内容大于16会扩容（扩容机制为：原来容量 * 2 + 2）
+- 如果扩容之后还不够，以实际长度为准
 
+添加的内容长度小于16，直接存
 
+~~~java
+public class Test4 {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder();
+        // 容量：最多装多少
+        // 长度：已经装了多少
+        System.out.println(sb.capacity()); // 16
+        System.out.println(sb.length()); // 0
 
+        sb.append('abc');
+        System.out.println(sb.capacity()); // 16
+        System.out.println(sb.length()); // 3
+    }
+}
+~~~
 
+添加的内容大于16会扩容（扩容机制为：原来容量 * 2 + 2）
 
+~~~java
+public class Test4 {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder();
+        // 容量：最多装多少
+        // 长度：已经装了多少
+        System.out.println(sb.capacity()); // 16
+        System.out.println(sb.length()); // 0
 
+        sb.append('abcdefghizklmnopqrstuvwsyz'); // 26 个英文字母
+        System.out.println(sb.capacity()); // 34
+        System.out.println(sb.length()); // 26
+    }
+}
+~~~
 
+如果扩容之后还不够，以实际长度为准
 
+~~~java
+public class Test4 {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder();
+        // 容量：最多装多少
+        // 长度：已经装了多少
+        System.out.println(sb.capacity()); // 16
+        System.out.println(sb.length()); // 0
 
+        sb.append("abcdefghizklmnopqrstuvwsyz0123456789"); // 26 个英文字母
+        System.out.println(sb.capacity()); // 36
+        System.out.println(sb.length()); // 36
+    }
+}
+~~~
 
+---
 
+## 九、`StringBuilder` 源码分析
 
+### 1）空参构造
 
+首先选中 `StringBuilder` ，按住 <kbd>ctrl</kbd> 不松 ，然后用鼠标左键点一下
 
+![image-20240409134235368](./assets/image-20240409134235368.png)
 
+在这里，你看见了一个空参构造，括号里的参数就是 capacity，因此我们使用空参构造的时候，它会创建一个长度为16的字节数组。
 
+![image-20240409134245472](./assets/image-20240409134245472.png)
 
+继续按住 <kbd>ctrl</kbd> 不松 ，然后用鼠标左键点一下
 
+![image-20240409134557698](./assets/image-20240409134557698.png)
 
+`value = new byte[capacity];` 就是创建字节数组的代码，容量是 `capacity` ，也就是刚刚传进来的 16。
 
+![image-20240409134620511](./assets/image-20240409134620511.png)
 
+----
 
+### 2）
 
+选中 `StringBuilder.java` 这个类，然后按 <kbd>ctrl + F12</kbd> 找一下这里的 `append` 方法，`append` 方法它有很多重载的，我们来看一下 `append(string):StringBuilder` 这个（添加字符串的）。
 
+![image-20240409135048790](./assets/image-20240409135048790.png)
 
+这个方法里面它会调用其他的 `append` 方法，按住鼠标不动，然后左键点一下
 
+![image-20240409135206499](./assets/image-20240409135206499.png)
+
+它首先会对传入进来的 `str` 参数进行非空判断，如果说你要添加的是 null，此时它会调用一个 `appendNull()` 的方法，再点进去。
+
+![image-20240409135334930](./assets/image-20240409135334930.png)
+
+这个方法是往数组中添加 `n`、`u`、`l`、`l`，`count` 就表示当前已经存了多少字符。
+
+一开始我们什么都没存，`count` 就是 0 ，n会放到数组的0索引位置上，存完了之后，`count++`。`u`会放到数组的1索引位置上，存完了之后，`count++`。以此类推。
+
+![image-20240409135648640](./assets/image-20240409135648640.png)
 
 
 
