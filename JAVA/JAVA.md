@@ -15088,254 +15088,586 @@ public class Test6 {
 
 # Day 11 集合
 
-## 1.ArrayList
+# 111.集合的基本使用
 
-### 集合和数组的优势对比：
+## 一、为什么要有集合？
 
-1. 长度可变
-2. 添加数据的时候不需要考虑索引，默认将数据添加到末尾
+如果我现在想同时存储多个元素，我们该怎么办？
 
-### 1.1 ArrayList类概述
+数组就可以干这件事情，但是数组有弊端。
 
-- 什么是集合
+数组的长度是固定的，一旦创建完毕后，长度就不能发生变化了。那能不能有一个容器它的长度是可变的呢？当然有，这个容器就是我们今天要学习的集合。
 
-  ​	提供一种存储空间可变的存储模型，存储的数据容量可以发生改变
+集合是一个容器，它也是可以来存储多个数据，只不过它的长度是可以发生变化的。
 
-- ArrayList集合的特点
+当我们在创建一个集合对象的时候，因为一开始还没有添加元素，因此集合的长度一开始是为0。然后添加了第一个元素，集合的长度会自动扩容变成1，不需要我们管，集合底层自动实现的，我们只需要把元素添加进去就可以了。当添加第二个元素进去的时候，集合的长度会再次扩容变成2。添加第三个元素，它的长度会再次扩容变成3.............**在这个过程中，最为重要的四个字：自动扩容**
 
-  ​	长度可以变化，只能存储引用数据类型。
+----
 
-- 泛型的使用
+## 二、集合存储数据类型的特点
 
-  ​	用于约束集合中存储元素的数据类型
+除此之外，集合跟数组在存储元素之外还有第二个区别。
 
-### 1.2 ArrayList类常用方法
+数组是可以存储基本数据类型的，例如 `int[] arr1 = new int[3];`
 
-#### 1.2.1 构造方法
+数组也是可以存储引用数据类型的，例如 `User[] userArr = new User[2];`
 
-| 方法名             | 说明                 |
-| ------------------ | -------------------- |
-| public ArrayList() | 创建一个空的集合对象 |
+但是集合只可以存引用数据类型。
 
-#### 1.2.2 成员方法
+![image-20240409193940915](./assets/image-20240409193940915.png)
 
-| 方法名                                | 说明                                   |
-| ------------------------------------- | -------------------------------------- |
-| public boolean add(要添加的元素)      | 将指定的元素追加到此集合的末尾         |
-| public boolean remove(要删除的元素)   | 删除指定元素,返回值表示是否删除成功    |
-| public E  remove(int   index)         | 删除指定索引处的元素，返回被删除的元素 |
-| public E   set(int index,E   element) | 修改指定索引处的元素，返回被修改的元素 |
-| public E   get(int   index)           | 返回指定索引处的元素                   |
-| public int   size()                   | 返回集合中的元素的个数                 |
+但如果我们就是想存 `1~9` 这样的整数，或者是小数，或者是字符怎么办，就需要将它们变成其对应的包装类。
 
-#### 1.2.3 示例代码
+----
 
-```java
-public class ArrayListDemo02 {
+## 三、集合和数组的对比
+
+### 1）长度的区别
+
+数组的长度是固定的，集合的长度是可变的，当我们往集合中添加了一个元素后，集合的长度自动加1，删除一个元素，集合的长度自动减一。如果我们添加了两个元素，集合的长度自动加二，删除两个元素，集合的长度自动减二。非常的灵活，用八个字去形容：自动伸缩，可长可短。
+
+### 2）存储类型的区别
+
+数组是可以存储基本数据类型的，例如整数、小数、字符、布尔.....
+
+数组还可以存引用数据类型。
+
+但是集合只能存引用数据类型，如果需要存基本数据类型，需要把它们变成其对应的包装类才可以。
+
+![image-20240409194447665](./assets/image-20240409194447665.png)
+
+----
+
+## 四、集合
+
+在Java中其实规定了很多很多种结合，每种集合都有其各自的特点。
+
+![image-20240409194853313](./assets/image-20240409194853313.png)
+
+现在我们先来学习以后用的最多的 `ArrayList` 集合。
+
+-----
+
+## 五、ArrayList集合
+
+想要学习这个类，肯定要来看它的构造和成员方法，因此我们先打开API帮助文档先查阅一下。
+
+`ArrayList` 是定义在 `java.util` 包下的，因此我们一会在使用的时候需要导包。
+
+![image-20240409195041604](./assets/image-20240409195041604.png)
+
+在类名的右侧有个 `<E>`，这个 `<E>` 就是泛型，我们在创建对象的时候，`ArrayList` 后面也要写这样的 `<>`，`<>` 里面写存储的数据类型就可以了。
+
+![image-20240409195244793](./assets/image-20240409195244793.png)
+
+再往下看的就是构造方法，构造是一个空参的，我们就用它就行。
+
+![image-20240409195345908](./assets/image-20240409195345908.png)
+
+创建完对象后，我们就可以成员方法对集合里的数据进行添加、删除、查找等等。
+
+~~~java
+package com.itheima.listdemo;
+
+import java.util.ArrayList;
+
+public class ArrayListDemo1 {
     public static void main(String[] args) {
-        //创建集合
-        ArrayList<String> array = new ArrayList<String>();
+        //1.创建集合的对象，集合的对象创建完毕后，就好比存储数据的容器就有了
+        // 但是这么写会有个小问题，集合也是个容器，也可以用来存储数据，但这里容器中的数据类型没发限定
+        ArrayList list = new ArrayList();
+        //此时我们就需要引入一个概念 —— 泛型，泛型的作用：限定集合中存储数据的类型
+        // 如果在里面写了int，就会报错，因为集合里面不能直接存基本数据类型
+        ArrayList<int> list = new ArrayList();
+        // 但我们可以写字符串，因为在字符串是引用数据类型，前面写了，后面也需要写，即在类名的后面都需要写上
+        // 这句话的意思就是：我们创建了一个集合用来存储数据，集合以后只能存储String这样的字符串
+        ArrayList<String> list = new ArrayList<String>();
+        // 但是这种写法是JDK7以前的写法，到了JDK7以后，它觉得，我前面写过了，那后面还要再写一遍，太麻烦了，因此后面的String可以省略不写，但是<>一定要留着
+        ArrayList<String> list = new ArrayList<String>();
 
-        //添加元素
-        array.add("hello");
-        array.add("world");
-        array.add("java");
-
-        //public boolean remove(Object o)：删除指定的元素，返回删除是否成功
-        //        System.out.println(array.remove("world"));
-        //        System.out.println(array.remove("javaee"));
-
-        //public E remove(int index)：删除指定索引处的元素，返回被删除的元素
-        //        System.out.println(array.remove(1));
-
-        //IndexOutOfBoundsException
-        //        System.out.println(array.remove(3));
-
-        //public E set(int index,E element)：修改指定索引处的元素，返回被修改的元素
-        //        System.out.println(array.set(1,"javaee"));
-
-        //IndexOutOfBoundsException
-        //        System.out.println(array.set(3,"javaee"));
-
-        //public E get(int index)：返回指定索引处的元素
-        //        System.out.println(array.get(0));
-        //        System.out.println(array.get(1));
-        //        System.out.println(array.get(2));
-        //System.out.println(array.get(3)); //？？？？？？ 自己测试
-
-        //public int size()：返回集合中的元素的个数
-        System.out.println(array.size());
-
-        //输出集合
-        System.out.println("array:" + array);
+        //解释[]：
+        //此时我们创建的是ArrayList的对象，而ArrayList是java已经写好的一个类
+        //这个类在底层做了一些处理
+        //1.打印对象不是地址值，而是集合中存储数据内容
+        //2.在展示的时候会拿[]把所有的数据进行包裹
+        //如果[]中间什么也没有，就表示集合现在是空的，它的长度为0，里面是没有内容的
+        ArrayList<String> list = new ArrayList<>();
+        System.out.println(list);
     }
 }
-```
+~~~
 
-### 1.3 ArrayList存储字符串并遍历
+----
 
-#### 1.3.1 案例需求
+## 六、`ArrayList` 成员方法
 
-​	创建一个存储字符串的集合，存储3个字符串元素，使用程序实现在控制台遍历该集合
+虽然方法很多，但是我们可以总结为四个字：增、删、改、查。
 
-#### 1.3.2 代码实现
+查的时候我们可以查询单个的，也可以查询集合中所有的元素。
 
-```java
-public class ArrayListDemo3 {
+所以说我们以后在学习这种容器类的知识点的时候，抓住 增、删、改、查 这四个字就可以了。
+
+| 方法名                                  | 说明                                   |
+| :-------------------------------------- | -------------------------------------- |
+| `public boolean add(要添加的元素)`      | 将指定的元素追加到此集合的末尾         |
+| `public boolean remove(要删除的元素)`   | 删除指定元素,返回值表示是否删除成功    |
+| `public E  remove(int   index)`         | 删除指定索引处的元素，返回被删除的元素 |
+| `public E   set(int index,E   element)` | 修改指定索引处的元素，返回被修改的元素 |
+| `public E   get(int   index)`           | 返回指定索引处的元素                   |
+| `public int   size()`                   | 返回集合中的元素的个数                 |
+
+----
+
+### 1）`boolean add(E e)`
+
+`list.add("aaa");` 代码中，调用 `add` 方法时候，括号里面的 `e` 就表示 element，即添加元素的意思。
+
+这里的 `e` 的类型是 `String`，就表示现在可以往里面添加字符串。
+
+方法的返回值是布尔类型的，表示当前的元素是否添加成功。
+
+![image-20240409201733732](./assets/image-20240409201733732.png)
+
+`ArrayList` 集合有一个特点，就是不管添加什么，它都是可以添加成功的，因此这个方法永远返回一个 `true`。
+
+我们可以来看看 `add` 的源码，选中 `add`，然后<kbd>ctrl + b</kbd>。
+
+![image-20240409202500042](./assets/image-20240409202500042.png)
+
+虽然中间这两行我们暂时看不懂，没关系，我们直接看最后一句话。在添加完毕后，它直接 return 一个 `true`。
+
+![image-20240409202408025](./assets/image-20240409202408025.png)
+
+由于因为不管添加什么，都会返回一个`true`，因此我们在添加的时候一般是不会去管它的返回值的，也就是说我们直接调用方法，直接使用方法本身的添加功能就可以了：`list.add("aaa");`
+
+~~~java
+//1.创建一个集合
+ArrayList<String> list = new ArrayList<>();
+
+//2.添加元素
+list.add("aaa");
+list.add("aaa");
+list.add("bbb");
+list.add("ccc");
+~~~
+
+---
+
+### 2）`boolean remove(E e)`
+
+元素删除成功，返回一个 `true`；如果删除失败，返回 `false`
+
+~~~java
+boolean result1 = list.remove("aaa");
+System.out.println(result1); // true
+
+boolean result2 = list.remove("ddd");
+System.out.println(result2); // 当你要删除的元素不存在的时候，就会返回false
+~~~
+
+----
+
+### 3）`E remove(int index)`
+
+根据索引删除，看到这个方法就知道，`ArrayList集合` 还有索引，它的索引规则跟数组、字符串的规则都是一样的，都是从0开始，逐一增长，中间不间断的。
+
+如果是通过索引删除的，它就会把被删除的元素返回。
+
+~~~java
+String str = list.remove(2);
+System.out.println(str); // "aaa"
+~~~
+
+----
+
+### 3）`E set(int index,E e)` 
+
+把被覆盖的元素，也就是原来的旧值返回。
+
+~~~java
+String result = list.set(1, "ddd"); // 将 1 索引上的元素变成 "ddd"
+System.out.println(result); // 接收到的是 "aaa"，即被覆盖的字符串
+~~~
+
+----
+
+### 4）`E get(int index)`
+
+根据制定的索引来查询到对应的元素。
+
+~~~java
+String s = list.get(0);
+System.out.println(s); // "aaa"
+~~~
+
+----
+
+### 5）`int size()`
+
+获取集合的长度，要注意的是，集合的长度不叫做 `length()` 了，而是 `size()`，而且它也是个方法，在调用的时候需要加一个 `()`。
+
+方法就会将集合的长度做一个返回。
+
+`get()` 方法与 `size()` 方法结合起来就可以做一个变量，遍历同样不需要我们手写，使用IDEA快捷方式自动生成就可以了：<kbd>list.fori</kbd> 。
+
+![image-20240409204619829](./assets/image-20240409204619829.png)
+
+~~~java
+//遍历
+for (int i = 0; i < list.size(); i++) {
+    //i 索引
+    //list.get(i) 元素
+    String str = list.get(i);
+    System.out.println(str);
+}
+~~~
+
+----
+
+# 112.练习：添加字符串和整数 并遍历
+
+## 一、练习：集合的遍历方式
+
+需求：定义一个集合，添加字符串，并进行遍历。
+
+遍历格式按照：`[元素1, 元素2, 元素3]`
+
+~~~java
+package com.itheima.test;
+
+import java.util.ArrayList;
+
+public class Test1 {
     public static void main(String[] args) {
-        //1.创建集合对象
+        //1.创建集合
         ArrayList<String> list = new ArrayList<>();
 
         //2.添加元素
-        list.add("aaa");
-        list.add("bbb");
-        list.add("ccc");
-        list.add("ddd");
+        list.add("点赞了吗？");
+        list.add("收藏了吗？");
+        list.add("投币了吗？");
+        list.add("转发了吗？");
 
         //3.遍历
-        //快捷键: list.fori 正向遍历
-        //list.forr 倒着遍历
         System.out.print("[");
         for (int i = 0; i < list.size(); i++) {
-            //i 依次表示集合里面的每一个索引
-
             if(i == list.size() - 1){
-                //最大索引
                 System.out.print(list.get(i));
             }else{
-                //非最大索引
                 System.out.print(list.get(i) + ", ");
             }
         }
-        System.out.print("]");
+        System.out.println("]");
     }
 }
+~~~
 
-```
+----
 
-### 1.4 ArrayList存储学生对象并遍历
+## 二、基本数据类型对应的包装类
 
-#### 1.4.1 案例需求
+| 基本数据类型 | 包装类    |
+| ------------ | --------- |
+| byte         | Byte      |
+| short        | Short     |
+| char         | Character |
+| int          | Integer   |
+| long         | Long      |
+| float        | Float     |
+| double       | Double    |
+| boolean      | Boolean   |
 
-​	创建一个存储学生对象的集合，存储3个学生对象，使用程序实现在控制台遍历该集合
+在这些当中，其实我们只需要记住 `char ——> Character`、`int ——> Integer` 就可以了。
 
-#### 1.4.2 代码实现
+并且这些都不需要我们去背，使用IDEA就可以关联出来了。
 
-```java
-public class ArrayListDemo4 {
+----
+
+## 三、练习：添加数字并遍历
+
+需求：定义一个集合，添加数字，并进行遍历。
+
+集合中是不能添加基本数据类型的，如果一定要添加，就需要将它变成对应的包装类。
+
+PS：在写 `ArrayList` 的泛型的时候，我们不能直接写 `int`，而是需要写 `Integer`。
+
+~~~java
+package com.itheima.test;
+
+import java.util.ArrayList;
+
+public class Test2 {
     public static void main(String[] args) {
-        //1.创建集合对象，用来存储数据
+        //1.创建集合
+        ArrayList<Integer> list = new ArrayList<>();
+
+        //2.添加元素
+        //jdk5以后 int 和 Integer 之间是可以互相转化的
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        list.add(4);
+        list.add(5);
+
+        //3.遍历集合
+        System.out.print("[");
+        for (int i = 0; i < list.size(); i++) {
+            if(i == list.size() - 1){
+                System.out.print(list.get(i));
+            }else{
+                System.out.print(list.get(i) + ", ");
+            }
+        }
+        System.out.println("]");
+    }
+}
+~~~
+
+----
+
+## 四、练习：添加字符
+
+需求：定义一个集合，添加字符。
+
+此时创建 `ArrayList对象` 的时候泛型不能写 `char`，而需要写 `Character` 即可。
+
+~~~java
+package com.itheima.test;
+
+import java.util.ArrayList;
+
+public class Test3 {
+    public static void main(String[] args) {
+        ArrayList<Character> list = new ArrayList<>();
+
+        list.add('a');
+        list.add('b');
+        list.add('c');
+
+        System.out.println(list);
+    }
+}
+~~~
+
+
+
+----
+
+# 113.练习：添加学生对象并遍历的两个练习
+
+## 一、添加学生对象并遍历 —— 一
+
+需求：定义一个集合，添加一些学生对象，并进行遍历。
+
+学生类的属性为：姓名、年龄。
+
+**Student.java**
+
+~~~java
+package com.itheima.test;
+
+public class Student {
+    //标准JavaBean：
+    //1.私有化成员变量
+    //2.空参构造方法
+    //3.带全部参数的构造方法
+    //4.get/set方法
+
+    private String name;
+    private int age;
+
+    public Student() {
+    }
+
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+~~~
+
+**Test4.java**
+
+这里 `ArrayList` 的泛型写什么？泛型写什么应该看元素的类型，而我现在的元素是学生对象，因此这里的泛型应该写 `Student`。
+
+由于我们的泛型是 `Student`，因此我们只能往里面添加 `Student` 类型的对象。
+
+![image-20240409211412197](./assets/image-20240409211412197.png)
+
+~~~java
+package com.itheima.test;
+
+import java.util.ArrayList;
+
+public class Test4 {
+    public static void main(String[] args) {
+        //1.创建集合
         ArrayList<Student> list = new ArrayList<>();
 
         //2.创建学生对象
-        Student s1 = new Student("zhangsan",16);
-        Student s2 = new Student("lisi",15);
-        Student s3 = new Student("wangwu",18);
+        Student s1 = new Student("zhangsan",23);
+        Student s2 = new Student("lisi",24);
+        Student s3 = new Student("wangwu",25);
 
-        //3.把学生对象添加到集合中
+        //3.添加元素
         list.add(s1);
         list.add(s2);
         list.add(s3);
 
-        //4.遍历
+        //4.遍历集合
         for (int i = 0; i < list.size(); i++) {
-            //i 依次表示集合中的每一个索引
+            //i 索引 list.get(i) 元素/学生对象
+            Student stu = list.get(i);
+            // 由于直接打印 stu 的时候都是地址值，地址值对我来讲没有用，因此需要将里面的属性给 get 出来才行
+            System.out.println(stu.getName() + ", " + stu.getAge());
+        }
+    }
+}
+~~~
+
+----
+
+## 二、练习二：添加学生对象并遍历 —— 二
+
+需求：定义一个集合，添加一些学生对象，并进行遍历。
+
+学生类的属性为：姓名、年龄。
+
+要求：对象的数据来自键盘录入。
+
+~~~java
+package com.itheima.test;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Test5 {
+    public static void main(String[] args) {
+        //1.创建集合
+        ArrayList<Student> list = new ArrayList<>();
+        //长度为0
+        //2.键盘录入学生的信息并添加到集合当中
+        Scanner sc = new Scanner(System.in);
+        for (int i = 0; i < 3; i++) {
+            Student s = new Student(); // 创建对象只能写在循环里面！
+            System.out.println("请输入学生的姓名");
+            String name = sc.next();
+            System.out.println("请输入学生的年龄");
+            int age = sc.nextInt();
+
+            //把name和age赋值给学生对象
+            s.setName(name);
+            s.setAge(age);
+
+            //把学生对象添加到集合当中
+            list.add(s);
+        }
+        //3.遍历
+        for (int i = 0; i < list.size(); i++) {
+            //i 索引 list.get(i) 元素/学生对象
             Student stu = list.get(i);
             System.out.println(stu.getName() + ", " + stu.getAge());
         }
-
-
-
     }
 }
+~~~
 
-```
 
-### 1.5 查找用户的索引
+
+----
+
+# 114.练习：查找用户是否存在
+
+## 一、查找用户是否存在
 
 需求： 
 
-1，main方法中定义一个集合，存入三个用户对象。 
+1、main方法中定义一个集合，存入三个用户对象。 
 
    用户属性为：id，username，password    
 
-2，要求：定义一个方法，根据id查找对应的学生信息。
+2、要求：定义一个方法，根据id查找对应的学生信息。
 
-   如果存在，返回索引
+   如果存在，返回 `true`
 
-   如果不存在，返回-1
+   如果不存在，返回 `false`
 
-代码示例：
+User.java
 
-```java
-public class ArrayListDemo6 {
-    public static void main(String[] args) {
-        /*需求：
-        1，main方法中定义一个集合，存入三个用户对象。
-        用户属性为：id，username，password
-        2，要求：定义一个方法，根据id查找对应的学生信息。
-        如果存在，返回索引
-        如果不存在，返回-1*/
+~~~java
+package com.itheima.test;
+
+public class User {
+    private String id;
+    private String username;
+    private String password;
 
 
-        //1.创建集合对象
-        ArrayList<User> list = new ArrayList<>();
-
-        //2.创建用户对象
-        User u1 = new User("heima001", "zhangsan", "123456");
-        User u2 = new User("heima002", "lisi", "1234");
-        User u3 = new User("heima003", "wangwu", "1234qwer");
-
-        //3.把用户对象添加到集合当中
-        list.add(u1);
-        list.add(u2);
-        list.add(u3);
-
-        //4.调用方法，通过id获取对应的索引
-        int index = getIndex(list, "heima001");
-
-        System.out.println(index);
-
+    public User() {
     }
 
+    public User(String id, String username, String password) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+    }
 
-    //1.我要干嘛？  根据id查找对应的学生信息
-    //2.我干这件事情需要什么才能完成？   集合 id
-    //3.方法的调用处是否需要继续使用方法的结果？
-    //要用必须返回，不要用可以返回也可以不返回
-    //明确说明需要有返回值 int
-    public static int getIndex(ArrayList<User> list, String id) {
-        //遍历集合得到每一个元素
-        for (int i = 0; i < list.size(); i++) {
-            User u = list.get(i);
-            String uid = u.getId();
-            if(uid.equals(id)){
-                return i;
-            }
-        }
-        //因为只有当集合里面所有的元素都比较完了，才能断定id是不存在的。
-        return -1;
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
+~~~
 
-```
+Test6.test —— 1
 
-### 1.6 判断用户的是否存在
+~~~java
+package com.itheima.test;
 
-```java
-public class ArrayListDemo5 {
+import java.util.ArrayList;
+
+public class Test6 {
     public static void main(String[] args) {
-       /* 需求：
-        1，main方法中定义一个集合，存入三个用户对象。
-        用户属性为：id，username，password
-        2，要求：定义一个方法，根据id查找对应的学生信息。
-        如果存在，返回true
-        如果不存在，返回false*/
-
-        //1.定义集合
+        //1.创建集合
         ArrayList<User> list = new ArrayList<>();
 
-        //2.创建对象
+        //2.创建三个用户对象
         User u1 = new User("heima001","zhangsan","123456");
         User u2 = new User("heima002","lisi","12345678");
         User u3 = new User("heima003","wangwu","1234qwer");
@@ -15345,43 +15677,345 @@ public class ArrayListDemo5 {
         list.add(u2);
         list.add(u3);
 
-        //4.调用方法，查询id是否存在
-        boolean result = contains(list, "heima001");
-        System.out.println(result);
+        //4.调用方法查看id是否存在
+        boolean flag = contains(list, "heima0010");
+
+        //5.打印结果
+        System.out.println(flag);
 
     }
 
-    //定义在测试类中的方法需要加static
-    //1.我要干嘛？ 我要根据id查询学生是否存在
-    //2.我干这件事情，需要什么才能完成？ 集合 id
-    //3.方法的调用处是否需要使用方法的结果？
-    //如果要用，必须返回，如果不用，可以返回也可以不返回
-    //但是本题明确说明需要返回
+    //1.我要干嘛？   根据id查找用户
+    //2.我干这件事需要什么才能完成？   list  id
+    //3.调用处是否需要使用方法的结果？ 返回
     public static boolean contains(ArrayList<User> list, String id){
-        //循环遍历集合，得到集合里面的每一个元素
-        //再进行判断
-
         for (int i = 0; i < list.size(); i++) {
-            //i 索引  list.get(i); 元素
             User u = list.get(i);
-            //判断id是否存在，我是拿着谁跟谁比较
-            //需要把用户对象里面的id拿出来再进行比较。
             String uid = u.getId();
-            if(id.equals(uid)){
-                return true;//return 关键字：作用就是结束方法。
+            if(uid.equals(id)){
+                //如果找到了直接返回true
+                return true;
             }
         }
-        //只有当集合里面所有的元素全部比较完毕才能认为是不存在的。
+        //当循环结束表示集合里面所有的元素都已经比较完毕，还没有一样的，那么返回false就可以了
         return false;
     }
-
 }
+~~~
 
+---
+
+## 二、变形题1
+
+Test6.test —— 2
+
+~~~java
+package com.itheima.test;
+
+import java.util.ArrayList;
+
+/*需求：
+1，main方法中定义一个集合，存入三个用户对象。
+      用户属性为：id，username，password
+2，要求：定义一个方法，根据id查找对应的用户信息。
+      如果存在，返回索引
+      如果不存在，返回-1
+*/
+public class Test7 {
+    public static void main(String[] args) {
+        //1.创建集合
+        ArrayList<User> list = new ArrayList<>();
+
+        //2.创建三个用户对象
+        User u1 = new User("heima001", "zhangsan", "123456");
+        User u2 = new User("heima002", "lisi", "12345678");
+        User u3 = new User("heima003", "wangwu", "1234qwer");
+
+        //3.把用户对象添加到集合当中
+        list.add(u1);
+        list.add(u2);
+        list.add(u3);
+
+        //4.查找索引
+        int index = getIndex(list, "heima004");
+
+        //5.打印
+        System.out.println(index);
+    }
+
+
+    public static int getIndex(ArrayList<User> list, String id) {
+        for (int i = 0; i < list.size(); i++) {
+            User u = list.get(i);
+            String uid = u.getId();
+            if(uid.equals(id)){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+}
+~~~
+
+---
+
+## 三、变形题2
+
+如果题目即要我返回 `true` 跟 `false`，还要返回索引。此时我们就可以把刚刚的两个练习进行合并。
+
+就不需要将两个方法完全写完，在写 `contains` 方法的时候可以调用 `getIndex` 方法，相当于一个偷懒。偷懒是程序员的一个美德，一定要把这个美德发展下去。
+
+~~~java
+package com.itheima.test;
+
+import java.util.ArrayList;
+public class Test6 {
+    public static void main(String[] args) {
+        //1.创建集合
+        ArrayList<User> list = new ArrayList<>();
+
+        //2.创建三个用户对象
+        User u1 = new User("heima001","zhangsan","123456");
+        User u2 = new User("heima002","lisi","12345678");
+        User u3 = new User("heima003","wangwu","1234qwer");
+
+        //3.把用户对象添加到集合当中
+        list.add(u1);
+        list.add(u2);
+        list.add(u3);
+
+        //4.调用方法查看id是否存在
+        boolean flag = contains(list, "heima0010");
+
+        //5.打印结果
+        System.out.println(flag);
+
+    }
+
+    //1.我要干嘛？   根据id查找用户
+    //2.我干这件事需要什么才能完成？   list  id
+    //3.调用处是否需要使用方法的结果？ 返回
+    public static boolean contains(ArrayList<User> list, String id){
+       /* for (int i = 0; i < list.size(); i++) {
+            User u = list.get(i);
+            String uid = u.getId();
+            if(uid.equals(id)){
+                //如果找到了直接返回true
+                return true;
+            }
+        }
+        //当循环结束表示集合里面所有的元素都已经比较完毕，还没有一样的，那么返回false就可以了
+        return false;*/
+
+       return getIndex(list,id) >= 0;
+
+    }
+
+
+    public static int getIndex(ArrayList<User> list, String id) {
+        for (int i = 0; i < list.size(); i++) {
+            User u = list.get(i);
+            String uid = u.getId();
+            if(uid.equals(id)){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+}
+~~~
+
+
+
+----
+
+# 115.练习：返回多个数据
+
+需求：
+定义Javabean类：Phone
+Phone属性：品牌，价格。
+main方法中定义一个集合，存入三个手机对象。
+分别为：小米，1000。苹果，8000。锤子 2999。
+定义一个方法，将价格低于3000的手机信息返回。
+
+Phone.java
+
+~~~java
+package com.itheima.test;
+
+public class Phone {
+    //Phone属性：品牌，价格。
+    private String brand;
+    private int price;
+
+    public Phone() {
+    }
+
+
+    public Phone(String brand, int price) {
+        this.brand = brand;
+        this.price = price;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+}
+~~~
+
+Test8.test
+
+~~~java
+package com.itheima.test;
+import java.util.ArrayList;
+
+public class Test8 {
+    public static void main(String[] args) {
+
+        //1.创建集合对象
+        ArrayList<Phone> list = new ArrayList<>();
+
+        //2.创建手机的对象
+        Phone p1 = new Phone("小米",1000);
+        Phone p2 = new Phone("苹果",8000);
+        Phone p3 = new Phone("锤子",2999);
+
+        //3.添加数据
+        list.add(p1);
+        list.add(p2);
+        list.add(p3);
+
+        //4.调用方法
+        ArrayList<Phone> phoneInfoList = getPhoneInfo(list);
+
+        //5.遍历集合
+        for (int i = 0; i < phoneInfoList.size(); i++) {
+            Phone phone = phoneInfoList.get(i);
+            System.out.println(phone.getBrand() + ", " + phone.getPrice());
+        }
+
+    }
+
+
+    //1.我要干嘛？ 查询手机信息
+    //2.我干这件事情，需要什么才能完成？  集合
+    //3.我干完了，方法的调用处是否需要继续使用结果？  返回
+
+    //技巧：
+    //如果我们要返回多个数据，可以把这些数据先放到一个容器当中，再把容器返回
+    //集合 数组
+    public static ArrayList<Phone> getPhoneInfo(ArrayList<Phone> list){
+        //定义一个集合用于存储价格低于3000的手机对象
+        ArrayList<Phone> resultList = new ArrayList<>();
+        //遍历集合
+        for (int i = 0; i < list.size(); i++) {
+            Phone p = list.get(i);
+            int price = p.getPrice();
+            //如果当前手机的价格低于3000，那么就把手机对象添加到resultList中
+            if(price < 3000){
+                resultList.add(p);
+            }
+        }
+        //返回resultList
+        return resultList;
+    }
+}
+~~~
+
+
+
+----
+
+# 116.学生管理系统 —— 业务分析并搭建主菜单
+
+以后工作中一般都会给一个需求文档，这个文档就写了当前项目中所有的业务操作，我们作为开发者需要学会阅读需求文档，从文档当中找出业务流程再去书写代码。
+
+## 一、需求文档
+
+----
+
+学生管理系统
+
+**需求**：
+
+​	采取控制台的方式去书写学生管理系统。
+
+> 控制台：所有的操作，所有的展示都是在控制台里面进行的。
+>
+> 等我们以后学习完在浏览器中展示数据的方式之后，我们也可以把它移植到浏览器当中。
+
+一开始会有个分析，它告诉你这个项目中所有的流程。
+
+**分析**：
+
+**初始菜单**：
+
+```java
+"-------------欢迎来到黑马学生管理系统----------------"
+"1：添加学生"
+"2：删除学生"
+"3：修改学生"
+"4：查询学生"
+"5：退出"
+"请输入您的选择:"
 ```
 
-## 2.学生管理系统
+**学生类**：
 
-### 2.1学生管理系统实现步骤
+属性：id、姓名、年龄、家庭住址
+
+**添加功能**：
+
+键盘录入每一个学生信息并添加，需要满足以下要求：id唯一
+
+**删除功能**：
+
+键盘录入要删除的学生id，需要满足以下要求：
+
+* id存在删除
+* id不存在，需要提示不存在，并回到初始菜单
+
+**修改功能**：
+
+键盘录入要修改的学生id，需要满足以下要求
+
+* id存在，继续录入其他信息
+* id不存在，需要提示不存在，并回到初始菜单
+
+**查询功能**：
+
+打印所有的学生信息，需要满足以下要求
+
+* 如果没有学生信息，提示：当前无学生信息，请添加后再查询
+* 如果有学生信息，需要按照以下格式输出。（不用过于纠结对齐的问题）
+
+```java
+id			姓名		年龄		家庭住址
+heima001	张三		23		 南京
+heima002	李四		24		 北京
+heima003	王五		25		 广州
+heima004	赵六	 	26		 深圳
+```
+
+----
+
+
+
+
 
 - 案例需求
 
