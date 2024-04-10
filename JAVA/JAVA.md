@@ -4832,6 +4832,8 @@ case和值之间要用空格隔开，值的后面要加冒号。
 
 case后面的值只能是字面量，不能是变量！
 
+并且值的类型必须要与表达式的结果的类型保持一致，否则会报错！
+
 ![image-20240402112119948](./assets/image-20240402112119948.png)
 
 流程图
@@ -5045,12 +5047,17 @@ public class SwitchDemo4 {
         // 由于上面那种写法看上去有点乱，因为打印语句和break都比较多。所以在JDK12的时候，优化了语句体和break。
         int number = 10;
         switch (number) {
-            // 语法：省略冒号，直接写一个箭头，在箭头的后面写一对大括号，可以将要执行的语句体都写在大括号当中。用这种方式来写可以省略break，也不会出发case穿透现象。相当于利用了一个大括号，将break给优化了。
+            // 语法：省略冒号，直接写一个箭头，在箭头的后面写一对大括号，可以将要执行的语句体都写在大括号当中。用这种方式来写可以省略break，也不会出发case穿透现象。相当于利用了一个大括号，将break给优化了。就算大括号中加上 break 对程序也没有影响。
+            // 但是如果语句体有多行的话，大括号是不能省略的。
             case 0 -> {
 
             };
+            // 但如果要跳出其他循环，就可以在里面加上 break语句，此时它执行的是我们自己写的break语句，而不是大括号自带的break语句。
+            case 1 -> {
+                System.out.println("一");
+                break loop; // 表示我要跳出 loop 这个循环
+            }
             // 如果大括号里只有一行代码，大括号是可以省略的。
-            case 1 -> System.out.println("一");
             case 2 -> System.out.println("二");
             case 3 -> System.out.println("三");
             default -> System.out.println("没有这种选项");
@@ -16011,103 +16018,87 @@ heima003	王五		25		 广州
 heima004	赵六	 	26		 深圳
 ```
 
-----
+---
 
-
-
-
-
-- 案例需求
-
-  ​	针对目前我们的所学内容，完成一个综合案例：学生管理系统。该系统主要功能如下：
-
-  ​	添加学生：通过键盘录入学生信息，添加到集合中
-
-  ​	删除学生：通过键盘录入要删除学生的学号，将该学生对象从集合中删除
-
-  ​	修改学生：通过键盘录入要修改学生的学号，将该学生对象其他信息进行修改
-
-  ​	查看学生：将集合中的学生对象信息进行展示
-
-  ​	退出系统：结束程序
-
-- 实现步骤
-
-  1. 定义学生类，包含以下成员变量
-
-     ​       private String sid            // 学生id
-
-     ​       private String name       // 学生姓名
-
-     ​       private String age          // 学生年龄
-
-     ​       private String address   // 学生所在地
-
-  2. 学生管理系统主界面的搭建步骤
-
-     2.1 用输出语句完成主界面的编写
-     2.2 用Scanner实现键盘输入
-     2.3 用switch语句完成选择的功能
-     2.4 用循环完成功能结束后再次回到主界面
-
-  3. 学生管理系统的添加学生功能实现步骤
-
-     3.1 定义一个方法，接收ArrayList<Student>集合
-     3.2 方法内完成添加学生的功能
-     ​         ①键盘录入学生信息
-     ​         ②根据录入的信息创建学生对象
-     ​         ③将学生对象添加到集合中
-     ​         ④提示添加成功信息
-     3.3 在添加学生的选项里调用添加学生的方法
-
-  4. 学生管理系统的查看学生功能实现步骤
-
-     4.1 定义一个方法，接收ArrayList<Student>集合
-     4.2 方法内遍历集合，将学生信息进行输出
-     4.3 在查看所有学生选项里调用查看学生方法
-
-  5. 学生管理系统的删除学生功能实现步骤
-
-     5.1 定义一个方法，接收ArrayList<Student>集合
-     5.2 方法中接收要删除学生的学号
-     5.3 遍历集合，获取每个学生对象
-     5.4 使用学生对象的学号和录入的要删除的学号进行比较,如果相同，则将当前学生对象从集合中删除
-     5.5 在删除学生选项里调用删除学生的方法
-
-  6. 学生管理系统的修改学生功能实现步骤
-
-     6.1 定义一个方法，接收ArrayList<Student>集合
-     6.2 方法中接收要修改学生的学号
-     6.3 通过键盘录入学生对象所需的信息，并创建对象
-     6.4 遍历集合，获取每一个学生对象。并和录入的修改学生学号进行比较.如果相同，则使用新学生对象替换当前学生对象
-     6.5 在修改学生选项里调用修改学生的方法
-
-  7. 退出系统
-
-     使用System.exit(0);退出JVM
-
-### 2.2学生类的定义
+## 二、学生类的定义
 
 ```java
 package com.itheima.studentsystem;
 
 public class Student {
+    //id name age address
     private String id;
     private String name;
     private int age;
     private String address;
 
- 	//下面是空参，有参，get和set方法
-}
+    public Student() {
+    }
 
+    public Student(String id, String name, int age, String address) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.address = address;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+}
 ```
 
-### 2.3测试类的定义
+----
+
+## 三、测试类的定义
+
+当我们点击IDEA右上角的 `×`，也相当于执行了 `System.exit(0);`，让虚拟机停止运行。
+
+![image-20240410093244747](./assets/image-20240410093244747.png)
+
+如果代码写的太多，可以点击旁边的收起来的按钮。
+
+![image-20240410093517261](./assets/image-20240410093517261.png)
 
 ```java
+package com.itheima.studentsystem;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
 public class StudentSystem {
     public static void main(String[] args) {
         ArrayList<Student> list = new ArrayList<>();
+        // 如果想从 switch 语句中直接结束循环，可以用一个标号在这里，相当于就是给外面的这个循环起个名字，起什么都可以，只要符合标识符的命名规范就行。起"abc"都可以，但是 "abc" 没有什么实际的意义。
+        // 我给它起个名字：loop，表示循环的意思
         loop:
         while (true) {
             System.out.println("-----------------欢迎来到黑马学生管理系统-------------------");
@@ -16118,15 +16109,18 @@ public class StudentSystem {
             System.out.println("5:退出");
             System.out.println("请输入您的选择：");
             Scanner sc = new Scanner(System.in);
-            String choose = sc.next();
+            String choose = sc.next(); // 推荐使用 next()，因为用户可能会输入字符串等，如果输入了字符串，nextInt() 就会报错，但是 next() 不会。等用户录进来后将这种不可取的情况写在 switch 的 default当中，因此这种写法容错率更高一点。
             switch (choose) {
+                // 注意 case 后面的字面量需要与上面choose的类型保持一致，上面是字符串，下面也必须要是字符串，否则会报错，因为两个类型不一样肯定匹配不上。
                 case "1" -> addStudent(list);
                 case "2" -> deleteStudent(list);
                 case "3" -> updateStudent(list);
                 case "4" -> queryStudent(list);
                 case "5" -> {
                     System.out.println("退出");
-                    //break loop;
+                    // 跳出外圈循环写法1：
+                    //break loop; // 表示我要跳出 loop 这个循环
+                    // 跳出外圈循环写法2：
                     System.exit(0);//停止虚拟机运行
                 }
                 default -> System.out.println("没有这个选项");
@@ -16135,122 +16129,185 @@ public class StudentSystem {
     }
 
     //添加学生
-    public static void addStudent(ArrayList<Student> list) {
-        //利用空参构造先创建学生对象
-        Student s = new Student();
-
-        Scanner sc = new Scanner(System.in);
-        String id = null;
-        while (true) {
-            System.out.println("请输入学生的id");
-            id = sc.next();
-            boolean flag = contains(list, id);
-            if(flag){
-                //表示id已经存在，需要重新录入
-                System.out.println("id已经存在，请重新录入");
-            }else{
-                //表示id不存在，表示可以使用
-                s.setId(id);
-                break;
-            }
-        }
-
-        System.out.println("请输入学生的姓名");
-        String name = sc.next();
-        s.setName(name);
-
-        System.out.println("请输入学生的年龄");
-        int age = sc.nextInt();
-        s.setAge(age);
-
-        System.out.println("请输入学生的家庭住址");
-        String address = sc.next();
-        s.setAddress(address);
-
-
-        //把学生对象添加到集合当中
-        list.add(s);
-
-        //提示一下用户
-        System.out.println("学生信息添加成功");
+    public static void addStudent() {
+        System.out.println("添加学生");
     }
 
     //删除学生
-    public static void deleteStudent(ArrayList<Student> list) {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("请输入要删除的id");
-        String id = sc.next();
-        //查询id在集合中的索引
-        int index = getIndex(list, id);
-        //对index进行判断
-        //如果-1，就表示不存在，结束方法，回到初始菜单
-        if(index >= 0){
-            //如果大于等于0的，表示存在，直接删除
-            list.remove(index);
-            System.out.println("id为：" + id + "的学生删除成功");
-        }else{
-            System.out.println("id不存在，删除失败");
-        }
+    public static void deleteStudent() {
+        System.out.println("删除学生");
     }
 
     //修改学生
-    public static void updateStudent(ArrayList<Student> list) {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("请输入要修改学生的id");
-        String id = sc.next();
-
-        int index = getIndex(list, id);
-
-        if(index == -1){
-            System.out.println("要修改的id" + id + "不存在，请重新输入");
-            return;
-        }
-
-        //当代码执行到这里，表示什么？表示当前id是存在的。
-        //获取要修改的学生对象
-        Student stu = list.get(index);
-
-        //输入其他的信息并修改
-        System.out.println("请输入要修改的学生姓名");
-        String newName = sc.next();
-        stu.setName(newName);
-
-        System.out.println("请输入要修改的学生年龄");
-        int newAge = sc.nextInt();
-        stu.setAge(newAge);
-
-        System.out.println("请输入要修改的学生家庭住址");
-        String newAddress = sc.next();
-        stu.setAddress(newAddress);
-
-        System.out.println("学生信息修改成功");
-
-
+    public static void updateStudent() {
+        System.out.println("修改学生");
     }
 
 
     //查询学生
     public static void queryStudent(ArrayList<Student> list) {
-        if (list.size() == 0) {
-            System.out.println("当前无学生信息，请添加后再查询");
-            //结束方法
-            return;
-        }
+        System.out.println("查询学生");
+    }
+}
+```
 
-        //打印表头信息
-        System.out.println("id\t\t姓名\t年龄\t家庭住址");
-        //当代码执行到这里，表示集合中是有数据的
-        for (int i = 0; i < list.size(); i++) {
-            Student stu = list.get(i);
-            System.out.println(stu.getId() + "\t" + stu.getName() + "\t" + stu.getAge() + "\t" + stu.getAddress());
+---
+
+## 四、学习方法
+
+1、我们在写项目的时候，不要靠着脑子想，一定要对照结构图去写。
+
+![image-20240410094225396](./assets/image-20240410094225396.png)
+
+2、写的时候千万不要照着代码看一行写一行，这叫抄作业，没有用。你一定要首先，先去读需求文档，根据需求文档自己画出项目的结构图，根据结构图再去把代码写全，这样才能学到真正的知识。
+
+
+
+---
+
+# 117.学生管理系统 —— 查询和添加
+
+~~~java
+//添加学生
+public static void addStudent(ArrayList<Student> list) {
+    //利用空参构造先创建学生对象
+    Student s = new Student();
+
+    Scanner sc = new Scanner(System.in);
+    String id = null;
+    while (true) {
+        System.out.println("请输入学生的id");
+        id = sc.next();
+        boolean flag = contains(list, id);
+        if(flag){
+            //表示id已经存在，需要重新录入
+            System.out.println("id已经存在，请重新录入");
+        }else{
+            //表示id不存在，表示可以使用
+            s.setId(id);
+            break;
         }
     }
 
+    System.out.println("请输入学生的姓名");
+    String name = sc.next();
+    s.setName(name);
 
-    //判断id在集合中是否存在
-    public static boolean contains(ArrayList<Student> list, String id) {
-        //循环遍历集合得到里面的每一个学生对象
-        /*for (int i = 0; i < list.size(); i++) {
+    System.out.println("请输入学生的年龄");
+    int age = sc.nextInt();
+    s.setAge(age);
+
+    System.out.println("请输入学生的家庭住址");
+    String address = sc.next();
+    s.setAddress(address);
+
+
+    //把学生对象添加到集合当中
+    list.add(s);
+
+    //提示一下用户。由于现在使用的是 ArrayList，ArrayList有个特点，就是它不管添加什么，结果都是添加成功，因此执行到这里的代码一定添加成功。 
+    System.out.println("学生信息添加成功");
+}
+
+//查询学生
+public static void queryStudent(ArrayList<Student> list) {
+    if (list.size() == 0) {
+        System.out.println("当前无学生信息，请添加后再查询");
+        //结束方法
+        return;
+    }
+
+    //打印表头信息
+    System.out.println("id\t\t姓名\t年龄\t家庭住址");
+    //当代码执行到这里，表示集合中是有数据的
+    for (int i = 0; i < list.size(); i++) {
+        Student stu = list.get(i);
+        System.out.println(stu.getId() + "\t" + stu.getName() + "\t" + stu.getAge() + "\t" + stu.getAddress());
+    }
+}
+
+
+//判断id在集合中是否存在
+public static boolean contains(ArrayList<Student> list, String id) {
+    //循环遍历集合得到里面的每一个学生对象
+    for (int i = 0; i < list.size(); i++) {
+        //拿到学生对象后，获取id并进行判断
+        Student stu = list.get(i);
+        String sid = stu.getId();
+        if(sid.equals(id)){
+            //存在，true
+            return true;
+        }
+    }
+    // 不存在false
+    return false;
+}
+~~~
+
+
+
+----
+
+# 118.学生管理系统 —— 删除和修改
+
+~~~java
+//删除学生
+public static void deleteStudent(ArrayList<Student> list) {
+    Scanner sc = new Scanner(System.in);
+    System.out.println("请输入要删除的id");
+    String id = sc.next();
+    //查询id在集合中的索引
+    int index = getIndex(list, id);
+    //对index进行判断
+    //如果-1，就表示不存在，结束方法，回到初始菜单
+    if(index >= 0){
+        //如果大于等于0的，表示存在，直接删除
+        list.remove(index);
+        System.out.println("id为：" + id + "的学生删除成功");
+    }else{
+        System.out.println("id不存在，删除失败");
+    }
+}
+
+//修改学生
+public static void updateStudent(ArrayList<Student> list) {
+    Scanner sc = new Scanner(System.in);
+    System.out.println("请输入要修改学生的id");
+    String id = sc.next();
+
+    // 这里不用contains方法，而是使用 getIndex 方法更好，因为这样不仅可以判断它存不存在，而且还可以返回索引，我们就可以根据这个索引获取到学生对象，然后对它进行修改了。
+    int index = getIndex(list, id);
+
+    if(index == -1){
+        System.out.println("要修改的id" + id + "不存在，请重新输入");
+        return;
+    }
+
+    //当代码执行到这里，表示什么？表示当前id是存在的。
+    //获取要修改的学生对象
+    Student stu = list.get(index);
+
+    //输入其他的信息并修改
+    System.out.println("请输入要修改的学生姓名");
+    String newName = sc.next();
+    stu.setName(newName);
+
+    System.out.println("请输入要修改的学生年龄");
+    int newAge = sc.nextInt();
+    stu.setAge(newAge);
+
+    System.out.println("请输入要修改的学生家庭住址");
+    String newAddress = sc.next();
+    stu.setAddress(newAddress);
+
+    System.out.println("学生信息修改成功");
+}
+
+//判断id在集合中是否存在
+public static boolean contains(ArrayList<Student> list, String id) {
+    // 法1：
+    //循环遍历集合得到里面的每一个学生对象
+    /*for (int i = 0; i < list.size(); i++) {
             //拿到学生对象后，获取id并进行判断
             Student stu = list.get(i);
             String sid = stu.getId();
@@ -16261,47 +16318,624 @@ public class StudentSystem {
         }
         // 不存在false
         return false;*/
-       return getIndex(list,id) >= 0;
+    // 法2：重新写一个getIndex方法
+    return getIndex
+getIndex(list,id) >= 0;
+}
+
+//通过id获取索引的方法
+public static int getIndex(ArrayList<Student> list, String id){
+    //遍历集合
+    for (int i = 0; i < list.size(); i++) {
+        //得到每一个学生对象
+        Student stu = list.get(i);
+        //得到每一个学生对象的id
+        String sid = stu.getId();
+        //拿着集合中的学生id跟要查询的id进行比较
+        if(sid.equals(id)){
+            //如果一样，那么就返回索引
+            return i;
+        }
+    }
+    //当循环结束之后还没有找到，就表示不存在，返回-1.
+    return -1;
+}
+~~~
+
+
+
+---
+
+# 119.学生管理系统升级 —— 思路分析
+
+## 一、需求文档
+
+---
+
+**学生管理系统升级版**
+
+**需求**：
+
+​	为学生管理系统书写一个登陆、注册、忘记密码的功能。
+
+​	只有用户登录成功之后，才能进入到学生管理系统中进行增删改查操作。
+
+**分析**：
+
+**登录界面**：
+
+```java
+System.out.println("欢迎来到学生管理系统");
+System.out.println("请选择操作1登录 2注册 3忘记密码");
+```
+
+**用户类**：
+
+​	属性：用户名、密码、身份证号码、手机号码
+
+**注册功能**：
+
+​	1，用户名需要满足以下要求：
+
+​		验证要求：
+
+​			用户名唯一
+
+​			用户名长度必须在3~15位之间 
+
+​			只能是字母加数字的组合，但是不能是纯数字
+
+​	2，密码键盘输入两次，两次一致才可以进行注册。
+
+​	3，身份证号码需要验证。
+
+​		验证要求：
+
+​			长度为18位
+
+​			不能以0为开头
+
+​			前17位，必须都是数字
+
+​			最为一位可以是数字，也可以是大写X或小写x
+
+​	4，手机号验证。
+
+​		验证要求：
+
+​			长度为11位
+
+​			不能以0为开头
+
+​			必须都是数字
+
+**登录功能**：
+
+​	1，键盘录入用户名
+
+​	2，键盘录入密码
+
+​	3，键盘录入验证码
+
+验证要求：
+
+​		用户名如果未注册，直接结束方法，并提示：用户名未注册，请先注册
+
+​		判断验证码是否正确，如不正确，重新输入
+
+​		再判断用户名和密码是否正确，有3次机会
+
+**忘记密码**：
+
+​       1，键盘录入用户名，判断当前用户名是否存在，如不存在，直接结束方法，并提示：未注册
+
+​	2，键盘录入身份证号码和手机号码
+
+​	3，判断当前用户的身份证号码和手机号码是否一致，
+
+​			如果一致，则提示输入密码，进行修改。
+
+​			如果不一致，则提示：账号信息不匹配，修改失败。
+
+**验证码规则**：
+
+​	长度为5
+
+​	由4位大写或者小写字母和1位数字组成，同一个字母可重复
+
+​	数字可以出现在任意位置
+
+比如：
+
+​	aQa1K
+
+----
+
+## 二、画图
+
+### 1）整体代码分析
+
+注册肯定是第一个做的，因为我们只有注册完了才能登录，才能忘记密码。
+
+![image-20240410102804694](./assets/image-20240410102804694.png)
+
+### 2）注册业务分析
+
+![image-20240410102907434](./assets/image-20240410102907434.png)
+
+### 3）登录业务分析
+
+![image-20240410104011727](./assets/image-20240410104011727.png)
+
+### 4）忘记密码业务分析
+
+![image-20240410104041348](./assets/image-20240410104041348.png)
+
+
+
+---
+
+# 120.学生管理系统升级
+
+## 一、App.java
+
+IDEA快捷键 <kbd>alt + 回车</kbd>，选择 `create method 'login' in 'App'`，它相当于我们利用IDEA帮我们生成一个方法。
+
+![image-20240410105245701](./assets/image-20240410105245701.png)
+
+~~~java
+package com.itheima.studentsystem;
+
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+
+public class App {
+    public static void main(String[] args) {
+        ArrayList<User> list = new ArrayList<>();
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            System.out.println("欢迎来到学生管理系统");
+            System.out.println("请选择操作：1登录 2注册 3忘记密码");
+            String choose = sc.next();
+            switch (choose) {
+                case "1" -> login(list);
+                case "2" -> register(list);
+                case "3" -> forgetPassword(list);
+                case "4" -> {
+                    System.out.println("谢谢使用，再见");
+                    System.exit(0);
+                }
+                default -> System.out.println("没有这个选项");
+            }
+        }
     }
 
-    //通过id获取索引的方法
-    public static int getIndex(ArrayList<Student> list, String id){
-        //遍历集合
+    private static void login(ArrayList<User> list) {
+        Scanner sc = new Scanner(System.in);
+        for (int i = 0; i < 3; i++) {
+            System.out.println("请输入用户名");
+            String username = sc.next();
+            //判断用户名是否存在
+            boolean flag = contains(list, username);
+            if (!flag) {
+                System.out.println("用户名" + username + "未注册，请先注册再登录");
+                return;
+            }
+
+            System.out.println("请输入密码");
+            String password = sc.next();
+
+
+            while (true) {
+                String rightCode = getCode();
+                System.out.println("当前正确的验证码为：" + rightCode);
+                System.out.println("请输入验证码");
+                String code = sc.next();
+                if (code.equalsIgnoreCase(rightCode)) {
+                    System.out.println("验证码正确");
+                    break;
+                } else {
+                    System.out.println("验证码错误");
+                    continue;
+                }
+            }
+
+            //验证用户名和密码是否正确
+            //集合中是否包含用户名和密码
+            //定义一个方法验证用户名和密码是否正确
+            //封装思想的应用：
+            //我们可以把一些零散的数据，封装成一个对象
+            //以后传递参数的时候，只要传递一个整体就可以了，不需要管这些零散的数据。
+            User useInfo = new User(username, password, null, null);
+            boolean result = checkUserInfo(list, useInfo);
+            if (result) {
+                System.out.println("登录成功，可以开始使用学生管理系统了");
+                //创建对象调用方法，启动学生管理系统
+                StudentSystem ss = new StudentSystem();
+                ss.startStudentSystem();
+                break;
+            } else {
+                System.out.println("登录失败，用户名或密码错误");
+                if (i == 2) {
+                    System.out.println("当前账号" + username + "被锁定，请联系黑马程序员客服：XXX-XXXXX");
+                    //当前账号锁定之后，直接结束方法即可
+                    return;
+                } else {
+                    System.out.println("用户名或密码错误，还剩下" + (2 - i) + "次机会");
+                }
+            }
+
+        }
+
+    }
+
+    private static boolean checkUserInfo(ArrayList<User> list, User useInfo) {
+        //遍历集合，判断用户是否存在，如果存在登录成功，如果不存在登录失败
         for (int i = 0; i < list.size(); i++) {
-            //得到每一个学生对象
-            Student stu = list.get(i);
-            //得到每一个学生对象的id
-            String sid = stu.getId();
-            //拿着集合中的学生id跟要查询的id进行比较
-            if(sid.equals(id)){
-                //如果一样，那么就返回索引
+            User user = list.get(i);
+            if (user.getUsername().equals(useInfo.getUsername()) && user.getPassword().equals(useInfo.getPassword())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void forgetPassword(ArrayList<User> list) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("请输入用户名");
+        String username = sc.next();
+        boolean flag = contains(list, username);
+        if (!flag) {
+            System.out.println("当前用户" + username + "未注册，请先注册");
+            return;
+        }
+
+        //键盘录入身份证号码和手机号码
+        System.out.println("请输入身份证号码");
+        String personID = sc.next();
+        System.out.println("请输入手机号码");
+        String phoneNumber = sc.next();
+
+
+        //需要把用户对象通过索引先获取出来。
+        int index = findIndex(list, username);
+        User user = list.get(index);
+        //比较用户对象中的手机号码和身份证号码是否相同
+        if(!(user.getPersonID().equalsIgnoreCase(personID) && user.getPhoneNumber().equals(phoneNumber))){
+            System.out.println("身份证号码或手机号码输入有误，不能修改密码");
+            return;
+        }
+
+        //当代码执行到这里，表示所有的数据全部验证成功，直接修改即可
+        String password;
+        while (true) {
+            System.out.println("请输入新的密码");
+            password = sc.next();
+            System.out.println("请再次输入新的密码");
+            String againPassword = sc.next();
+            if(password.equals(againPassword)){
+                System.out.println("两次密码输入一致");
+                break;
+            }else{
+                System.out.println("两次密码输入不一致，请重新输入");
+                continue;
+            }
+        }
+
+        //直接修改即可
+        user.setPassword(password);
+        System.out.println("密码修改成功");
+
+    }
+
+    private static int findIndex(ArrayList<User> list, String username) {
+        for (int i = 0; i < list.size(); i++) {
+            User user = list.get(i);
+            if(user.getUsername().equals(username)){
                 return i;
             }
         }
-        //当循环结束之后还没有找到，就表示不存在，返回-1.
         return -1;
     }
+
+    private static void register(ArrayList<User> list) {
+        //1.键盘录入用户名
+        Scanner sc = new Scanner(System.in);
+        String username;
+        while (true) {
+            System.out.println("请输入用户名");
+            username = sc.next();
+            //在校验的时候会有个规矩，开发细节：先验证格式是否正确，再验证是否唯一
+            //         因为在以后所有的数据，都是存在数据库中，如果我们要校验是否唯一，就需要使用到网络资源，有点浪费性能。一般会把浪费性能的放在最后
+            boolean flag1 = checkUsername(username);
+            if (!flag1) {
+                System.out.println("用户名格式不满足条件，需要重新输入");
+                continue;
+            }
+
+            //校验用户名唯一
+            //username到集合中判断是否有存在
+            boolean flag2 = contains(list, username);
+            if (flag2) {
+                //用户名已存在，那么当前用户名无法注册，需要重新输入
+                System.out.println("用户名" + username + "已存在，请重新输入");
+            } else {
+                //不存在，表示当前用户名可用，可以继续录入下面的其他数据
+                System.out.println("用户名" + username + "可用");
+                break;
+            }
+        }
+        //2.键盘录入密码
+        //密码键盘输入两次，两次一致才可以进行注册。
+        String password;
+        while (true) {
+            System.out.println("请输入要注册的密码");
+            password = sc.next();
+            System.out.println("请再次输入要注册的密码");
+            String againPassword = sc.next();
+            if (!password.equals(againPassword)) {
+                System.out.println("两次密码输入不一致，请重新输入");
+                continue;
+            } else {
+                System.out.println("两次密码一致，继续录入其他数据");
+                break;
+            }
+        }
+        //3.键盘录入身份证号码
+        String personID;
+        while (true) {
+            System.out.println("请输入身份证号码");
+            personID = sc.next();
+            boolean flag = checkPersonID(personID);
+            if (flag) {
+                System.out.println("身份证号码满足要求");
+                break;
+            } else {
+                System.out.println("身份证号码格式有误，请重新输入");
+                continue;
+            }
+        }
+        //4.键盘录入手机号码
+        String phoneNumber;
+        while (true) {
+            System.out.println("请输入手机号码");
+            phoneNumber = sc.next();
+            boolean flag = checkPhoneNumber(phoneNumber);
+            if (flag) {
+                System.out.println("手机号码格式正确");
+                break;
+            } else {
+                System.out.println("手机号码格式有误，请重新输入");
+                continue;
+            }
+        }
+        //用户名，密码，身份证号码，手机号码放到用户对象中
+        User u = new User(username, password, personID, phoneNumber);
+        //把用户对象添加到集合中
+        list.add(u);
+        System.out.println("注册成功");
+
+        //遍历集合
+        printList(list);
+
+
+    }
+
+    private static void printList(ArrayList<User> list) {
+        for (int i = 0; i < list.size(); i++) {
+            //i 索引
+            User user = list.get(i);
+            System.out.println(user.getUsername() + ", " + user.getPassword() + ", "
+                    + user.getPersonID() + ", " + user.getPhoneNumber());
+        }
+    }
+
+    private static boolean checkPhoneNumber(String phoneNumber) {
+        //长度为11位
+        if (phoneNumber.length() != 11) {
+            return false;
+        }
+        //不能以0为开头
+        if (phoneNumber.startsWith("0")) {
+            return false;
+        }
+        //必须都是数字
+        for (int i = 0; i < phoneNumber.length(); i++) {
+            char c = phoneNumber.charAt(i);
+            if (!(c >= '0' && c <= '9')) {
+                return false;
+            }
+        }
+        //当循环结束之后，表示每一个字符都在0-9之间
+        return true;
+    }
+
+    private static boolean checkPersonID(String personID) {
+        //长度为18位
+        if (personID.length() != 18) {
+            return false;
+        }
+        //不能以0为开头
+        // 可以使用 personId.charAt(0) 或者 personId.startsWith（可以检测字符串是不是以0开头，如果是，返回true；如果不是，返回false。
+        if (personID.startsWith("0")) {
+            //如果以0开头，那么返回false
+            return false;
+        }
+        //前17位，必须都是数字
+        for (int i = 0; i < personID.length() - 1; i++) {
+            char c = personID.charAt(i);
+            //如果有一个字符不在0-9之间，那么直接返回false
+            if (!(c >= '0' && c <= '9')) {
+                return false;
+            }
+        }
+        //最为一位可以是数字，也可以是大写X或小写x
+        char endChar = personID.charAt(personID.length() - 1);
+        if ((endChar >= '0' && endChar <= '9') || (endChar == 'x') || (endChar == 'X')) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean contains(ArrayList<User> list, String username) {
+        //循环遍历集合得到每一个用户对象
+        //拿着用户对象中的用户名进行比较
+        for (int i = 0; i < list.size(); i++) {
+            //i 索引
+            User user = list.get(i);
+            String rightUsername = user.getUsername();
+            if (rightUsername.equals(username)) {
+                return true;
+            }
+        }
+        //当循环结束了，表示集合里面所有的用户都比较完毕了，还没有一样的，则返回false
+        return false;
+    }
+
+    private static boolean checkUsername(String username) {
+        //用户名长度必须在3~15位之间
+        int len = username.length();
+        if (len < 3 || len > 15) {
+            return false;
+        }
+        //当代码执行到这里，表示用户名的长度是符合要求的。
+        //继续校验：只能是字母加数字的组合
+        //循环得到username里面的每一个字符，如果有一个字符不是字母或者数字，那么就返回false
+        for (int i = 0; i < username.length(); i++) {
+            //i 索引
+            char c = username.charAt(i);
+            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))) {
+                return false;
+            }
+        }
+        //当代码执行到这里,表示什么？
+        //用户名满足两个要求：1长度满足 2内容也满足（字母+数字）
+        //但是不能是纯数字
+        //统计在用户名中，有多少字母就可以了。
+        int count = 0;
+        for (int i = 0; i < username.length(); i++) {
+            //i 索引
+            char c = username.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+                count++;
+                break; // 当有一个满足就可以break，这样可以减少循环次数，提高代码效率
+            }
+        }
+        return count > 0;
+    }
+
+    private static String getCode() {
+        //1.创建一个集合添加所有的大写和小写字母
+        ArrayList<Character> list = new ArrayList<>();
+        for (int i = 0; i < 26; i++) {
+            list.add((char) ('a' + i));
+            list.add((char) ('A' + i));
+        }
+
+        StringBuilder sb = new StringBuilder();
+        //2.要随机抽取4个字符
+        Random r = new Random();
+        for (int i = 0; i < 4; i++) {
+            //获取随机索引
+            int index = r.nextInt(list.size());
+            //利用随机索引获取字符
+            char c = list.get(index);
+            //把随机字符添加到sb当中
+            sb.append(c);
+        }
+
+        //3.把一个随机数字添加到末尾
+        int number = r.nextInt(10);
+        sb.append(number);
+
+        //4.如果我们要修改字符串中的内容
+        //先把字符串变成字符数组，在数组中修改，然后再创建一个新的字符串
+        char[] arr = sb.toString().toCharArray();
+        //拿着最后一个索引，跟随机索引进行交换
+        int randomIndex = r.nextInt(arr.length);
+        //最大索引指向的元素 跟随机索引指向的元素交换
+        char temp = arr[randomIndex];
+        arr[randomIndex] = arr[arr.length - 1];
+        arr[arr.length - 1] = temp;
+        return new String(arr);
+
+    }
 }
+~~~
 
-```
+----
 
+## 二、User.java
 
+~~~java
+package com.itheima.studentsystem;
 
-
-
-
-
-
-
-
-
-
-
-
+public class User {
+    private String username;
+    private String password;
+    private String personID;
+    private String phoneNumber;
 
 
+    public User() {
+    }
 
+    public User(String username, String password, String personID, String phoneNumber) {
+        this.username = username;
+        this.password = password;
+        this.personID = personID;
+        this.phoneNumber = phoneNumber;
+    }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPersonID() {
+        return personID;
+    }
+
+    public void setPersonID(String personID) {
+        this.personID = personID;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+}
+~~~
+
+---
+
+## 三、总结
+
+### 1）开发细节
+
+在校验的时候会有个规矩，开发细节：先验证格式是否正确，再验证是否唯一。因为在以后所有的数据，都是存在数据库中，如果我们要校验是否唯一，就需要使用到网络资源，有点浪费性能。一般会把浪费性能的放在最后。
+
+### 2）抽取变量
+
+例如，代码中如果要多次用到 `username.length()`，就可以将  `username.length()` 单独抽成一个变量 `len`。
+
+多次调用 `length()` 方法会降低效率。
 
 
 
