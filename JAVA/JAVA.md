@@ -16576,7 +16576,7 @@ public class App {
             User user = list.get(i);
             if (user.getUsername().equals(useInfo.getUsername()) && user.getPassword().equals(useInfo.getPassword())) {
                 return true;
-            }
+            } 
         }
         return false;
     }
@@ -16601,7 +16601,8 @@ public class App {
         //需要把用户对象通过索引先获取出来。
         int index = findIndex(list, username);
         User user = list.get(index);
-        //比较用户对象中的手机号码和身份证号码是否相同
+        //比较用户对象中的手机号码和身份证号码是否相同。
+        // 使用 equalsIgnoreCase() 的原因是因为身份证号码最后的小写x和大写X是一样的。
         if(!(user.getPersonID().equalsIgnoreCase(personID) && user.getPhoneNumber().equals(phoneNumber))){
             System.out.println("身份证号码或手机号码输入有误，不能修改密码");
             return;
@@ -16626,7 +16627,6 @@ public class App {
         //直接修改即可
         user.setPassword(password);
         System.out.println("密码修改成功");
-
     }
 
     private static int findIndex(ArrayList<User> list, String username) {
@@ -16718,8 +16718,6 @@ public class App {
 
         //遍历集合
         printList(list);
-
-
     }
 
     private static void printList(ArrayList<User> list) {
@@ -16860,7 +16858,6 @@ public class App {
         arr[randomIndex] = arr[arr.length - 1];
         arr[arr.length - 1] = temp;
         return new String(arr);
-
     }
 }
 ~~~
@@ -16925,6 +16922,17 @@ public class User {
 
 ---
 
+## 四、StudentSystem.java
+
+```java
+public class StudentSystem {
+    public static void startStudentSystem() {
+    }
+}
+```
+
+----
+
 ## 三、总结
 
 ### 1）开发细节
@@ -16936,6 +16944,534 @@ public class User {
 例如，代码中如果要多次用到 `username.length()`，就可以将  `username.length()` 单独抽成一个变量 `len`。
 
 多次调用 `length()` 方法会降低效率。
+
+
+
+----
+
+# ----------------------------------
+
+# Day 13  面向对象进阶
+
+# 121.static —— 静态变量
+
+## 一、引入
+
+static翻译过来就是静态的意思。
+
+首先来看一个需求：写一个JavaBean类来描述这个班级的学生。
+
+属性：姓名、年龄、性别
+
+行为：学习
+
+> 从今天起我们涉及到的类就有很多个了，因此从现在开始每一个练习创建的不是一个类，而是一个包。而在IDEA中，包名是按照字母从小到大进行排序的，因此为了让大家在课后复习的时候更方便，就在前面加了一个 `a01` ，就表示是序号的意思，表示第一题，`a02` 表示第2题。但由于起名字不能以数字开头，因此在数字前面都加了一个 `a`。
+>
+> ![image-20240410150004348](./assets/image-20240410150004348.png)
+
+Student.java
+
+~~~java
+package com.itheima.a01staticdemo1;
+
+public class Student {
+    //属性：姓名 年龄 性别
+    //新增：老师的姓名
+    private String name;
+    private int age;
+    private String gender;
+    public String teacherName;
+
+    public Student() {
+    }
+
+    public Student(String name, int age, String gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    //行为
+    public void study() {
+        System.out.println(name + "正在学习");
+    }
+
+    public void show() {
+        System.out.println(name + ", " + age + ", " + gender + ", " + teacherName);
+    }
+}
+~~~
+
+StudentTest.java
+
+~~~java
+package com.itheima.a01staticdemo1;
+
+import java.util.Random;
+
+public class StudentTest {
+    public static void main(String[] args) {
+        //1.创建第一个学生对象
+        Student s1 = new Student();
+        s1.setName("张三");
+        s1.setAge(23);
+        s1.setGender("男");
+        s1.teacherName = "阿玮老师";
+
+        s1.study();
+        s1.show();
+
+        //2.创建第二个学生对象
+        Student s2 = new Student();
+        s2.setName("李四");
+        s2.setAge(24);
+        s2.setGender("女");
+        s2.teacherName = "阿玮老师";
+
+        s2.study();
+        s2.show();
+    }
+}
+~~~
+
+由于一个班只有一个老师，`teacherName` 应该是共享的。既然是共享的，那每一次都需要用对象去调用 `teacherName` 去赋值，太麻烦了。能不能只赋值一次，就让这个类所有对象都共享一个值。这必定是可以的。
+
+解决办法：在 `teacherName` 前面加一个修饰符 ——  `static`，一旦加上之后，`Strudent` 这个类所有的对象都共享同一个老师的姓名了。
+
+~~~java
+public String teacherName;
+~~~
+
+此时当第一个学生对 `teacherName` 赋值的时候，所有的对象再去获取 `teacherName` 的时候就已经有值了。
+
+~~~java
+s1.teacherName = "阿玮老师";
+~~~
+
+并且一旦用 `static` 修饰后，它还多了一种调用方式：直接用类名去调用。
+
+~~~java
+Student.teacherName = "阿玮老师";
+~~~
+
+----
+
+## 二、概念
+
+static：static表示静态，是Java中的一个修饰符，可以修饰成员方法、成员变量。
+
+因此我们需要将 `static` 修饰成员方法、 `static` 修饰成员变量分开去学习。
+
+---
+
+## 三、`static` 修饰成员变量
+
+成员变量一旦被 `static` 修饰之后，这个成员变量就叫做 `静态变量`。
+
+`静态变量` 的特点：
+
+- 被这个类所有对象共享
+
+- 不属于对象，属于类
+
+- 随着类的加载而加载，优先于对象存在
+
+  而对象一定要等 `new` 关键字执行了，它才在内存中出现
+
+调用方式：
+
+- 类名调用（推荐）
+- 对象名调用
+
+至于推荐类名调用的原因：既然所有的对象都共享这个属性，这个属性就不属于某个特定的类，因此用一个特定的对象去调用它，在语法中是可以的，但是不合理，因此我们需要用 `类名调用`。
+
+----
+
+## 四、`static` 内存图
+
+为了内存图尽可能让大家理解，所以下面代码的成员变量前面都没有加 `private`。
+
+程序刚开始启动，肯定是main方法先进栈。
+
+然后执行main方法中的第一行代码中：`Student.teacherName = "阿玮老师"`，在这行代码中，使用类名调用了 `Student` 类中的静态变量 `teacherName`，并赋值为 `"阿玮老师"`。此时就用到了 `Student` 类。因此在内存中，就会将 `Student` 类的字节码文件，加载到方法区，并在内存中创建了一个 **单独存放** 静态变量的空间，我们可以把这个空间叫做 `静态静态区`。
+
+因此当 `Student` 的字节码文件加载到方法区后，`静态区` 就出现了。
+
+在JDK8以前，静态区是在方法区里面的。JDK8以后，就挪到了堆空间当中。
+
+在静态区中就存着这个内所有的静态变量，例如 `teacherName`。由于 `teacherName` 为引用数据类型，因此默认初始化值为 `null`。
+
+要注意的是，现在内存中并没有对象，因为我们代码还没有执行到 `new` 关键字，只有 `new` 关键字执行了，在内存当中才有对象！
+
+由此可见：静态变量是随着类的加载而加载的，优先于对象出现的。
+
+在以后我们还会用 `static` 去修饰其他的内容，其他的内容也会去遵守这个规则，只要使用 `static` 修饰的，都是随着类的加载而加载，加载的时候是优先于对象出现的。
+
+![image-20240410160029254](./assets/image-20240410160029254.png)
+
+此时第一行还没完，等号的右边还需要赋值，因此它会将 `静态区` 中的 `teacherNamer` 赋值为 `"阿玮老师"`，原来的 `null` 就会被覆盖。
+
+![image-20240410160625737](./assets/image-20240410160625737.png)
+
+接下来再来看第二行代码：`Student s1 = new Student();`，这个时候就出现 `new` 关键字了，此时对象在内存当中才会出现。
+
+等号的左边相当于在栈的main方法中定义了一个变量 `s1`，等号的右边有 `new` 关键字了，所以就在堆内存中开辟了一个空间。
+
+假设这个空间的地址值是 `0x0011` ，这个空间也是我们平时所说的对象。
+
+在这个空间里面存储的是所有的非静态的变量：`name`、`age`，并进行默认初始化 `null`、`0`。
+
+再将这个小空间的地址赋值给 `s1`，因此 `s1` 记录的地址就是 `0x0011`。
+
+![image-20240410161326967](./assets/image-20240410161326967.png)
+
+现在如果我想通过 `s1` 去访问静态变量 `teacherName`，此时就回去静态区中去找对应的变量。
+
+`s1.name = "张三"`，这里的 `s1` 记录的是 `0x0011`，这行代码就相当于将 `"张三"` 赋值给 `0x0011` 的 `name`。右上角的 `null` 就会被 `"张三"` 给覆盖。
+
+再往下，`s1.age = 23` ，`s1` 记录的是 `0x0011`，因此这行我们就可以这么理解：把 `23` 赋值给 `0x0011` 的 `age`。右上角的 `0` 就会被 `23` 给覆盖。
+
+![image-20240410161815444](./assets/image-20240410161815444.png)
+
+再往下：`s1.show()`，用 `s1` 去调用 `show()` 方法。`show()` 方法就会被加载进栈，因为此时 `show()` 方法的调用者是 `s1`，就会通过 `s1` 去找里面的 `name`、`age`，然后再去找到静态区里面的 `teacherName`。
+
+因此在控制台中打印的就是 `张三...23...阿玮老师`。
+
+![image-20240410162603733](./assets/image-20240410162603733.png)
+
+此时方法执行完毕，`show()` 方法出栈。
+
+然后执行：`Student s2 = new Student();`，创建了第二个对象 `s2`，等号的右边还是有 `new` 关键字，因此在堆中又开辟了一个新的小空间，假设地址为 `0x0022`。在这个小空间里面，它就会存储所有非静态的成员变量 `name`、`age`，并默认初始化为 `null` 、`0`。
+
+如果我想通过 `s2` 去获取静态变量，它也可以到下面静态区找到 `teacherName`。
+
+最后再将 `0x0011` 的地址赋值给左边的变量 `s2`。
+
+![image-20240410164456555](./assets/image-20240410164456555.png)
+
+继续，`s2.show()`，通过 `s2` 再去调用 `show()` 方法，此时 `show()` 方法就会被加载进栈。
+
+又因为此时 `show()` 方法的调用者是 `s2`，就会通过 `s2` 去找里面的 `name`、`age`，然后再去找到静态区里面的 `teacherName`。
+
+因此在控制台中打印的就是 `null...0...阿玮老师`。
+
+![image-20240410164918482](./assets/image-20240410164918482.png)
+
+然后 `show()` 方法执行完毕，出栈。
+
+通过上面的内存图接，我们可以看到里面的核心点。静态区里面的变量，是对象共享的，在内存中只有一份，谁要用谁去拿。
+
+而非静态的东西，例如 `name`、`age`，都是每个对象独有的，每个对象都会单独存放一份，这就是它们的区别。
+
+----
+
+## 五、练习：请说出以下属性是否可以被定义为静态
+
+在以后当中，以后有哪些属性可以用 `static` 来修饰呢？
+
+其实很简单，我们只需要抓住两个字：**共享**。只要是所有对象都共享的，就必须要用 `static` 去修饰。
+
+案例：在 `Student` 中有以下五个属性。有哪些属性可以被 `static` 修饰呢？
+
+![image-20240410165646113](./assets/image-20240410165646113.png)
+
+是否能被 `static` 修饰，就看两个字：**共享**。但是这个共享不是绝对的，我们要看具体的业务场景。
+
+**1、name**
+
+如果说 `name` 用 `static` 去修饰了，就表示说有的学生都共享同一个姓名，这种情况可能性非常少，因此这个 `name` 我们不会用 `static` 去修饰。
+
+**2、age**
+
+如果说 `age` 用 `static` 去修饰了，就表示说有的学生都共享同一个年龄，但每个学生的年龄也是不一样的，因此 `age` 也不会用 `static` 去修饰。
+
+**3、teacherName**
+
+如果现在这个 `Student` 表示一个班的学生，一个班的学生老师肯定是共享的，因此在这种情况下，`teacherName` 就必须用 `static` 去修饰。
+
+但是还有种情况，就是你放学之后，你自己给自己请的私人家教，它就不是共享的了，因此在这种情况下，老师的姓名就不能加 `static` 修饰了。
+
+因此在不同情况下是否用 `static` 修饰，你要自己想，抓住一个核心点：**共享**。
+
+
+
+----
+
+# 122.static —— 静态方法和工具类
+
+## 一、引入
+
+上一节中，我们已经学习完了静态变量，今天来学习一下静态方法。
+
+被 `static` 修饰的成员方法就叫做静态方法。
+
+因此我们以前写在测试类中的都是静态方法，写在JavaBean中的 get、set 都是普通的成员方法。
+
+特点：
+
+- 多用在测试类和工具类中
+
+- JavaBean类中很少会用
+
+  在JavaBean中就算用到了，也会涉及到后面的知识点，例如：设计模式。
+
+调用方式：
+
+- 如果是调用本类的，直接调用就行
+- 如果是调用其他类的，可以用类名调用（推荐）
+- 也可以使用其他类的对象去进行调用
+
+当然我们还是推荐用类名去进行调用。
+
+---
+
+## 二、工具类
+
+工具类：帮助我们做一些事情的，但是不描述任何事物的类。
+
+我们可以将工具类跟其他的类进行对比学习，到目前为止我们已经学习完了三种类了：JavaBean类、测试类、工具类。
+
+**JavaBean类：用来描述一类事物的类。比如：Student（用来描述学生）、Teacher（用来描述老师）、Dog（用来描述狗）、Cat（用来描述猫等。**
+
+我们在书写JavaBean类的时候，要私有化成员变量、书写空参构造方法、书写带全部参数的构造方法，需要针对每个私有化的成员变量提供对应的 get 和 set 方法，如果还有额外的行为，例如：`sleep()`、`study()`等，还需要写额外的成员方法。
+
+**测试类：用来检查其他类是否书写正确，带有main方法的类，是程序的入口。**
+
+在以前我们是在测试类中创建JavaBean类的对象，并进行赋值调用的。
+
+**工具类：不是用来描述一类事物的，而是帮我们做一些事情的类。**
+
+在书写工具类的时候，我们需要遵守以下规则：
+
+1、类名要见名知意。
+
+例如要写一个类专门用来进行数学计算，类名就要写成 `Math`。
+
+如果要写一个类专门用来操作数组，类名就可以写成 `ArrUil`，表示数组工具的意思
+
+2、私有化构造方法
+
+构造方法一旦私有了，那么在外界就不能创建这个类的对象了。这是因为工具类不是用来描述一类事务的，创建它的对象没有任何的意义。
+
+例如现在是一个JavaBean类：`Student`，这个类是用来描述学生的，创建它的对象是有意义的：创建一个 `Student` 对象，就表示一个学生；创建两个 `Student` 对象，就表示两个学生.....
+
+<img src="./assets/image-20240410173429988.png" alt="image-20240410173429988" style="zoom:67%;" />
+
+但，例如我现在创建 `ArrUtil` 对象，这个对象什么都表示不了，因此我们私有化构造方法，不让外界创建它，因为创建它的对象，这个对象没有什么实际的意义。
+
+3、方法都定义为静态方法
+
+例如我们定义一个求数组最大值、最小值、和、平均值
+
+![image-20240410174003318](./assets/image-20240410174003318.png)
+
+----
+
+## 三、练习：定义数组工具类
+
+需求:在实际开发中，经常会遇到一些数组使用的工具类。
+
+请按照如下要求编写一个数组的工具类:ArrayUtil
+
+- 提供一个工具类方法printArr，用于返回整数数组的内容。
+
+  返回的字符串格式如:`[10, 20, 50, 34, 100]`(只考虑整数数组，且只考虑一维数组)提供这样一个工具方法getAerage，用于返回平均分。(只考虑浮点型数组，且只考虑一维数组)
+
+- 定义一个测试类TestDemo，调用该工具类的工具方法，并返回结果。
+
+ArrayUtil.test
+
+~~~java
+package com.itheima.a02staticdemo2;
+
+public class ArrayUtil {
+
+    //私有化构造方法
+    //目的：为了不让外界创建他的对象
+    private ArrayUtil() {
+    }
+
+
+    //需要定义为静态的，方便调用
+    public static String printArr(int[] arr) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < arr.length; i++) {
+            //i 索引 arr[i] 元素
+            if (i == arr.length - 1) {
+                sb.append(arr[i]);
+            } else {
+                sb.append(arr[i]).append(", ");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+
+    public static double getAverage(double[] arr) {
+        double sum = 0;
+        for (int i = 0; i < arr.length; i++) {
+            sum = sum + arr[i];
+        }
+        return sum / arr.length;
+    }
+}
+~~~
+
+TestDemo.java
+
+~~~java
+package com.itheima.a02staticdemo2;
+
+public class TestDemo {
+    public static void main(String[] args) {
+        //测试工具类中的两个方法是否正确
+
+        int[] arr1 = {1, 2, 3, 4, 5};
+        String str = ArrayUtil.printArr(arr1);
+        System.out.println(str); //[1, 2, 3, 4, 5]
+
+        double[] arr2 = {1.5, 3.7, 4.9, 5.8, 6.6};
+        double avg = ArrayUtil.getAverage(arr2);
+        System.out.println(avg); // 4.5
+    }
+}
+~~~
+
+----
+
+## 四、练习：定义学生工具类
+
+需求：定义一个集合，用于存储3个学生对象。
+
+学生类的属性为：name、age、gender
+
+定义一个工具类，用于获取集合中最大学生的年龄。
+
+Student.java
+
+~~~java
+package com.itheima.a03staticdemo3;
+
+public class Student {
+    private String name;
+    private int age;
+    private String gender;
+
+    // 空参、全称、get、set
+}
+~~~
+
+Test.java
+
+在导入 `Student` 的包的时候，会出现两个选择，这是因为我们在不同包下都创建了 `Student` 类。
+
+而我们要导入的一个是我们现在所在的包 `a03staticdemo3` 下的 `Student`。
+
+![image-20240410175353265](./assets/image-20240410175353265.png)
+
+~~~java
+package com.itheima.a03staticdemo3;
+
+import java.util.ArrayList;
+
+public class Test {
+    public static void main(String[] args) {
+        //1.创建一个集合用来存储学生对象
+        ArrayList<Student> list = new ArrayList<>();
+
+        //2.创建3个学生对象
+        Student stu1 = new Student("zhangsan",23,"男");
+        Student stu2 = new Student("lisi",24,"女");
+        Student stu3 = new Student("wangwu",25,"男");
+
+
+        //3把学生对象添加到集合当中
+        list.add(stu1);
+        list.add(stu2);
+        list.add(stu3);
+
+        //4.调用工具类中的方法
+        int maxAgeStudent = StudentUtil.getMaxAgeStudent(list);
+
+        System.out.println(maxAgeStudent);
+    }
+}
+~~~
+
+StudentUtil.java
+
+~~~java
+package com.itheima.a03staticdemo3;
+
+import java.util.ArrayList;
+
+public class StudentUtil {
+
+    private StudentUtil(){}
+
+    //静态方法
+    public static int getMaxAgeStudent(ArrayList<Student> list){
+        //1.定义一个参照物
+        int max = list.get(0).getAge();
+
+        //2.循环遍历集合，循环从1开始，提高效率
+        for (int i = 1; i < list.size(); i++) {
+            //i ——> 索引  list.get(i) ——> 元素/学生对象  我们还需要getAge获取到年龄之后再进行比较
+            int tempAge = list.get(i).getAge(); // 一个方法的返回值如果需要反复去用，最好定义成一个变量去接收，提高代码效率。
+            if(tempAge > max){
+                max = tempAge;
+            }
+        }
+
+        //3.直接返回max
+        return max;
+    }
+}
+~~~
+
+
+
+----
+
+# 123.
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
