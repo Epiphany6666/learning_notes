@@ -348,45 +348,27 @@ spring.security.user.password=123
 
 # 10.基于内存的用户认证
 
-### 创建自定义配置
+## 一、创建自定义配置
 
-实际开发的过程中，我们需要应用程序更加灵活，可以在SpringSecurity中创建自定义配置文件
+前面的课程中我们学习了使用最简单的方式来创建一个基本的SpringSecurity用户认证程序，这里面提到的其实都是一些默认的SpringSecurity配置，例如默认的登录和登出页、默认的用户名和密码，都是在应用程序内部已经配置好的，我们只需要通过简单的几个步骤把应用程序创建出来，就可以直接使用这些默认的功能了。
 
-**官方文档：**[Java自定义配置](https://docs.spring.io/spring-security/reference/servlet/configuration/java.html)
+实际开发的过程中，我们想要应用程序更加灵活，可以在 `SpringSecurity` 中创建自定义配置文件
+
+**官方文档：**[Java自定义配置](https://docs.spring.io/spring-security/reference/servlet/configuration/java.html)，这里面就提到了如何在 `SpringSecurity` 中创建默认的配置文件。
 
 首先需要创建一个类，这个类的名字无所谓，但是两个注解一定要加上
 
 ![image-20240306125520060](assets/image-20240306125520060.png)
 
-**UserDetailsService**用来管理用户信息，`InMemoryUserDetailsManager`是UserDetailsService的一个实现，用来管理基于内存的用户信息。
+---
 
-创建一个 `java/com.atguigu/securitydemo.WebSecurityConfig` 类：
+## 二、代码实现
 
-`SpringBootWebSecurityConfiguration` 这个类就是在SpringBoot环境下，针对于` SpringSecurity` 做的一个默认的配置了。
-
-红框框起来的意思就是，整个应用程序当中，只要EnableWebSecurity这个类被加载到了应用程序的上下文当中，那么@EnableWebSecurity注解就会生效。
-
-![image-20240306131439091](assets/image-20240306131439091.png)
-
-只要这个依赖被添加在了我们的项目中，那么这个类就在我们的应用程序中加载进来了
-
-![image-20240306131710845](assets/image-20240306131710845.png)
-
-只要它加载进来，这个注解就有了
-
-
-
-定义一个@Bean，类型是UserDetailsService，实现是InMemoryUserDetailsManager
-
-> UserDetailsService本身并不是一个类，它是一个接口，这个接口下面有很多具体的实现（chtl + h）
->
-> 先对InMemoryUserDetailsManager做一个测试，它的意思就是把我们的用户信息管理在SpringSecurity应用程序的内存中。
->
-> ![image-20240306132627378](assets/image-20240306132627378.png)
+下面的代码直接从官方文档上复制粘贴即可。
 
 ```java
 @Configuration // 标识这个类为配置类，这样spring应用程序一启动的时候，这个类的bean结点就会被初始在spring应用程序的上下文当中
-@EnableWebSecurity // 如果我们想要在Security中做一个自定义配置的话，就需要在这个配置类上标识一个@EnableWebSecurity，目的是开启SpringSecurity的自定义配置，如果当前项目是SpringBoot项目，实际上@EnableWebSecurity是可以省略的，这是因为它含义autoconfigure这个jar包，基于SpringBoot第三方的所有的配置都会在autoconfig中被预先定义好。但如果单纯只是个spring项目的话，这个就必须添加上
+@EnableWebSecurity // 如果我们想要在Security中做一个自定义配置的话，就需要在这个配置类上标识一个@EnableWebSecurity，目的是开启SpringSecurity的自定义配置，如果当前项目是SpringBoot项目，实际上@EnableWebSecurity是可以省略的，这是因为它包含在spring-boot-autoconfigure这个jar包，基于SpringBoot第三方的所有的配置都会在autoconfig中被预先定义好（在第三点中有解释）。但如果单纯只是个spring项目的话，这个就必须添加上
 public class WebSecurityConfig {
 
     @Bean
@@ -412,13 +394,49 @@ public class WebSecurityConfig {
 
 ![image-20240306142104533](assets/image-20240306142104533.png)
 
-
-
 此时应用程序中默认的UserDetailsService就被替换成了我们现在定义的UserDetailsService，在替换的同时，默认的用户名和密码也被替换成了我们现在定义的用户名和密码。
 
 **测试：**使用用户名huan，密码password登录
 
 此时properties中设置的用户名和密码已经不能生效了。
+
+---
+
+## 三、代码部分解释
+
+**UserDetailsService**用来管理用户信息，`InMemoryUserDetailsManager`是UserDetailsService的一个实现，用来管理基于内存的用户信息。
+
+创建一个 `java.com.atguigu.securitydemo.WebSecurityConfig` 类：
+
+
+
+----
+
+`如果当前项目是SpringBoot项目，实际上@EnableWebSecurity是可以省略的，这是因为它包含在spring-boot-autoconfigure这个jar包，基于SpringBoot第三方的所有的配置都会在autoconfig中被预先定义好` 的原因：
+
+我们有一个非常重要的jar包为`spring-boot-autoconfigure`，基于`springboot项目` 的所有的第三方默认的配置，都在 `spring-boot-autoconfigure` 中预先的定义好了。
+
+如下图找到的类中，`SpringBootWebSecurityConfiguration` 这个类就是在SpringBoot环境下，针对于` SpringSecurity` 做的一个默认的配置了。
+
+红框框起来的黄色的内容意思就是，整个应用程序当中，只要EnableWebSecurity这个类被加载到了应用程序的上下文当中，那么@EnableWebSecurity注解就会生效。
+
+![image-20240306131439091](assets/image-20240306131439091.png)
+
+这个类什么时候加载到应用程序的上下文当中呢？我们在创建项目之初，只要这个依赖 `spring-boot-starter-security` 被添加在了我们的项目中，那么这个类就在我们的应用程序中加载进来了。
+
+![image-20240306131710845](assets/image-20240306131710845.png)
+
+只要它加载进来，这个注解就有了。
+
+----
+
+定义一个@Bean，类型是UserDetailsService，实现是InMemoryUserDetailsManager
+
+UserDetailsService本身并不是一个类，它是一个接口，这个接口下面有很多具体的实现（chtl + h）
+
+先对InMemoryUserDetailsManager做一个测试，它的意思就是把我们的用户信息管理在SpringSecurity应用程序的内存中。
+
+![image-20240306132627378](assets/image-20240306132627378.png)
 
 ---
 
