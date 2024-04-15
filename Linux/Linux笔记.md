@@ -914,7 +914,7 @@ win11：
 
 点击启动
 
-![image-20231006135635776](F:\BaiduSyncdisk\other\Linux\img\image-20231006135635776.png)
+![image-20231006135635776](.\img\image-20231006135635776.png)
 
 输入用户名用以创建一个用户：
 
