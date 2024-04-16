@@ -18621,7 +18621,7 @@ public class Animal {
 
 ![image-20240412141544449](./assets/image-20240412141544449.png)
 
-当子类想要有多个构造方法，必须要自己手动写一遍。
+当子类想要有多个构造方法，必须要自己手动写一遍。如果没有手写任何构造方法，那么虚拟机就会默认给它一个 `空构造方法`。
 
 ---
 
@@ -19377,17 +19377,681 @@ System.out.println(hobby);//喝茶
 System.out.println(this.hobby);//喝茶
 System.out.println(super.hobby);//喝茶
 //如何打印吃鸡
-System.out.println(game);
-System.out.println(this.game);
+System.out.println(game); // 吃鸡
+System.out.println(this.game); // 吃鸡
 ~~~
 
+----
+
+## 三、`成员变量的访问特点` 总结
+
+**1、继承中成员变量访问特点：就近原则。**
+
+先在局部位置找，如果没有，就回到本类成员位置找，再没有，就会到父类成员位置找，逐级往上，如果一直都没有找到，代码就会报错。
+
+**2、如果出现了重名的成员变量怎么办？**
+
+~~~java
+System.out.println(name); // 直接调用 name 的话，会从局部位置开始往上找
+System.out.println(this.name); // 如果是 this.name，会从本类成员变量位置开始往上找
+System.out.println(super.name); // 如果是 super.name，就会从父类成员位置开始往上找
+~~~
+
+----
+
+## 四、继承中：`成员方法` 的访问特点
+
+`成员方法的访问特点` 跟 `成员变量的访问特点` 是类似的。
+
+如果直接调用，就会满足就近原则：谁离我近，我就用谁。
+
+如果使用 `super` 调用，它就会直接访问父类。
+
+**1）代码示例：如果直接调用，就会满足就近原则：谁离我近，我就用谁。**
+
+~~~~java
+class Person {
+    public  void eat() {
+        System.out.println("吃米饭，吃菜");
+    }
+
+    public void drink() {
+        System.out.println("喝开水");
+    }
+}
+
+class Student extends Person{
+
+    public void lunch(){
+        // 像这种方法直接调用，前面其实有一个隐含的 this，因为方法在直接调用的时候它需要有调用者
+        eat();
+        // 这种情况会触发 就近原则，它会先在本类中查看eat和drink方法，如果有，就会调用子类的，如果没有，就会调用从父类中继承下来的eat和drink方法
+        this.eat();
+        this.drink();
+
+        // 如果用super直接调用，不会查找子类，而是直接调用父类中的eat和drink方法
+        super.eat();
+        super.drink();
+    }
+}
+~~~~
+
+**2）代码示例：如果使用 `super` 调用，它就会直接访问父类。**
+
+~~~java
+class Person {
+    public  void eat() {
+        System.out.println("吃米饭，吃菜");
+    }
+
+    public void drink() {
+        System.out.println("喝开水");
+    }
+}
+
+//留学生（OverseasStudent：外国的学生）
+class OverseasStudent extends Person{
+    public void lunch(){
+        this.eat();//吃意大利面
+        this.drink();//喝凉水
+
+        super.eat();//吃米饭，吃菜
+        super.drink();//喝开水
+    }
+
+    // 这种将父类中的方法又重新写了一遍，在Java中有什么特定的称呼吗？有什么应用场景吗？
+    public void eat() {
+        System.out.println("吃意大利面");
+    }
+
+    public void drink() {
+        System.out.println("喝凉水");
+    }
+}
+~~~
+
+问题就来了，这种将父类中的方法又重新写了一遍，在Java中有什么特定的称呼吗？有什么应用场景吗？
+
+~~~java
+public void eat() {
+    System.out.println("吃意大利面");
+}
+~~~
+
+---
+
+## 五、方法的重写
+
+### 1）引入
+
+当父类的方法不能满足子类现在的需求时，就需要进行方法重写。
+
+书写格式：在继承体系中，子类出现了和父类中一模一样的方法声明，我们就称子类这个方法是重写的方法。
+
+----
+
+### 2）方法重写的细节
+
+在重写方法的上面，我们需要加上 `@Override` ，`@` 是一个固定格式，可以读作 `艾特`。
+
+`@Override` 整体叫做：重写的注解。所谓注解，其实跟注释是类似的，注解与注释都是给程序的一个解释说明，只不过注释是给程序员看的，而注解是给程序员和虚拟机看的。
+
+当虚拟机看到一个方法当中有 `@Override` 的时候，这个时候它就知道了，这个方法是重写了父类里面的方法，它就会去检查你重写的语法是否正确，如果重写语法是正确的，它没有任何提示。如果语法错误了，加上注解后就会有`红色波浪线`，表示语法错误。
+
+**因此，建议重写方法都加 `@Override` 注解，代码安全，而且非常的优雅！**
+
+~~~java
+//应用场景：当父类中方法，不能满足子类现在的需求时，我们就需要把这个方法进行重写。
+//注意：子类中重写的方法上面需要加上@override
+@Override
+public  void eat() {
+    System.out.println("吃意大利面");
+}
+
+@Override
+    public void drink() {
+        System.out.println("喝凉水");
+    }
+~~~
+
+----
+
+### 3）方法重写的本质
+
+方法重写一定是建立在子父类的关系上的，因此首先假设我们有一个继承结构：A继承B，B又继承C。
+
+![image-20240416152733992](./assets/image-20240416152733992.png)
+
+在之前我们曾经说过，每个类的下面其实都有自己的`虚方法表`。
+
+`虚方法表` 会把类中的非私有的、非静态的、非 `final` 修饰的方法全都加载到 `虚方法表` 中。
+
+当子类继承的时候，它就会把 `父类虚方法表` 中所有的方法全都继承下来，而且，它会在父类的基础上，添加自己类中的虚方法。
+
+同理 `A类` 也一样，它在继承 `B类` 的时候，会在 `B类` 的基础上，再添加自己类中的 `虚方法`。
+
+如果说此时，在子类中发生了方法重写，那么子类中的方法就会进行覆盖。
+
+![image-20240416153156677](./assets/image-20240416153156677.png)
+
+假设现在在 `C类` 中有两个方法：`method1` 和 `method2`，这两个方法都是虚方法，所以可以添加到虚方发表中。
+
+![image-20240416153454144](./assets/image-20240416153454144.png)
+
+当 `B类` 继承 `C类` 的时候，它会将 `C类` 的虚方法都继承下来，假设在 `B类` 中重写了 `method2`，此时它就会把父类中继承过来的 `method2` 进行覆盖。此时 `method1` 还是 `C类` 里面的，但是 `method2` 就变成了 `B类` 里面的了，这就是方法的重写。
+
+![image-20240416153530783](./assets/image-20240416153530783.png)
+
+再往下，在 `A类` 中，如果我又继续重写了 `method2`，此时它就会继续覆盖。因此在 `A类` 中，如果我用 `A` 的对象去调用 `method1`，那么 `method1` 它是 `C类的`；但是如果用 `A` 的对象去调用 `method2`，调用的就是覆盖之后 `A类` 里面的方法。
+
+但如果创建 `B类` 的对象，它就会去查找 `B类` 的虚方法表。调用 `method1` 还是 `C类` 里面的 `method1`；但是你调用 `method2`，就是 `B类` 中的 `method2`。
+
+![image-20240416153843861](./assets/image-20240416153843861.png)
+
+因此 `方法的重写`，它的本质就是覆盖了 `虚方法表` 中的方法而已。
+
+说白了就是一句话：子类覆盖了从父类中继承下来 `虚方法表` 里面的方法，这个就是 `方法的重写`。
+
+---
+
+### 4）方法重写的注意事项和要求
+
+1、重写方法的名称、形参列表必须与父类中的一致。
+
+2、子类重写父类方法时，访问权限子类必须大于等于父类（默认 < protected < public）。
+
+3、子类重写父类方法时，返回值类型子类必须小于等于父类。
+
+由于第二点和第三点相对来讲稍微来讲有点难，在以后使用的次数也很少。
+
+**建议：重写的方法尽量和父类保持一致。**
+
+> 很多课程中会写：`私有方法不能被重写`、`私有方法不能被重写。`其实这两点并不完整，通过刚刚的分析，方法重写的本质我们知道了：方法重写其实就是覆盖了 `虚方法表` 中从父类继承过来的方法。因此，如果一个方法都不能加到 `虚方法表` 中，它能重写吗？肯定不行！
+>
+> 因此第 4 点中讲述的更加完整。
+
+4、只有被添加到虚方法表中的方法才能被重写。如果重写了，就会报错。
+
+---
+
+### 5）代码验证：子类重写父类方法时，返回值类型子类必须小于等于父类。
+
+假设 Dog类 继承 Animal类，Cat类 也继承 Animal类。
+
+~~~java
+class Person {
+    public Animal eat() {
+        System.out.println("吃米饭，吃菜");
+    }
+}
+
+//留学生
+class OverseasStudent extends Person{
+    // 下面这两种写法都不会报错
+    @Override
+    public Animal eat() {
+        System.out.println("吃意大利面");
+    }
+    
+    @Override
+    public Dog eat() {
+        System.out.println("吃意大利面");
+    }
+}
+~~~
+
+但如果！
+
+~~~java
+class Person {
+    public Dog eat() {
+        System.out.println("吃米饭，吃菜");
+    }
+}
+
+//留学生
+class OverseasStudent extends Person{
+    // 这里直接报错！Animal 下面会有 红色波浪线。
+    @Override
+    public Animal eat() {
+        System.out.println("吃意大利面");
+    }
+}
+~~~
+
+----
+
+## 六、方法重写练习：利用方法的重写设计继承结构
+
+### 1）题目分析
+
+现在有三种动物：哈士奇（Husky）、沙皮狗（SharPei）、中华田园犬（ChineseDog）
+
+暂时不考虑属性，只要考虑行为。请按照继承的思想特点进行继承体系的设计。
+
+三种动物分别有以下的行为：
+哈士奇：吃饭(吃狗粮)、喝水、看家、拆家
+沙皮狗：吃饭（吃狗粮、吃骨头）、喝水、看家
+中华田园犬：吃饭(吃剩饭)、喝水、看家
+
+本题的解决方法还是：画图法。
+
+之前我们讲过，画图的时候需要从下往上画，因为不断的往上画是抽取共性的动作。
+
+而写代码的时候需要从上往下写，先写 父类 再写 子类，因为在编写继承代码的时候，需要书写继承关系。
+
+![image-20240416160806034](./assets/image-20240416160806034.png)
+
+----
+
+### 2）代码示例
+
+**Dog.java**
+
+~~~java
+package com.itheima.a07oopextendsdemo7;
+
+public class Dog {
+    public void eat() {
+        System.out.println("狗在吃狗粮");
+    }
+
+
+    public void drink() {
+        System.out.println("狗在喝水");
+    }
+
+    public void lookHome() {
+        System.out.println("狗在看家");
+    }
+}
+~~~
+
+**Husky.java**
+
+~~~java
+package com.itheima.a07oopextendsdemo7;
+
+public class Husky extends Dog{
+    //哈士奇有一个额外的方法拆家
+    public void breakHome(){
+        System.out.println("哈士奇又在拆家了");
+    }
+}
+~~~
+
+**SharPei.java**
+
+每只狗都有吃狗粮的方法，已经抽取到了父类中，不需要重新写了，可以使用 super 先调用父类中的方法。
+
+~~~java
+package com.itheima.a07oopextendsdemo7;
+
+public class SharPei extends Dog{
+
+    //因为沙皮狗吃的狗粮和骨头
+    //父类中的方法不能满足我们的需求了，所以需要进行重写
+    @Override
+    public void eat() {
+        // 吃狗粮的行为，已经抽取到了父类中，不需要重新写了，可以使用 super 先调用父类中的方法。
+        // 这样就是在父类的基础上再添加了 狗啃骨头 这样的行为。
+        super.eat();//吃狗粮
+        System.out.println("狗啃骨头");
+    }
+}
+~~~
+
+ChineseDog.java
+
+~~~java
+package com.itheima.a07oopextendsdemo7;
+
+public class ChineseDog extends Dog{
+
+    //父类中的方法不能满足我们的需求了，所以需要进行重写
+    //而且中华田园犬完全用不到父类中的代码的，所以不需要通过super进行调用
+    @Override
+    public void eat() {
+        System.out.println("吃剩饭");
+    }
+}
+~~~
+
+DogTest.java
+
+~~~java
+package com.itheima.a07oopextendsdemo7;
+
+public class DogTest {
+    public static void main(String[] args) {
+        //创建对象并调用
+        Husky h = new Husky();
+        h.eat();
+        h.drink();
+        h.lookHome();
+        h.breakHome();
+
+        ChineseDog cd = new ChineseDog();
+        cd.eat();
+        cd.drink();
+        cd.lookHome();
+    }
+}
+~~~
+
+---
+
+### 3）案例总结
+
+在重写的时候，我们需要根据需求分析，有的时候它是完全不需要调用父类的；但是有的时候它可以调用父类，在父类的基础上再去添加额外的东西。
+
+----
+
+## 七、`成员方法的访问特点` 总结
+
+**1、继承中成员方法的访问特点**
+
+使用 `this` 调用：就会触发就近原则。会先在本类中找，如果没有，再到父类中找。
+
+使用 `super` 调用：它就不会在 `子类` 中找，直接找父类里面的方法。
+
+**2、什么是方法重写？**
+
+写继承的时候，有的时候会用到方法的重写。
+
+当父类的方法不能满足子类现在的需求时，就需要进行方法重写。
+
+在继承体系中，子类如果出现了和父类中一模一样的方法声明，我们就会称子类的这个方法是重写父类的。
+
+**3、方法重写建议加上哪个注解，有什么好处？**
+
+`@Override注解` 可以检测重写的语法是否正确，因此代码的可读性会更好。
+
+**4、重写方法有哪些基本要求？**
+
+- 子类重写的方法尽量跟父类中的方法保持一致。
+- 只有虚方法表里面的方法可以被重写。
+
+**5、方法重写的本质？**
+
+覆盖虚方法表中的方法
 
 
 
+----
+
+# 128.继承中的构造方法
+
+## 一、构造方法的访问特点
+
+- 父类中的构造方法不会被子类继承。
+
+- 子类中所有的构造方法默认会先访问父类中的无参构造，再执行自己。
+
+  相当于下图的这个箭头，子类的无参构造会默认去访问父类的无参构造。
+
+  ![image-20240416163224635](./assets/image-20240416163224635.png)
+
+  为什么Java会这么去设计呢？这是因为父类中的属性都是共性的内容，而且都是可以被子类继承下来的。
+
+  而父类中的空参构造，它做的事情相当于就是给父类中的属性进行默认初始化，如果没有这一步，子类在使用父类中的属性的时候，就没值了！
+
+**官方一点解释一下为什么？**
+
+- 子类在初始化的时候，有可能会使用到父类中的数据，如果父类没有完成初始化，子类将无法使用父类的数据
+- 子类初始化之前，一定要调用父类构造方法先完成父类数据空间的初始化。
+
+**怎么调用父类构造方法的？**
+
+- 子类构造方法的第一行语句默认都是：**super()，不写也存在，虚拟机会自动帮你加上。并且必须在第一行。**
+- 如果想调用父类有参构造，必须手动写 `super` 进行调用。因为默认它只会调用午餐。
+
+----
+
+## 二、`构造方法的访问特点` 代码示例
+
+**Person.java**
+
+```java
+package com.itheima.a08oopextendsdemo8;
+
+public class Person {
+    String name;
+    int age;
+
+    public Person() {
+        System.out.println("父类的无参构造");
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+**Student.java**
+
+~~~java
+package com.itheima.a08oopextendsdemo8;
+
+public class Student extends Person{
+    public Student(){
+        //子类构造方法中隐藏的super()去访问父类的无参构造
+        super();
+        System.out.println("子类的无参构造");
+    }
+    
+    public Student(String name,int age){
+       super(name,age);
+    }
+}
+~~~
+
+![image-20240416165505415](./assets/image-20240416165505415.png)
+
+Test.java
+
+~~~java
+package com.itheima.a08oopextendsdemo8;
+
+public class Test {
+    public static void main(String[] args) {
+        //创建学生对象
+        Student s = new Student();
+        Student s = new Student("zhangsan",23);
+    }
+}
+
+~~~
+
+但如果我想要在创建 `Student` 对象的时候就给 `name`、`age` 赋值。
+
+如果这里构造方法中空着不写，它相当于默认有个 `super()`，去访问父类的无参构造，这是没有用的，因为就算访问无参构造，它还是没有给 `name`、`age` 赋值。
+
+~~~java
+package com.itheima.a08oopextendsdemo8;
+
+public class Student extends Person{
+    public Student(String name,int age){
+       super();
+    }
+}
+~~~
+
+因此，如果我们想要将 `"zhangsan",23` 给父类的成员变量，就需要手动调用父类的带参构造。
+
+直接将 `name、age` 直接写在 `super` 的小括号当中即可，这样就相当于调用父类的带参构造。
+
+~~~java
+package com.itheima.a08oopextendsdemo8;
+
+public class Student extends Person{
+    public Student(String name,int age){
+       super(name,age);
+    }
+}
+~~~
+
+在调用的时候它是这样的：首先将 `"zhangsan",23` 传递给子类的 `name、age`。
+
+然后在带参构造中，再将接收到的 `name、age` 传递给 父类的带参构造，此时就可以通过父类的带参构造给成员变量name、age`赋值了。
+
+![image-20240416165438723](./assets/image-20240416165438723.png)
+
+----
+
+## 三、`构造方法的访问特点` 总结
+
+- 子类不能继承父类的构造方法，但是可以通过super调用
+
+- 子类构造方法的第一行，有一个默认的 `super();`，你写不写它都会存在。
+
+  你写了，虚拟机就不会给你加；如果你没写，虚拟机就会帮你加上。
+
+- `super()` 表示 默认先访问父类中无参的构造方法，再执行自己。
+
+- 如果你不想调用父类的无参构造，而是调用父类的有参构造，给成员变量进行赋值，那么这个 `super()` 必须手动写，而且还需要将赋的值写在 `小括号` 当中。
+
+----
+
+# `this`、`supper`关键字
+
+## 一、`this` 使用总结
+
+`this`：理解成一个变量，表示当前方法调用者的地址值。
+
+例如：当下图中 `show()` 方法被调用的时候，就会把调用者的地址值赋值给 `this`，此时 `this` 就表示右边 `s` 对象。
+
+并且我们下面在调用成员变量的时候，它前面其实也有个隐含的 `this`。
+
+![image-20240416170910474](./assets/image-20240416170910474.png)
+
+----
+
+## 二、推翻其他资料
+
+在网上有很多资料，它会把这个 `this` 解释的非常的复杂，甚至会说：在创建一个对象的时候，对象里面还包含了一个 `this`，其实这不对。
+
+### 1）证明方法一：通过打印对象的内存结构
+
+Student.java
+
+~~~java
+package com.itheima.a09oopextendsdemo9;
+
+public class Student {
+    String name;
+    int age;
+
+    public void show(){
+        System.out.println(name + ", " + age);
+    }
+}
+~~~
+
+Test.java
+
+~~~java
+package com.itheima.a09oopextendsdemo9;
 
 
+import org.openjdk.jol.info.ClassLayout;
 
+public class Test {
+    public static void main(String[] args) {
+        Student s = new Student();
+        s.name = "zhangsan";
+        s.age = 23;
 
+        // 可以把对象在内存中的结构打印出来
+        ClassLayout layout = ClassLayout.parseInstance(s);
+        System.out.println(layout.toPrintable());
+    }
+}
+~~~
+
+程序运行完毕，可以看见现在打印的这个对象，它是 `Student` 类型的。
+
+![image-20240416171637402](./assets/image-20240416171637402.png)
+
+第二段就是关于对象在内存中的结构。
+
+第一行叫做 `markword` 表示在这个里面存储的是对象的 `哈希值`、`锁` 的信息。
+
+![image-20240416171721008](./assets/image-20240416171721008.png)
+
+第二行是 `classword`，即告诉你这个对象是什么类型的，你就可以把第二行理解成 `Student` 的意思。
+
+![image-20240416171827097](./assets/image-20240416171827097.png)
+
+从第三行开始，就是对象里面存储的成员变量的值，例如 `age` 的值是 `23`，它是占用 `4个字节`；`name` 是一个对象，是一个 `字符串` 对象，这个 `String` 它也占用四个字节。
+
+![image-20240416172040779](./assets/image-20240416172040779.png)
+
+最后一行，表示的是对象的补齐。你可以这么认为：Java的虚拟机它有强迫症，它规定了，所有对象在内存中占用的大小，必须是 `8` 的整数倍，如果你不是，虚拟机就会给你补齐，后面的补齐相当于就是空白，没有任何的意义。
+
+即它一共占用了 `8 + 4 + 4 + 4`，最后虚拟机又补了 `4个字节`。
+
+![image-20240416172300080](./assets/image-20240416172300080.png)
+
+**但是至始至终我们都没有看到 `this`，因此在 对象里面 是没有 `this` 的。**
+
+----
+
+### 2）证明 `this` 在虚拟机眼中，它就是一个局部变量
+
+此时先在 `show()` 方法中先写几个局部变量做一个对比。
+
+在虚拟机眼中，`this` 跟下面的 `a`、`b`、`c` 其实是一模一样的。
+
+~~~java
+public class Student {
+    String name;
+    int age;
+
+    public void show(){
+        int a = 10;
+        int b = 20;
+        int c = 30;
+        System.out.println(name + ', ' + age);
+    }
+}
+~~~
+
+首先重新运行 `Test.java` 测试类，然后通过IDEA的工具查看右边 `Student类` 的字节码信息。
+
+![image-20240416174228726](./assets/image-20240416174228726.png)
+
+在我们刚刚看到的这里的 `Student`的字节码指令当中，主要是看这里的 `show()` 方法。
+
+![image-20240416174829972](./assets/image-20240416174829972.png)
+
+`show()` 方法其中的 `Code` 以下的，就是所有方法的运行过程
+
+![image-20240416174901018](./assets/image-20240416174901018.png)
+
+这个不重要，现在我们也看不懂，我们往下拉到最下面。
+
+在最下面有张表，表的名字叫做 `LocalVariableTable`（局部变量表）
+
+在这张表中，就记录了 `show()` 方法中所有的局部变量。
+
+![image-20240416175103518](./assets/image-20240416175103518.png)
+
+局部变量第一个就是 `this`，它所对应的序号是 `0`。`a` 、`b`、`c` 变量都是 `int` 类型的。
+
+因此从这里就看出了，在虚拟机中，`this` 其实就是一个局部变量。
+
+`this` 这个局部变量当方法调用的时候就有值。因此我们不需要把这个 `this` 想的有多复杂，它就是一个局部变量而已。
+
+----
+
+## 三、`super` 使用总结
+
+`super`：代表父类存储空间。
+
+如果你看到了 `super`，那就表示它要调用父类里面的内容了。
 
 
 
