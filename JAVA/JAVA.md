@@ -9691,9 +9691,7 @@ public class GirlFriendTest {
 
 <img src="./assets/image-20240404210347113.png" alt="image-20240404210347113" style="zoom:67%;" />
 
-封装是面向对象三大特征之一。
-
-面向对象三大特征：封装、继承、多态。
+封装是面向对象三大特征（封装、继承、多态）之一。
 
 ----
 
@@ -16960,7 +16958,7 @@ public class StudentSystem {
 
 # ----------------------------------
 
-# Day 13  面向对象进阶
+# Day 13  static&继承
 
 # 121.static —— 静态变量
 
@@ -18026,7 +18024,7 @@ public class Test {
 
 -----
 
-## 三、推到继承出现的原因
+## 三、推导`继承`出现的原因
 
 但是会有个小问题，当这样的JavaBean类越来越多之后，问题就会出现了。
 
@@ -19804,7 +19802,7 @@ public class DogTest {
 **怎么调用父类构造方法的？**
 
 - 子类构造方法的第一行语句默认都是：**super()，不写也存在，虚拟机会自动帮你加上。并且必须在第一行。**
-- 如果想调用父类有参构造，必须手动写 `super` 进行调用。因为默认它只会调用午餐。
+- 如果想调用父类有参构造，必须手动写 `super` 进行调用。因为默认它只会调用父类的无参构造。
 
 ----
 
@@ -19907,7 +19905,7 @@ public class Student extends Person{
 
 - 子类构造方法的第一行，有一个默认的 `super();`，你写不写它都会存在。
 
-  你写了，虚拟机就不会给你加；如果你没写，虚拟机就会帮你加上。
+  你写了，虚拟机就不会给你加；如果你没写，虚拟机就会帮你加上。并且必须在第一行。
 
 - `super()` 表示 默认先访问父类中无参的构造方法，再执行自己。
 
@@ -20052,6 +20050,698 @@ public class Student {
 `super`：代表父类存储空间。
 
 如果你看到了 `super`，那就表示它要调用父类里面的内容了。
+
+---
+
+## 四、`this`、`super` 的使用方式
+
+| 关键字  | 访问成员变量                       | 访问成员方法                            | 访问构造方法                      |
+| ------- | ---------------------------------- | --------------------------------------- | --------------------------------- |
+| `this`  | `this.成员变量`：调用本类成员变量  | `this.成员方法(...)`：调用本类成员方法  | `this(...)`：调用本类其他构造方法 |
+| `super` | `super.成员变量`：调用父类成员变量 | `super.成员方法(...)`：调用父类成员方法 | `super(...)`：调用父类构造方法    |
+
+没有 `局部变量` 跟 `成员变量` 重名的话，前面的 `this.` 可以省略不写。
+
+使用 `this` 调用本类成员方法的时候，`this.` 可以省略不写。
+
+如果需要访问 `父类无参构造`，直接写 `super()` 即可。如果需要访问 `父类有参构造`，只需要在 `小括号` 中加上对应参数即可。
+
+----
+
+## 五、解释：`this(...)：调用本类其他构造方法`
+
+使用场景：要给一些数据做一些默认值的时候，就会用到这种方式。
+
+需求：如果没有主动给 `school` 变量赋值，默认为 `传智大学`。此时就可以使用 `this` 去调用本类的其他构造。
+
+Student.java 
+
+~~~java
+package com.itheima.a09oopextendsdemo9;
+
+public class Student {
+    String name;
+    int age;
+    String school;
+
+    public Student() {
+        // 表示调用本类其他构造方法
+        // 细节1：调用本类其他构造方法后，虚拟机就不会再添加super();，因为在本类其他构造方法中，默认的第一行有一个隐藏的 `super()`。因此在子类的构造方法中，只需要有一个构造去访问父类就行了。
+        // 细节2：this() 跟 super() 一样，也必须写在第一行。
+        this(null,0,"传智大学");
+    }
+
+    public Student(String name, int age, String school) {
+        this.name = name;
+        this.age = age;
+        this.school = school;
+    }
+}
+~~~
+
+Test.java
+
+~~~java
+public class Test {
+    public static void main(String[] args) {
+        Student s = new Student();
+    }
+}
+~~~
+
+----
+
+## 六、练习：带有继承结构的标准 JavaBean类
+
+1.经理
+成员变量:工号，姓名，工资，管理奖金
+成员方法:工作(管理其他人)，吃饭(吃米饭)
+
+2.厨师
+成员变量:工号，姓名，工资
+成员方法:工作(炒菜)，吃饭(吃米饭)
+
+### 1）代码示例
+
+Employee.java
+
+~~~java
+package com.itheima.a10oopextendsdemo10;
+
+public class Employee {
+    //1.类名见名知意
+    //2.所有的成员变量都需要私有
+    //3.构造方法（空参  带全部参数的构造）
+    //4.get/set
+
+    private String id;
+    private String name;
+    private double salary;
+
+    public Employee() {
+    }
+
+    public Employee(String id, String name, double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(double salary) {
+        this.salary = salary;
+    }
+
+    //工作
+    public void work(){
+        System.out.println("员工在工作");
+    }
+
+    //吃饭
+    public void eat(){
+        System.out.println("吃米饭");
+    }
+}
+~~~
+
+Manager.java
+
+带全部参数的构造 是需要加上父类中的 成员变量的，此时我们可以通过IDEA的自动提示功能一起做。
+
+<kbd>alt + insert</kbd> 选择 `Constuctor`，在这里它就发现了，`Manager类` 有个爹，是 `Employee`，`Employee` 里面有两个构造方法，要不要带过来一起用？
+
+![image-20240416191415097](./assets/image-20240416191415097.png)
+
+那必须的，<kbd>ctrl + A</kbd> 全选，点击 `ok` 即可。
+
+然后它又会弹出一个选择框，看上面的提示： `Choose Fields to Initialize by Constructor `
+
+意思就是说：在子类中，也有个变量 `bouns` 是 `double` 类型的，要不要把它放在构造方法里面一起初始化，因此选中，然后 `ok` 即可。
+
+![image-20240416191743221](./assets/image-20240416191743221.png)
+
+只不过最后生成的空参需要再去改改，将 `bonus` 删掉即可。
+
+![image-20240416192008272](./assets/image-20240416192008272.png)
+
+重写父类方法的快捷方式：
+
+![image-20240416192333803](./assets/image-20240416192333803.png)
+
+~~~java
+package com.itheima.a10oopextendsdemo10;
+
+public class Manager extends Employee{
+
+    private double bouns;
+
+    //空参构造
+    public Manager() {
+    }
+
+    //带全部参数的构造
+    //父类 + 子类
+    public Manager(String id, String name, double salary, double bouns) {
+        super(id, name, salary);
+        this.bouns = bouns;
+    }
+
+    // 针对于id、name、salary就不需要再写get/set方法了，因为父类里面有，我可以直接拿过来用
+    public double getBouns() {
+        return bouns;
+    }
+
+    public void setBouns(double bouns) {
+        this.bouns = bouns;
+    }
+
+    @Override
+    public void work() {
+        System.out.println("管理其他人");
+    }
+}
+~~~
+
+Cook.java
+
+~~~java
+package com.itheima.a10oopextendsdemo10;
+
+public class Cook extends Employee{
+
+    public Cook() {
+    }
+
+    public Cook(String id, String name, double salary) {
+        super(id, name, salary);
+    }
+
+
+    @Override
+    public void work() {
+        System.out.println("厨师正在炒菜");
+    }
+}
+~~~
+
+Test.java
+
+~~~java
+package com.itheima.a10oopextendsdemo10;
+
+public class Test {
+    public static void main(String[] args) {
+        //创建对象并赋值调用
+        Manager m = new Manager("heima001","张三",15000,8000);
+        System.out.println(m.getId() + ", " + m.getName() +
+                ", " + m.getSalary() + ", " + m.getBouns());
+        m.work();
+        m.eat();
+
+        Cook c = new Cook();
+        c.setId("heima002");
+        c.setName("李四");
+        c.setSalary(8000);
+        System.out.println(c.getId() + ", " + c.getName() + ", " + c.getSalary());
+        c.work();
+        c.eat();
+    }
+}
+~~~
+
+----
+
+### 2）练习总结
+
+在 `Manager`、`Cook` 两个子类中都重写了 `work` 方法，那为什么还需要再往上抽取呢？
+
+这是因为我们将 `work` 抽取到 父类当中，相当于是一个通用的工作方式，如果现在我再来一个收银员，如果没有给它指定它的工作内容，就可以默认使用父类中的 `work()` 方法来进行表示了，因此 共性的内容 还是需要往上抽取。
+
+
+
+----
+
+# --------------------------------------
+
+# Day14 多态 & 包 & 权限修饰符 & 代码块
+
+
+
+----
+
+# 129.认识多态（polymorphism）
+
+## 一、引入
+
+**多态**是面向对象三大特征（封装、继承、多态）之一。
+
+所有的技术都是为了解决问题而出现的，多态也不例外。
+
+接下来我们就一起推导一下多态为什么出现，它又可以解决什么样的问题呢？
+
+在推导多态之前，我们还是要先来看一下 `封装`。因为有了 `封装` 才有 `面向对象`，有了 `面向对象` 才有 `继承` 和 `多态`。
+
+----
+
+## 二、封装
+
+之前我们讲封装的时候曾经说过：对象代表什么，就得封装对应的数据，并提供数据所对应的行为。
+
+有了封装之后，就可以把一些`零散的数据` 和 `行为`都封装成一个整体，这就是我们所说的 `对象`。
+
+![image-20240416193907633](./assets/image-20240416193907633.png)
+
+好处就是有了对象之后，我们面对的就是一个整体，而不是一些零散的数据了。
+
+在实际开发当中，如果我们需要在方法中打印一个学生的信息，有了封装之后，我们就可以把整体的对象，传递给方法。在方法中需要什么参数，直接通过 `get方法` 就可以获取出来了。
+
+想要调用什么行为，通过这里的 `s` 就可以直接调用，非常的方便。
+
+![image-20240416194215376](./assets/image-20240416194215376.png)
+
+但这有个问题：当这样的JavaBean类越来越多之后，类里面重复的内容就越来越多了。
+
+为了解决这个问题，我们就可以把同一个类中 `共性的内容` 都抽取到同一个类中，在子类中我们就不需要再写一遍了，从而提高了代码的复用性。
+
+![image-20240411135316140](./assets/image-20240411135316140.png)
+
+在这个结构中，上面是 `爸爸`，也叫做 `父类`；下面是 `儿子`，也叫作 `子类`。
+
+在 `子类` 中可以访问 `父类` 非私有的成员，这就是继承，我们是用 `继承` 去解决 `JavaBean` 中代码重复的问题的。
+
+![image-20240411135752644](./assets/image-20240411135752644.png)
+
+`继承` 其实也是 `多态` 的前提条件，可以说没有 `继承`，就没有多态，那到底什么是多态呢？
+
+----
+
+## 三、多态
+
+多态：对象的多种形态。
+
+我们可以使用 `new` 关键字去创建一个学生对象 `new Student();`。把这个对象赋值给 `Student` 类型：`Student s = new Student();`，那就表示，这个 `Student对象` 现在是学生形态，这是我们以前创建对象的方式。
+
+![image-20240416200036298](./assets/image-20240416200036298.png)
+
+有了多态以后，我们在创建对象的时候，还可以这么玩：`Person p = new Student();`。将 `学生对象` 赋值给它的父类类型，这就表示这个学生对象现在是 `Person` 形态。
+
+此时学生对象就有了两种形态，一个是上面的 `学生形态`，另一个就是下面 `人的形态`，这就是`多态`。
+
+![image-20240416200240510](./assets/image-20240416200240510.png)
+
+这时，有同学就要想：就这？有什么用呢？
+
+---
+
+## 四、多态的应用场景
+
+相信大家都听说过：学生管理系统、教务管理系统。
+
+在这些系统中，假设，现在有三个角色：`Student`、`Teacher`、`administrator`。
+
+每一个角色在使用 `系统` 之前，它都是需要注册账号的。
+
+![image-20240416200544910](./assets/image-20240416200544910.png)
+
+`注册账号` 在代码里面假设就是一个 `register` 方法干的事情，那你说方法的形参我写什么类型会比较好呢？
+
+乍一看，`Student`、`Teacher`、`administrator` 这三个类型无论哪个写在方法形参中，好像都不是很合理。
+
+![image-20240416201055287](./assets/image-20240416201055287.png)
+
+如果想实现三个角色都可以注册，在以前，我们只能写三个注册的方法，分别给老师、学生、管理员对应，但是这种设计方案是不好的，甚至是愚蠢的。因为如果再添加一个角色 `辅导员`，那么就还需要再写一个对应的 `register` 方法，太麻烦了！
+
+![image-20240416201259425](./assets/image-20240416201259425.png)
+
+遇到问题不怕，我们需要学会思考。
+
+首先我们要想的是：现在需要的是什么？答：一个通用的注册方法。这个方法既能接受老师，又能接受学生，还能接受其他的学生。
+
+所以为了解决这个问题，我们只能在形参写它们共同的父类：`Person`。这样就可以解决刚刚的问题了。
+
+当我们传递一个 `new Teacher()` 对象过来的时候，代码相当于等于 `Person p = new Person`，这个就是我们刚刚所说的 `多态`—— 把子类对象，赋值给父类类型的变量。
+
+![image-20240416202502993](./assets/image-20240416202502993.png)
+
+同理，注册学生的时候也是一样的，传递 `学生对象`，赋值给父类类型。
+
+![image-20240416202553244](./assets/image-20240416202553244.png)
+
+或者是传递 `管理员对象`，也赋值给 `父类类型`。
+
+![image-20240416202637899](./assets/image-20240416202637899.png)
+
+哪怕在以后，我再添加一个 `辅导员` 的角色，只要这个角色继承于 `Person`，都可以使用这个方法来进行注册。
+
+并且更重要的是：如果在 `register()` 注册方法里面用对象调用其他的方法，只要子类重写了这个方法，多态还可以根据你传递对象的不同，调用不同类里面的方法。
+
+如果说你是注册老师，那么 `register()` 方法中调用的就是 `Teacher` 里面的 `show()` 方法。
+
+同理，如果是注册学生，那么 `register()` 方法中调用的就是 `Student` 里面的 `show()` 方法。
+
+如果是注册管理员，那么 `register()` 方法中调用的就是 `Administrator` 里面的 `show()` 方法。
+
+这个就是多态带给我们的好处。
+
+![image-20240416202929559](./assets/image-20240416202929559.png)
+
+----
+
+## 五、系统的学习 `多态`
+
+在刚刚我们已经清楚了多态的重要性，现在我们就要来系统的学习一下它。
+
+**1、什么是多态？**
+
+同类型的对象，表现出的不同形态。
+
+**2、多态的表现形式**
+
+就是将子类的对象，赋值给父类的类型
+
+~~~java
+父类类型 对象名称 = 子类对象;
+~~~
+
+但是 `多态` 并不是一个随便的人，不是你想写就能写的，它需要有前提条件。
+
+**3、多态的前提**
+
+- 有继承/实现关系
+
+- 有父类引用指向子类对象
+
+   说的就是这种创建对象的方式：`Fu f = new Zi();`。
+
+  `父类引用` 指的就是等号左边是父类类型的变量。
+
+  ![image-20240416203816970](./assets/image-20240416203816970.png)
+
+  `指向` 就是中间的等号
+
+  ![image-20240416203829761](./assets/image-20240416203829761.png)
+
+  `子类对象` 就是等号右边 `new` 出来的这个对象。
+
+  ![image-20240416203910933](./assets/image-20240416203910933.png)
+
+- 需要有方法重写
+
+----
+
+## 六、多态代码实现
+
+Person.java
+
+~~~java
+package com.itheima.a01polymorphismdemo1;
+
+public class Person {
+    private String name;
+    private int age;
+
+    public Person() {
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+ 
+    // 最后加一个 show() 方法
+    public void show(){
+        System.out.println(name + ", " + age);
+    }
+}
+~~~
+
+**Student.java**
+
+~~~java
+package com.itheima.a01polymorphismdemo1;
+
+public class Student extends Person{
+    @Override
+    public void show() {
+        System.out.println("学生的信息为：" + getName() + ", " + getAge());
+    }
+}
+~~~
+
+**Teacher.java**
+
+~~~java
+package com.itheima.a01polymorphismdemo1;
+
+public class Teacher extends Person{
+    @Override
+    public void show() {
+        System.out.println("老师的信息为：" + getName() + ", " + getAge());
+    }
+}
+~~~
+
+**Test.java**
+
+~~~java
+package com.itheima.a01polymorphismdemo1;
+
+public class Test {
+    public static void main(String[] args) {
+        //创建三个对象，并调用register方法
+        Student s = new Student();
+        s.setName("张三");
+        s.setAge(18);
+
+
+        Teacher t = new Teacher();
+        t.setName("王建国");
+        t.setAge(30);
+
+        Administrator admin = new Administrator();
+        admin.setName("管理员");
+        admin.setAge(35);
+
+
+
+        register(s);
+        register(t);
+        register(admin);
+    }
+
+    //这个方法既能接收老师，又能接收学生，还能接收管理员
+    //只能把参数写成这三个类型的父类
+    public static void register(Person p){
+        // 多态还可以根据你传递过来不同的对象去调用不同的 `show()` 方法
+        p.show();
+    }
+}
+~~~
+
+打印结果
+
+~~~java
+学生的信息为：张三, 18
+老师的信息为：王建国, 30
+管理员的信息为：管理员, 35
+~~~
+
+**因此，当我们看见这个方法传递的是一个类的名字，我们需要知道，此时就可以传递这个类所有的子类对象。**
+
+----
+
+## 七、总结
+
+**1、什么是多态？**
+
+同类型的对象，表现出的不同形态。
+
+**2、多态的前提**
+
+- 有继承/实现关系
+
+- 有父类引用指向子类对象
+
+   说的就是这种创建对象的方式：`Fu f = new Zi();`。
+
+- 需要有方法重写
+
+**3、多态的好处？**
+
+使用父类类型作为一个方法的形参，那么这个方法可以接收所有的子类对象。从而体现了多态的扩展性与便利。
+
+----
+
+# 130.多态中调用成员的特点
+
+## 一、规则
+
+- 调用 `成员变量`：编译看左边，运行也看左边
+- 调用 `成员方法`：编译看左边，运行看右边
+
+----
+
+## 二、代码实现
+
+阅读顺序：先看定义 `父类与子类` 的 代码，最后再阅读测试类
+
+**Test.java**
+
+~~~java
+package com.itheima.a02polymorphismdemo2;
+
+public class Test {
+    public static void main(String[] args) {
+        //创建对象（多态方式）
+        //Fu f = new Zi();
+        Animal a = new Dog();
+        //使用多态调用成员变量所遵守的规则：编译看左边，运行也看左边
+        //编译看左边：javac编译代码的时候，会看左边的父类中有没有这个变量，如果有，编译成功，如果没有编译失败。
+        //运行也看左边：java运行代码的时候，实际获取的就是左边父类中成员变量的值
+        System.out.println(a.name);//打印出来的时父类中的 "动物"
+
+        //调用成员方法：编译看左边，运行看右边
+        //编译看左边：javac编译代码的时候，会看左边的父类中有没有这个方法，如果有，编译成功，如果没有编译失败。
+        //运行看右边：java运行代码的时候，实际上运行的是子类中的方法。
+        a.show();///Dog --- show方法
+
+        //理解：
+        //Animal a = new Dog();
+        //现在用a去调用变量和方法的呀？是的
+        //而a是Animal类型的，所以默认都会从Animal这个类中去找
+
+        //成员变量：在子类的对象中，会把父类的成员变量也继承下的，这个时候其实有两个 `name`。父：name  子：name，那在多态中我们使用的应该是哪个呢？这个就需要看这个变量是什么类型的。
+        //如果像以前写的 `Dog d = new Dog();`，在以前，我们使用 `d` 去调用 `name`，`d` 是子类类型的，因此它获取的就是子类中的 `name`。
+        //而我们现在使用的是多态方式，用父类类型的变量去调用，那他肯定是调用父类中的 `name`。
+        
+        //成员方法：如果子类对方法进行了重写，那么在虚方法表中是会把父类的方法进行覆盖的。因此它调用的其实是子类中重写的方法。
+    }
+}
+
+
+class Animal{
+    String name = "动物";
+
+   public void show(){
+        System.out.println("Animal --- show方法");
+    }
+}
+
+class Dog extends Animal{
+    String name = "狗";
+
+    @Override
+    public void show() {
+        System.out.println("Dog --- show方法");
+    }
+}
+
+class Cat extends Animal{
+    String name = "猫";
+
+   @Override
+    public void show() {
+        System.out.println("Cat --- show方法");
+    }
+}
+~~~
+
+----
+
+## 三、多态调用成员的内存图解
+
+接下来我们就从内存的角度去理解一下 `多态调用成员的特点`。
+
+首先先来看一下左边的代码。上面还是一个继承结构，父类是 `Animal`，子类是 `Dog`，并且子类中重写了父类的 `show()` 方法。
+
+在测试类中使用的是多态的方式创建的对象 `Animal a = new Dog()`，一个子类的对象赋值给了父类类型。
+
+最后使用 `a` 分别调用 `成员变量` 和 `成员方法`。
+
+接下来根据左边的代码，看看在右边的内存中到底是怎么回事。
+
+![image-20240416212127806](./assets/image-20240416212127806.png)
+
+首先第一步：测试类（Test.java）的字节码文件先加载到方法区当中，然后虚拟机会自动去调用 `main方法`，此时 `main方法` 加载进栈。
+
+开始执行 `main方法` 中的第一行代码：`Animal a = new Dog()`，在第一行代码中，用到了 `Animal类`，还用到了 `Dog类`。那我们应该先加载谁的字节码文件呢？
+
+在Java中加载字节码文件时有个特点：永远先加载父类，然后再加载子类。
+
+此时来看，`Dog` 的父类是 `Animal`，`Animal` 还有个父类 `Object`。所以说在真正加载字节码文件的时候，它是先加载 `Object`，然后加载 `Animal` 的字节码文件，最后再加载 `Dog` 的字节码文件。只不过在这一题中 `Object类` 跟我们暂时没有什么太大的影响，这里就先忽略。此时只需要考虑 `Dog`、`Animal` 就行了。
+
+那么在方法区中先加载父类 `Animal` 的字节码文件，在字节码文件中就有所有的 `成员变量` 和 `成员方法`。
+
+下面它还会挂一个 `虚方法表`，它会把在 `Animal` 类中的 `虚方法` 都加载进来，在 `Animal` 中其实只有一个虚方法，那就是 `show()` 方法，此时父类加载完毕。
+
+接下来再来加载子类 `Dog.class`，同样的在这个里面有所有的 `成员变量` 和 `成员方法`。与此同时，它会把对应的`虚方法表`继承下来，此时它就发现了，在子类中对 `show()` 方法做了一个重写，因此在子类的 `虚方法表` 中，它会把 `show()` 方法进行覆盖，覆盖之后就是子类自己的 `show()` 方法。
+
+到目前为止，字节码文件全部加载完毕。
+
+在字节码文件中，`Dog` 跟 `Animal` 之间会有一个联系，因为 `Dog` 它的爹是 `Animal`，它会记录自己父类 `Animal` 字节码文件的位置。
+
+![image-20240416214906710](./assets/image-20240416214906710.png)
+
+接下来再来看等号的左边，等号的左边其实就是在栈中开辟了一个小空间，这个空间就是 `变量a`。类型是 `Animal` 类型的。
+
+![image-20240416215423958](./assets/image-20240416215423958.png)
+
+再来看等号的右边，在等号右边看到了 `new`，就一定是在堆中开辟了一个小空间。假设这个空间中的地址值是 `001`，在对象当中它会把这个空间分成两部分，一部分用来存储从父类里面继承下来的 `成员变量` 的信息，还有一个是自己子类里面 `成员变量` 里面的信息。
+
+父类中成员变量里面只有一个 `name`，赋值为 `动物`。自己子类中也有个 `name`，赋值为 `狗`。
+
+等初始化完毕后，它会把地址值 `001` 赋值给左边的变量 `a`，`a` 通过 `001` 也可以找到右边的对象。
+
+此时第一行代码才算是走完。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
