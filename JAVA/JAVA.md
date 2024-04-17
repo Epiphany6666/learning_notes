@@ -22278,11 +22278,66 @@ public abstract class 类名{}
 
 <img src="./assets/image-20240417175418800.png" alt="image-20240417175418800" style="zoom:67%;" />
 
+一旦加上分号之后，IDEA就会爆红报错，我们用鼠标点击一下红色波浪线，按快捷键<kbd>alt + 回车</kbd> ，她会给我们两种解决方案。
+
+第一种解决方案：`Add method body` —— `添加一个方法体`，这个肯定不是我想要的，因为方法体我不知道写什么，每一个子类工作的内容都是不一样的。
+
+第二种解决方案：`Make 'work' abstract` —— `让当前的 'work' 方法变成抽象`。这正是我们需要的，因此我们选择第二种解决方案。
+
+![image-20240417184844126](./assets/image-20240417184844126.png)
+
+注意看，一旦把方法变成抽象的了之后，IDEA在类的上面也自动帮我们加上了 `abstract(抽象类关键字)`，这个就是抽象类和抽象方法。
+
+<img src="./assets/image-20240417185219875.png" alt="image-20240417185219875" style="zoom:67%;" />
+
 ~~~java
-package com.itheima.a01abstractdemo1;
-
 public abstract class Person {
+    public abstract void work();
+}
+~~~
 
+----
+
+## 六、抽象类和抽象方法的注意事项
+
+这些注意点我们不需要去背，在以后写代码的时候，如果IDEA报错了，你要知道怎么改就可以了。
+
+### 1）抽象类不能实例化
+
+这里的`实例化`就是`创建对象`的意思。
+
+<img src="./assets/image-20240417191259584.png" alt="image-20240417191259584" style="zoom:67%;" />
+
+同样我们也可以反过来理解：如果抽象类可以创建对象，那我就可以通过该创建的对象去调用抽象类里面的抽象方法了。但是抽象方法里面又没有方法体，根本没有东西能执行。因此在Java中它就规定了，**抽象类不能创建对象！**
+
+---
+
+### 2）抽象类中不一定有抽象方法，但是有抽象方法的类一定是抽象类。
+
+这句话读起来有点拗口，我们把它分成两部分来讲：
+
+`抽象类中不一定有抽象方法`：即抽象类中有抽象方法可以，没有抽象方法也可以。
+
+如下图，抽象方法中写了非抽象的方法，IDEA中并没有报错。
+
+<img src="./assets/image-20240417191548978.png" alt="image-20240417191548978" style="zoom:67%;" />
+
+----
+
+`但是有抽象方法的类一定是抽象类。`
+
+当我们将类前面的 `abstract关键字` 删除后，代码就报错了。
+
+<img src="./assets/image-20240417191703669.png" alt="image-20240417191703669" style="zoom:67%;" />
+
+----
+
+### 3）抽象类可以有构造方法
+
+如下代码，并不会报错。
+
+~~~java
+public abstract class Person {
     private String name;
     private int age;
 
@@ -22294,6 +22349,139 @@ public abstract class Person {
         this.name = name;
         this.age = age;
     }
+    
+    // name、age的get/set方法
+
+    public abstract void work();
+
+    public void sleep(){
+        System.out.println("睡觉");
+    }
+}
+~~~
+
+说到这里，有同学就要讲了：抽象类既然都不能创建对象，那这个构造方法有什么作用呢？
+
+不着急，我们先来写一个 `Person` 的子类，用子类去继承 `Person`。
+
+如果子类中什么都不写，就会报错。
+
+![image-20240417192033129](./assets/image-20240417192033129.png)
+
+我们可以点击红色波浪线，然后 <kbd>alt + 回车</kbd> ，然后选择第一项，将父类中的抽象方法全部重写就可以了。
+
+![image-20240417192123066](./assets/image-20240417192123066.png)
+
+选择要重写的父类中的抽象方法
+
+<img src="./assets/image-20240417192205773.png" alt="image-20240417192205773" style="zoom:80%;" />
+
+最后点击ok即可。
+
+~~~java
+public class Student extends Person{
+    public Student() {
+    }
+
+    // 当我们创建学生对象的时候，将学生的姓名、年龄都传递过来，此时它并是在Student类中赋值的，而是通过 super 关键字，交给父类去进行赋值的。
+    public Student(String name, int age) {
+        super(name, age);
+    }
+
+    @Override
+    public void work() {
+        System.out.println("学生的工作是学习");
+    }
+}
+~~~
+
+然后在测试类中，就可以来创建子类的对象。
+
+~~~java
+public class Test {
+    public static void main(String[] args) {
+        Student s = new Student("zhangsan",23);
+        System.out.println(s.getName() + ", " + s.getAge());
+    }
+}
+~~~
+
+因此，通过这个案例我们就知道了，虽然抽象类不能创建对象，但是它里面也可以写构造方法。这个构造方法的**作用是：当创建子类对象时，给属性进行赋值的。**
+
+抽象类也是父类，既然是父类，就需要将子类共有的属性都抽取上来，当我们创建子类对象的时候，如何给这些共有的属性进行赋值呢？就是通过使用 `super` 关键字，调用父类的构造方法来进行赋值。
+
+-----
+
+### 4）抽象类的子类
+
+- 要么重写抽象类中的**所有**抽象方法
+- 要么子类本身也是一个抽象类
+
+如果子类还是一个抽象类的话，同样的，我们还是不能创建子类的对象，如果一定要创建对象的话，就还需要再写一个孙子类，再去继承子类，去重写里面所有的抽象方法。
+
+例如下方，让 `Teacher类` 去继承 `Person类`，用鼠标点击红色波浪线，<kbd>alt + 回车</kbd>，就可以看见，IDEA给出了第二个修改方案：`Make 'Teacher' abstract` —— `让老师这个类变成抽象`。
+
+![image-20240417192916753](./assets/image-20240417192916753.png)
+
+用鼠标点击第二个解决方案，此时它就不会报错了，在这种情况下`Teacher类`也不需要再去重写父类了。
+
+![image-20240417193049046](./assets/image-20240417193049046.png)
+
+但是它有个小问题，此时你在测试类中还是不能创建老师的对象，如果你想要创建老师的对象的话，就还需要再写一个类，例如这里就使用 `ATeacher类` 去继承 `Teacher类`，然后还是需要重写父类的抽象方法。
+
+~~~java
+public class ATeacher extends Teacher{
+    @Override
+    public void work() {
+    }
+}
+~~~
+
+因此一般来讲，我们更多的都是采取第一种解决方案：子类重写抽象类中的**所有**抽象方法。
+
+----
+
+## 七、练习：编写带有抽象类的标准Javabean类
+
+### 1）要求
+
+~~~java
+青蛙frog		属性:名字，年龄		行为:吃虫子，喝水
+狗Dog	　　 属性:名字，年龄		    行为:吃骨头，喝水
+山羊Sheep		属性:名字，年龄		行为:吃艹，喝水
+~~~
+
+----
+
+### 2）画图
+
+抽取共性的时候要注意：父类不一定是抽象的。
+
+当父类中有抽象方法的时候，这个类才是抽象的；但是如果父类中没有抽象方法，还是按照以前继承的方式来写就行了。
+
+![image-20240417193907086](./assets/image-20240417193907086.png)
+
+----
+
+### 3）代码示例
+
+#### Animal.java
+
+~~~java
+package com.itheima.a02abstractdemo2;
+
+public abstract class Animal {
+    private String name;
+    private int age;
+
+    public Animal() {
+    }
+
+    public Animal(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
 
     public String getName() {
         return name;
@@ -22311,52 +22499,534 @@ public abstract class Person {
         this.age = age;
     }
 
-    public abstract void work();
 
-    public void sleep(){
-        System.out.println("睡觉");
+    public void drink(){
+        System.out.println("动物在喝水");
     }
 
+
+    public abstract void eat();
+}
+~~~
+
+#### Frog.java
+
+~~~java
+package com.itheima.a02abstractdemo2;
+
+public class Frog extends Animal{
+    public Frog() {
+    }
+
+    public Frog(String name, int age) {
+        super(name, age);
+    }
+
+    @Override
+    public void eat() {
+        System.out.println("青蛙在吃虫子");
+    }
+}
+~~~
+
+#### Dog.java
+
+~~~java
+package com.itheima.a02abstractdemo2;
+
+public class Dog extends Animal{
+
+    public Dog() {
+    }
+
+    public Dog(String name, int age) {
+        super(name, age);
+    }
+
+    @Override
+    public void eat() {
+        System.out.println("狗吃骨头");
+    }
+}
+~~~
+
+#### Sheep.java
+
+~~~java
+package com.itheima.a02abstractdemo2;
+
+public class Sheep extends Animal{
+
+    public Sheep() {
+    }
+
+    public Sheep(String name, int age) {
+        super(name, age);
+    }
+
+    @Override
+    public void eat() {
+        System.out.println("山羊在吃草");
+    }
+}
+~~~
+
+#### Test.java
+
+~~~java
+package com.itheima.a02abstractdemo2;
+
+public class Test {
+    public static void main(String[] args) {
+        //创建对象
+        Frog f = new Frog("小绿",1);
+        System.out.println(f.getName() + ", " + f.getAge());
+        f.drink();
+        f.eat();
+    }
+}
+~~~
+
+----
+
+## 八、抽象类和抽象方法的意义
+
+将共性的内容抽取出来之后，由于方法体不确定，父类中的方法需要定义为抽象的，子类在使用的时候必须要进行重写。
+
+有同学学完之后会问：那我不抽取到父类，直接在子类写不是更节约代码吗？
+
+----
+
+### 1）引入问题
+
+假设现在我有两个子类：`Cat、Dog`，具体代码如下图。
+
+![image-20240417195754119](./assets/image-20240417195754119.png)
+
+按照我们以前所学，我们需要定义一个父类 `Animal`，然后把共性的内容抽取上去。由于 `drink` 的方法体是一样的，抽取上去没有问题，但如果 `eat` 方法没有抽取，问题就会出现了。
+
+以后在公司里面是很多人一起来开发一个项目的，不会说一个项目是你一个人写的。
+
+假设左边的 `Cat`  是第一个程序员开发的，这个程序员在开发的时候他觉得：吃的方法叫什么名字，我想不起来了，方法名就使用 `abc` 代替。然后猫吃东西不能每次都吃一样的吧？所以方法需要加上一个形参，表示是猫吃的东西。完整代码如下图的左边。
+
+乍一看这个程序员写的代码，一点问题也没有。
+
+假设右边的 `Dog` 是第二个程序员开发的，这个程序员在开发的时候他觉得：狗吃完了需要排除，因此这个程序员给这个方法加上了一个返回值。完整代码如下图的右边。
+
+乍一看第2个程序员写的代码，也一点问题也没有。
+
+![image-20240417200907377](./assets/image-20240417200907377.png)
+
+但是两个程序员的代码合在一起，问题就出现了：假设第三个程序员，想要调用 `吃东西` 的方法，那就变的麻烦起来了。
+
+如果他想要调用 `猫` 吃东西的方法，它就需要到 `Cat类` 中看一下吃东西的方法是哪个；
+
+如果他想要调用 `狗` 吃东西的方法，它就需要到 `Dog类` 中看一下吃东西的方法是哪个；
+
+如果这个Javabean的体系越来越大，每次第三个程序员调用eat方法的时候，到要到对应的子类去看一下你的 `eat` 方法是怎么写的，他才能去调用。
+
+![image-20240417201226981](./assets/image-20240417201226981.png)
+
+因此这种方式会导致代码不统一，以后在调用的时候非常的痛苦，有一种浑身蛋疼的感觉。
+
+----
+
+### 2）解决方案
+
+假如我将共性的内容放到父类，其中方法体不一样的，我把它写成抽象的。那么子类在继承动物的时候，它就需要强制去重写这个方法。
+
+以后别人在调用的时候，就不需要去看子类了，而是只需要直接去看父类就可以了。知道父类中的 `eat()` 方法是怎么定义的，就可以去调用所有子类中的 `eat()` 方法了。
+
+同时这种方式，它还有一个隐藏的含义：`强制子类必须按照这种格式进行重写`，因此这种方式，它相当于就是有一种 `将代码格式统一` 的味道在里面。
+
+![image-20240417201617020](./assets/image-20240417201617020.png)
+
+----
+
+## 九、总结
+
+**1、抽象类的作用是什么？**
+
+当我们在多个子类中抽取共性时，如果在父类中无法确定方法体，就可以把这个方法定义为抽象的。
+
+强制让子类按照这种格式进行重写。
+
+抽象方法所在的类，必须写成抽象类。
+
+**2、抽象类和抽象方法的格式？**
+
+抽象方法就是：没有方法体，然后再加一个 `abstract` 修饰
+
+~~~java
+public abstract 返回值类型 方法名(参数列表);
+~~~
+
+抽象类：直接加一个 `abstract` 就行了
+
+~~~java
+public abstract class 类名{ }
+~~~
+
+**3、继承抽象类要注意哪些东西？**
+
+- 子类要么重写抽象类中的所有抽象方法
+- 要么子类本身也是一个抽象类
+
+但是刚刚说了，如果你采取的是第二种方式，那你还要有一个子类去进行重写。
+
+因此一般来讲，采取第一种方式会更多一些：直接重写抽象类中的所有抽象方法。
+
+
+
+----
+
+# 136.接口
+
+## 一、为什么会有 `接口` ？
+
+首先我们还是要先来看一个继承体系：在继承体系中，父类是动物类，子类有三个（兔子类、青蛙类、狗类）。
+
+其中 `动物类` 中定义了整个体系的共性，例如：吃饭、喝水，这没有任何毛病。
+
+但如果说我需要给这个继承体系添加一个新的行为：游泳，那你说可以把游泳写在动物类当中吗？
+
+正确答案是不可以的，这是为什么呢？
+
+因为在下面的三个子类中，`狗、青蛙` 会游泳没有问题，但是 `兔子` 是不会游泳的。
+
+如果将游泳写在父类中的话，就表示所有的子类都拥有 `游泳` 这个功能，但是 `兔子` 是不会游泳的，因此写在父类中是不合适的。
+
+![image-20240417203505151](./assets/image-20240417203505151.png)
+
+既然不合适，那到底应该写在哪呢？难道要分别写在 `青蛙类、狗类` 中吗？
+
+其实这样写也可以，但是有个弊端：如果强行这样写，就无法限定子类中方法书写的格式，导致方法不统一。
+
+![image-20240417204915471](./assets/image-20240417204915471.png)
+
+在这种情况下，我们就回去定义一个接口，叫做 `拥有游泳的接口`。
+
+在接口中，可以定义 `游泳` 的抽象方法，这个接口就可以看做是我自己定义的 `游泳` 的规则。
+
+你想让哪个接口动物拥有游泳这个功能，就让这个类跟 `游泳接口` 发生关系就行了。
+
+更重要的是，我们可以强制要求让 `青蛙类、狗类` 按照接口中定义的规则来书写代码，这样代码就统一起来。
+
+![image-20240417210337530](./assets/image-20240417210337530.png)
+
+因此`接口`就可以把它理解成是一种`规则`。例如现在的接口，就是 `游泳` 这个行为的规则。
+
+这个时候，有的同学就要问了：以后子类中所有特有的方法，我是不是都要定义成接口？
+
+其实没必要，举个栗子：狗类中 `lookHome()` 看家的方法，看家这个行为是只有狗才有的，其他动物是没有的。
+
+就算你定义了看家的接口，也只有狗才能用，其他动物是用不了的，因此 `看家没有必要去写成接口`，直接将 `看家` 写在 `Dog类` 中作为狗类特有的方法就行了。
+
+<img src="./assets/image-20240417210708263.png" alt="image-20240417210708263" style="zoom:67%;" />
+
+在现在这个案例中，为什么游泳需要写成特定的接口呢？
+
+其实就是因为，除了狗，还有青蛙，也能用到游泳这个行为。
+
+当我们需要给多个类同时去定义规则的时候，就需要用到接口了。
+
+----
+
+## 二、接口的应用
+
+因此，接口就是一种规则，有了这种规则之后，在实际开发中我们写代码的时候，就可以有另外的一个思路了。
+
+例如有一个 `搬家` 方法，形参可以写 `Car`，在调用方法的时候就可以传递很多车的对象，只要是 `Car` 的子类，都可以传递过来，因为有多态，因此是完全没有任何问题的。
+
+<img src="./assets/image-20240417211512387.png" alt="image-20240417211512387" style="zoom:67%;" />
+
+但是你要想，能搬家的，不仅仅只有车，搬家公司也能搬家。但是在这个代码中，如果传递一个 `搬家公司` 的对象，代码就会报错。
+
+因为在我们现实的逻辑中，`搬家公司` 是不可能去继承 `Car` 的，因此这里搬家公司的对象是不能传递过来的。
+
+<img src="./assets/image-20240417211653306.png" alt="image-20240417211653306" style="zoom:67%;" />
+
+那应该怎么完美的去解决这个问题呢？
+
+此时我们就需要思考：在这个案例中，我需要的是什么？——  只要能搬家就行，不管是黑车，搬家公司，三轮，哪怕是用肩膀抗，只要有搬家的行为，都可以。
+
+细品，可以发觉我们现在要的不是一个继承体系，而是侧重于 `要干的活`。谁干、怎么干 我不管，只要能干就可以。
+
+此时就可以定义一个 `运输` 的接口，在 `搬家` 的方法中，参数直接写 `接口类型` 就行了。
+
+在调用方法的时候，不管是车、搬家公司，只要按照 `运输接口` 规定的规则编写的方法，都可以传递过来，这个就是接口。
+
+接口不代表一类事务，接口就是一种规则，它是对行为的一种抽象。
+
+<img src="./assets/image-20240417212100859.png" alt="image-20240417212100859" style="zoom:80%;" />
+
+----
+
+## 三、接口和抽象类的异同
+
+每次学完接口的时候，很多同学都会跟抽象类去混淆，其实这是两类完全不一样的知识点。
+
+抽象类更多是用在父类当中，在抽取共性方法的时候，方法体不一样了，就可以写成抽象方法，而`抽象方法所在的类`就是`抽象类`。
+
+例如在现在的继承体系中，`Animal类` 就可以把它定义成一个抽象类，此时抽象类是作为父类的，它是表示`动物`这一类事物。
+
+而右边的 `接口` 就不一样了，接口它不是表示一类事务的，接口更加侧重于行为：青蛙可以拥有这个行为，狗也可以拥有这个行为。
+
+同样的，学生也可以拥有这个行为，老师也可以拥有这个行为。
+
+所以说接口它就是一种规则，是对行为的抽象。
+
+![image-20240417212908613](./assets/image-20240417212908613.png)
+
+----
+
+## 四、接口的定义和使用
+
+- 接口是使用关键字 `interface` 来定义的
+
+  ~~~java
+  public interface 接口名{}
+  ~~~
+
+- 在使用接口的时候要注意：接口不能实例化。
+
+  也就是说接口不能创建它的对象。
+
+- 接口与类之间是实现关系，通过 `implements` 关键字表示。
+
+  ~~~java
+  public class 类名 implements 接口名{ }
+  ~~~
+
+- 接口的子类我们一般也会称作：实现类。
+
+  在实现类中，要么重写接口中所有的抽象方法；要么实现类本身也是一个抽象类。
+
+  当然我们更多的还是采用第一种方式：重写接口里所有的抽象方法。
+
+**注意1：接口和类的实现关系，可以单实现，也可以多实现。**
+
+也就是说一个类可以实现多个接口。
+
+~~~java
+public class 类名 implements 接口名1, 接口名2{}
+~~~
+
+**注意2：实现类还可以在继承一个类的同时实现多个接口。**
+
+~~~java
+public class 类名 extends 父类 implements 接口名1, 接口名2{}
+~~~
+
+----
+
+## 五、练习：编写带有接口和抽象类的标准Javabean类
+
+### 1）需求
+
+~~~java
+青蛙frog		属性:名字，年龄		行为：吃虫子，蛙泳
+狗Dog	　　  属性:名字，年龄	    行为：吃骨头，狗刨
+兔子Rabbit	 属性:名字，年龄		 行为：吃胡萝卜
+~~~
+
+----
+
+## 2）代码实现
+
+### Animal.java
+
+~~~java
+package com.itheima.a01interfacedemo1;
+
+public abstract class Animal {
+    private String name;
+    private int age;
+
+
+    public Animal() {
+    }
+
+    public Animal(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    // name、age的get / set方法
+    
+    public abstract void eat();
+}
+~~~
+
+----
+
+### Swim.java
+
+注意，新建接口的时候，需要选择下面的 `Interface`。
+
+<img src="./assets/image-20240417214307475.png" alt="image-20240417214307475" style="zoom:67%;" />
+
+如果有的小伙伴忘记选择 `Interface`，也不要紧，直接将 `class` 改成 `interface` 就可以了。
+
+![image-20240417214503151](./assets/image-20240417214503151.png)
+
+~~~java
+package com.itheima.a01interfacedemo1;
+
+public interface Swim {
+    // 在接口中定义游泳的规则
+    public abstract void swim();
+}
+~~~
+
+----
+
+### Rubbit.java
+
+由于兔子是不会游泳的，因此它只需要继承 `Animal类` 即可，不需要去实现游泳接口。
+
+~~~java
+package com.itheima.a01interfacedemo1;
+
+public class Rabbit extends Animal{
+    // 记得加上构造方法
+    public Rabbit() {
+    }
+
+    public Rabbit(String name, int age) {
+        super(name, age);
+    }
+
+    @Override
+    public void eat() {
+        System.out.println("兔子在吃胡萝卜");
+    }
+}
+~~~
+
+----
+
+### Frog.java
+
+此时青蛙是继承了一个抽象类，并且实现了一个 `Swim` 接口，此时它就要去重写所有的抽象方法。
+
+用鼠标点击红色波浪线，<kbd>alt + 回车</kbd>，选择第一个解决办法。
+
+<img src="./assets/image-20240417214850358.png" alt="image-20240417214850358" style="zoom:67%;" />
+
+此时IDEA会给你个提示：父类 `Animal类` 中有个抽象方法 `eat()`；接口 `Swim` 中有个抽象方法 `swim()`
+
+![image-20240417214915862](./assets/image-20240417214915862.png)
+
+我们需要全选，而默认也是全选，因此我们只需要点击下面的 `OK` 就可以了。
+
+~~~java
+package com.itheima.a01interfacedemo1;
+
+public class Frog extends Animal implements Swim{
+    public Frog() {
+    }
+
+    public Frog(String name, int age) {
+        super(name, age);
+    }
+
+    @Override
+    public void eat() {
+        System.out.println("青蛙在吃虫子");
+    }
+
+    @Override
+    public void swim() {
+        System.out.println("青蛙在蛙泳");
+    }
+}
+~~~
+
+----
+
+### Dog.java
+
+~~~java
+package com.itheima.a01interfacedemo1;
+
+public class Dog extends Animal implements Swim{
+
+    public Dog() {
+    }
+
+    public Dog(String name, int age) {
+        super(name, age);
+    }
+
+    @Override
+    public void eat() {
+        System.out.println("狗吃骨头");
+    }
+
+    @Override
+    public void swim() {
+        System.out.println("狗刨");
+    }
+}
+~~~
+
+----
+
+### Test.java
+
+~~~java
+package com.itheima.a01interfacedemo1;
+
+
+public class Test {
+
+    public static void main(String[] args) {
+        //创建青蛙的对象
+        Frog f = new Frog("小青",1);
+        System.out.println(f.getName() + ", " + f.getAge());
+        f.eat();
+        f.swim();
+
+        //创建兔子的对象
+        Rabbit r = new Rabbit("小白",2);
+        System.out.println(r.getName() + ", " + r.getAge());
+        r.eat();
+    }
 }
 ~~~
 
 
 
+----
 
+# 137.接口的细节：成员特点和接口的各种关系
 
+## 一、概述
 
+说到成员就是三样东西：成员变量、构造方法、成员方法。
 
+### 1）成员变量
 
+接口中的成员变量只能是 `常量`，**默认**会使用 `public static final` 去修饰。
 
+这里默认的意思就是：就算你没写，Java也会帮你加上。为什么是这样的呢？其实是有原因的。
 
+思考：`多个子类的共有属性` 你觉得它是抽取到哪里的？是抽取到接口当中的吗？
 
+并不是的，`多个子类的共有属性` 它是抽取到 `父类` 中的，不会抽取到接口里面。
 
+因此接口中是不会有类似于：name、age等这些成员变量的。
 
+而且接口是一种规则，规则是不能发生改变的。因此接口中的成员变量都是 `常量`，会使用 `final` 去修饰。
 
+`static` 的目的其实就是我可以方便的进行调用，用 `接口名.常量名` 就行了。
 
+`public` 表示公共的，表示在所有的地方都可以去使用接口中的常量。
 
+----
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### 2）构造方法
 
 
 
