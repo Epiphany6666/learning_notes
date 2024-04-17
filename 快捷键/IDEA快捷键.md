@@ -195,3 +195,5 @@ PTG插件可以1秒生成标准Javabean。
 然后 <kbd>shift + alt + 回车</kbd> 就可以将分隔出来的代码进行上下移动了0
 
  <kbd>ctrl + d</kbd> ：向下复制一行
+
+将一个单词快速统一转为 `大写 / 小写` 的快捷键：<kbd>ctrl + shift + u</kbd> ，这里的 `u` 就是 `upper（大写）` 的意思
