@@ -20729,6 +20729,970 @@ class Cat extends Animal{
 
 此时第一行代码才算是走完。
 
+![image-20240417074412389](./assets/image-20240417074412389.png)
+
+接下来执行到第二行代码：`sout(a.name)`，用 `a` 去调用变量 `name`。
+
+刚刚我们讲过，用多态方式调用成员变量，特点是：`编译看左边，运行也看左边`。
+
+编译看左边，就看看父类中有没有 `name`，如果有 `name` ，编译成功；如果没有 `name`，直接编译失败。
+
+运行看左边，也是直接找父类中的 `name`，然后将 `name` 的值获取出来并进行打印。
+
+![image-20240417074734130](./assets/image-20240417074734130.png)
+
+但在以前，我们没有使用多态方式创建对象：`Dog d = new Dog()`，此时用 `d` 去调用 `name` 的时候，`d` 是子类类型的，它就不会看左边从父类中继承下来的空间，而是先到自己类的空间中找。
+
+![image-20240417075002593](./assets/image-20240417075002593.png)
+
+如果本类没有，才会到父类中找。
+
+但是现在代码中 `a` 是 `Animal`(父类)类型的，因此它会直接去父类的空间找 `name`。这就是两种方式的区别。
+
+----
+
+接下来：`a.show()`，相当于是调用了里面的 `show()` 方法。
+
+在刚刚我们说了，用多态方式调用`成员方法`，遵守一个原则：编译看左边，运行看右边。
+
+`编译看左边`：会去找父类中有没有 `show()` 方法，如果找到了，它不会报错，代码正常；但是如果在父类中没有找到，代码都不用运行，直接爆红。
+
+`运行看右边`：在实际运行的时候它找的是 `子类` 里面的 `show()`。又由于这个 `show()` 方法我们已经重写过了，一旦重写了，相当于就是把父类中继承下来的 `show()` 方法给覆盖了！
+
+因此这里真正运行的还是看子类中的 `show()` 方法。
+
+![image-20240417075649601](./assets/image-20240417075649601.png)
+
+因此在控制台中打印的就是 `Dog ---- show方法`。
+
+![image-20240417075758344](./assets/image-20240417075758344.png)
+
+-----
+
+## 四、总结
+
+调用成员变量的特点：编译看左边，运行也看左边。
+
+调用成员方法的特点：编译看左边，运行看右边。
+
+
+
+----
+
+# 131.多态的优势和弊端
+
+## 一、多态的优势
+
+传智教育徐磊老师 曾经总结过这一点：多态的优势一共有两点
+
+- 在多态形式下，右边对象可以实现解耦合，便于扩展和维护
+
+这句话比较拗口，举个栗子：比如现在用多态方式创建对象，并调用调用方法
+
+~~~java
+Person p = new Student();
+// 业务逻辑发生改变时，后续代码无需修改
+p.work(); 
+~~~
+
+例如过了几天，我不想让学生去工作了，而是想让老师 Teacher 去工作，此时在代码中，我们只需要将创建对象的代码修改即可，后续的代码其实是不需要修改了，更重要的是，`p.work` 运行的其实是修改之后的 `Teacher类` 中的方法。
+
+![image-20240417080812683](./assets/image-20240417080812683.png)
+
+这个就是多态的第一个优势，它可以让我们的程序更加利于维护。
+
+- 定义方法的时候，如果使用父类作为形参，那么这个方法可以接收所有子类对象，体现多态的扩展性与便利。
+
+这个 好处 在刚刚我们也写了代码去演示。
+
+当我们以后在调用一个方法的时候，发现一个方法的形参是一个类名，那么我们就可以传递这个类所有的子类对象。
+
+----
+
+## 二、优势的示例代码
+
+### 1）案例1：`StringBuilder`
+
+我们来看一个以前写过的东西
+
+~~~java
+StringBuilder sb= new StringBuilder();
+sb.append()
+~~~
+
+当我们想要将一些数据添加到 `sb` 当中，就需要调用 `append` 方法。
+
+在调用的时候发现，有一个方法，类型是 `Object` 。在之前我们说过，`Object` 是Java中的顶级父类，所有的类都 `直接` / `间接` 继承 `Object类`。
+
+这里 `append` 方法的形参是 `Object`，就表示我们可以把 `任意的对象` 都可以往里面放。
+
+如果没有多态，要往 `StringBuilder` 中添加数据的话，每种类型都要去写一个方法，太麻烦了。
+
+但是现在有了多态了，所有的对象都可以统一的使用这个方法即可，因为它的参数类型是 `Object`。
+
+![image-20240417081433813](./assets/image-20240417081433813.png)
+
+----
+
+### 2）案例2：`ArrayList`
+
+ArrayList（集合）其实也是一个容器，也可以往这个容器里面去添加元素。
+
+我在创建的时候，后面需要加一个泛型，泛型表示元素的类型。
+
+例如下面泛型是 `String` ，表示它只能把字符串类型的往里面添加，其他的就不能添加了。
+
+~~~java
+ArrayList<String> list = new ArrayList<>();
+~~~
+
+但假如集合后面不写泛型呢？
+
+不写泛型就表示现在对添加到集合里面的元素没有任意的限定，即所有的类型都可以往里面添加。
+
+~~~java
+ArrayList list = new ArrayList();
+list.add()
+~~~
+
+如下图，如果没有写泛型，`add` 方法的形参是 `Object` 类型。
+
+一旦是 `Objcet` ，就表示任意类型。
+
+![image-20240417090050724](./assets/image-20240417090050724.png)
+
+----
+
+## 三、多态的弊端
+
+### 1）代码示例
+
+~~~~java
+package com.itheima.a03polymorphismdemo3;
+
+
+public class Test {
+    public static void main(String[] args) {
+        //创建对象
+        Animal a = new Dog();
+        //编译看左边，运行看右边
+        a.eat();
+    }
+}
+
+class Animal{
+    public void eat(){
+        System.out.println("动物在吃东西");
+    }
+}
+
+class Dog extends Animal{
+    @Override
+    public void eat() {
+        System.out.println("狗吃骨头");
+    }
+
+    public void lookHome(){
+        System.out.println("狗看家");
+    }
+}
+
+class Cat extends Animal{
+    @Override
+    public void eat() {
+        System.out.println("猫吃小鱼干");
+    }
+
+    public void catchMouse(){
+        System.out.println("猫抓老鼠");
+    }
+}
+~~~~
+
+多态的弊端：不能调用子类的特有功能（例如`Dog类` 中的 `lookHome()`、`Cat类` 中的 `catchMouse()`。）
+
+
+```java
+//当我使用 `a` 变量去调用 lookHome() 方法时，发现IDEA根本没有 lookHome() 的提示，并且如果强行加上，也会报错！
+//报错的原因？
+//当调用成员方法的时候，编译看左边，运行看右边
+//那么在编译的时候会先检查左边的父类中有没有这个方法，如果没有直接报错。
+//因此在这它发现了，父类中没有 lookHome() 方法，这个时候就会直接报错！
+a.lookHome();
+
+
+
+```
+
+解决方案：把调用者 `a` 变回子类类型就可以了，即强制转换（如果要把一个取值范围大的数值，赋值给取值范围小的变量。是不允许直接赋值的。如果一定要这么做就需要加入强制转换。）
+
+就算忘记怎么强转为子类类型也没关系，可以使用 IDEA 的提示。
+
+点击下面的红色波浪线，<kbd>alt + enter</kbd> 选择第一个：`Cast`：转换，整句话的意思是：将它转换成 `com.itheima.a03polymorphismdemo3` 包中的 `Dog` 类型。
+
+最后回车即可。
+
+![image-20240417091900406](./assets/image-20240417091900406.png)
+
+一旦转化为子类类型后，再用 `d` 去调用，子类的特有功能 `lookHome()` 也就出来了。
+
+![image-20240417092158419](./assets/image-20240417092158419.png)
+
+-----
+
+### 2）细节
+
+转换的时候不能瞎转，如果转成其他类的类型，就会报错。
+
+~~~java
+//例如上面创建对象的时候：Animal a = new Dog();，子类使用的是狗的类型，但是在强转的时候我将它强制为 Cat类。
+//然后用c去调用Cat类特有的catchMouse()方法：
+Cat c = (Cat) a;
+//编译的时候是不会报错的，但是运行的时候会抛出一个异常
+c.catchMouse();
+~~~
+
+遇到异常不要怕，要学会看异常。
+
+`Exception in thread "main"`：异常在 `main方法` 中。
+
+在 `mian方法` 中出现了一个 `java.lang.ClassCastException` 异常，翻译过来就是：类型转化异常。
+
+后面的` class com.itheima.a03polymorphismdemo3.Dog cannot be cast to class com.itheima.a03polymorphismdemo3.Cat (com.itheima.a03polymorphismdemo3.Dog and com.itheima.a03polymorphismdemo3.Cat are in unnamed module of loader 'app')
+	at com.itheima.a03polymorphismdemo3.Test.main(Test.java:34)` ：就是异常的解释说明。
+
+解释说明比较长，但是没关系，我们一个个看。
+
+`com.itheima.a03polymorphismdemo3.Dog`：是一个包名 + 类名。
+
+`class com.itheima.a03polymorphismdemo3.Dog cannot be cast to class com.itheima.a03polymorphismdemo3.Cat` ：`Dog类` 不能被转成 `Cat类`。
+
+`at com.itheima.a03polymorphismdemo3.Test.main(Test.java:34)`：表示这个错误在 `main方法` 的第 22 行。
+
+![image-20240417092755409](./assets/image-20240417092755409.png)
+
+----
+
+### 3）新出现的问题
+
+此时又有新的问题出现了：倘若我也不知道你创建的对象是什么类型，那该怎么办呢？
+
+~~~java
+//此时就可以来做一个if判断，判断a是不是Dog类型 / a是不是Cat类型....
+//Java的类型判断是通过一个关键字来判断类型是否相等：instanceof
+//instanceof 前面是变量名，后面是类名，相当于就是判断，你这个变量所记录的对象是不是Dog类型，如果是，结果为 true，如果不是，结果为 false
+if(a instanceof Dog){
+    Dog d = (Dog) a;
+    d.lookHome();
+}else if(a instanceof Cat){
+    Cat c = (Cat) a;
+    c.catchMouse();
+}else{
+    System.out.println("没有这个类型，无法转换");
+}
+~~~
+
+上面的代码看似是解决问题了，但是每次还是需要先判断再强转，太麻烦了！
+
+因此Java在 `JDK14` 的时候，提出了一个**新特性：将判断与强转两个合在一起，写在一行。**
+
+直接在 `Dog` /  `Cat` 的后面写上一个变量名即可。
+
+~~~java
+//新特性
+//解释：先判断a是否为Dog类型，如果是，则强转成Dog类型，转换之后变量名为d
+//如果不是Dog类型，则不强转，结果直接是false
+if(a instanceof Dog d){
+    d.lookHome();
+}else if(a instanceof Cat c){
+    c.catchMouse();
+}else{
+    System.out.println("没有这个类型，无法转换");
+}
+~~~
+
+-----
+
+## 四、总结
+
+**1、多态的优势**
+
+定义方法的时候，如果使用父类作为形参，那么这个方法可以接收所有子类对象，体现多态的扩展性与便利。
+
+**2、多态的弊端是什么？**
+
+不能使用子类的特有功能。
+
+如果想要强行使用子类的特有功能，可以进行类型转换。
+
+**3、引用数据类型的类型转换，有几种方式？**
+
+引用类型的类型转换其实分为两种：自动类型转换、强制类型转换。
+
+在刚刚，重点学习的是第二种（强制类型转换）。
+
+这里解释一下自动类型转换：例如下面代码，将创建的`子类对象`赋值给`父类类型的变量`，由小变大，这个就是自动类型转换。
+
+~~~java
+Person p = new Student();
+~~~
+
+强制类型转化：将`父类类型的变量`，强转为`子类类型`。
+
+~~~java
+Student s = (Student) p;
+~~~
+
+**4、强制类型转换能解决什么问题？**
+
+可以转换成真正的子类类型，从而调用子类独有功能。
+
+5、面试官问你：多态中如果想要使用子类的特有功能该怎么办？
+
+首先你要说，在多态中，它是不能使用子类的特有功能的；如果你一定要用，我们要做强转。
+
+并且在强转的时候，它有可能会发生 `对象的类型与现在要转的类型不一致`，此时就会抛出异常。
+
+解决办法就是：转换的时候用 `instanceof` 关键字来进行一个判断即可。
+
+
+
+---
+
+# 132.多态的综合练习
+
+## 1）需求
+
+~~~java
+根据需求完成代码:
+	1.定义狗类
+		属性：
+			年龄，颜色
+		行为:
+			eat(String something)(something表示吃的东西)
+			看家lookHome方法(无参数)
+
+	2.定义猫类
+		属性：
+			年龄，颜色
+		行为:
+			eat(String something)方法(something表示吃的东西)
+			逮老鼠catchMouse方法(无参数)
+
+	3.定义Person类 //饲养员
+		属性：
+			姓名，年龄
+		行为：
+			keepPet(Dog dog,String something)方法 // keepPet：饲养动物
+				功能：喂养宠物狗，something表示喂养的东西
+		行为：
+			keepPet(Cat cat,String something)方法
+				功能：喂养宠物猫，something表示喂养的东西
+		生成空参有参构造，set和get方法  
+	4.定义测试类(完成以下打印效果):
+		keepPet(Dog dog,String somethind)方法打印内容如下：
+			年龄为30岁的老王养了一只黑颜色的2岁的狗 // 对饲养员的描述
+			2岁的黑颜色的狗两只前腿死死的抱住骨头猛吃 // 当狗在吃东西的时候的描述
+		keepPet(Cat cat,String somethind)方法打印内容如下：
+			年龄为25岁的老李养了一只灰颜色的3岁的猫
+			3岁的灰颜色的猫眯着眼睛侧着头吃鱼
+	5.思考：		
+		1.Dog和Cat都是Animal的子类，以上案例中针对不同的动物，定义了不同的keepPet方法，过于繁琐，能否简化，并体会简化后的好处？
+		2.Dog和Cat虽然都是Animal的子类，但是都有其特有方法，能否想办法在keepPet中调用特有方法？
+~~~
+
+----
+
+## 2）画图分析
+
+`Person类` 跟这个继承体系是没关系的，它是一个独立的 `JavaBean`。
+
+![image-20240417110518335](./assets/image-20240417110518335.png)
+
+----
+
+## 3）代码示例
+
+### Animal.java
+
+~~~java
+package com.itheima.a04polymorphismdemo4;
+
+public class Animal {
+
+    /*属性：
+    年龄，颜色
+    行为:
+    eat(String something)(something表示吃的东西)*/
+
+
+    private int age;
+    private String color;
+
+
+    public Animal() {
+    }
+
+    public Animal(int age, String color) {
+        this.age = age;
+        this.color = color;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public void eat(String something){
+        System.out.println("动物在吃" + something);
+    }
+}
+~~~
+
+### Dog.java
+
+~~~java
+package com.itheima.a04polymorphismdemo4;
+
+public class Dog extends Animal {
+    /* 1.定义狗类
+    行为:
+    eat(String something)(something表示吃的东西)
+    看家lookHome方法(无参数)*/
+
+
+    //空参构造
+    //带全部参数的构造
+    public Dog() {
+    }
+
+    // 子类不需要再写age、color的get/set方法了，因为父类中已经含有，直接拿过来使用就行了。
+    public Dog(int age, String color) {
+        super(age, color);
+    }
+
+    //行为
+    //eat(String something)(something表示吃的东西)
+    //看家lookHome方法(无参数)
+    @Override
+    public void eat(String something) {
+        // 由于 age、color 都是私有的，如果想要使用，就必须调用父类的 get/set 方法
+        System.out.println(getAge() + "岁的" + getColor() + "颜色的狗两只前腿死死的抱住" + something + "猛吃");
+    }
+
+    public void lookHome(){
+        System.out.println("狗在看家");
+    }
+}
+~~~
+
+### Cat.java
+
+~~~java
+package com.itheima.a04polymorphismdemo4;
+
+public class Cat extends Animal {
+
+    public Cat() {
+    }
+
+    public Cat(int age, String color) {
+        super(age, color);
+    }
+
+
+    /*eat(String something)方法(something表示吃的东西)
+    逮老鼠catchMouse方法(无参数)*/
+
+    @Override
+    public void eat(String something) {
+        System.out.println(getAge() + "岁的" + getColor() + "颜色的猫眯着眼睛侧着头吃" + something);
+    }
+
+    public void catchMouse(){
+        System.out.println("猫抓老鼠");
+    }
+}
+~~~
+
+### Person.java
+
+~~~java
+package com.itheima.a04polymorphismdemo4;
+
+public class Person {
+   /* 属性：
+    姓名，年龄
+    行为：
+    keepPet(Dog dog,String something)方法
+    功能：喂养宠物狗，something表示喂养的东西
+    行为：
+    keepPet(Cat cat,String something)方法
+    功能：喂养宠物猫，something表示喂养的东西
+    生成空参有参构造，set和get方法
+	4.定义测试类(完成以下打印效果):
+    keepPet(Dog dog,String somethind)方法打印内容如下：
+    年龄为30岁的老王养了一只黑颜色的2岁的狗   //对饲养员的描述
+			2岁的黑颜色的狗两只前腿死死的抱住骨头猛吃  //当狗在吃东西的时候的描述
+    keepPet(Cat cat,String somethind)方法打印内容如下：
+    年龄为25岁的老李养了一只灰颜色的3岁的猫
+			3岁的灰颜色的猫眯着眼睛侧着头吃鱼*/
+
+    private String name;
+    private int age;
+
+    public Person() {
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    //饲养狗
+     public void keepPet(Dog dog, String something) {
+        System.out.println("年龄为" + age + "岁的" + name + "养了一只" + dog.getColor() + "颜色的" + dog.getAge() + "岁的狗");
+        dog.eat(something);
+    }
+
+    //饲养猫
+    public void keepPet(Cat cat, String something) {
+        System.out.println("年龄为" + age + "岁的" + name + "养了一只" + cat.getColor() + "颜色的" + cat.getAge() + "岁的猫");
+        cat.eat(something);
+    }
+}
+~~~
+
+### Test.java
+
+~~~java
+package com.itheima.a04polymorphismdemo4;
+
+   /* 根据需求完成代码:
+            1.定义狗类
+    属性：
+    年龄，颜色
+    行为:
+    eat(String something)(something表示吃的东西)
+    看家lookHome方法(无参数)
+
+	2.定义猫类
+    属性：
+    年龄，颜色
+    行为:
+    eat(String something)方法(something表示吃的东西)
+    逮老鼠catchMouse方法(无参数)
+
+	3.定义Person类//饲养员
+    属性：
+    姓名，年龄
+    行为：
+    keepPet(Dog dog,String something)方法
+    功能：喂养宠物狗，something表示喂养的东西
+    行为：
+    keepPet(Cat cat,String something)方法
+    功能：喂养宠物猫，something表示喂养的东西
+    生成空参有参构造，set和get方法
+	4.定义测试类(完成以下打印效果):
+    keepPet(Dog dog,String somethind)方法打印内容如下：
+            年龄为30岁的老王养了一只黑颜色的2岁的狗   //对饲养员的描述
+			2岁的黑颜色的狗两只前腿死死的抱住骨头猛吃  //当狗在吃东西的时候的描述
+    keepPet(Cat cat,String somethind)方法打印内容如下：
+            年龄为25岁的老李养了一只灰颜色的3岁的猫
+			3岁的灰颜色的猫眯着眼睛侧着头吃鱼
+	5.思考：
+            1.Dog和Cat都是Animal的子类，以上案例中针对不同的动物，定义了不同的keepPet方法，过于繁琐，能否简化，并体会简化后的好处？
+            2.Dog和Cat虽然都是Animal的子类，但是都有其特有方法，能否想办法在keepPet中调用特有方法？*/
+
+public class Test {
+    public static void main(String[] args) {
+        //创建对象并调用方法
+        Person p1 = new Person("老王",30);
+        Dog d = new Dog(2,"黑");
+        p1.keepPet(d,"骨头");
+
+
+        Person p2 = new Person("老李",25);
+        Cat c = new Cat(3,"灰");
+        p2.keepPet(c,"鱼");
+
+
+
+        //创建饲养员的对象
+        Person p = new Person("老王",30);
+        Dog d = new Dog(2,"黑");
+        Cat c = new Cat(3,"灰");
+        p.keepPet(d,"骨头");
+        p.keepPet(c,"鱼");
+    }
+}
+~~~
+
+## 4）改进
+
+~~~java
+//想要一个方法，能接收所有的动物，包括猫，包括狗
+//方法的形参：可以写这些类的父类 Animal
+public void keepPet(Animal a, String something) {
+    if(a instanceof Dog d){
+        System.out.println("年龄为" + age + "岁的" + name + "养了一只" + a.getColor() + "颜色的" + a.getAge() + "岁的狗");
+        d.eat(something);
+    }else if(a instanceof Cat c){
+        System.out.println("年龄为" + age + "岁的" + name + "养了一只" + c.getColor() + "颜色的" + c.getAge() + "岁的猫");
+        c.eat(something);
+    }else{
+        System.out.println("没有这种动物");
+    }
+}
+~~~
+
+
+
+-----
+
+# 133.包 
+
+## 一、什么是包？
+
+之前学习IDEA的时候曾经说过，包在操作系统中其实就是一个文件夹。用来管理各种不同功能的Java类，方便管理和维护。
+
+在IDEA项目中，建包的操作如下：
+
+![](./assets/aaa.jpg)
+
+**包名的命令规则**：公司域名反写 + 包的作用，需要全部英文小写，见名知意
+
+```java
+com.itheima.domain //domain表示这个包以后装的都是类似于Student、Teacher这些JavaBean类。
+```
+
+- 包名一般是公司域名的倒写。例如：黑马是www.itheima.com,包名就可以定义成com.itheima.技术名称。
+- 包名必须用”.“连接。
+- 包名的每个路径名必须是一个合法的标识符，而且不能是Java的关键字。
+
+## 2.2 导包
+
+什么时候需要导包？
+
+​	情况一：在使用Java中提供的非核心包中的类时
+
+​	情况二：使用自己写的其他包中的类时
+
+什么时候不需要导包？
+
+​	情况一：在使用Java核心包（java.lang）中的类时
+
+​	情况二：在使用自己写的同一个包中的类时
+
+## 2.3 使用不同包下的相同类怎么办？
+
+假设demo1和demo2中都有一个Student该如何使用？
+
+代码示例：
+
+```java
+//使用全类名的形式即可。
+//全类名：包名 + 类名
+//拷贝全类名的快捷键：选中类名crtl + shift + alt + c 或者用鼠标点copy，再点击copy Reference
+com.itheima.homework.demo1.Student s1 = new com.itheima.homework.demo1.Student();
+com.itheima.homework.demo2.Student s2 = new com.itheima.homework.demo2.Student();
+```
+
+# 第三章 权限修饰符
+
+## 3.1 权限修饰符
+
+​	在Java中提供了四种访问权限，使用不同的访问权限修饰符修饰时，被修饰的内容会有不同的访问权限，我们之前已经学习过了public 和 private，接下来我们研究一下protected和默认修饰符的作用。
+
+- public：公共的，所有地方都可以访问。
+
+- protected：本类 ，本包，其他包中的子类都可以访问。
+
+- 默认（没有修饰符）：本类 ，本包可以访问。
+
+  注意：默认是空着不写，不是default
+
+- private：私有的，当前类可以访问。
+  `public > protected > 默认 > private`
+
+## 3.2 不同权限的访问能力
+
+|                  | public | protected | 默认 | private |
+| ---------------- | ------ | --------- | ---- | ------- |
+| 同一类中         | √      | √         | √    | √       |
+| 同一包中的类     | √      | √         | √    |         |
+| 不同包的子类     | √      | √         |      |         |
+| 不同包中的无关类 | √      |           |      |         |
+
+可见，public具有最大权限。private则是最小权限。
+
+编写代码时，如果没有特殊的考虑，建议这样使用权限：
+
+- 成员变量使用`private` ，隐藏细节。
+- 构造方法使用` public` ，方便创建对象。
+- 成员方法使用`public` ，方便调用方法。
+
+> 小贴士：不加权限修饰符，就是默认权限
+
+# 第四章 final关键字
+
+## 4.1 概述
+
+​	学习了继承后，我们知道，子类可以在父类的基础上改写父类内容，比如，方法重写。
+
+如果有一个方法我不想别人去改写里面内容，该怎么办呢？
+
+Java提供了`final` 关键字，表示修饰的内容不可变。
+
+- **final**：  不可改变，最终的含义。可以用于修饰类、方法和变量。
+  - 类：被修饰的类，不能被继承。
+  - 方法：被修饰的方法，不能被重写。
+  - 变量：被修饰的变量，有且仅能被赋值一次。
+
+## 4.2 使用方式
+
+### 4.2.1 修饰类
+
+final修饰的类，不能被继承。
+
+格式如下：
+
+```java
+final class 类名 {
+}
+```
+
+代码:
+
+```java
+final class Fu {
+}
+// class Zi extends Fu {} // 报错,不能继承final的类
+```
+
+查询API发现像 `public final class String` 、`public final class Math` 、`public final class Scanner` 等，很多我们学习过的类，都是被final修饰的，目的就是供我们使用，而不让我们所以改变其内容。
+
+### 4.2.2 修饰方法
+
+final修饰的方法，不能被重写。
+格式如下：
+
+```java
+修饰符 final 返回值类型 方法名(参数列表){
+    //方法体
+}
+```
+
+代码: 
+
+```java
+class Fu2 {
+	final public void show1() {
+		System.out.println("Fu2 show1");
+	}
+	public void show2() {
+		System.out.println("Fu2 show2");
+	}
+}
+
+class Zi2 extends Fu2 {
+//	@Override
+//	public void show1() {
+//		System.out.println("Zi2 show1");
+//	}
+	@Override
+	public void show2() {
+		System.out.println("Zi2 show2");
+	}
+}
+```
+
+### 4.2.3 修饰变量-局部变量
+
+1. **局部变量——基本类型**
+   基本类型的局部变量，被final修饰后，只能赋值一次，不能再更改。代码如下：
+
+```java
+public class FinalDemo1 {
+    public static void main(String[] args) {
+        // 声明变量，使用final修饰
+        final int a;
+        // 第一次赋值 
+        a = 10;
+        // 第二次赋值
+        a = 20; // 报错,不可重新赋值
+
+        // 声明变量，直接赋值，使用final修饰
+        final int b = 10;
+        // 第二次赋值
+        b = 20; // 报错,不可重新赋值
+    }
+}
+```
+
+思考，下面两种写法，哪种可以通过编译？
+
+写法1：
+
+```java
+final int c = 0;
+for (int i = 0; i < 10; i++) {
+    c = i;
+    System.out.println(c);
+}
+```
+
+写法2：
+
+```java
+for (int i = 0; i < 10; i++) {
+    final int c = i;
+    System.out.println(c);
+}
+```
+
+根据 `final` 的定义，写法1报错！写法2，为什么通过编译呢？因为每次循环，都是一次新的变量c。这也是大家需要注意的地方。
+
+### 4.2.4 修饰变量-成员变量
+
+成员变量涉及到初始化的问题，初始化方式有显示初始化和构造方法初始化，只能选择其中一个：
+
+- 显示初始化(在定义成员变量的时候立马赋值)（常用）；
+
+```java
+public class Student {
+    final int num = 10;
+}
+```
+
+- 构造方法初始化(在构造方法中赋值一次)（不常用，了解即可）。
+
+  **注意：每个构造方法中都要赋值一次！**
+
+```java
+public class Student {
+    final int num = 10;
+    final int num2;
+
+    public Student() {
+        this.num2 = 20;
+//     this.num2 = 20;
+    }
+    
+     public Student(String name) {
+        this.num2 = 20;
+//     this.num2 = 20;
+    }
+}
+```
+
+> 被final修饰的常量名称，一般都有书写规范，所有字母都**大写**。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
