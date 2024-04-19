@@ -10119,7 +10119,7 @@ public class GirlFriend {
 
 > 这里的 `初始化` 是一个专业名字，其实就是赋值的意思。
 >
-> 因此构造方法简单理解，就是在创建对象的时候给成员变量进行赋值的。
+> 因此构造方法简单理解：就是在创建对象的时候给成员变量进行赋值的。
 
 在以前的代码中，小括号中都是空着的，什么也不写。此时就表示我们调用的是空参的构造方法。
 
@@ -13801,9 +13801,11 @@ String s6 = s1 + s2 + s3 + s4 + s5;
 
 **代码示例**
 
-PS：在Java中起名字的时候会有个小习惯，如果变量名不知道起什么，就可以用类型的首字母来做变量名。而 `StringBuilder` 类型是两个单词，第一个单词首字母是 `s`，第二个单词首字母是 `b`，所以合起来就是 `sb`。同样我们也可以通过查阅 `API帮助文档`，看看它上的示例命名是什么。
+PS：在Java中起名字的时候会有个小习惯，如果变量名不知道起什么，就可以用类型的首字母来做变量名。而 `StringBuilder` 类型是两个单词，第一个单词首字母是 `s`，第二个单词首字母是 `b`，所以合起来就是 `sb`。同样我们也可以通过查阅 `API帮助文档`，看看它上面的示例命名是什么，可以发现，也是 `sb。
 
 ![image-20240408152453115](./assets/image-20240408152453115.png)
+
+----
 
 下述代码很奇怪，`sb` 是 `new` 出来的对象，我打印一个对象应该是地址值才对，为什么这里什么都没有。
 
@@ -21635,7 +21637,7 @@ class Zi extends Fu{
 
 - 如果是多个单词：也是全部大写，单词与单词直接，需要使用 `下划线` 将单词分隔开。
 
-  PS：之前在给变量起名的时候，不建议使用 `下划线`，这是因为 `下划线` 是给 `常量` 使用的。
+  PS：之前在给变量起名的时候，不建议使用 `下划线`，这是因为 `下划线` 是给 `常量` 使用的，而 `$` 是给 `内部类` 使用的。
   
   <img src="./assets/image-20240418213838474.png" alt="image-20240418213838474" style="zoom: 67%;" />
 
@@ -22832,9 +22834,9 @@ public class 类名 extends 父类 implements 接口名1, 接口名2{}
 
 ----
 
-## 2）代码实现
+### 2）代码实现
 
-### Animal.java
+#### Animal.java
 
 ~~~java
 package com.itheima.a01interfacedemo1;
@@ -22860,7 +22862,7 @@ public abstract class Animal {
 
 ----
 
-### Swim.java
+#### Swim.java
 
 注意，新建接口的时候，需要选择下面的 `Interface`。
 
@@ -22881,7 +22883,7 @@ public interface Swim {
 
 ----
 
-### Rubbit.java
+#### Rubbit.java
 
 由于兔子是不会游泳的，因此它只需要继承 `Animal类` 即可，不需要去实现游泳接口。
 
@@ -22906,7 +22908,7 @@ public class Rabbit extends Animal{
 
 ----
 
-### Frog.java
+#### Frog.java
 
 此时青蛙是继承了一个抽象类，并且实现了一个 `Swim` 接口，此时它就要去重写所有的抽象方法。
 
@@ -22945,7 +22947,7 @@ public class Frog extends Animal implements Swim{
 
 ----
 
-### Dog.java
+#### Dog.java
 
 ~~~java
 package com.itheima.a01interfacedemo1;
@@ -22973,7 +22975,7 @@ public class Dog extends Animal implements Swim{
 
 ----
 
-### Test.java
+#### Test.java
 
 ~~~java
 package com.itheima.a01interfacedemo1;
@@ -26570,9 +26572,9 @@ Java语言主要是做后台服务器开发的。
 
 -----
 
-## 七、练习：创建主页面1
+# 创建主页面1
 
-### 1）需求
+## 一、需求
 
 到IDEA中创建一个宽603像素，高680像素的游戏主界面（也就是那个窗口）
 
@@ -26598,7 +26600,7 @@ Java语言主要是做后台服务器开发的。
 
 -----
 
-### 2）代码实现
+## 二、代码实现
 
 新建模块 `puzzlegame`，现在将会带着大家一点一点的，从0开始写这个拼图游戏。
 
@@ -26673,11 +26675,11 @@ registerJframe.setVisible(true);
 
 右键Run运行来看下效果，此时会发现，三个页面都出现了。
 
-<img src="./assets/image-20240419164812657.png" alt="image-20240419164812657" style="zoom:50%;" />
+<img src="./assets/image-20240419191418338.png" alt="image-20240419191418338" style="zoom:50%;" />
 
 ----
 
-### 3）理解代码
+## 三、理解代码
 
 这些代码写完后，跟大家解释一下，这些代码我们该如何去理解。
 
@@ -26691,7 +26693,7 @@ JFrame gameJframe = new JFrame();
 
 ----
 
-#### ① 查看属性
+### ① 查看属性
 
 这里可以带大家简单的阅读一下源码：选中 `JFrame`，<kbd>ctrl + b</kbd> 跟进。
 
@@ -26731,7 +26733,7 @@ JFrame gameJframe = new JFrame();
 
 ----
 
-#### ② 查看行为
+### ② 查看行为
 
 选中 `setVisible()` <kbd>ctrl + b</kbd> 跟进，你会发现，它就是 `Window类` 中的。
 
@@ -26757,7 +26759,7 @@ JFrame gameJframe = new JFrame();
 
 ----
 
-#### ③ 扩展
+### ③ 扩展
 
 其实我们自己在代码中也是可以直接调用 `show()` 方法的。
 
@@ -26775,7 +26777,7 @@ JFrame gameJframe = new JFrame();
 
 ----
 
-### 4）引出问题
+## 四、引出问题
 
 继续往下，我们要来继续思考了，你觉得我的代码写成这样就可以了吗？三个界面全都把它写在 `main方法` 中吗？这样肯定不好。
 
@@ -26801,7 +26803,9 @@ JFrame gameJframe = new JFrame();
 
 ----
 
-### 5）优化
+## 五、优化
+
+### 1）解决代码集中问题
 
 在这我就不会将所有的代码都写在 `main方法` 里面了，因为在以后实际开发中，`main方法` 里面一般来讲，它是作为程序的启动入口，一般是不会写什么业务逻辑代码的。
 
@@ -26811,7 +26815,7 @@ JFrame gameJframe = new JFrame();
 
 接下来回到我们自己的模块当中，新建 `GameJFrame类`，利用这个类去 `extends JFrame` ，注意！这个动作很关键！
 
-在Java中，`JFrame` 表示一个界面 / 窗体，那它的子类呢？它的子类应该也表示界面 / 窗体。
+**在Java中，`JFrame` 表示一个界面 / 窗体，那它的子类呢？它的子类应该也表示界面 / 窗体。**
 
 现在我们就规定：`GameJFrame` 这个界面表示的就是游戏的主界面，那么在以后，跟游戏相关的所有逻辑都写在这个类中。
 
@@ -26821,9 +26825,6 @@ package com.itheima.ui;
 import javax.swing.*;
 
 public class GameJFrame extends JFrame {
-    //JFrame 界面，窗体
-    //子类呢？也表示界面，窗体
-    //规定：GameJFrame这个界面表示的就是游戏的主界面
     //以后跟游戏相关的所有逻辑都写在这个类中
 }
 ~~~
@@ -26891,6 +26892,10 @@ public class App {
 
 但是在这会有一个小问题：在 `LoginJFrame` 这个界面中它并没有宽高，默认都是隐藏的，那那些设置我可以写在哪呢？
 
+----
+
+### 2）解决初始化问题
+
 此时我们就可以在这个里面写一个构造方法。
 
 我的需求是：在创建登录界面的时候，同时给这个界面去设置一些信息，例如：宽、高、直接展示。
@@ -26898,6 +26903,8 @@ public class App {
 我们可以直接将刚刚 Test类 中的代码复制粘贴到这个构造方法中。
 
 然后再将前面的调用者改为 `this`，这个 `this` 就表示调用者的地址值。
+
+当然这里的 `this` 也可以省略不写，如果不写的话，它就会先到局部位置找，如果局部位置没找到，就会去成员位置找，如果成员位置没找到，就会到父类中找，一层一层往上找。
 
 ~~~java
 package com.itheima.ui;
@@ -26912,139 +26919,662 @@ public class LoginJFrame {
 }
 ~~~
 
-如果你不理解，没关系，带着你再来看一遍。
+如果你不理解，没关系，带着你再来看一遍代码。
 
+此时我创建了一个登录界面，小括号中什么都没写，相当于就是在这里使用了空参构造。
 
+在构造方法中有一个 `this`，`this` 就表示当前对象的地址值，因此 `this` 表示的就是左边创建的对象 `new LoginJFrame()`，这个对象就是一个界面，因为它继承了 `JFrame类`
 
+`this.setSize(488, 430)`：给这个界面去设置宽、高。
 
+`this.setVisible(true)`：给这个界面显示出来。
 
+![image-20240419184544179](./assets/image-20240419184544179.png)
 
+这个思想就是我们之前讲过的：构造方法就是在创建对象的时候用来初始化的。
 
+在这里就是：创建登录界面的时候，我们可以给这里的 `宽、高、是否显示出来` 进行初始化。
 
+同样的道理，我们可以给 `GameJFrame类`、`RegisterFrame类` 也来做一个初始化。
 
+**GameJFrame.java**
 
+~~~java
+public class GameJFrame extends JFrame {
+    //规定：GameJFrame这个界面表示的就是游戏的主界面
+    //以后跟游戏相关的所有逻辑都写在这个类中
+    public GameJFrame() {
+        this.setSize(603, 680);
+        this.setVisible(true);
+    }
+}
+~~~
 
+**RegisterJFrame.java**
 
+~~~java
+public class RegisterJFrame extends JFrame {
+    //跟注册相关的代码，都写在这个界面中
+    public RegisterJFrame() {
+        this.setSize(488, 500);
+        this.setVisible(true);
+    }
+}
+~~~
 
+现在我们的代码就用继承改写完毕了，此时 `Test.java` 对我们来讲已经没有用了，我们就可以把它右键删掉
 
+<img src="./assets/image-20240419191242936.png" alt="image-20240419191242936" style="zoom:67%;" />
 
+在以后如果我们想要启动的时候，直接在 `App` 这里面启动就行了。
 
+例如我现在想要将三个界面都打开，那我们就可以这样做：
 
+~~~java
+public class App {
+    public static void main(String[] args) {
+        //表示程序的启动入口
+        //如果我们想要开启一个界面，就创建谁的对象就可以了
+        new LoginJFrame();
+        new RegisterJFrame();
+        new GameJFrame();
+    }
+}
+~~~
 
+然后右键运行，可以看到三个界面都出来了。
 
+<img src="./assets/image-20240419191433697.png" alt="image-20240419191433697" style="zoom:67%;" />
 
+程序的效果跟之前是一模一样的，但是现在，我们就使用继承对它做了一个改写。
 
+改写的好处：将三个界面分开了。
 
 
 
+----
 
+# 145.创建主页面2
 
+## 一、问题一
 
+我们刚刚已经创建了三个主页面，并且用继承做了一个改写。
 
+用继承改写之后的好处就是：将代码分类。
 
+<img src="./assets/image-20240419191815422.png" alt="image-20240419191815422" style="zoom:67%;" />
 
+写完了之后，其实我们还有一些小问题：这些设置其实我们还没有弄完。
 
+我们以游戏的主页面为例，左上角有这种标题；除此之外，我还想让这个软件置顶，能盖住其他所有的软件，这些东西其实也都是一些 `set设置方法` 。
 
+<img src="./assets/image-20240419192013252.png" alt="image-20240419192013252" style="zoom:67%;" />
 
+----
 
+## 二、解决问题一
 
+找到 `GameJFrame类(游戏的主界面)`，我们来对它做一个设置。
 
+在设置的同时，顺便也给代码加上注释。
 
+**GameJFrame.java**
 
+~~~java
+public class GameJFrame extends JFrame {
+    //规定：GameJFrame这个界面表示的就是游戏的主界面
+    //以后跟游戏相关的所有逻辑都写在这个类中
+    public GameJFrame() {
+        // 设置界面的宽高
+        this.setSize(603, 680);
+        // 设置界面的标题
+        this.setTitle("拼图单机版 v1.0");
+        // 设置界面置顶，setAlwaysOnTop：一直处在最上方
+        // ctrl + p：可以看见需要传入一个boolean类型的参数，传入true之后，它会盖住所有的软件
+        this.setAlwaysOnTop(true);
+        // 让界面显示出来，这行代码我们建议写在最后
+        this.setVisible(true);
+    }
+}
+~~~
 
+补充完后，打开 `App.java`，先注释掉登录、注册，然后重新运行代码。
 
+<img src="./assets/image-20240419192545310.png" alt="image-20240419192545310" style="zoom:67%;" />
 
+运行完毕，可以看见左上角的标题已经有了，并且当我点击其他软件时，它也会一直固定在最上面。
 
+![image-20240419192807334](./assets/image-20240419192807334.png)
 
+但当我注释掉 `this.setAlwaysOnTop(true);` 的时候，点击IDEA，可以看见IDEA会把游戏的界面盖住。
 
+<img src="./assets/image-20240419192932936.png" alt="image-20240419192932936" style="zoom:67%;" />
 
+因此这个置顶也是需要设置的。
 
+----
 
+## 三、问题二
 
+每次程序运行的时候，界面都在屏幕的左上角。
 
+需求：在重新运行的时候，让界面打开的时候它处于屏幕的正中央。
 
+它也是一个 `set方法`，在括号中传递 `null` 即可。
 
+![image-20240419193156522](./assets/image-20240419193156522.png)
 
+~~~java
+// 设置界面居中
+this.setLocationRelativeTo(null);
+~~~
 
+重新运行，当界面打开的时候可以发现它是居中的了。
 
+![image-20240419193328739](./assets/image-20240419193328739.png)
 
+----
 
+## 四、问题三
 
+### 1）解决问题
 
+当我点击左上角的 `关闭按钮` 时，可以发现控制台这里，程序并没有停止，因为红色的灯，它没有灭。
 
+![image-20240419193431443](./assets/image-20240419193431443.png)
 
+但是我想当我把游戏关闭后，程序也随之停止，虚拟机直接结束，此时我们就需要去设置 `游戏的关闭模式`，这个也是一个 `set方法`。
 
+~~~java
+// 设置关闭模式，setDefaultCloseOperation：设置默认的关闭方式
+// 括号中写的数字3
+this.setDefaultCloseOperation(3);
+~~~
 
+重新运行程序，可以看到，当点击左上角的 `关闭按钮` 时，虚拟机也跟着一起关了，这个就是关闭模式。
 
+![yoceg-k61ux](./assets/yoceg-k61ux.gif)
 
+那么这个关闭默认为什么是 `3` 呢？其实也是有说法的，我们可以将 `3` 删掉，然后 <kbd>ctrl + p</kbd>，可以看见参数是一个 `int类型`，也就表示每个数字都是一种关闭模式，那这种关闭模式到底有几种呢？
 
+此时我们就可以选中 `setDefaultCloseOperation()` ，<kbd>ctrl + b</kbd> 跟进，看下源码。
 
+可以发现它有很多种这种模式。
 
+![image-20240419194622870](./assets/image-20240419194622870.png)
 
+然后随便选中一种模式，<kbd>ctrl + b</kbd> 跟进，可以看见，这些模式都定义在一个接口当中。
 
+![image-20240419194718154](./assets/image-20240419194718154.png)
 
+之前讲接口的时候，我们曾经说过：接口是一种规则，现在它就是把这些状态，定义在了接口当中。
 
+它一共有四种状态。
 
+首先下载一个翻译插件：`Translation`，它支持源码翻译，下载好后重启IDEA即可。
 
+![image-20240419195435827](./assets/image-20240419195435827.png)
 
+然后选中我们需要翻译的语句，右击，选择 `Translate Documentation`
 
+<img src="./assets/image-20240419195622304.png" alt="image-20240419195622304" style="zoom:67%;" />
 
+此时它就会把翻译结果直接给你写出来
 
+![image-20240419195713350](./assets/image-20240419195713350.png)
 
+按照上述操作，逐一翻译。
 
+`状态2` 它解释起来有点拗口，会涉及到后面的知识点，大概的意思就是说：当你开启多个界面后，只有关闭最后一个界面，这个虚拟机才会停止。
 
+`状态3` 的意思就是：只要你关闭了一个界面，那么整个虚拟机就会停止。
 
+~~~java
+// 不执行任何操作的默认窗口关闭操作。
+public static final int DO_NOTHING_ON_CLOSE = 0;
+// hide-window 默认窗口关闭操作
+public static final int HIDE_ON_CLOSE = 1;
+// dispose-window 默认窗口关闭操作。
+// 注： 当 Java 虚拟机 （VM） 中的最后一个可显示窗口被释放时，VM 可能会终止。有关详细信息，请参阅 AWT 线程问题 。
+// 另请参见：
+// java.awt.Window.dispose(), JInternalFrame.dispose()
+public static final int DISPOSE_ON_CLOSE = 2;
+// 退出应用程序默认窗口关闭操作。尝试在支持此功能的 Windows 上设置此项（例如 JFrame）可能会抛SecurityManager出SecurityException基于 .建议您仅在应用程序中使用它。
+// 因为：
+// 1.4
+// 另请参见：
+// JFrame.setDefaultCloseOperation
+public static final int EXIT_ON_CLOSE = 3;
+~~~
 
+因此在括号中，我们就可以去写这几种状态。
 
+但是有个小问题：时间长了，这些数字我记不住，因此它就使用了 `public static final` 所修饰的 `常量` 给你来替代，看到这些常量名，你就能猜到它大概的意思了。因此这里的常量名只是有见名知意的效果。
 
+因此我们可以把它来做一个截图，然后回到 `GameJFrame类` 中，在刚刚设置关闭模式的代码中，不写数字 `3`了，而是直接使用接口中的常量。
 
+![image-20240419201113903](./assets/image-20240419201113903.png)
 
+----
 
+### 2）对每个状态做一个分析
 
+#### ① 0 —— WindowConstants.DISPOSE_ON_CLOSE
 
+`DO_NOTHING_ON_CLOSE`：当我们点击 `X` 的时候，它什么事都不做。
 
+DO_NOTHING(不做任何事情)_ON_CLOSE(在关闭的时候)。
 
+效果如下图，当我点击关闭的时候，是没有任何反应的。
 
+![1mejl-mbzlq](./assets/1mejl-mbzlq.gif)
 
+----
 
+#### ② 1 —— HIDE_ON_CLOSE
 
+`HIDE_ON_CLOSE`：这个是默认的，如果你不设置关闭模式，那么默认就是 `HIDE_ON_CLOSE`，即 `1`。
 
+----
 
+#### ③ 2 —— DISPOSE_ON_CLOSE
 
+`DISPOSE_ON_CLOSE`：表示如果你有多个界面，只有在你关闭最后一个界面的时候，它才会把整个虚拟机关闭。
 
+但是这个模式有个小问题：就是你所有的界面都需要设置这个值，它才会生效。
 
+例如我现在将三个类都设置为这个模式
 
+<img src="./assets/image-20240419202307383.png" alt="image-20240419202307383" style="zoom:67%;" />
 
+然后在 `App` 中同时打开三个界面运行。
 
+<img src="./assets/image-20240419202401867.png" alt="image-20240419202401867" style="zoom:67%;" />
 
+效果：关闭三个窗口后，虚拟机自动停止。
 
+----
 
+#### ④ 3 —— EXIT_ON_CLOSE
 
+`EXIT_ON_CLOSE`：表示只要关闭其中一个，虚拟机就会结束。也就是数字 `3`。
 
+先将三个类的关闭模式都设置为 `EXIT_ON_CLOSE`。
 
+<img src="./assets/image-20240419203952763.png" alt="image-20240419203952763" style="zoom:67%;" />
 
+然后运行程序，效果如下图所示，关闭其中一个窗口，虚拟机就跟着关闭了。
 
+![izo3t-1e10s](./assets/izo3t-1e10s.gif)
 
+----
 
+### 3）问题：不应该是2才更合适吗
 
+如果有问问出这个问题，说明你思考了，没有问题。
 
+但是要注意，我们写的这三个界面，我们并不会让它同时出现：在程序一开始启动的时候，是登录界面；当跳转到游戏主界面的时候，登录界面就会被隐藏 / 关掉。
 
+因此在游戏中，同时出现的只有一个界面。因此这里选择的就是 `3`，即 `indowConstants.EXIT_ON_CLOSE`。
 
+这个设置任然需要在三个类中都设置。
 
+----
 
+### 4）完善代码
 
+与此同时，我们将 `GameJFrame类` 中新增的设置都复制到 `LoginJFrame类` 和 `RegisterJFrame类` 中，最后将每个界面的标题修改一下即可。
 
+**LoginJFrame.java**
 
+~~~java
+package com.itheima.ui;
+import javax.swing.*;
 
+public class LoginJFrame extends JFrame {
+    //LoginJFrame 表示登录界面
+    //以后所有跟登录相关的代码，都写在这里
+    public LoginJFrame(){
+        // 设置界面的宽高
+        this.setSize(488, 430);
+        // 设置界面的标题
+        this.setTitle("拼图 登录");
+        // 设置界面置顶，setAlwaysOnTop：一直处在最上方
+        // ctrl + p：可以看见需要传入一个boolean类型的参数，传入true之后，它会盖住所有的软件
+        this.setAlwaysOnTop(true);
+        // 设置界面居中
+        this.setLocationRelativeTo(null);
+        // 设置关闭模式，setDefaultCloseOperation：设置默认的关闭方式
+        // 括号中写的数字3
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        // 让界面显示出来，这行代码我们建议写在最后
+        this.setVisible(true);
+    }
+}
+~~~
 
+**RegisterJFrame.java**
 
+~~~java
+package com.itheima.ui;
 
+import javax.swing.*;
 
+public class RegisterJFrame extends JFrame {
+    //跟注册相关的代码，都写在这个界面中
+    public RegisterJFrame() {
+        // 设置界面的宽高
+        this.setSize(488, 500);
+        // 设置界面的标题
+        this.setTitle("拼图 注册");
+        // 设置界面置顶，setAlwaysOnTop：一直处在最上方
+        // ctrl + p：可以看见需要传入一个boolean类型的参数，传入true之后，它会盖住所有的软件
+        this.setAlwaysOnTop(true);
+        // 设置界面居中
+        this.setLocationRelativeTo(null);
+        // 设置关闭模式，setDefaultCloseOperation：设置默认的关闭方式
+        // 括号中写的数字3
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        // 让界面显示出来，这行代码我们建议写在最后
+        this.setVisible(true);
+    }
+}
+~~~
 
+然后回到 `App.java` 中同时打开三个界面，观察效果：三个界面都已经置顶，并且左上角的标题也都修改成功了。
 
+并且当我任意关闭一个窗口之后，整个虚拟机就直接结束了。
 
+![image-20240419205300250](./assets/image-20240419205300250.png)
 
+----
 
+# 菜单制作
+
+## 一、介绍
+
+本节内容就是在游戏窗口的上方，去添加菜单。
+
+![image-20240419205521674](./assets/image-20240419205521674.png)
+
+要创建菜单，那就要先去创建菜单的对象。在Java中有一个类，它是用来专门描述菜单的：`JMenuBar(Java Menu Bar)`。
+
+但是光有 `JMenuBar` 这一个类还不行，因为 `JMenuBar` 表示的是这一整个菜单，即我现在红色框起来的这一部分。
+
+<img src="./assets/image-20240419205752990.png" alt="image-20240419205752990" style="zoom:67%;" />
+
+在菜单中，它还会有很多的选项，每一个选项都对应着一个 `JMenu` 的类，例如：功能、联系我们、充值入口。。。
+
+现在在菜单中有三个选项，因此在代码中，我就需要创建三个 `JMenu` 的对象。
+
+![image-20240419205943262](./assets/image-20240419205943262.png)
+
+现在我以第一个 `功能` 选项为例，当我点击功能选项，下面它还会有多个下拉框，这里它会有很多个选择，每个选择都是独立的 `JMenueItem` 的对象，这里的 `Item` 就可以把它理解成 `条目` 的意思。因此我们也可以把下拉框中的`每一个选择`称之为`每一个条目`。
+
+此时这个菜单的接口，就有一点点的难度了。
+
+<img src="./assets/image-20240419210226917.png" alt="image-20240419210226917" style="zoom:67%;" />
+
+----
+
+## 二、制作步骤
+
+1、先创建 `JMenuBar` 的对象
+
+2、再创建 `JMnue` 的对象
+
+3、再创建 `JMenuItem` 的对象
+
+<img src="./assets/image-20240419210429249.png" alt="image-20240419210429249" style="zoom:67%;" />
+
+但是这三个对象创建出来后，它们之间是互相独立的。
+
+4、因此，我们还需要将 `JMenuItem` 放到 `JMenu` 里面
+
+5、再把 `JMenue` 放到 `JMenuBar` 中
+
+6、最后把整个菜单 `JMenuBar` 添加到 `JFrame` 界面中
+
+----
+
+## 三、代码实现
+
+先来看一下最终效果，其中 `更换图片` 的代码比较复杂，我们写不写，等后面写到业务逻辑的时候，再去补全。
+
+![image-20240419210949312](./assets/image-20240419210949312.png)
+
+然后找到 `GameJFrame类`，当我们创建这个类对象的时候，会调用它的空参构造，首先一开始，它会对整个界面来做一个设置，设置完成后，再去让它设置菜单，因此我们应该将设置菜单的代码写在如下图箭头位置。
+
+![image-20240419211243386](./assets/image-20240419211243386.png)
+
+等菜单初始化完毕后，再去调用 `setVisible()` 把整个界面展示出来，因此展示界面的代码，我们一定要放到最后面。
+
+**GameJFrame.java**
+
+下面代码只需要从 `初始化菜单(第23行)` 开始看即可，其他的都是之前写过的
+
+~~~java
+package com.itheima.ui;
+
+import javax.swing.*;
+
+public class GameJFrame extends JFrame {
+    //规定：GameJFrame这个界面表示的就是游戏的主界面
+    //以后跟游戏相关的所有逻辑都写在这个类中
+    public GameJFrame() {
+        // 设置界面的宽高
+        this.setSize(603, 680);
+        // 设置界面的标题
+        this.setTitle("拼图单机版 v1.0");
+        // 设置界面置顶，setAlwaysOnTop：一直处在最上方
+        // ctrl + p：可以看见需要传入一个boolean类型的参数，传入true之后，它会盖住所有的软件
+        this.setAlwaysOnTop(true);
+        // 设置界面居中
+        this.setLocationRelativeTo(null);
+        // 设置关闭模式，setDefaultCloseOperation：设置默认的关闭方式
+        // 括号中写的数字3
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+
+        // 初始化菜单
+        // 1.创建整个菜单对象 JMenuBar
+        JMenuBar jMenuBar = new JMenuBar();
+
+        // 2.创建菜单上面两个选项的对象（功能、关于我们） JMenu
+        JMenu functionJMenu = new JMenu("功能"); // 将要展示的文字放在小括号中，表示调用它的有参构造。
+        // 快捷键 ctrl + d ：向下复制一行
+        JMenu aboutJMenu = new JMenu("关于我们");
+
+        // 3.创建选项下面的条目对象（功能：重新游戏、重新登陆、关闭游戏；关于我们：公众号），合起来一共四个 JMenuItem 对象
+        JMenuItem replayItem = new JMenuItem("重新游戏"); // 同样也是调用它的有参构造设置展示文字
+        // 快捷键 ctrl + d ：向下复制一行
+        JMenuItem reLoginItem = new JMenuItem("重新登录");
+        JMenuItem closeItem = new JMenuItem("关闭游戏");
+
+        // 由于前三个是一组，最后一个公众号是一组，因此我们在写代码的时候打一个空行，提高阅读性
+        JMenuItem accountItem = new JMenuItem("公众号");
+
+        // 4.将每一个选项下面的条目添加到选项中：调用JMenu对象的add方法
+        functionJMenu.add(replayItem);
+        // 快捷键 ctrl + d ：向下复制一行
+        functionJMenu.add(reLoginItem);
+        functionJMenu.add(closeItem);
+
+        aboutJMenu.add(accountItem);
+
+        // 5.将菜单里面的两个选项添加到菜单当中：调用JMenuBar对象的add方法
+        jMenuBar.add(functionJMenu);
+        // 快捷键 ctrl + d ：向下复制一行
+        jMenuBar.add(aboutJMenu);
+
+        // 6.把整个菜单 `JMenuBar` 添加到 `JFrame` 界面中
+        // this 表示当前的界面对象，调用 setJMenuBar 方法
+        this.setJMenuBar(jMenuBar);
+
+
+        // 让界面显示出来，这行代码我们建议写在最后
+        this.setVisible(true);
+    }
+}
+~~~
+
+代码写完后，回到 `App.java` 中，先将 `LoginJFrame` 和 `RegisterJFrame` 注释掉，只留 `GameJFrame`，然后直接右键Run。
+
+<img src="./assets/image-20240419214002959.png" alt="image-20240419214002959" style="zoom:67%;" />
+
+程序运行完毕后发现，这里的菜单已经有了，并且点击对应的选项也会出现其包含的条目。
+
+<img src="./assets/image-20240419214122199.png" alt="image-20240419214122199" style="zoom:67%;" />
+
+----
+
+## 四、优化
+
+### 1）优化讲解
+
+当我们写完 `GameJFrame类` 中的代码后，可以发现构造方法中的代码太多了！
+
+那以后代码出问题了，还需要在构造方法中一行一行的找，太麻烦了！
+
+因此我们需要将构造方法中不同功能的代码进行抽取，抽取成一个独立的方法。
+
+例如将 `界面设置`、`初始化菜单` 分别放到一个方法中即可。
+
+选中上面的这一堆
+
+![image-20240419214430338](./assets/image-20240419214430338.png)
+
+按快捷键 <kbd>ctrl + alt + M</kbd> ，然后改下方法名：`initJFrame(初始化界面)`，然后回车即可。
+
+<img src="./assets/image-20240419214548577.png" alt="image-20240419214548577" style="zoom:67%;" />
+
+最后在构造方法中给 `initJFrame()` 方法加上注释即可。
+
+<img src="./assets/image-20240419214732701.png" alt="image-20240419214732701" style="zoom:67%;" />
+
+-----
+
+接下来抽取跟菜单相关的代码。
+
+选中跟菜单相关的代码
+
+![image-20240419215013198](./assets/image-20240419215013198.png)
+
+按快捷键 <kbd>ctrl + alt + M</kbd> ，然后改下方法名：`initJMenuBar(初始化菜单)`，然后回车即可。
+
+![image-20240419215134207](./assets/image-20240419215134207.png)
+
+最后在构造方法中给 `initJMenuBar()` 方法加上注释即可。
+
+---
+
+然后下面的这两个方法我们直接放到最后就行了，以后如果要修改，直接找对应的方法就OK了，非常的方便。
+
+![image-20240419215311282](./assets/image-20240419215311282.png)
+
+现在我们再来回过头来看构造，构造方法中的代码就非常简洁了。
+
+<img src="./assets/image-20240419215355088.png" alt="image-20240419215355088" style="zoom:67%;" />
+
+最后再来右键运行，看下效果，可以看见程序没有任何问题。
+
+![image-20240419215449257](./assets/image-20240419215449257.png)
+
+-----
+
+### 2）完整代码
+
+**GameJFrame.java**
+
+~~~java
+package com.itheima.ui;
+
+import javax.swing.*;
+
+public class GameJFrame extends JFrame {
+    //规定：GameJFrame这个界面表示的就是游戏的主界面
+    //以后跟游戏相关的所有逻辑都写在这个类中
+    public GameJFrame() {
+        // 初始化界面
+        initJFrame();
+
+        // 初始化菜单
+        initJMenuBar();
+
+        // 让界面显示出来，这行代码我们建议写在最后
+        this.setVisible(true);
+    }
+
+    private void initJMenuBar() {
+        // 1.创建整个菜单对象 JMenuBar
+        JMenuBar jMenuBar = new JMenuBar();
+
+        // 2.创建菜单上面两个选项的对象（功能、关于我们） JMenu
+        JMenu functionJMenu = new JMenu("功能"); // 将要展示的文字放在小括号中，表示调用它的有参构造。
+        // 快捷键 ctrl + d ：向下复制一行
+        JMenu aboutJMenu = new JMenu("关于我们");
+
+        // 3.创建选项下面的条目对象（功能：重新游戏、重新登陆、关闭游戏；关于我们：公众号），合起来一共四个 JMenuItem 对象
+        JMenuItem replayItem = new JMenuItem("重新游戏"); // 同样也是调用它的有参构造设置展示文字
+        // 快捷键 ctrl + d ：向下复制一行
+        JMenuItem reLoginItem = new JMenuItem("重新登录");
+        JMenuItem closeItem = new JMenuItem("关闭游戏");
+
+        // 由于前三个是一组，最后一个公众号是一组，因此我们在写代码的时候打一个空行，提高阅读性
+        JMenuItem accountItem = new JMenuItem("公众号");
+
+        // 4.将每一个选项下面的条目添加到选项中：调用JMenu对象的add方法
+        functionJMenu.add(replayItem);
+        // 快捷键 ctrl + d ：向下复制一行
+        functionJMenu.add(reLoginItem);
+        functionJMenu.add(closeItem);
+
+        aboutJMenu.add(accountItem);
+
+        // 5.将菜单里面的两个选项添加到菜单当中：调用JMenuBar对象的add方法
+        jMenuBar.add(functionJMenu);
+        // 快捷键 ctrl + d ：向下复制一行
+        jMenuBar.add(aboutJMenu);
+
+        // 6.把整个菜单 `JMenuBar` 添加到 `JFrame` 界面中
+        // this 表示当前的界面对象，调用 setJMenuBar 方法
+        this.setJMenuBar(jMenuBar);
+    }
+
+    private void initJFrame() {
+        // 设置界面的宽高
+        this.setSize(603, 680);
+        // 设置界面的标题
+        this.setTitle("拼图单机版 v1.0");
+        // 设置界面置顶，setAlwaysOnTop：一直处在最上方
+        // ctrl + p：可以看见需要传入一个boolean类型的参数，传入true之后，它会盖住所有的软件
+        this.setAlwaysOnTop(true);
+        // 设置界面居中
+        this.setLocationRelativeTo(null);
+        // 设置关闭模式，setDefaultCloseOperation：设置默认的关闭方式
+        // 括号中写的数字3
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    }
+}
+~~~
+
+
+
+------
+
+# 146.添加图片
+
+## 一、介绍
+
+在刚刚我们已经在界面中添加了菜单，接下来就开始学习如何在界面中添加图片。
+
+有的同学可能会认为，下面是一张大的图片，再切割成N个小份。
+
+其实并不是这样，在游戏中，下面这个是 `15张` 小的图片，还有一个空白而已。
+
+![image-20240419215922536](./assets/image-20240419215922536.png)
+
+在后面，当我们学习完移动后，实际上就是移动这里小图片的位置。
 
 
 

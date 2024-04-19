@@ -197,3 +197,5 @@ PTG插件可以1秒生成标准Javabean。
  <kbd>ctrl + d</kbd> ：向下复制一行
 
 将一个单词快速统一转为 `大写 / 小写` 的快捷键：<kbd>ctrl + shift + u</kbd> ，这里的 `u` 就是 `upper（大写）` 的意思
+
+快捷键 ctrl + d ：向下复制一行
