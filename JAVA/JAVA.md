@@ -26404,7 +26404,7 @@ new 类名/接口名(){
 
 # --------------------------------------
 
-# Day 16 阶段综合项目
+# Day16 阶段综合项目（上）
 
 
 
@@ -28468,6 +28468,20 @@ public class GameJFrame extends JFrame {
 
   动作监听在监听鼠标的时候，它只能监听 `点击`；在监听键盘的时候，它只能监听空格。
 
+----
+
+### 4）事件的三种实现方式
+
+* 定义实现类实现接口
+* 匿名内部类
+* 本类实现接口
+
+----
+
+## 二、动作监听
+
+### 1）代码实现
+
 我提前在 `Test3` 中写了一段代码，在代码中创建了一个窗体，并给界面设置了宽高、标题、界面置顶、居中、关闭模式、取消默认的居中放置、让整个界面显示出来。
 
 ```java
@@ -28593,7 +28607,7 @@ jFrame.getContentPane().add(jtb);
 
 ----
 
-### 4）优化1
+### 2）优化1：采用 `匿名内部类` 简化代码
 
 在实际开发中，每一个按钮的业务逻辑都是不一样的，如果每一个按钮都要去新创建一个类，太麻烦了！
 
@@ -28620,129 +28634,18 @@ jtb.addActionListener(new ActionListener() {
 
 ----
 
-### 5）优化2
+### 3）优化2：直接使用本类作为实现类
 
+我提前写好了 `MyJFrame类` 放到 `Test包` 下。
 
+`MyJFrame`：我的界面，用这个界面去 `extends JFrame`。
 
-### 9.3 动作监听
+在这个界面中，首先我对这个界面做了一个设置，然后创建了两个按钮。
 
-包含：
+~~~java
+package com.itheima.test;
 
-* 鼠标左键点击
-* 空格
-
-#### 9.3.1 事件的三种实现方式
-
-* 定义实现类实现接口
-* 匿名内部类
-* 本类实现接口
-
-#### 方式一：实现类
-
-​	定义实现类实现ActionListener接口
-
-```java
-public class Test3 {
-    public static void main(String[] args) {
-        JFrame jFrame = new JFrame();
-        //设置界面的宽高
-        jFrame.setSize(603, 680);
-        //设置界面的标题
-        jFrame.setTitle("事件演示");
-        //设置界面置顶
-        jFrame.setAlwaysOnTop(true);
-        //设置界面居中
-        jFrame.setLocationRelativeTo(null);
-        //设置关闭模式
-        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        //取消默认的居中放置，只有取消了才会按照XY轴的形式添加组件
-        jFrame.setLayout(null);
-
-
-        //创建一个按钮对象
-        JButton jtb = new JButton("点我啊");
-        //设置位置和宽高
-        jtb.setBounds(0,0,100,50);
-        //给按钮添加动作监听
-        //jtb:组件对象，表示你要给哪个组件添加事件
-        //addActionListener：表示我要给组件添加哪个事件监听（动作监听包含鼠标左键点击，空格）
-        //参数：表示事件被触发之后要执行的代码
-        jtb.addActionListener(new MyActionListener());
-
-
-        //把按钮添加到界面当中
-        jFrame.getContentPane().add(jtb);
-
-
-        jFrame.setVisible(true);
-    }
-}
-
-
-public class MyActionListener implements ActionListener {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        System.out.println("按钮被点击了");
-    }
-}
-```
-
-#### 方式二：匿名内部类
-
-```java
-public class Test3 {
-    public static void main(String[] args) {
-        JFrame jFrame = new JFrame();
-        //设置界面的宽高
-        jFrame.setSize(603, 680);
-        //设置界面的标题
-        jFrame.setTitle("事件演示");
-        //设置界面置顶
-        jFrame.setAlwaysOnTop(true);
-        //设置界面居中
-        jFrame.setLocationRelativeTo(null);
-        //设置关闭模式
-        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        //取消默认的居中放置，只有取消了才会按照XY轴的形式添加组件
-        jFrame.setLayout(null);
-
-
-        //创建一个按钮对象
-        JButton jtb = new JButton("点我啊");
-        //设置位置和宽高
-        jtb.setBounds(0,0,100,50);
-        //给按钮添加动作监听
-        //jtb:组件对象，表示你要给哪个组件添加事件
-        //addActionListener：表示我要给组件添加哪个事件监听（动作监听包含鼠标左键点击，空格）
-        //参数：表示事件被触发之后要执行的代码
-
-        jtb.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("达咩~不要点我哟~");
-            }
-        });
-
-
-        //把按钮添加到界面当中
-        jFrame.getContentPane().add(jtb);
-
-
-        jFrame.setVisible(true);
-    }
-}
-```
-
-#### 方式三：本类实现接口
-
-```java
-public class MyJFrame extends JFrame implements ActionListener {
-
-    //创建一个按钮对象
-    JButton jtb1 = new JButton("点我啊");
-    //创建一个按钮对象
-    JButton jtb2 = new JButton("再点我啊");
-
+public class MyJFrame extends JFrame {
     public MyJFrame(){
         //设置界面的宽高
         this.setSize(603, 680);
@@ -28757,86 +28660,480 @@ public class MyJFrame extends JFrame implements ActionListener {
         //取消默认的居中放置，只有取消了才会按照XY轴的形式添加组件
         this.setLayout(null);
 
-
+        //创建一个按钮对象
+        JButton jtb1 = new JButton("点我啊");
         //给按钮设置位置和宽高
         jtb1.setBounds(0,0,100,50);
-        //给按钮添加事件
-        jtb1.addActionListener(this);
 
 
+        //创建一个按钮对象
+        JButton jtb2 = new JButton("再点我啊");
         //给按钮设置位置和宽高
         jtb2.setBounds(100,0,100,50);
-        jtb2.addActionListener(this);
 
-
-        //那按钮添加到整个界面当中
-        this.getContentPane().add(jtb1);
-        this.getContentPane().add(jtb2);
 
         //让整个界面显示出来
         this.setVisible(true);
     }
+}
+~~~
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        //对当前的按钮进行判断
+现在我就要在这个界面中，给这两个按钮添加事件。
 
-        //获取当前被操作的那个按钮对象
-        Object source = e.getSource();
+在添加点击事件的时候，我们需要在括号中传入 `ActionListener` 实现类的对象。
 
-        if(source == jtb1){
-            jtb1.setSize(200,200);
-        }else if(source == jtb2){
-            Random r = new Random();
-            jtb2.setLocation(r.nextInt(500),r.nextInt(500));
-        }
+~~~java
+jtb1.addActionListener();
+~~~
+
+现在我们有第三种写法：让 `MyJFrame类` 实现 `ActionListener`，然后再去重写里面所有的抽象方法。
+
+![image-20240420133725918](./assets/image-20240420133725918.png)
+
+此时在小括号中就不需要去 `new` 了，直接写 `this` 即可。
+
+下面的 `jtb2` 也是一样的，给 `jtb2` 也去添加一个 `ActionListener`，后面的 `this` 表示的就是本类的对象。
+
+如下代码，我给两个按钮都添加了 `动作监听`，当 `动作监听` 这个事件被触发之后，就会执行本类里面刚刚重写的 `actionPerformed()方法` 中对应的代码
+
+~~~java
+//创建一个按钮对象
+JButton jtb1 = new JButton("点我啊");
+//给按钮设置位置和宽高
+jtb1.setBounds(0,0,100,50);
+// 给按钮添加事件
+jtb1.addActionListener(this);
+
+
+//创建一个按钮对象
+JButton jtb2 = new JButton("再点我啊");
+//给按钮设置位置和宽高
+jtb2.setBounds(100,0,100,50);
+jtb2.addActionListener(this);
+~~~
+
+在重写 `actionPerformed()` 方法中，就可以对按钮进行判断。
+
+`e.getSource()`：可以获取当前被操作的按钮对象，接收的时候是使用 `Object(父类类型)` 接收的。
+
+~~~java
+@Override
+public void actionPerformed(ActionEvent e) {
+    Object source = e.getSource();
+}
+~~~
+
+再往下，就可以使用 `source变量` 跟上面的按钮做一个 `==` 比较。
+
+~~~java
+@Override
+public void actionPerformed(ActionEvent e) {
+    Object source = e.getSource();
+    if (source == jtb1) {
+        // 如果点击了按钮1，它的大小就会变成 200,200
+        jtb1.setSize(200, 200);
+    } else if (source == jtb2) {
+        // 如果点击了按钮2，它的位置就会随机改变
+        Random r = new Random();
+        jtb2.setLocation(r.nextInt(500), r.nextInt(500));
     }
 }
-```
+~~~
+
+由于要在多个方法中用到 `jtb1、jtb2按钮`，因此将它们放到成员位置。
+
+~~~java
+public class MyJFrame extends JFrame implements ActionListener {
+    //创建一个按钮对象
+    JButton jtb1 = new JButton("点我啊");
+    //创建一个按钮对象
+    JButton jtb2 = new JButton("再点我啊");
+    public MyJFrame(){
+        // 构造方法内容
+    }
+}
+~~~
+
+最后，将两个按钮都添加到页面中即可。
+
+~~~java
+// 将按钮添加到整个界面中
+this.getContentPane().add(jtb1);
+this.getContentPane().add(jtb2);
+~~~
+
+此时 `MyJFrame类` 就已经写好了，如果想要将这个界面启动起来，就要再定义一个测试类 `Test4`。
+
+<img src="./assets/image-20240420135550730.png" alt="image-20240420135550730" style="zoom:67%;" />
+
+在测试类 `new` 这个界面就行了。
+
+~~~java
+package com.itheima.test;
+
+public class Test4 {
+    public static void main(String[] args) {
+        new MyJFrame();
+    }
+}
+~~~
+
+这样就可以启动我自己写的这个界面。
+
+启动之后就会调用 `MyJFrame类` 的空参构造。
+
+效果如下图，点击第二个按钮位置是随机的，点击第一个按钮可以发现它变大了。
+
+<img src="./assets/rng6f-fdxnn.gif" alt="rng6f-fdxnn" style="zoom: 50%;" />
 
 
 
+------
+
+## 三、鼠标监听机制 —— MouseListener
+
+### 1）介绍
+
+我们刚刚学习了最简单的 `ActionListener(动作监听)` ，但是动作监听它是有弊端的，它只能识别点击， 但是当我用鼠标点击一个按钮后，其实这个点击我可以把它拆解成很多，例如下面四个动作。
+
+`将鼠标放到按钮上，还没有点击`，这个就叫做 `划入动作`。
+
+`用鼠标点击按钮，但是不松开`，这个就叫做 `按下动作`。
+
+`松开`，这个就叫做 `松开动作`。
+
+`从按钮上划出`，这个就叫做 `划出动作`。
+
+但如果想要让这个按钮有一些复杂的功能，针对于 `划入、按下、松开、划出` 都要执行不同的操作，此时就只能使用 `MouseListener`。
+
+在 `MouseListener` 中除了这四个动作，它把 `按下跟松开` 归为了一组，叫做 `单击动作`。
+
+<img src="./assets/image-20240420143427566.png" alt="image-20240420143427566" style="zoom:50%;" />
+
+如果以后我想要监听按钮的单击事件，就一共有三种写法
+
+1. 动作监听（`ActionListenner`）
+2. 鼠标监听（`MouseListener`）中的单击事件
+3. 鼠标监听（`MouseListener`）中的松开事件
+
+-----
+
+### 2）代码实现
+
+在这里我新建好了一个类 `MyJFrame2`，用它 `extends JFrame`，在构造方法中对整体的界面做了一些设置（宽高、标题、置顶、界面居中、关闭模式、取消默认的图片居中方式），然后在成员位置定义了一个按钮，然后在构造方法中给按钮设置了位置跟宽高，然后把按钮添加到整个界面中。
+
+~~~java
+package com.itheima.test;
+
+import javax.swing.*;
+
+public class MyJFrame2 extends JFrame {
+
+    //创建一个按钮对象
+    JButton jtb1 = new JButton("点我啊");
+
+    public MyJFrame2(){
+        //设置界面的宽高
+        this.setSize(603, 680);
+        //设置界面的标题
+        this.setTitle("拼图单机版 v1.0");
+        //设置界面置顶
+        this.setAlwaysOnTop(true);
+        //设置界面居中
+        this.setLocationRelativeTo(null);
+        //设置关闭模式
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        //取消默认的居中放置，只有取消了才会按照XY轴的形式添加组件
+        this.setLayout(null);
+
+        //给按钮设置位置和宽高
+        jtb1.setBounds(0,0,100,50);
+
+        //那按钮添加到整个界面当中
+        this.getContentPane().add(jtb1);
+
+        //让整个界面显示出来
+        this.setVisible(true);
+    }
+}
+~~~
+
+需求：对按钮来绑定鼠标事件
+
+~~~java
+//给按钮绑定鼠标事件
+jtb1.addMouseListener();
+~~~
+
+<kbd>ctrl + b</kbd> 跟进方法，查看形参，可以看见是 `MouseListener`。
+
+<img src="./assets/image-20240420145922325.png" alt="image-20240420145922325" style="zoom:67%;" />
+
+继续跟进，可以看见 `MouseListener` 也是一个接口。
+
+<img src="./assets/image-20240420150158703.png" alt="image-20240420150158703" style="zoom:67%;" />
+
+因此在小括号中，我们要传入的就是 `MouseListener接口` 的实现类对象。
+
+同样，我们可以让本类去 `implements MouseListener` ，然后重写里面所有的方法，一共有五个。
+
+![image-20240420150832030](./assets/image-20240420150832030.png)
+
+可以看见所有的动作都在这里，因此 `MouseListener` 可以把单击拆解的很细。
+
+`mouseClicked`：单击（按下并释放）。
+
+`mouseEntered`：划入（表示鼠标进入组件）。
+
+`mouseExited`：划出（退出组件）。
+
+`mousePressed`：按下不松。
+
+`mouseReleased`：松开。
+
+接着，我们可以把每一个重写方法去写一个输出语句。
+
+~~~java
+@Override
+public void mouseClicked(MouseEvent e) {
+    System.out.println("单击");
+}
+
+@Override
+public void mousePressed(MouseEvent e) {
+    System.out.println("按下不松");
+}
+
+@Override
+public void mouseReleased(MouseEvent e) {
+    System.out.println("松开");
+}
+
+@Override
+public void mouseEntered(MouseEvent e) {
+    System.out.println("划入");
+}
+
+@Override
+public void mouseExited(MouseEvent e) {
+    System.out.println("划出");
+}
+~~~
+
+最后再在绑定事件中传入 `this` 即可，表示是给 `jtb1` 这个按钮绑定鼠标事件，当这个事件被触发之后，就会执行 `this`，也就是本类里面的这些重写的代码。
+
+~~~java
+//给按钮绑定鼠标事件
+jtb1.addMouseListener();
+~~~
+
+最后回到 `Test4类` 中，创建 `MyJFrame2` 对象，来启动我们刚刚写的界面。
+
+~~~java
+public class Test4 {
+    public static void main(String[] args) {
+        new MyJFrame2();
+    }
+}
+~~~
+
+程序启动后，注意看控制台，并且在松开的时候它还会触发单击事件。
+
+<img src="./assets/0w3ji-b4rh3.gif" alt="0w3ji-b4rh3" style="zoom:67%;" />
+
+----
+
+### 3）总结
+
+在刚刚我们已经学习完了鼠标监听：`MouseListener`，在 `MouseListener` 中它有5个方法。
+
+`mouseClicked`：单击（按下并释放）。
+
+`mouseEntered`：划入（表示鼠标进入组件）。
+
+`mouseExited`：划出（退出组件）。
+
+`mousePressed`：按下不松。
+
+`mouseReleased`：松开。
+
+<img src="./assets/image-20240420153104268.png" alt="image-20240420153104268" style="zoom:80%;" />
+
+-----
+
+## 四、键盘监听机制 —— KeyListener
+
+### 1）介绍
+
+`KeyListener` 中一共有三个方法。
+
+`keyPressed(KeyEvent e)`：表示我们在键盘上按下某个键的时候会触发这个事件（按下不松）。
+
+`keyReleased(KeyEvent e)`：松开按键时触发。
+
+`keyTyped(KeyEvent e)`：
+
+第三个方法我们一般是不会用的，了解一下即可，因为第三个方法有局限性，在键盘中有一些按键它是监听不了的，例如 `ctrl、alt` 等，因此我们只需要使用上面两个键就行了。
+
+<img src="./assets/image-20240420154025607.png" alt="image-20240420154025607" style="zoom:67%;" />
+
+----
+
+### 2）代码实现
+
+在这里，我又新建了一个 `MyJFrame3类`（我的第三个界面），然后依旧去给这个界面做了一个设置，因此我们会在这个界面中去实现键盘监听。
+
+~~~java
+package com.itheima.test;
+
+import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+public class MyJFrame3 extends JFrame {
+
+    public MyJFrame3(){
+        //设置界面的宽高
+        this.setSize(603, 680);
+        //设置界面的标题
+        this.setTitle("拼图单机版 v1.0");
+        //设置界面置顶
+        this.setAlwaysOnTop(true);
+        //设置界面居中
+        this.setLocationRelativeTo(null);
+        //设置关闭模式
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        //取消默认的居中放置，只有取消了才会按照XY轴的形式添加组件
+        this.setLayout(null);
+        
+        //让整个界面显示出来
+        this.setVisible(true);
+    }
+}
+~~~
+
+大家在平时操作一些软件的时候会发现，很多软件都会有快捷键，一般来讲这个快捷键就是用键盘监听去实现的。
+
+---
+
+我们一般是给整个窗体去添加键盘监听，因此这里是通过 `this` 调用 `addKeyListener`，然后在括号里面再去写一个实现类的对象。
+
+~~~~java
+// 给整个窗体添加键盘监听
+this.addKeyListener();
+~~~~
+
+选中 `addKeyListener()` 方法，<kbd>ctrl + b</kbd> 跟进，可以发现形参的类型是 `KeyListener`。
+
+<img src="./assets/image-20240420154707767.png" alt="image-20240420154707767" style="zoom:67%;" />
+
+继续 <kbd>ctrl + b</kbd> 跟进，可以发现 `KeyListener` 跟之前的都一样，同样也是一个接口。
+
+![image-20240420154812927](./assets/image-20240420154812927.png)
+
+因此在括号里面，我们可以传递 `KeyListener` 的实现类对象。
+
+此时我们就可以让本界面去 `implements KeyListener`，然后去重写该接口中所有的抽象方法。
+
+默认全选，点击ok即可。
+
+![image-20240420155254109](./assets/image-20240420155254109.png)
+
+在下面的小括号中，我们直接传入 `this` 就行了。
+
+这里的第一个 `this` 表示的是调用者，即本类对象，本类对象其实也就是当前界面对象，表示我要给整个界面添加监听。
+
+那么你要添加哪个监听呢？是由谁说了算的？是由 `addKeyListener()` 方法说了算的：表示我要给本界面添加键盘监听。
+
+~~~java
+// 给整个窗体添加键盘监听
+this.addKeyListener(this);
+~~~
+
+参数 `this` 表示：当事件被触发之后，会执行本类中对应代码，即我们重写的代码。
+
+~~~java
+@Override
+public void keyTyped(KeyEvent e) {
+    // 这个方法我们不用管
+}
+
+@Override
+public void keyPressed(KeyEvent e) {
+    System.out.println("按下不松");
+}
+
+@Override
+public void keyReleased(KeyEvent e) {
+    System.out.println("松开按键");
+}
+~~~
+
+然后回到 `Test4测试类` 中，创建 `MyJFrame3对象`，效果如下图：当我按下按键时，两个方法都会触发。
+
+当我一直按住按键不松开，就会一直重复调用 `keyPressed()` 方法。
+
+PS：在输入的时候建议使用英文状态下的输入，并且在键盘输入时，一定要点击Java程序的运行界面，因为我们绑定事件是绑定在这个界面上的。
+
+<img src="./assets/k5wue-68vkw.gif" alt="k5wue-68vkw" style="zoom:67%;" />
+
+----
+
+### 3）区分按键
+
+由于 `按下不松` 的方法会反复调用，因此我们将 `区分按键` 的代码写在 `松开按键` 的方法中。
+
+在 `keyReleased()` 方法中，有一个参数，表示 `KeyEvent`，就是你那个动作对象。
+
+但是呢这个动作对象不重要，重要的是可以用它调用方法，其中就有一个 `getKeyCode()` 的方法，这个方法就可以获取键盘上每一个按键的编号，并且这个方法的返回值就是 `int类型` 的。
+
+~~~java
+@Override
+public void keyReleased(KeyEvent e) {
+    System.out.println("松开按键");
+    // 获取键盘上每一个按键的编号
+    int code = e.getKeyCode();
+    System.out.println(code);
+}
+~~~
+
+该写完代码后，回到 `Test4类` 中程序运行，点一下游戏界面，分别按 `a`、`b`、`c`、`d` 便会打印出如下图的数字。
+
+<img src="./assets/b15ly-ajppu.gif" alt="b15ly-ajppu" style="zoom:67%;" />
+
+这个打印出的数字跟 `ASCII码表` 没有什么太大关系，它只不过刚好`小写字母的编号`跟 `ASCII码表上大小的字母` 对应起来罢了。
+
+由此我们就能发现，每一个按键，都有一个编号与之对应，此时我们就能在方法中进行 `if判断`。
+
+~~~java
+@Override
+public void keyReleased(KeyEvent e) {
+    System.out.println("松开按键");
+    //获取键盘上每一个按键的编号
+    int code = e.getKeyCode();
+    if(code == 65){
+        System.out.println("现在按的是A");
+    }else if(code == 66){
+        System.out.println("现在按的是B");
+    }
+}
+~~~
+
+该写完代码后，回到 `Test4类` 中再来点击程序运行，点一下游戏界面，分别按 `a`、`b` 便会打印出如下图的结果。
+
+当我们按除 `a、b` 以外的键时其实也会触发 `keyReleased()` 方法，只不过我们对按键的编号做了一些判断，只有 `a、b` 的时候才有代码输出。
+
+<img src="./assets/65k63-3u23w.gif" alt="65k63-3u23w" style="zoom:70%;" />
 
 
 
+-----
 
+# -----------------------------
 
+# Day17 阶段综合项目（下）
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# 149.美化界面
 
 
 
