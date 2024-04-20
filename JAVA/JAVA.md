@@ -29135,75 +29135,402 @@ public void keyReleased(KeyEvent e) {
 
 # 149.美化界面
 
+## 一、引入
 
+来和美化后的界面对比一下，会感觉我们之前写的界面太丑啦。
 
+<img src="./assets/image-20240420165742868.png" alt="image-20240420165742868" style="zoom:67%;" />
 
+左右一对比，其实我们就差三个地方：中央偏下显示、背景图片（也就是这个黄色的）、每个小图片的边框。
 
+<img src="./assets/image-20240420165937200.png" alt="image-20240420165937200" style="zoom:75%;" />
 
+-----
 
+## 二、代码实现
 
+### 1）将 15个 小图片移动到中间偏下方
 
+当我们以后写的代码越来越多，但是我们又需要给它添加新的需求时，我们应该写在哪里呢？
 
+找到 `GameJFrame类`，首先，是在 `initJFrame()` 初始化界面中的方法中写吗？肯定不是，因为这个方法是对整个窗体的设置。
 
+快捷键 <kbd>ctrl + alt + ←</kbd> 就可以回到我们在IDEA中刚刚看的地方。
 
+肯定也不是写在 `initMenu()` 中的，因为这个方法都是跟菜单相关的。
 
+再往下，`initData()`，这个方法是用来初始化数据的，肯定也不是，因为在这个方法中，它是用来打乱数据的。
 
+再往下，`initImage()`，这个方法就对了，选中它，直接点进去。
 
+<img src="./assets/image-20240420170806227.png" alt="image-20240420170806227" style="zoom:50%;" />
 
+因为在这个方法中，我们是用来添加小图片的，也就是这里的 `70行` 代码。
 
+![image-20240420170858434](./assets/image-20240420170858434.png)
 
+我们可以在添加小图片的同时，给它加一个 `位移`，例如我们可以在 `x轴` 方向先加10个像素，`y轴` 方向先加20个像素。
 
+~~~java
+jLabel.setBounds(105 * j + 10, 105 * i + 20, 105, 105);
+~~~
 
+运行 `App`，先来看一下运行效果，如下图所示，可以看见 `x轴` 添加10个像素， `y轴` 添加20个像素，它的位移比较小。
 
+<img src="./assets/image-20240420171142620.png" alt="image-20240420171142620" style="zoom:50%;" />
 
+这个偏移的量需要我们不断去测试，在之前我已经测试过，`x轴` 方向偏移83个像素，`y轴` 方向偏移134个像素 会更好看一些。
 
+~~~java
+jLabel.setBounds(105 * j + 83, 105 * i + 134, 105, 105);
+~~~
 
+运行 `App`，再来看一下运行效果，如下图所示，游戏的图片已经跑到中间偏下方啦。
 
+<img src="./assets/image-20240420171404903.png" alt="image-20240420171404903" style="zoom:50%;" />
 
+----
 
+### 2）给游戏添加背景图片
 
+给在大家的图片中，有一个 `background.png`，这个就是背景图片。
 
+![image-20240420171603331](./assets/image-20240420171603331.png)
 
+当我们把背景图片添加进去后，我想要的效果是：这15个小图片展示在下图框中的地方。
 
+<img src="./assets/image-20240420171711818.png" alt="image-20240420171711818" style="zoom:80%;" />
 
+因此背景图片的位置也需要我们慢慢调整。
 
+除此之外，我们还需要看背景图片的宽、高为：`508×560`，单位是像素。
 
+----
 
+背景图片我们同样还是写在 `initImage()` 方法中，但是这会出现一个问题，是在循环前面添加背景图片，还是在循环后面添加背景图片呢？
 
+![image-20240420172012509](./assets/image-20240420172012509.png)
 
+如果不知道，没关系，我们可以随便写一个，例如我们先写在上面。
 
+新建 `ImageIcon` 对象
 
+~~~java
+ImageIcon bg = new ImageIcon();
+~~~
 
+复制背景图片的路径
 
+![image-20240420172206072](./assets/image-20240420172206072.png)
 
+然后括号中传入背景图片的路径
 
+~~~java
+ImageIcon bg = new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\background.png");
+~~~
 
+接下来创建 `JLabel对象`，同时我们也可以将创建 `ImageIcon对象` 的代码直接写在这一行。
 
+~~~java
+// 添加背景图片
+JLabel background = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\background.png"));
+~~~
 
+接下来我需要对 `background` 这个 `JLabel对象` 做一个设置（位置、宽高）。
 
+由于位置已经在之前调试过了，`(40, 40)` 是最好的。宽高就是它原生的宽高。
 
+~~~java
+background.setBounds(40, 40, 508, 560);
+~~~
 
+最后一步将把背景图片添加到界面当中即可。
 
+~~~java
+// 把背景图片添加到界面当中
+this.getContentPane().add(background);
+~~~
 
+完整代码
 
+~~~java
+// 初始化图片
+private void initImage() {
+    // 添加背景图片
+    JLabel background = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\background.png"));
+    background.setBounds(40, 40, 508, 560);
+    // 把背景图片添加到界面当中
+    this.getContentPane().add(background);
 
 
+    // 添加图片的循环代码
+    .......
+}
+~~~
 
+运行 `App`，先来看一下运行效果，如下图所示：背景图片确实已经添加进去了，而且位置也挺好，但是 `15张小图片和1个空白` 被覆盖了。
 
+<img src="./assets/image-20240420172912048.png" alt="image-20240420172912048" style="zoom:50%;" />
 
+现在我们将 `添加背景图片的代码` 放到 `添加小图片代码的后面` 看看。
 
+~~~java
+// 初始化图片
+private void initImage() {
+    // 添加图片的循环代码
+    .......
+    
+    // 添加背景图片
+    JLabel background = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\background.png"));
+    background.setBounds(40, 40, 508, 560);
+    // 把背景图片添加到界面当中
+    this.getContentPane().add(background);
+}
+~~~
 
+运行 `App`，再来看一下运行效果，如下图所示：这 `15张小图片` 刚好就在背景图片的正中央。
 
+<img src="./assets/image-20240420173254041.png" alt="image-20240420173254041" style="zoom:50%;" />
 
+-----
 
+因此，它在加载图片的时候，会有一个小小的细节：先加载的图片在上方，后加载的图片会塞在下面。
 
+因此背景图片需要放到最后添加。
 
+----
 
+### 3）给每个小图片添加边框
 
+添加边框的代码是在循环的里面书写的。
 
+我们需要给管理小图片的 `JLabel` 去进行设置。
 
+调用 `JLabel对象` 的 `setBorder()` 方法，可以看到，方法需要传入的参数类型为 `Border`。
 
+<img src="./assets/image-20240420173559836.png" alt="image-20240420173559836" style="zoom:80%;" />
 
+<kbd>ctrl + b</kbd> 跟进方法
+
+<img src="./assets/image-20240420173825912.png" alt="image-20240420173825912" style="zoom:80%;" />
+
+然后再选中 `Border`，<kbd>ctrl + b</kbd> 跟进看看，这时就明了了，它是一个接口。
+
+![image-20240420174026437](./assets/image-20240420174026437.png)
+
+这个接口我可以 <kbd>ctrl + c</kbd> 复制一下，打开 `API帮助文档` 来搜索一下它。
+
+`Border接口` 其实是规定了边框的规则，下面这些所有的实现类，就是各种各样不同样式的边框，在这里，我准备使用 `BevelBorder` 这个实现类的对象，这个边框它是那种斜面样式的，相对来讲比较好看一点。
+
+![image-20240420174317236](./assets/image-20240420174317236.png)
+
+点击一下它，`BevelBorder类` 它是由两个单词来组成的，`Bevel`：斜面；`Border`：边框。合起来就是：斜面的边框。
+
+![image-20240420174525219](./assets/image-20240420174525219.png)
+
+回到IDEA中，找到 `GameJFrame类`，在调用 `setBorder()` 方法的时候，我们就要去 `new` 一个斜面的对象。
+
+<img src="./assets/image-20240420174643328.png" alt="image-20240420174643328" style="zoom:80%;" />
+
+在括号中你需要传入一个参数，你可以传 `0`，或者是传 `1`，这个数字表示的就是斜面边框的方向。
+
+我们可以先在里面写个 `0`，先来看下效果。
+
+~~~java
+// 给图片添加边框
+jLabel.setBorder(new BevelBorder(0));
+~~~
+
+运行 `App`，效果如图所示。
+
+<img src="./assets/image-20240420174824015.png" alt="image-20240420174824015" style="zoom:67%;" />
+
+程序运行完毕，截图放大，可以看见图片已经都添加上了边框，细看：这种边框的样式，它是让图片凸起来的。
+
+<img src="./assets/image-20240420174931527.png" alt="image-20240420174931527" style="zoom:50%;" />
+
+我们回到代码当中，将里面的数字换成 `1` 试试。
+
+~~~java
+// 给图片添加边框
+jLabel.setBorder(new BevelBorder(1));
+~~~
+
+运行 `App`，效果如图所示。
+
+<img src="./assets/image-20240420175044207.png" alt="image-20240420175044207" style="zoom:67%;" />
+
+程序运行完毕，截图放大，可以看见图片已经都添加上了边框，细看：这种边框的样式，它是让图片凹下去的。
+
+<img src="./assets/image-20240420175110933.png" alt="image-20240420175110933" style="zoom:50%;" />
+
+---
+
+因此在这我可以传递两个值：`0` 和 `1`。
+
+`0`：表示让图片凸起来
+
+`1`：表示让图片凹下去
+
+但是时间长了，这个 `0` 和 `1` 我记不住怎么办？
+
+Java为了考虑你记不住的问题，在 `BevelBorder类` 中，它定义了一些常量。
+
+选择 `BevelBorder`，<kbd>ctrl + b</kbd> 跟进。
+
+往上翻，可以看见两个常量，`RAISED`：凸起来；`LOWERD`：凹下去
+
+<img src="./assets/image-20240420175355392.png" alt="image-20240420175355392" style="zoom:67%;" />
+
+因此如果代码中的 `0` 跟 `1` 你记不住，就可以写它的常量形式。
+
+由于我觉得 `1` 比较好看，因此这里写的常量就是 `BevelBorder.LOWERED`。
+
+~~~java
+// 给图片添加边框
+jLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+~~~
+
+重新运行 `App`，看下效果。程序运行完毕，可以发现这个界面比一开始的界面好看太多啦。
+
+<img src="./assets/image-20240420175613222.png" alt="image-20240420175613222" style="zoom:50%;" />
+
+----
+
+### 4）优化
+
+代码中，我感觉图片的路径有点太长了！
+
+![image-20240420175725881](./assets/image-20240420175725881.png)
+
+能不能将路径简化一下呢？当然可以。
+
+在简化之前，需要说一个知识点：在Java中，路径是分为两种的 —— ① 绝对路径；② 相对路径
+
+① 绝对路径：一定是从盘符开始的（例如 `C:` 就是一个 `盘符`，它就表示是从 `C盘` 开始的）
+
+② 相对路径：不是从盘符开始的（例如：`aaa\\bbb`，并且相对路径是相对当前项目而言的）
+
+`aaa\\bbb` 就表示：在当前项目下去找 `aaa文件夹`，然后在 `aaa文件夹` 里面再去找 `bbb文件夹`。
+
+---
+
+此时我们就可以来简化图片路径了。
+
+`E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\background.png` 中 `E:\\learning_notes\\JAVA\\code\\basic-code` 可以直接删掉，项目的相对路径应该从项目的根目录开始。
+
+![image-20240420180759427](./assets/image-20240420180759427.png)
+
+删掉后就只剩下 `puzzlegame\\image\\background.png`，表示的是：先在当前项目中找 `puzzlegame文件夹`，再在 `puzzlegame文件夹` 中找 `image文件夹`，在 `image文件夹` 中再去找 `background.png`。
+
+因此简写完后，代码就变成了：
+
+~~~java
+JLabel background = new JLabel(new ImageIcon("puzzlegame\\image\\background.png"));
+~~~
+
+当然在实际开发中，也是推荐写相对路径。
+
+我们可以反过来推导，如果我写绝对路径的话，`E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\background.png` 是我电脑中的路径，但是别人项目的路径并不一定是这个路径！因此推荐写相对路径。
+
+同样的，前面添加小图片的路径也需要使用相对路径简化。
+
+~~~java
+JLabel jLabel = new JLabel(new ImageIcon("puzzlegame\\image\\animal\\animal3\\" + num +".jpg"));
+~~~
+
+此时右键运行 `App`，来看下效果。
+
+程序运行完毕，可以发现效果是一模一样的。
+
+<img src="./assets/image-20240420180645236.png" alt="image-20240420180645236" style="zoom:67%;" />
+
+有些同学在修改完路径后，图片加载不出来了，此时只有一个原因：就是你的路径写错了。
+
+----
+
+## 三、总结
+
+本节的代码中，我们一共改了4个地方。
+
+**1、将15张小图片移动到界面的中央偏下方**
+
+想要实现这个效果很简单，只要让这个整体在 x、y 上做一个适当的偏移就行了。
+
+**2、给整个游戏添加背景图片**
+
+在添加的时候有个小细节：在代码中后添加的，它是塞在最下方的。
+
+因此我们在添加图片的时候，一定要先加载15张小图片，再去添加背景图片。
+
+**3、添加图片的边框**
+
+使用 `JLabel对象` 去调用方法 `setBorder()`，我们要添加斜面边框，斜面边框就叫做 `BevelBorder`。
+
+在创建 `BevelBorder` 对象的时候，可以传入 `1`，也可以使用 `BevelBorder` 中的常量表示。
+
+~~~java
+jLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+~~~
+
+**4、优化路径**
+
+- 从盘符开始的：绝对路径
+- 不是从盘符开始的：相对路径
+
+在相对路径中有一个小细节：相对路径是相对于谁而言？
+
+这里的相对路径是相对于当前项目而言。
+
+
+
+----
+
+# 150.移动图片
+
+## 一、向上移动
+
+### 1）分析
+
+问题：你觉得当你按了向上的按钮后，它该怎么移动才是一个合理的业务逻辑呢？
+
+<img src="./assets/image-20240420181447494.png" alt="image-20240420181447494" style="zoom:67%;" />
+
+正常的业务逻辑应该是将空白的图片往下方移动。 
+
+![pygry-v7qz9](./assets/pygry-v7qz9.gif)
+
+在这我们就可以得出一个结论：向上移动实际上就是把空白方块下方的图片网上移动。
+
+逻辑我们知道了，那代码该如何实现呢？
+
+我们知道，在代码中，每一张小图片其实都跟一个唯一的数字对应，而这些数字都是存放在二维数组中的。
+
+因此我们只需要找到 `0` 和 `13` 在二维数组中的位置就行了，然后再做一个数据的交换。
+
+![image-20240420182023240](./assets/image-20240420182023240.png)
+
+现在，我又要问大家了：你觉得 `0` 和 `13` 在二维数组中的索引分别是多少呢？
+
+正确答案是：`0` —— `(1, 1)`；`13` —— `(2, 1)`
+
+因此，网上移动的本质其实就是：将 `13` 复制给 `(1, 1)` 位置，然后再把 `(2, 1)` 位置变成 `0` 就行了。
+
+![image-20240420182351708](./assets/image-20240420182351708.png)
+
+交换完成后，根据数字去添加对应的图片就行了，这就是向上移动。
+
+为了让大家更好的理解数字在二维数组中的位置，下图给每个数字都做了索引标记。
+
+![image-20240420182508363](./assets/image-20240420182508363.png)
+
+---
+
+### 2）代码示例
+
+找到 `GameJFrame类`（游戏的主界面），首先我们要做的其实并不是 `上下左右移动`，而是需要先给整个界面添加一个键盘监听事件。
+
+因为我们是在整个游戏界面中按 `上下左右键` 的时候才会去移动图片。
 
 
 
