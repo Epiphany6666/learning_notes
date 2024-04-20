@@ -1,21 +1,78 @@
 package com.itheima.ui;
 
 import javax.swing.*;
+import java.util.Random;
+import java.util.StringJoiner;
 
 public class GameJFrame extends JFrame {
     //规定：GameJFrame这个界面表示的就是游戏的主界面
     //以后跟游戏相关的所有逻辑都写在这个类中
+
+    // 创建一个二维数组
+    // 目的：用来管理数据。加载图片的时候，会根据二维数组中的数据进行加载。
+    int[][] data = new int[4][4];
+
     public GameJFrame() {
+        super();
         // 初始化界面
         initJFrame();
 
         // 初始化菜单
         initJMenuBar();
 
+        // 初始化数据（其实就是打乱图片）
+        initData();
+
+        // 初始化图片（根据打乱之后的结果去加载图片）
+        initImage();
+
         // 让界面显示出来，这行代码我们建议写在最后
         this.setVisible(true);
     }
 
+    // 初始化数据（打乱）
+    private void initData() {
+        //1.定义一个一维数组
+        int[] tempArr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+        //2.打乱数组中的数据的顺序
+        //遍历数组，得到每一个元素，拿着每一个元素跟随机索引上的数据进行交换
+        Random r = new Random();
+        for (int i = 0; i < tempArr.length; i++) {
+            //获取到随机索引
+            int index = r.nextInt(tempArr.length);
+            //拿着遍历到的每一个数据，跟随机索引上的数据进行交换
+            int temp = tempArr[i];
+            tempArr[i] = tempArr[index];
+            tempArr[index] = temp;
+        }
+
+
+        //5.给二维数组添加数据
+        //遍历一维数组tempArr得到每一个元素，把每一个元素依次添加到二维数组当中
+        for (int i = 0; i < tempArr.length; i++) {
+            data[i / 4][i % 4] = tempArr[i];
+        }
+    }
+
+
+    // 初始化图片
+    // 添加图片的时候，就需要安装二维数组中管理的数据添加图片
+    private void initImage() {
+        //外循环 --- 把内循环重复执行了4次。
+        for (int i = 0; i < 4; i++) {
+            //内循环 --- 表示在一行添加4张图片
+            for (int j = 0; j < 4; j++) {
+                // 获取当前要加载图片的序号
+                int num = data[i][j];
+                // 创建一个 JLabel对象（管理容器）
+                JLabel jLabel = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\" + num +".jpg"));
+                // 指定图片的位置，调用方法：setBounds
+                jLabel.setBounds(105 * j, 105 * i, 105, 105);
+                // 把管理容器添加到界面中，调用JFrame的add方法
+                this.getContentPane().add(jLabel);
+            }
+        }
+    }
 
 
     private void initJMenuBar() {
@@ -67,6 +124,9 @@ public class GameJFrame extends JFrame {
         // 设置关闭模式，setDefaultCloseOperation：设置默认的关闭方式
         // 括号中写的数字3
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        // 取消默认的居中方式，只有取消了，才会安装xy轴的形式添加组件
+        this.setLayout(null);
     }
 }
 

@@ -26556,7 +26556,7 @@ Java语言主要是做后台服务器开发的。
 
 图片也是一样的，先创建一个JLabel管理容器对象，再把图片放进去，最后把JLabel放到整个窗体当中即可。
 
-![image-20240419153720174](./assets/image-20240419153720174.png)
+![image-20240420095926496](./assets/image-20240420095926496.png)
 
 所以整个JLabel我们可以把它理解成是一个 `管理容器`。
 
@@ -27575,6 +27575,1224 @@ public class GameJFrame extends JFrame {
 ![image-20240419215922536](./assets/image-20240419215922536.png)
 
 在后面，当我们学习完移动后，实际上就是移动这里小图片的位置。
+
+图片所对应的类是 `ImageIcon`，因此一张图片就会对应一个 `ImageIcon` 的对象，15张图片就应该对应 `15个ImageIcon` 的对象。
+
+但是我们现在不能直接将 `ImageIcon` 直接添加到 `JFrame` 界面中，因为我们还需要给图片进行 `宽高、位置等` 设置。
+
+因此需要先把图片放到一个 `JLabel` 中。
+
+`JLabel` 你可以把它理解成是一个管理者，它可以管理 `文字和图片`。
+
+它在管理图片的时候，就可以对图片的`宽高、位置、边框`进行设置，代码写起来也很简单。
+
+----
+
+## 二、步骤
+
+首先创一个 `ImageIcon` 的对象，并指定图片在电脑中的位置。
+
+再创建一个 `JLabel` 的对象，把图片交给 `JLabel`，再把这个整体放到界面中即可。
+
+此时图片就会成功的添加到界面 `JFrame` 中，默认是展示在界面的正中央。
+
+<img src="./assets/image-20240420065440146.png" alt="image-20240420065440146" style="zoom:67%;" />
+
+首先我们需要将图片素材全部添加到项目中。
+
+本游戏使用到的图片都整理到了 `素材的image` 中
+
+<img src="./assets/image-20240420071242964.png" alt="image-20240420071242964" style="zoom: 67%;" />
+
+直接复制 `image` 这个文件夹，
+
+![image-20240420071532240](./assets/image-20240420071532240.png)
+
+打开IDEA，选中模块名，直接 <kbd>ctrl + v</kbd> 粘贴进去，点击OK即可。
+
+![image-20240420071628843](./assets/image-20240420071628843.png)
+
+注意不要粘贴错了，是粘贴在当前模块下。
+
+找到 `image ——> animal ——> animal3 ——> all.jpg`，这个是游戏的完整图。
+
+前面的 `1.jpg ~ 15.jpg` 就是我把这张图去分隔成了15个小方格，和一个留白。
+
+![image-20240420071942219](./assets/image-20240420071942219.png)
+
+每张小图片的大小都是固定的，看右上角。
+
+它的宽高都是 `105 * 105`，单位是像素
+
+![image-20240420072218339](./assets/image-20240420072218339.png)
+
+-----
+
+## 三、代码示例
+
+### 1）思路分析
+
+找到 `GameJFrame`，当我们创建 `GameJFrame` 对象的时候，就表示游戏的窗体就已经出来了。
+
+然后对这个窗体进行一些初始化、添加菜单，添加完菜单后，我们要在下面去初始化图片，相当于就是将图片加载到界面当中。
+
+这里我们通过 `initImage()` 方法，然后 <kbd>alt + 回车</kbd> ，选择第一个 `Create method 'initImage' in 'GameJFrame'` ，即利用IDEA帮我们创建方法，方法的名字叫做 `initImage`，在当前的 `GameJFrame` 类中。
+
+<img src="./assets/image-20240420072720100.png" alt="image-20240420072720100" style="zoom:67%;" />
+
+此时在下面就自动生成好了方法。
+
+<img src="./assets/image-20240420072755733.png" alt="image-20240420072755733" style="zoom:67%;" />
+
+然后给方法加上注释
+
+~~~java
+// 初始化图片
+private void initImage() {
+}
+~~~
+
+现在，我们就可以添加图片了。
+
+但是要注意的是，图片不是直接添加到界面中的，而是需要先创建 `ImageIcon` 的对象；第二步还需要创建一个 `JLabel` 的对象（管理容器）；第三步：将管理容器添加到界面中。
+
+~~~java
+// 初始化图片
+private void initImage() {
+    // 创建一个图片 ImageIcon 对象
+
+    // 创建一个 JLabel对象（管理容器）
+
+    // 把管理容器添加到界面中
+}
+~~~
+
+如果你不知道ImageIcon对象如何创建，你可以：① 看源码；② 看API帮助文档
+
+-----
+
+#### ① 看源码
+
+这里就来看源码。<kbd>ctrl + N</kbd> 搜索 `javax.swing` 包下的 `ImageIcon`
+
+![image-20240420073421652](./assets/image-20240420073421652.png)
+
+然后 <kbd>ctrl + F12</kbd> 找它的构造方法，可以看见它有很多很多的构造方法。
+
+![image-20240420073555041](./assets/image-20240420073555041.png)
+
+如果不知道用谁，可以先来看最简单的空参构造。
+
+空参构造肯定不行，因为你要想，我创建一个图片对象，那肯定要将图片在电脑上的位置告诉它。
+
+![image-20240420073737401](./assets/image-20240420073737401.png)
+
+有没有一个构造方法中直接传入一个字符串，表示图片的位置呢？
+
+此时可以找到有一个参数是 `String` 的构造方法
+
+![image-20240420073853315](./assets/image-20240420073853315.png)
+
+点进来看一下，形参类型是 `String`，形参的名字是 `filename(文件名)`
+
+![image-20240420073915964](./assets/image-20240420073915964.png)
+
+看到这我们就知道了，我们可以把图片路径用这个构造传递进去。
+
+----
+
+#### ②  看API帮助文档
+
+根据如图步骤搜索，同样也可以找到 `形参是String的构造方法`。
+
+![image-20240420074214365](./assets/image-20240420074214365.png)
+
+----
+
+### 2）创建 `ImageIcon` 对象
+
+首先来复制图片的路径，右击本地图片 ——> Copy Path/Reference... ——> Absolute Path，这个就是图片的完整路径
+
+![image-20240420074626004](./assets/image-20240420074626004.png)
+
+然后调用ImageIcon的构造方法将路径传入进去。
+
+这句话的意思是：我要把 `E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3` 路径下的 `3.jpg` 这张图片加载到内存中。
+
+~~~java
+// 创建一个图片 ImageIcon 对象
+ImageIcon icon = new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\3.jpg");
+~~~
+
+----
+
+### 3）创建 `JLabel` 对象
+
+表示的是：这个管理容器就管理括号中的内容
+
+~~~~java
+// 创建一个 JLabel对象（管理容器）
+JLabel jLabel1 = new JLabel(icon);
+~~~~
+
+----
+
+### 4）把管理容器添加到界面中
+
+~~~java
+// 把管理容器添加到界面中，调用JFrame的add方法
+// 添加进去后，默认会放在页面的正中央
+this.add(jLabel1);
+~~~
+
+----
+
+### 5）调试
+
+右键运行App，可以看见图片成功展示。
+
+<img src="./assets/image-20240420081420738.png" alt="image-20240420081420738" style="zoom:50%;" />
+
+
+
+----
+
+# 位置坐标
+
+## 一、引入
+
+刚刚我们已经在页面中添加了图片了，代码并不是很难。
+
+但是代码这样写，会有一点小问题，因为图片都是默认放在正中央的，如果我们添加的图片超过一张，这些图片就会重叠在一起。
+
+我的需求是：第一张图片在左上角显示，然后剩余的图片依次往后放。
+
+想要实现这个效果，就会涉及到左边的概念。
+
+----
+
+## 二、介绍
+
+坐标以左上角为原点，向右为 `x轴`，向下为 `y轴`。
+
+图片所在的位置其实就是 `图片左上角的点` 在坐标上的位置。
+
+<img src="./assets/坐标-1713566714740-2.png" style="zoom:50%;" />
+
+如果是 `x、y` 都设置为0，那么该图片会显示在屏幕的左上角。
+
+<img src="./assets/image-20240420080523199.png" alt="image-20240420080523199" style="zoom:67%;" />
+
+与此同时，图片的 `宽高` 也可以一起设置，之前带大家看过，所有的这种小图片都是 `105个像素`。
+
+-----
+
+## 三、引出问题
+
+找到 `GameJFrame` 游戏的主界面，然后再找到构造方法，再看里面的 `initImage方法`，我们是在添加图片的时候，给图片去指定它的位置。
+
+指定位置的时候要注意了，一定要在 `把管理容器添加到界面中` 之前才可以。
+
+<img src="./assets/image-20240420080901695.png" alt="image-20240420080901695" style="zoom:67%;" />
+
+调用 `setBounds()` 方法，<kbd>ctrl + p</kbd> 查看参数，`x、y` 表示图片的位置，`width、height` 表示图片的宽高，单位都是像素。
+
+因此位置这里就写 `0, 0`，宽高写 `105， 105`
+
+~~~java
+// 指定图片的位置，调用方法：setBounds
+jLabel1.setBounds(0, 0, 105, 105);
+~~~
+
+你觉得这个代码就行了吗？不知道，打开App，右键运行，来启动一下看下效果是不是跟我们想的一样。
+
+程序运行完毕，你发现它的位置并不在 `(0, 0)`。
+
+<img src="./assets/image-20240420081405425.png" alt="image-20240420081405425" style="zoom:50%;" />
+
+这是因为在这里其实还有一个小细节。
+
+-----
+
+## 四、解决问题
+
+右边是一个 `JFrame` 主窗体界面，在刚刚我们要把一张图片添加到界面中，默认是显示在正中央。
+
+但是我刚刚已经指定了x、y的位置了，它应该显示在左上角，那为什么还是显示在正中央呢？
+
+<img src="./assets/image-20240420081746640.png" alt="image-20240420081746640" style="zoom:67%;" />
+
+不着急，听我来跟你慢慢分析。
+
+这个主窗体现在我们可以把它看成是三个部分。
+
+第一个部分：上面的标题；
+
+第二个部分：中间的菜单；
+
+第三个部分：在最下面，它其实还有一个隐藏的容器。
+
+此时这个隐藏的容器它就说话了：`JFrame` 只是个大的架子，我才是用来装载所有组件的。（图片、文字、按钮、进度条等，我们都可以叫做组件，组件是一个统称）。
+
+<img src="./assets/image-20240420082054897.png" alt="image-20240420082054897" style="zoom:67%;" />
+
+我们在代码中，可以通过 `getContentPane()` 去获取这个隐藏容器。
+
+细节：隐藏的容器不需要我们自己创建对象，因为它是 `JFrame对象` 里面的东西，当我们创建了 `JFrame窗体对象` 的时候，它就会出现了，一会会带着大家看源码。
+
+因此我们可以直接通过 `get方法` 就能获取到这个隐藏容器了，那么我们在添加图片的时候，需要将要显示的图片添加给这个隐藏的容器。
+
+在添加的时候没有什么特殊要求，它会把要添加的图片**默认**放在正中央。
+
+<img src="./assets/image-20240420082434888.png" alt="image-20240420082434888" style="zoom:67%;" />
+
+但如果我不想让你放到正中央呢？就需要将默认的机制给取消。
+
+因此在代码中我们还需要去调用一个方法 `setLayout(null)`，这个方法我们可以通过它的名字去猜一猜它的意思。
+
+`set`：设置，`layout`：布局，`null`：没有。因此这个方法的大概意思：将布局设置为 `null`，这里的布局指的就是它的排列方式。
+
+因此这个方法的真正意思：我要取消默认的居中方式。
+
+一旦取消了这个居中方式，那就会完全按照我们自己指定的 `x、y` 的坐标来放置图片了。
+
+----
+
+## 五、代码示例
+
+在 `GameJFrame类` 中的构造方法中，找到 `initJFrame` 方法，我们需要在初始化界面的时候，就将默认的居中放置给取消。
+
+选中方法 <kbd>ctrl + b</kbd> 跟进，跳转到方法中。
+
+~~~java
+private void initJFrame() {
+    ..... // 之前写的代码
+
+    // 取消默认的居中方式，只有取消了，才会安装xy轴的形式添加组件
+    this.setLayout(null);
+}
+~~~
+
+回到 `initImage()` 方法中，首先我们将图片改为加载 `1.jpg` 这张图片。
+
+然后在添加的时候，将我们之前添加的代码注释掉，然后使用 `this(当前界面的对象)` 调用方法 `getContentPane()`，获取到 `JFrame(界面)` 中隐藏的容器，然后再去调用 `add方法`，把 `jLabel1` 添加到隐藏容器中。
+
+~~~java
+// 初始化图片
+private void initImage() {
+    // 创建一个图片 ImageIcon 对象
+    ImageIcon icon = new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\1.jpg");
+    // 创建一个 JLabel对象（管理容器）
+    JLabel jLabel1 = new JLabel(icon);
+    // 指定图片的位置，调用方法：setBounds
+    jLabel1.setBounds(0, 0, 105, 105);
+    // 把管理容器添加到界面中，调用JFrame的add方法
+    // 添加进去后，默认会放在页面的正中央
+    // this.add(jLabel1);
+    this.getContentPane().add(jLabel1);
+}
+~~~
+
+然后重新运行 `App`，右键运行，可以发现第一张图片 `1.jpg` 已经放在左上角了。
+
+<img src="./assets/image-20240420084127415.png" alt="image-20240420084127415" style="zoom:50%;" />
+
+----
+
+## 六、扩展
+
+在刚刚我们说了，那个隐藏的容器不需要我们自己创建，它是在创建界面对象的时候自动就创建出来了。那我能不能看一看呢？必须是可以的。
+
+首先找到 `GameJFrame` 的构造方法，它的第一行其实有一个隐藏的 `super()`，表示调用父类的空参构造。
+
+![image-20240420084954581](./assets/image-20240420084954581.png)
+
+<kbd>ctrl + b</kbd> 跟进它的父类 `JFrame`，<kbd>ctrl + F12</kbd> 找到空参构造。
+
+在它的空参构造中，又调用了 `frameInit()` 方法，这就是说，我们在创建界面对象的时候，Java底层其实也做了很多的初始化动作。
+
+![image-20240420085151811](./assets/image-20240420085151811.png)
+
+<kbd>ctrl + b</kbd> 跟进 `frameInit()` 方法，此时可以看见Java底层对界面做的初始化。
+
+最终要的是 `258行`，`setRootPane()：设置隐藏容器` 。`set`：设置；`root`：根，其实就是那个隐藏容器；`pane`：是隐藏容器的名字 `pane`，其实它完整的名字是 `panel(面板)`，`pane` 只是它一个简写名字。
+
+它的参数是 `createRootPane()：创建一个隐藏的容器`。
+
+![image-20240420085403077](./assets/image-20240420085403077.png)
+
+选中 `createRootPane()`，<kbd>ctrl + b</kbd> 跟进。
+
+在这个方法中，它就帮我们去创建了一个对象。
+
+<img src="./assets/image-20240420085900858.png" alt="image-20240420085900858" style="zoom:67%;" />
+
+此时我们就知道了，这个隐藏容器的对象不需要我们自己创建。
+
+在我们创建界面 `JFrame` 对象的时候，在底层，就帮我们自动的去创建了这个隐藏容器。
+
+所以我们在代码中，直接通过 `getContentPane()` 方法获取出来就行了。
+
+-----
+
+# 添加剩下的图片
+
+## 一、引入
+
+在刚刚，我们已经将第一张图片添加到游戏的左上角了，接下来我们要开始来添加第二张图片，你觉得第二张图片它的位置是多少呢？
+
+第二张图片的位置其实也是看这张 `图片左上角的点` 在坐标中的位置。
+
+初中的时候，我们学习过直角坐标系，在坐标系中任意的一个点，都可以用 `x、y` 来表示。
+
+`x`：对应在X轴的位置。
+
+`y`：对应在Y轴的位置。
+
+因此第二张图片的左上角在坐标系中的位置应该为：`(105, 0)`。
+
+<img src="./assets/image-20240420090500882.png" alt="image-20240420090500882" style="zoom:50%;" />
+
+----
+
+## 二、代码实现
+
+在这里因为代码比较固定，所以我已经提前准备好了。
+
+~~~java
+// 初始化图片
+private void initImage() {
+    // 第一张图片
+    // 创建一个图片 ImageIcon 对象
+    ImageIcon icon = new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\1.jpg");
+    // 创建一个 JLabel对象（管理容器）
+    JLabel jLabel1 = new JLabel(icon);
+    // 指定图片的位置，调用方法：setBounds
+    jLabel1.setBounds(0, 0, 105, 105);
+    // 把管理容器添加到界面中，调用JFrame的add方法
+    // 添加进去后，默认会放在页面的正中央
+    // this.add(jLabel1);
+    this.getContentPane().add(jLabel1);
+    
+    ------------------------------------------
+    
+    // 第二张图片
+    // 创建一个 JLabel对象（管理容器）
+    JLabel jLabel2 = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\2.jpg"));
+    // 指定图片的位置，调用方法：setBounds
+    jLabel2.setBounds(105, 0, 105, 105);
+    // 把管理容器添加到界面中，调用JFrame的add方法
+    this.getContentPane().add(jLabel2);
+    
+    ------------------------------------------
+    
+    // 第三张图片
+    // 创建一个 JLabel对象（管理容器）
+    JLabel jLabel3 = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\3.jpg"));
+    // 指定图片的位置，调用方法：setBounds
+    jLabel3.setBounds(210, 0, 105, 105);
+    // 把管理容器添加到界面中，调用JFrame的add方法
+    this.getContentPane().add(jLabel3);
+    
+    等等..........
+}
+~~~
+
+这个代码写完后，每张图片都需要写四行代码。那如果以后我要添加100张图片呢？那就要写400行代码，太麻烦了！
+
+----
+
+## 三、优化
+
+### 1）优化
+
+在优化前，首先将 `创建ImageIcon的代码` 和 `创建JLabel的代码进行合并`
+
+~~~java
+// 创建一个 JLabel对象（管理容器）
+JLabel jLabel1 = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\1.jpg"));
+// 指定图片的位置，调用方法：setBounds
+jLabel1.setBounds(0, 0, 105, 105);
+// 把管理容器添加到界面中，调用JFrame的add方法
+this.getContentPane().add(jLabel1);
+~~~
+
+使用循环优化：每一个循环都是打印一行图片
+
+~~~java
+// 初始化图片
+private void initImage() {
+    for (int i = 0; i < 4; i++) {
+        // 创建一个 JLabel对象（管理容器）
+        JLabel jLabel = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\1.jpg"));
+        // 指定图片的位置，调用方法：setBounds
+        jLabel.setBounds(105 * i, 0, 105, 105);
+        // 把管理容器添加到界面中，调用JFrame的add方法
+        this.getContentPane().add(jLabel);
+    }
+
+    for (int i = 0; i < 4; i++) {
+        // 创建一个 JLabel对象（管理容器）
+        JLabel jLabel = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\1.jpg"));
+        // 指定图片的位置，调用方法：setBounds
+        jLabel.setBounds(105 * i, 105, 105, 105);
+        // 把管理容器添加到界面中，调用JFrame的add方法
+        this.getContentPane().add(jLabel);
+    }
+
+    for (int i = 0; i < 4; i++) {
+        // 创建一个 JLabel对象（管理容器）
+        JLabel jLabel = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\1.jpg"));
+        // 指定图片的位置，调用方法：setBounds
+        jLabel.setBounds(105 * i, 210, 105, 105);
+        // 把管理容器添加到界面中，调用JFrame的add方法
+        this.getContentPane().add(jLabel);
+    }
+
+    for (int i = 0; i < 4; i++) {
+        // 创建一个 JLabel对象（管理容器）
+        JLabel jLabel = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\1.jpg"));
+        // 指定图片的位置，调用方法：setBounds
+        jLabel.setBounds(105 * i, 315, 105, 105);
+        // 把管理容器添加到界面中，调用JFrame的add方法
+        this.getContentPane().add(jLabel);
+    }
+}
+~~~
+
+进入 `App` 中运行，可以看见图片全都已经加载完毕了，虽然加载的都是同一张，别着急，最后再去改内容，先将加载图片的代码写完。
+
+<img src="./assets/image-20240420092826636.png" alt="image-20240420092826636" style="zoom:50%;" />
+
+----
+
+### 2）进一步优化
+
+可以看见上面循环中的代码也是重复的
+
+~~~java
+// 初始化图片
+private void initImage() {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            // 创建一个 JLabel对象（管理容器）
+            JLabel jLabel = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\1.jpg"));
+            // 指定图片的位置，调用方法：setBounds
+            jLabel.setBounds(105 * j, 105 * i, 105, 105);
+            // 把管理容器添加到界面中，调用JFrame的add方法
+            this.getContentPane().add(jLabel);
+        }
+    }
+}
+~~~
+
+重新运行程序，程序运行完毕，可以发现效果跟刚刚是一样的。
+
+<img src="./assets/image-20240420092826636.png" alt="image-20240420092826636" style="zoom:50%;" />
+
+在循环嵌套的代码中，外层循环叫做 `外循环`，里面的这层循环我们叫做 `内循环`。
+
+以后在看这种循环嵌套的时候有个技巧：先看 `内循环` 在做什么事情，然后再看外循环。
+
+~~~java
+// 初始化图片
+private void initImage() {
+    //外循环 --- 把内循环重复执行了4次。
+    for (int i = 0; i < 4; i++) {
+        //内循环 --- 表示在一行添加4张图片
+        for (int j = 0; j < 4; j++) {
+            JLabel jLabel = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\1.jpg"));
+            jLabel.setBounds(105 * j, 105 * i, 105, 105);
+            this.getContentPane().add(jLabel);
+        }
+    }
+}
+~~~
+
+-----
+
+## 四、替换图片
+
+可以看见在本地图片中，每一张图片都跟一个数字产生了一个对应关系。
+
+因此在代码中我们就可以这么写：定一个 `number变量` 表示要加载的图片。
+
+~~~java
+private void initImage() {
+    int number = 1; // 1.表示一开始我加载的时第一张图片
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            // 2.加载对应的图片
+            JLabel jLabel = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\" + number +".jpg"));
+            jLabel.setBounds(105 * j, 105 * i, 105, 105);
+            this.getContentPane().add(jLabel);
+            // 3.每次新增一张图片时，number需要自增，表示下一次加载后面一张图片
+            number++;
+        }
+    }
+}
+~~~
+
+回到App类中，右键运行代码，效果如下图，可以发现图片是正确的
+
+<img src="./assets/image-20240420094019611.png" alt="image-20240420094019611" style="zoom:50%;" />
+
+但是在这里会有一个小细节，我在加载最后一张图片 `number = 16时`，它是会有点小问题的，因为我们本地并没有 `16.jpg`，因此在添加第 16张图片 的时候，它找不到。虽然找不到，但是它也会加载一个 `JLabel`，只不过这个 `JLabel` 找不到管理的图片，它就会显示一个空白。
+
+~~~java
+JLabel jLabel = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\16.jpg"));
+~~~
+
+----
+
+## 五、总结
+
+到目前为止，关于加载图片所有的代码就已经全部写完了。
+
+现在我们把目前为止学习到的这些加载组件来回顾一下。
+
+在刚刚书写代码的时候，我们搭建了一个主界面，它的名字叫做 `JFrame(主窗体)`。
+
+我们给 `JFrame` 做了一个设置，例如：宽高、左上角的标题、关闭模式、让界面置顶居中、取消隐藏容器中默认居中的这种方式，取消了默认居中的这中方式，里面的组件才会按照 `x、y轴` 的形式来进行添加。
+
+<img src="./assets/image-20240420094804979.png" alt="image-20240420094804979" style="zoom:70%;" />
+
+---
+
+再往下，我们添加了菜单，菜单的名字叫做 `JMenuBar`，但是我们要知道 `JMenuBar` 指的是这个长条。
+
+![image-20240420095015223](./assets/image-20240420095015223.png)
+
+里面的每一个选项，它叫做 `JMenu`。因此在菜单里面，如果你有一个选项，就创建一个 `JMenu对象`，如果你有五个选项，那么你就要创建 `5个` JMenu的对象。
+
+<img src="./assets/image-20240419205943262.png" alt="image-20240419205943262" style="zoom:67%;" />
+
+我们以第一个 `JMenu` 为例，当我选择第一个选项的时候，下面还会有很多条目，每一个条目就对应了一个 `JMenuItem` 对象
+
+<img src="./assets/image-20240419210226917.png" alt="image-20240419210226917" style="zoom:67%;" />
+
+----
+
+再往下，我们就是在下面的隐藏容器中添加图片，这里有个细节：在我们添加图片的时候，一定要取消隐藏容器中居中的默认方式，要不然 `x、y的位置` 它是不会生效的。
+
+而且我们在添加图片的时候要注意，图片不是直接添加进去的，而是需要先创建一个 `JLabel` 容器对象，把图片放到 `JLabel` 中，再把 `JLabel` 才能添加到界面里面。
+
+![image-20240420095933686](./assets/image-20240420095933686.png)
+
+然后利用这个方式，结合循环的嵌套，就可以添加后面所有的图片。
+
+下一步我们应该做什么呢？
+
+我们在玩游戏之前，需要先打乱图片的顺序。因此下一节就是来打乱图片所有的顺序。
+
+
+
+----
+
+# 147.打乱图片
+
+## 一、思路
+
+在刚刚我们已经将游戏用到的小的图片都加载到界面中了，现在我们就来打乱图片的顺序。
+
+先来看一下打乱后的效果，可以用一个词来形容，那就是：随机。
+
+<img src="./assets/image-20240420100305518.png" alt="image-20240420100305518" style="zoom:80%;" />
+
+那代码该如何去实现呢？
+
+在写代码之前，我们需要先知道一个前提：`每一张小的图片` 都是和 `一个唯一的数字` 产生对应关系。
+
+分别是 `1 ~ 15`，右下角的空白区域为 `0`，有了这些数字之后，代码其实就很简单了。
+
+![image-20240420100553209](./assets/image-20240420100553209.png)
+
+我们可以把这些数字放到一个容器中去方便管理，这个容器我们就可以采用数组。
+
+然后在容器里面打乱数字的顺序，最后我们按照打乱后的顺序去加载图片即可。
+
+<img src="./assets/image-20240420100833980.png" alt="image-20240420100833980" style="zoom:67%;" />
+
+----
+
+## 二、问题
+
+但是到这个时候，会有两个小问题：
+
+### ① 如果我按照下面这个数组里打乱的数据加载图片，会非常的不方便。
+
+因为我还要去数：`0 - 3` 索引是第一排，`4 - 7` 索引是第二排，后面也是以此类推，需要一个个去数，太麻烦了！
+
+因此我们会将这个数组中，每四个数字拿出来，单独放到一个一维数组中，此时就会产生四个数组。
+
+再把这四个数组放到二维数组中，方便管理，这样就非常的方便了。
+
+其中 `第一个数组里面的数据` 就是 `第一排所对应的图片`； `第二个数组里面的数据` 就是 `第二排所对应的图片`，以此类推。
+
+![image-20240420101155558](./assets/image-20240420101155558.png)
+
+而且在后面学习上下左右移动的时候，二维数组也非常的方便。
+
+例如我想让空白区域往上移，那就是跟竖着的 `8` 去做一个位置的交换就行了。
+
+<img src="./assets/image-20240420101612077.png" alt="image-20240420101612077" style="zoom:67%;" />
+
+但假如我用一维数组去交换 `8` 跟 `0` 的位置，单单是断定它索引的位置，就非常的麻烦！
+
+![image-20240420101720329](./assets/image-20240420101720329.png)
+
+因此在这我们用二维数组会更方便。
+
+----
+
+### ② 可以用集合吗？
+
+说到这里，有的同学还会想：我用集合行不行。
+
+告诉你，用集合也可以，但是集合嵌套的代码写起来就更复杂了，它不如二维数组简单。
+
+因此，在以后，如果题目没有什么特殊的要求的话，我们一般是这么处理的：长度固定的，我们用数组；长度不固定的，我们会用集合。
+
+----
+
+## 三、练习：打乱一维数组中的数据
+
+### 1）需求
+
+我们先到IDEA中去写这样的一个小练习，练习写完，再去改写游戏。
+
+`int[] tempArr = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};`
+
+要求：打乱一维数组中的数据，并按照4个一组的方式添加到二维数组中。
+
+----
+
+### 2）代码实现
+
+我们首先需要来创建一个测试类，要注意的是，我们千万不要将测试类创建在 `ui` 包下，因为 `ui包` 表示游戏所有的界面。
+
+因此我们在这要新建一个包，包名为：`com.itheima.test`，它表示这个包下所有的类都是用来测试的。
+
+<img src="./assets/image-20240420104947855.png" alt="image-20240420104947855" style="zoom:67%;" />
+
+然后再来新建一个 `Test类`
+
+~~~java
+package com.itheima.test;
+
+import java.util.Random;
+
+public class Test1 {
+    public static void main(String[] args) {
+        //需求：
+        //把一个一维数组中的数据：0~15 打乱顺序
+        //然后再按照4个一组的方式添加到二维数组当中
+
+        //1.定义一个一维数组
+        int[] tempArr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+        //2.打乱数组中的数据的顺序
+        //遍历数组，得到每一个元素，拿着每一个元素跟随机索引上的数据进行交换
+        Random r = new Random();
+        for (int i = 0; i < tempArr.length; i++) {
+            //获取到随机索引
+            int index = r.nextInt(tempArr.length);
+            //拿着遍历到的每一个数据，跟随机索引上的数据进行交换
+            int temp = tempArr[i];
+            tempArr[i] = tempArr[index];
+            tempArr[index] = temp;
+        }
+        //3.遍历数组
+        for (int i = 0; i < tempArr.length; i++) {
+            System.out.print(tempArr[i] + " ");
+        }
+        System.out.println();
+
+        //4.创建一个二维数组
+        int[][] data = new int[4][4];
+
+        //5.给二维数组添加数据
+        //解法一：
+        //遍历一维数组tempArr得到每一个元素，把每一个元素依次添加到二维数组当中
+        for (int i = 0; i < tempArr.length; i++) {
+            data[i / 4][i % 4] = tempArr[i];
+        }
+
+        //解法二：编译二维数组，给里面的每一个数据赋值
+        int index = 0;
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                data[i][j] = tempArr[index];
+                index++;
+            }
+            System.out.println();
+        }
+
+        //遍历二维数组
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                System.out.print(data[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+}
+~~~
+
+----
+
+## 四、改写游戏界面
+
+我们需要在 `初始化图片` 的上面 `初始化数据`，我们在初始化数据的时候，做的其实就是打乱图片。打乱完图片后，在初始化图片的时候，此时就可以根据打乱之后的结果去加载图片。
+
+这个 `初始化数据` 的逻辑我们通过 `initData()` 方法来实现。
+
+此时我们可以将刚刚练习中的代码直接拷贝过来，再将创建二维数组的代码写到成员位置。
+
+PS：这个并不是 `GameJFrame类` 的完整代码，而是新增的代码。
+
+~~~java
+package com.itheima.ui;
+
+import javax.swing.*;
+import java.util.Random;
+import java.util.StringJoiner;
+
+public class GameJFrame extends JFrame {
+    // 创建一个二维数组
+    // 目的：用来管理数据。加载图片的时候，会根据二维数组中的数据进行加载。
+    int[][] data = new int[4][4];
+    
+    // 初始化数据（打乱）
+    private void initData() {
+        //1.定义一个一维数组
+        int[] tempArr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+        //2.打乱数组中的数据的顺序
+        //遍历数组，得到每一个元素，拿着每一个元素跟随机索引上的数据进行交换
+        Random r = new Random();
+        for (int i = 0; i < tempArr.length; i++) {
+            //获取到随机索引
+            int index = r.nextInt(tempArr.length);
+            //拿着遍历到的每一个数据，跟随机索引上的数据进行交换
+            int temp = tempArr[i];
+            tempArr[i] = tempArr[index];
+            tempArr[index] = temp;
+        }
+
+        //5.给二维数组添加数据
+        //遍历一维数组tempArr得到每一个元素，把每一个元素依次添加到二维数组当中
+        for (int i = 0; i < tempArr.length; i++) {
+            data[i / 4][i % 4] = tempArr[i];
+        }
+    }
+
+
+    // 初始化图片
+    // 添加图片的时候，就需要安装二维数组中管理的数据添加图片
+    private void initImage() {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                // 获取当前要加载图片的序号
+                int num = data[i][j];
+                JLabel jLabel = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\animal\\animal3\\" + num +".jpg"));
+                jLabel.setBounds(105 * j, 105 * i, 105, 105);
+                this.getContentPane().add(jLabel);
+            }
+        }
+    }
+}
+~~~
+
+----
+
+## 五、效果
+
+重新运行 `App类`，效果如下图所示，可以发现图片成功被打乱！
+
+<img src="./assets/image-20240420112428928.png" alt="image-20240420112428928" style="zoom:50%;" />
+
+
+
+-----
+
+# 148.事件
+
+## 一、介绍
+
+### 1）概念
+
+在刚刚，我们已经将游戏的界面搭建出来了，图片也都添加进去了，接下来我们要做的事情，就是让图片去移动起来，想要让它移动，就要来学习 `事件`。
+
+事件：可以被组件识别的操作。
+
+说白了就是：当你对组件干了某件事情之后，就会执行对应的代码。
+
+例如在登录页面中，当 `登录按钮` 被**点击**后，就会校验 `用户名和密码` 这段逻辑，这就是事件。
+
+<img src="./assets/image-20240420112841130.png" alt="image-20240420112841130" style="zoom:60%;" />
+
+----
+
+### 2）三个核心要素
+
+* 事件源（表示你要对哪些组件进行操作）： 按钮 图片 窗体... 
+
+  例如刚刚的登录案例中，被点击的 `登录按钮` 就是 `事件源`
+
+* 事件：对 `事件源` 进行的操作叫做 `事件`
+
+  例如：鼠标单机、鼠标划入、键盘输入.....
+
+* 绑定监听：当`事件源`上发生了某个事件，就会执行某段代码 
+
+  例如刚刚的登录案例中，当`事件源（登录按钮）`上发生了`点击事件`后，就会执行 `校验用户名和密码` 的这段代码
+
+----
+
+### 3）常见的三种事件监听
+
+* 键盘监听 KeyListener
+
+  键盘监听：对组件用键盘进行了操作。例如很多软件的快捷键就是这么干的
+
+* 鼠标监听 MouseListener
+
+  凡是能用鼠标操作的，都是 `鼠标监听`
+
+* 动作监听 ActionListener
+
+  动作监听比较特殊，你可以把它理解为 `键盘监听`、`鼠标监听` 的精简版。
+
+  `键盘监听` 几乎可以监听键盘中所有的按键。`鼠标监听` 可以监听 `鼠标按下不松...`，并且可以将单机分成很多步。
+
+  但是动作监听就没有这么麻烦了，它是一个精简版。
+
+  动作监听在监听鼠标的时候，它只能监听 `点击`；在监听键盘的时候，它只能监听空格。
+
+我提前在 `Test3` 中写了一段代码，在代码中创建了一个窗体，并给界面设置了宽高、标题、界面置顶、居中、关闭模式、取消默认的居中放置、让整个界面显示出来。
+
+```java
+package com.itheima.test;
+
+import javax.swing.*;
+
+public class Test3 {
+    public static void main(String[] args) {
+        JFrame jFrame = new JFrame();
+        //设置界面的宽高
+        jFrame.setSize(603, 680);
+        //设置界面的标题
+        jFrame.setTitle("事件演示");
+        //设置界面置顶
+        jFrame.setAlwaysOnTop(true);
+        //设置界面居中
+        jFrame.setLocationRelativeTo(null);
+        //设置关闭模式
+        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        //取消默认的居中放置，只有取消了才会按照XY轴的形式添加组件
+        jFrame.setLayout(null);
+
+        jFrame.setVisible(true);
+    }
+}
+```
+
+在中间，我们需要创建一个按钮对象，因为我们需要来对按钮添加事件。
+
+按钮的类叫做 `JButton(Java Button)`，给这个 `JButton` 取个名字为：`jtb`，在按钮中显示文本：`"点我啊"`
+
+~~~java
+//创建一个按钮对象
+JButton jtb = new JButton("点我啊");
+~~~
+
+再往下，去给这个按钮设置`位置`和`宽高`，通过 `jtb` 去调用 `setBounds()` 方法，它同样也有四个参数：`x、y` 代表位置，`width、height` 代表宽高，它们的单位都是 `像素`。
+
+~~~java
+//设置位置和宽高
+jtb.setBounds(0,0,100,50);
+~~~
+
+再往下，给 `jtb` 添加一个动作监听，调用方法 `jtb.addActionListener()`。
+
+这段代码我们可以把它拆解一下。
+
+`jtb`：组件对象，表示你要给哪个组件添加事件。
+
+`addActionListener()`：`add` 可以理解成 `添加`，后面的 `ActionListener` 就是需要监听的事件。
+
+合起来就是：我要给组件添加哪个事件监听。我现在写的是 `ActionListener` ，表示 `动作监听`，`动作监听` 包含两部分：① 鼠标左键点击；② 空格。除此之外，其他的都监听不了。
+
+~~~java
+jtb.addActionListener();
+~~~
+
+事件添加后，是不是要去执行一段代码，那这段代码在哪呢?
+
+这段代码就是由括号中的参数去决定的。
+
+选中方法，<kbd>ctrl + b</kbd> 跟进。
+
+<img src="./assets/image-20240420115022375.png" alt="image-20240420115022375" style="zoom:67%;" />
+
+可以看见它的形参是 `ActionListener` 类型的。
+
+选中它，继续跟进。
+
+<img src="./assets/image-20240420115113671.png" alt="image-20240420115113671" style="zoom:67%;" />
+
+可以看见 `ActionListener` 是一个接口，所以我们在调用方法的时候，需要传入 `ActionListener` 接口的实现类对象。
+
+最简单的方式就是写一个 `ActionListener` 的实现类
+
+<img src="./assets/image-20240420115326180.png" alt="image-20240420115326180" style="zoom:67%;" />
+
+然后用刚刚新建的类去实现 `ActionListener接口`。实现一个接口，需要重写里面的抽象方法。
+
+![image-20240420115459225](./assets/image-20240420115459225.png)
+
+~~~java
+package com.itheima.test;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class MyActionListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        System.out.println("按钮被点击了");
+    }
+}
+~~~
+
+此时在 `jtb.addActionListener()` 方法中就可以传入 `ActionListener` 的实现类对象。
+
+这句话整体解释就是：现在我们需要给 `jtb` 这个按钮去添加动作监听事件，动作监听中包含了：鼠标左键单机、空格。
+
+我们以 `鼠标左键单机` 为例，当用鼠标左键单机了 `jtb` 这个按钮之后，就会执行 `MyActionListener` 这个类中的代码。
+
+因此这里的参数就表示：事件被触发之后要执行的代码。
+
+由于里面的代码逻辑就是打印：`"按钮被点击了"`，因此当我们点击按钮后，这个输出语句就会出现。
+
+~~~java
+jtb.addActionListener(new MyActionListener());
+~~~
+
+最后，将按钮添加到整个界面中即可。
+
+要注意的时，这个 `jtb` 也应该被添加到隐藏容器中。
+
+~~~java
+//把按钮添加到界面当中
+jFrame.getContentPane().add(jtb);
+~~~
+
+右键运行来看下效果，可以发现鼠标每点击一次，都会打印出 `"按钮被点击了"` 这句话，同样按空格也会打印出这句话。
+
+<img src="./assets/5qoyy-l191m.gif" alt="5qoyy-l191m" style="zoom:80%;" />
+
+----
+
+### 4）优化1
+
+在实际开发中，每一个按钮的业务逻辑都是不一样的，如果每一个按钮都要去新创建一个类，太麻烦了！
+
+之前我们讲过，当一个接口的实现类只被用到一次时，这个类我们就没有必要再去单独定义一个类了，而是用 `匿名内部类` 的形式去简化代码。
+
+这样写其实跟刚刚是一样的，我要给 `jtb` 这个按钮去添加 `动作监听`，当这个监听被触发了之后，就会执行 `actionPerformed()` 方法中的代码。
+
+之前讲过，整个这段代码应该叫做 `匿名内部类的对象`，真正没有名字的类是后的的大括号，而这个大括号实现了前面 `ActionListener接口`，因此需要在该类中重写接口中所有的抽象方法。前面的 `nwe` 关键字 `new` 的并不是这里的接口，而是后面大括号这个没有名字的类。
+
+~~~java
+jtb.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        System.out.println("达咩~不要点我哟~");
+    }
+});
+~~~
+
+右键运行，用鼠标左键点它，或者按下空格，跟刚刚的效果都是一模一样的。
+
+<img src="./assets/z0n22-s3tu5.gif" alt="z0n22-s3tu5" style="zoom:67%;" />
+
+这个是我们在实际开发中其中的一种写法，除此之外，我们在实际开发当中还会有另外一种写法。
+
+----
+
+### 5）优化2
+
+
+
+### 9.3 动作监听
+
+包含：
+
+* 鼠标左键点击
+* 空格
+
+#### 9.3.1 事件的三种实现方式
+
+* 定义实现类实现接口
+* 匿名内部类
+* 本类实现接口
+
+#### 方式一：实现类
+
+​	定义实现类实现ActionListener接口
+
+```java
+public class Test3 {
+    public static void main(String[] args) {
+        JFrame jFrame = new JFrame();
+        //设置界面的宽高
+        jFrame.setSize(603, 680);
+        //设置界面的标题
+        jFrame.setTitle("事件演示");
+        //设置界面置顶
+        jFrame.setAlwaysOnTop(true);
+        //设置界面居中
+        jFrame.setLocationRelativeTo(null);
+        //设置关闭模式
+        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        //取消默认的居中放置，只有取消了才会按照XY轴的形式添加组件
+        jFrame.setLayout(null);
+
+
+        //创建一个按钮对象
+        JButton jtb = new JButton("点我啊");
+        //设置位置和宽高
+        jtb.setBounds(0,0,100,50);
+        //给按钮添加动作监听
+        //jtb:组件对象，表示你要给哪个组件添加事件
+        //addActionListener：表示我要给组件添加哪个事件监听（动作监听包含鼠标左键点击，空格）
+        //参数：表示事件被触发之后要执行的代码
+        jtb.addActionListener(new MyActionListener());
+
+
+        //把按钮添加到界面当中
+        jFrame.getContentPane().add(jtb);
+
+
+        jFrame.setVisible(true);
+    }
+}
+
+
+public class MyActionListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        System.out.println("按钮被点击了");
+    }
+}
+```
+
+#### 方式二：匿名内部类
+
+```java
+public class Test3 {
+    public static void main(String[] args) {
+        JFrame jFrame = new JFrame();
+        //设置界面的宽高
+        jFrame.setSize(603, 680);
+        //设置界面的标题
+        jFrame.setTitle("事件演示");
+        //设置界面置顶
+        jFrame.setAlwaysOnTop(true);
+        //设置界面居中
+        jFrame.setLocationRelativeTo(null);
+        //设置关闭模式
+        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        //取消默认的居中放置，只有取消了才会按照XY轴的形式添加组件
+        jFrame.setLayout(null);
+
+
+        //创建一个按钮对象
+        JButton jtb = new JButton("点我啊");
+        //设置位置和宽高
+        jtb.setBounds(0,0,100,50);
+        //给按钮添加动作监听
+        //jtb:组件对象，表示你要给哪个组件添加事件
+        //addActionListener：表示我要给组件添加哪个事件监听（动作监听包含鼠标左键点击，空格）
+        //参数：表示事件被触发之后要执行的代码
+
+        jtb.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("达咩~不要点我哟~");
+            }
+        });
+
+
+        //把按钮添加到界面当中
+        jFrame.getContentPane().add(jtb);
+
+
+        jFrame.setVisible(true);
+    }
+}
+```
+
+#### 方式三：本类实现接口
+
+```java
+public class MyJFrame extends JFrame implements ActionListener {
+
+    //创建一个按钮对象
+    JButton jtb1 = new JButton("点我啊");
+    //创建一个按钮对象
+    JButton jtb2 = new JButton("再点我啊");
+
+    public MyJFrame(){
+        //设置界面的宽高
+        this.setSize(603, 680);
+        //设置界面的标题
+        this.setTitle("拼图单机版 v1.0");
+        //设置界面置顶
+        this.setAlwaysOnTop(true);
+        //设置界面居中
+        this.setLocationRelativeTo(null);
+        //设置关闭模式
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        //取消默认的居中放置，只有取消了才会按照XY轴的形式添加组件
+        this.setLayout(null);
+
+
+        //给按钮设置位置和宽高
+        jtb1.setBounds(0,0,100,50);
+        //给按钮添加事件
+        jtb1.addActionListener(this);
+
+
+        //给按钮设置位置和宽高
+        jtb2.setBounds(100,0,100,50);
+        jtb2.addActionListener(this);
+
+
+        //那按钮添加到整个界面当中
+        this.getContentPane().add(jtb1);
+        this.getContentPane().add(jtb2);
+
+        //让整个界面显示出来
+        this.setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        //对当前的按钮进行判断
+
+        //获取当前被操作的那个按钮对象
+        Object source = e.getSource();
+
+        if(source == jtb1){
+            jtb1.setSize(200,200);
+        }else if(source == jtb2){
+            Random r = new Random();
+            jtb2.setLocation(r.nextInt(500),r.nextInt(500));
+        }
+    }
+}
+```
 
 
 
