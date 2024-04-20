@@ -29488,9 +29488,7 @@ jLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
 
 # 150.移动图片
 
-## 一、向上移动
-
-### 1）分析
+## 一、移动过程分析
 
 问题：你觉得当你按了向上的按钮后，它该怎么移动才是一个合理的业务逻辑呢？
 
@@ -29526,89 +29524,698 @@ jLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
 
 ---
 
-### 2）代码示例
+## 二、给界面添加点击事件
 
 找到 `GameJFrame类`（游戏的主界面），首先我们要做的其实并不是 `上下左右移动`，而是需要先给整个界面添加一个键盘监听事件。
 
 因为我们是在整个游戏界面中按 `上下左右键` 的时候才会去移动图片。
 
+我们让 `GameJFrame类` 去 `implements KeyListener`，然后重写里面所有的抽象方法。
 
+![image-20240420190738532](./assets/image-20240420190738532.png)
 
+此时我们需要找到 `initJFrame()` 初始化界面的方法，在方法的最后，我们需要去给整个界面去添加 `键盘监听事件`，
 
+当事件被触发时，需要执行 `this`(即本类) 中的代码。
 
+~~~java
+// 给整个界面添加键盘监听事件
+this.addKeyListener(this);
+~~~
 
+现在我要在游戏中 `上下左右移动`，既然是移动，那一定会跟这里的 `0` 发生关系。
 
+![image-20240420191525291](./assets/image-20240420191525291.png)
 
+`向上移动`：将 `0` 下面的图片往上移动。
 
+`向下移动`：将 `0` 上面的图片往下移动。
 
+不管你怎么移，你都得先知道 `0` 这个位置在哪才可以，因此我们需要先去统计一下 `0` 所在的位置。
 
+这个应该在 `initData()`(打乱数据) 方法中统计：在将一维数组的值添加到二维数组中时，就可以来做一个 `if判断`。
 
+如果你当前遍历到的位置 为0 的话，此时，就应该将 `0` 的位置记录下来。
 
+记录 `0` 的位置我可以在方法前面定义两个变量 `x 和 y`， `x 和 y` 就表示 `0` 在二维数组中的位置。 
 
+如果你不为 `0`，我才把数字添加到二维数组中。
 
+~~~java
+// 记录空白方块在二维数组中的位置
+int x = 0;
+int y = 0;
 
+// 初始化数据（打乱）
+private void initData() {
+    //5.给二维数组添加数据
+    //遍历一维数组tempArr得到每一个元素，把每一个元素依次添加到二维数组当中
+    for (int i = 0; i < tempArr.length; i++) {
+        if (tempArr[i] == 0) {
+            x = i / 4;
+            y = i % 4;
+        } else { // 如果你不为 `0`，我才把数字添加到二维数组中
+            data[i / 4][i % 4] = tempArr[i];
+        }
+    }
+}
+~~~
 
+PS：建议将成员变量都定义在最上面
 
+> 它是没有上下顺序的，没有规定谁一定要写在上面。只不过我们平时在写代码的时候，为了方便阅读，一般来讲都是把它们写在最上面的。
 
+<img src="./assets/image-20240420192545239.png" alt="image-20240420192545239" style="zoom:67%;" />
 
+接着，找到 `keyReleased()` 重写方法，在这个方法中我们才能对 `上、下、左、右` 进行判断。
 
+`向左的按钮` 对应的数字是 `37`，`向上的按钮` 所对应的数字是 `38`，`向右的按钮` 所对应的数字是 `39`，`向下的按钮` 所对应的数字是 `40`。
 
+那这个是怎么知道的呢？难不成我要背吗？ ——  不需要
 
+在这只需要将 `code值` 打印出来就行了。
 
+~~~java
+@Override
+public void keyReleased(KeyEvent e) {
+    int code = e.getKeyCode();
+    System.out.println(code);
+}
+~~~
 
+然后打开 `App` 右键运行，然后在整个界面中去按 `上下左右`，就会出现如下数字。
 
+<img src="./assets/image-20240420194421742.png" alt="image-20240420194421742" style="zoom:67%;" />
 
+因此这个数字不需要去记，以后要用了打印一下即可。
 
+这些数字其实是有规律的：从左开始，左上右下分别是37、38、39、40。
 
+接下来，针对于这四种情况，就要来写四个判断。
 
+~~~java
+@Override
+public void keyReleased(KeyEvent e) {
+    int code = e.getKeyCode();
+    if (code == 37) {
+        System.out.println("向左移动");
+    } else if (code == 38) {
+        System.out.println("向上移动");
+    } else if (code == 39) {
+        System.out.println("向右移动");
+    } else if (code == 40) {
+        System.out.println("向下移动");
+    }
+}
+~~~
 
+然后打开 `App` 右键运行，然后在整个界面中去按 `左上右下`，就会出现如下文字。
 
+<img src="./assets/image-20240420194836429.png" alt="image-20240420194836429" style="zoom:67%;" />
+
+因此接下来我们只需要将判断里面的代码去改写一下就OK了。
+
+首先我们先来写向上移动，因为向上移动它比较好理解。
+
+----
+
+## 三、向上移动
+
+向上移动实际的业务逻辑应该是：把空白方块下方的数字网上移动。
+
+我们已经知道了 `x、y` 就表示 `空白方块`，那空白方块下面的，我该怎么表示呢？ —— `(x + 1, y)`
+
+因此在代码中，我们只需要将 `(x, y)` 和 `(x + 1, y)` 两个位置的数据来做一个交换就行了。
+
+最后调用方法，按照最新的数字去加载图片即可。
+
+~~~java
+@Override
+public void keyReleased(KeyEvent e) {
+    int code = e.getKeyCode();
+    if (code == 37) {
+        System.out.println("向左移动");
+    } else if (code == 38) {
+        System.out.println("向上移动");
+        // 把空白方块下方的数字赋值给空白方块
+        // PS：这里不用使用到临时变量
+        // int tmp = data[x][y];
+        data[x][y] = data[x + 1][y];
+        // data[x + 1][y] = tmp;
+        data[x + 1][y] = 0;
+        x++;
+        // 调用方法按照最新的数字加载图片
+        initImage();
+    } else if (code == 39) {
+        System.out.println("向右移动");
+    } else if (code == 40) {
+        System.out.println("向下移动");
+    }
+}
+~~~
+
+代码写完后，打开 `App` 右键运行，会发现，当你按了 `向上的键` 后，事件被触发了，但是游戏界面并没有动，这是为什么呢？
+
+这就是我们最后的一个小细节：在 `initImage()` 方法中，我们还要做一个操作。
+
+在一开始，我们应该清楚原本已经出现的所有图片，并且在方法的最后，需要去刷新一下界面。
+
+~~~java
+// 初始化图片
+private void initImage() {
+    // 情况原本已经出现的所有图片
+    this.getContentPane().removeAll();
+
+    // 之前的代码
+    ...............
+
+    // 刷新一下界面
+    this.getContentPane().repaint();
+}
+~~~
+
+代码写完后，打开 `App` 右键运行，然后按住 `上键` ，可以发现图片已经上下移动了。
+
+<img src="./assets/bue4w-owkw3.gif" alt="bue4w-owkw3" style="zoom:50%;" />
+
+----
+
+## 四、将 `下、左、右` 三个方向做一个代码实现
+
+`向下移动` 的逻辑：跟向上移动的逻辑是反过来的，它其实就是把空白方块上方的图片往下移动。
+
+`向左移动` 的逻辑：将 `0` 右边的图片向左移动。
+
+`向右移动` 的逻辑：将 `0` 左边的图片向右移动。
+
+~~~java
+//松开按键的时候会调用这个方法
+@Override
+public void keyReleased(KeyEvent e) {
+    //对上，下，左，右进行判断
+    //左：37 上：38 右：39 下：40
+    int code = e.getKeyCode();
+    System.out.println(code);
+    if (code == 37) {
+        System.out.println("向左移动");
+        //逻辑：
+        //把空白方块右方的数字往左移动
+        data[x][y] = data[x][y + 1];
+        data[x][y + 1] = 0;
+        y++;
+        //调用方法按照最新的数字加载图片
+        initImage();
+    } else if (code == 38) {
+        System.out.println("向上移动");
+        //逻辑：
+        //把空白方块下方的数字赋值给空白方块
+        data[x][y] = data[x + 1][y];
+        data[x + 1][y] = 0;
+        x++;
+        //调用方法按照最新的数字加载图片
+        initImage();
+    } else if (code == 39) {
+        System.out.println("向右移动");
+        //逻辑：
+        //把空白方块左方的数字往右移动
+        data[x][y] = data[x][y - 1];
+        data[x][y - 1] = 0;
+        y--;
+        //调用方法按照最新的数字加载图片
+        initImage();
+    } else if (code == 40) {
+        System.out.println("向下移动");
+        //逻辑：
+        //把空白方块上方的数字往下移动
+        data[x][y] = data[x - 1][y];
+        data[x - 1][y] = 0;
+        x--;
+        //调用方法按照最新的数字加载图片
+        initImage();
+    }
+}
+~~~
+
+代码写完后，打开 `App` 右键运行，此时我们就可以完整的去玩一下这个游戏了。
+
+----
+
+## 五、优化代码
+
+当 `空白的格子` 在最下面时，此时我再去按 `上键`，程序虽然没有崩，但是在控制台就报异常了。
+
+![image-20240420201653624](./assets/image-20240420201653624.png)
+
+在 `"AWT-EventQueue-0"` 里面出现了一个叫 `ArrayIndexOutOfBoundsException`：数组的索引越界异常。
+
+这些异常我们该如何看呢？其实有一个小技巧，我们可以看前面的包名，从第三行开始的代码，包名都是 `java.desktop/java.awt.Component.....` 包下的，也就是说下面的这些代码不是我们写的，而是Java写的，Java那些大佬他们也有可能会发生错误，但是不会有这么低级的问题。因此肯定是我们写的代码出问题了。
+
+来看第二行我们自己写的代码的包名：`com.itheima.ui` 包下的 `GameJFrame` 的 `keyReleased()` 方法中的 `191行` 出问题了。
+
+~~~java
+Exception in thread "AWT-EventQueue-0" java.lang.ArrayIndexOutOfBoundsException: Index 4 out of bounds for length 4
+	at com.itheima.ui.GameJFrame.keyReleased(GameJFrame.java:191)
+	at java.desktop/java.awt.Component.processKeyEvent(Component.java:6587)
+	at java.desktop/java.awt.Component.processEvent(Component.java:6403)
+	at java.desktop/java.awt.Container.processEvent(Container.java:2266)
+	at java.desktop/java.awt.Window.processEvent(Window.java:2056)
+	at java.desktop/java.awt.Component.dispatchEventImpl(Component.java:5001)
+	at java.desktop/java.awt.Container.dispatchEventImpl(Container.java:2324)
+	at java.desktop/java.awt.Window.dispatchEventImpl(Window.java:2780)
+	at java.desktop/java.awt.Component.dispatchEvent(Component.java:4833)
+~~~
+
+点击一下出问题的蓝色字体，它就会自动跳到出问题的行。
+
+![image-20240420202233219](./assets/image-20240420202233219.png)
+
+你需要想：为什么会出问题呢？
+
+假设现在的空白区域是最下方：`(3, 0), (3, 1), (3, 2)`，如果在这种情况下，`x` 继续 `+ 1` 时，数组就超出索引了。
+
+因此在上面我们需要对它的边界情况做一些判断：如果超出索引了，就需要直接 `return`。
+
+以向上移动为例：`if(x == 3) return` ：表示空白方块已经在最下方了，他的下面没有图片再能移动了
+
+~~~java
+//松开按键的时候会调用这个方法
+@Override
+public void keyReleased(KeyEvent e) {
+    //对上，下，左，右进行判断
+    //左：37 上：38 右：39 下：40
+    int code = e.getKeyCode();
+    System.out.println(code);
+    if (code == 37) {
+        System.out.println("向左移动");
+        if(y == 3){
+            return;
+        }
+        //逻辑：
+        //把空白方块右方的数字往左移动
+        data[x][y] = data[x][y + 1];
+        data[x][y + 1] = 0;
+        y++;
+        //调用方法按照最新的数字加载图片
+        initImage();
+    } else if (code == 38) {
+        System.out.println("向上移动");
+        if(x == 3){
+            //表示空白方块已经在最下方了，他的下面没有图片再能移动了
+            return;
+        }
+        //逻辑：
+        //把空白方块下方的数字往上移动
+        //x，y  表示空白方块
+        //x + 1， y 表示空白方块下方的数字
+        //把空白方块下方的数字赋值给空白方块
+        data[x][y] = data[x + 1][y];
+        data[x + 1][y] = 0;
+        x++;
+        //调用方法按照最新的数字加载图片
+        initImage();
+    } else if (code == 39) {
+        System.out.println("向右移动");
+        if(y == 0){
+            return;
+        }
+        //逻辑：
+        //把空白方块左方的数字往右移动
+        data[x][y] = data[x][y - 1];
+        data[x][y - 1] = 0;
+        y--;
+        //调用方法按照最新的数字加载图片
+        initImage();
+    } else if (code == 40) {
+        System.out.println("向下移动");
+        if(x == 0){
+            return;
+        }
+        //逻辑：
+        //把空白方块上方的数字往下移动
+        data[x][y] = data[x - 1][y];
+        data[x - 1][y] = 0;
+        x--;
+        //调用方法按照最新的数字加载图片
+        initImage();
+    }
+}
+~~~
 
+代码写完后，打开 `App` 右键运行，一直按 `向下` 或者其他的方向键，在控制台也不会出现报错信息了。
 
+---
 
+## 六、总结
 
+在刚刚，我们是这么做的
 
+1、让本类实现 `KeyListener接口`，并重写所有的抽象方法
 
+2、给整个游戏界面添加键盘监听事件
 
+因为我们是在游戏界面中按 `上下左右键` 去移动数字方块的。
 
+3、在移动的时候，其实就是把空白对应的数字 `0` 跟它 `上下左右` 的数字进行一个交换
 
+首先我们需要来统计一下空白方块对应的数字 `0` 在二维数组中的位置。
 
+4、知道了位置后，就可以在 `keyReleased()` 重写方法中实现移动的逻辑
 
+说到这里有同学就会想：`keyReleased()` 是按键抬起来才会触发的，那我能不能在 `keyPressed()` (按下) 的方法中写呢？
 
+其实也可以，但是如果你按下但不松开，它就会反复去调用 `keyPressed()` 方法，这不是我想要的，我需要的一个是：按一下就移一次，因此我们应该在 `keyReleased()`(抬起来) 的方法中去实现 `上下左右` 移动的业务逻辑。
 
+5、Bug修复：
 
+- 当空白方块在最下面的时候，它是无法上移的
+- 当空白方块在最上面的时候，它是无法下移的
+- 当空白方块在最左面的时候，它是无法右移的
+- 当空白方块在最右面的时候，它是无法左移的
 
 
 
+-----
 
+# 151.查看完整图片
 
+## 一、引入
 
+先来看一下最终效果。游戏在刚开始启动的时候，图片是随机打乱的。
 
+但是在玩游戏的过程中我想看一下游戏完整的图片，该这么做呢？
 
+我可以给这个游戏去安排一个快捷键，例如 `A`，当我按住 `A` 不松的时候，它就会显示完整图片。
 
+当松开 `A` 的时候，再去显示打乱的图片即可。
 
+![image-20240420204941446](./assets/image-20240420204941446.png)
 
+首先来思考：在什么时候，来执行的这段代码？
 
+是不是我在整个窗体上玩游戏的时候，按键盘上的 `A` 触发的效果？
 
+因此我们应该给整个窗体去绑定一个 `键盘监听事件`。
 
+当事件被触发之后，再去执行对应的代码即可。
 
+在书写代码之前需要带着大家先去看一下我们导入的图片。
 
+还是以 `animal` 下的 `animal3` 为例，双击打开：在每组图片中，除了给大家提供了 `1 ~ 15` 这样的小图片之外，额外的还有一个叫做：`all.jpg`。
 
+<img src="./assets/image-20240420205309909.png" alt="image-20240420205309909" style="zoom:67%;" />
 
+双击打开，这个其实就是游戏的完整图片。
 
+它的大小看右上角：高和宽都是 `420个像素`
 
+![image-20240420205504963](./assets/image-20240420205504963.png)
 
+每一组图片都会有一个 `all.jpg`，因此我们要做的其实就是按住 `A` 不松的时候，把 `all.jpg` 显示出来。
 
 
 
+----
 
+## 二、代码实现
 
+找到 `GameJFrame类`，首先第一个你要来想：我是在整个窗体上玩游戏的时候触发的键盘监听事件，因此我需要给整个窗体添加一个键盘监听。
 
+但是不需要我们再去额外写代码了，因为在我们之前写 `上下左右移动` 的时候已经绑定过了，因此这一点我们可以忽略。
 
+<img src="./assets/image-20240420205809273.png" alt="image-20240420205809273" style="zoom:50%;" />
 
+接下来继续，找一下重写 `KeyListener接口` 的方法：当键盘按键按下不松的时候，就会反复调用 `keyPressed()` 方法；当你松开的时候，就会调用 `keyReleased()` 方法，因此这两个方法我们都需要用到。
 
+先来写 `keyPressed()` 重写方法。
 
+通过形参的 `e` 获取到当前所对应到的 `code` 值。
 
+然后就是对 `按键a` 做一个 `if判断`。
+
+这里一样要注意，在将完整图片添加到界面时，依旧需要先清空界面的图片，然后再来加载两张图片（完整图片、背景图片）。
+
+图片的位置在之前也调试过了：`(83, 134)`，宽高就是图片原来的大小：`(420, 420)`。
+
+添加背景图片的代码直接从 `initImage()` 中拷贝过来即可。
+
+最后不要忘记 `刷新界面`！
+
+~~~java
+// 按下不松时会调用这个方法
+@Override
+public void keyPressed(KeyEvent e) {
+    int code = e.getKeyCode();
+    if (code == 65) {
+        // 把界面中所有的图片全部删除
+        this.getContentPane().removeAll();
+        // 加载第一张完整的图片
+        JLabel all = new JLabel(new ImageIcon("puzzlegame\\image\\animal\\animal3\\all.jpg"));
+        all.setBounds(83, 134, 420, 420);
+        this.getContentPane().add(all);
+
+        // 添加背景图片
+        JLabel background = new JLabel(new ImageIcon("puzzlegame\\image\\background.png"));
+        background.setBounds(40, 40, 508, 560);
+        // 把背景图片添加到界面当中
+        this.getContentPane().add(background);
+        // 刷新界面
+        this.getContentPane().repaint();
+    }
+}
+~~~
+
+但此时还没结束，这个只是按下 `a` 的业务逻辑，我们还有松开，将图片变回去的代码没写！
+
+因此在 `keyReleased()` 方法中，我们还要再来加一个判断。
+
+松开的代码很简单：再次调用 `initImage()` 再来加载一下图片就行了。
+
+在 `initImage()` 方法中，它还是会来清空图片，然后按照二维数组的顺序来加载 `15` 张小图片，最后加载背景图片。
+
+因此我们直接调用 `initImage()` 方法即可。
+
+~~~java
+//松开按键的时候会调用这个方法
+@Override
+public void keyReleased(KeyEvent e) {
+    //对上，下，左，右进行判断
+    //左：37 上：38 右：39 下：40
+    int code = e.getKeyCode();
+    System.out.println(code);
+    if (code == 37) {
+        .....
+    } else if (code == 38) {
+        .....
+    } else if (code == 39) {
+        .....
+    } else if (code == 40) {
+        .....
+    } else if (code == 65) {
+        initImage();
+    }
+}
+~~~
+
+代码写完后，打开 `App` 右键运行，分别 `按下`、`松开` `a键`，查看效果。
+
+<img src="./assets/m3lu1-y2iav.gif" alt="m3lu1-y2iav" style="zoom:50%;" />
+
+代码写完后，我们还需要做最后一步优化。
+
+----
+
+## 三、优化
+
+现在不管是在 `initImage()` 方法中：`animal` 下的 `animal3` 下的 `jpg图片`
+
+![image-20240420211947318](./assets/image-20240420211947318.png)
+
+还是在展示完整图片的时候，路径都是写死的：`animal` 下的 `animal3` 下的 `all.jpg`
+
+![image-20240420212106737](./assets/image-20240420212106737.png)
+
+这么写的话它其实是有一个小弊端的：我们后面是不是要去写 `更换游戏图片`，如果这里直接将路径写死的话，那么以后想要更换游戏图片，就会非常麻烦！
+
+因此我们需要将这里的路径去改写一下，改写的方式也非常简单。
+
+在成员位置去定义一个变量：用来记录当前展示图片的路径。
+
+然后将重复的这一堆，可以直接粘贴过去 `"puzzlegame\\image\\animal\\animal3\\"`
+
+~~~java
+// 定义一个变量，记录当前展示图片的路径
+String path = "puzzlegame\\image\\animal\\animal3\\";
+~~~
+
+下面用到这个路径的时候，就不要去用后面的值了，直接使用 `path` 就行了。
+
+~~~java
+private void initImage() {
+    this.getContentPane().removeAll();
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            // 创建一个 JLabel对象（管理容器）
+            JLabel jLabel = new JLabel(new ImageIcon( path + num + ".jpg"));
+        }
+    }
+}
+~~~
+
+背景图片就不需要使用这种方式了，因为背景图片它是固定的。
+
+再往下，我们去展示完整图片的时候，也可以改写一下
+
+~~~java
+// 按下不松时会调用这个方法
+@Override
+public void keyPressed(KeyEvent e) {
+    int code = e.getKeyCode();
+    if (code == 65) {
+        // 加载第一张完整的图片
+        JLabel all = new JLabel(new ImageIcon(path + "all.jpg"));
+        ....
+    }
+}
+~~~
+
+这样以后，如果我需要更换图片，那我就只需要更改 `path变量` 所记录的值就行了。
+
+
+
+-----
+
+# 作弊码
+
+## 一、引入
+
+在玩游戏的过程中，如果我想让它一键通过，我们就可以给它安排一个快捷键，例如 `w`。
+
+当我按下 `w` 的时候，游戏界面就变成了最终的效果图片。
+
+![image-20240420213756659](./assets/image-20240420213756659.png)
+
+如何实现？我们是不是也是在游戏的窗体中触发的事件，因此同样的，我们需要给整个窗体添加 `键盘监听`，然后再对 `w` 做一个判断就行了。
+
+----
+
+## 二、代码实现
+
+找到 `GameJFrame类` 中的 `initJFrame()` 方法，我们任然需要去给整个窗体添加 `键盘监听事件`，但是这个代码在之前已经写过了，可以直接忽略。
+
+<img src="./assets/image-20240420205809273.png" alt="image-20240420205809273" style="zoom:50%;" />
+
+我们直接找到 `keyReleased()` 重写方法就行了。
+
+通过打印 `code` 的值，可以知道 `w` 所对应的数字是 `87`，因此我们直接对 `87` 来做一个判断就行。
+
+当按下 `w` 的时候，我们直接将图片展示为最终效果，最后不要忘记重新去加载图片！
+
+~~~java
+//松开按键的时候会调用这个方法
+@Override
+public void keyReleased(KeyEvent e) {
+    //对上，下，左，右进行判断
+    //左：37 上：38 右：39 下：40
+    int code = e.getKeyCode();
+    System.out.println(code);
+    if (code == 37) {
+        .....
+    } else if (code == 38) {
+        .....
+    } else if (code == 39) {
+        .....
+    } else if (code == 40) {
+        .....
+    } else if (code == 65) {
+        .....
+    } else if (code == 87) {
+        // 直接 new一个新数组
+        data = new int[][]{
+            {1,2,3,4},
+            {5,6,7,8},
+            {9,10,11,12},
+            {13,14,15,0}
+        };
+        initImage();
+    }
+}
+~~~
+
+代码写完后，打开 `App` 右键运行，按下 `w`，可以发现直接 `一键胜利`！
+
+<img src="./assets/image-20240420214631045.png" alt="image-20240420214631045" style="zoom:50%;" />
+
+
+
+-----
+
+# 判断胜利
+
+## 一、引入
+
+一开始，游戏的图片是随机展示的，然后不断的玩，不断的去移动。当玩到最后了，所有的图片都按照正确的进行展示了，那么界面中就应该显示 `胜利` 这个图标。这个效果该如何实现呢？
+
+![3pprz-3an7n](./assets/3pprz-3an7n.gif)
+
+其实不难：其实就是判断二维数组中的数字是否按照顺序进行排列。如果按顺序进行排列的，那么显示胜利的图片。
+
+实现步骤：
+
+1、既然我们要判断数组是否正确按顺序展示，因此我们需要先定义一个正确的二维数组 `win`。
+
+这个 `win数组` 中装的就是 `1 ~ 15，最后一个是 0` 这样的正确数组。
+
+2、在加载图片之前，先判断一下二维数组中的数字跟 `win数组` 中是否相同。
+
+3、如果相同，就展示 `胜利` 的图标
+
+4、如果不相同，就不会展示 `胜利` 的图标
+
+----
+
+正式写代码之前需要来说一个注意事项：目前我们在 `GameJFrame类` 中写的代码已经非常多了，将近 300行 了，如果将方法跟之前一样全部展开的话，会影响代码阅读，因此这里建议大家，可以把方法都收起来，这样可以提高代码的阅读性。
+
+<img src="./assets/image-20240420215613316.png" alt="image-20240420215613316" style="zoom:50%;" />
+
+----
+
+## 二、代码实现
+
+既然要判断胜利，那就先来定义一个二维数组，用来存储正确的数据。
+
+~~~java
+// 定义一个二维数组，用来存储正确的数据
+int[][] win = {
+    {1, 2, 3, 4},
+    {5, 6, 7, 8},
+    {9, 10, 11, 12},
+    {13, 14, 15, 0}
+};
+~~~
+
+<img src="./assets/image-20240420215809218.png" alt="image-20240420215809218" style="zoom:67%;" />
+
+然后定义一个方法，用来判断 `data中数组中的数据` 和 `win数组中的数据` 是否一致，如果一致，说明游戏已经成功了；如果不一致，那就表示还没有玩成功。
+
+~~~java
+//判断data数组中的数据是否跟win数组中相同
+//如果全部相同，返回true。否则返回false
+public boolean victory(){
+    for (int i = 0; i < data.length; i++) {
+        //i : 依次表示二维数组 data里面的索引
+        //data[i]：依次表示每一个一维数组
+        for (int j = 0; j < data[i].length; j++) {
+            if(data[i][j] != win[i][j]){
+                //只要有一个数据不一样，则返回false
+                return false;
+            }
+        }
+    }
+    //循环结束表示数组遍历比较完毕，全都一样返回true
+    return true;
+}
+~~~
 
 
 

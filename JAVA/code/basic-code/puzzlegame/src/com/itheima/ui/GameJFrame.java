@@ -2,16 +2,33 @@ package com.itheima.ui;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Random;
 import java.util.StringJoiner;
 
-public class GameJFrame extends JFrame {
+public class GameJFrame extends JFrame implements KeyListener {
     //规定：GameJFrame这个界面表示的就是游戏的主界面
     //以后跟游戏相关的所有逻辑都写在这个类中
 
     // 创建一个二维数组
     // 目的：用来管理数据。加载图片的时候，会根据二维数组中的数据进行加载。
     int[][] data = new int[4][4];
+
+    // 记录空白方块在二维数组中的位置
+    int x = 0;
+    int y = 0;
+
+    // 定义一个变量，记录当前展示图片的路径
+    String path = "puzzlegame\\image\\animal\\animal3\\";
+
+    // 定义一个二维数组，用来存储正确的数据
+    int[][] win = {
+            {1, 2, 3, 4},
+            {5, 6, 7, 8},
+            {9, 10, 11, 12},
+            {13, 14, 15, 0}
+    };
 
     public GameJFrame() {
         super();
@@ -30,6 +47,7 @@ public class GameJFrame extends JFrame {
         // 让界面显示出来，这行代码我们建议写在最后
         this.setVisible(true);
     }
+
 
     // 初始化数据（打乱）
     private void initData() {
@@ -51,7 +69,12 @@ public class GameJFrame extends JFrame {
         //5.给二维数组添加数据
         //遍历一维数组tempArr得到每一个元素，把每一个元素依次添加到二维数组当中
         for (int i = 0; i < tempArr.length; i++) {
-            data[i / 4][i % 4] = tempArr[i];
+            if (tempArr[i] == 0) {
+                x = i / 4;
+                y = i % 4;
+            } else { // 如果你不为 `0`，我才把数字添加到二维数组中
+                data[i / 4][i % 4] = tempArr[i];
+            }
         }
     }
 
@@ -59,6 +82,8 @@ public class GameJFrame extends JFrame {
     // 初始化图片
     // 添加图片的时候，就需要按照二维数组中管理的数据添加图片
     private void initImage() {
+        // 情况原本已经出现的所有图片
+        this.getContentPane().removeAll();
 
         //外循环 --- 把内循环重复执行了4次。
         for (int i = 0; i < 4; i++) {
@@ -67,7 +92,7 @@ public class GameJFrame extends JFrame {
                 // 获取当前要加载图片的序号
                 int num = data[i][j];
                 // 创建一个 JLabel对象（管理容器）
-                JLabel jLabel = new JLabel(new ImageIcon("puzzlegame\\image\\animal\\animal3\\" + num +".jpg"));
+                JLabel jLabel = new JLabel(new ImageIcon(path + num + ".jpg"));
                 // 指定图片的位置，调用方法：setBounds
                 jLabel.setBounds(105 * j + 83, 105 * i + 134, 105, 105);
                 // 给图片添加边框
@@ -82,6 +107,8 @@ public class GameJFrame extends JFrame {
         // 把背景图片添加到界面当中
         this.getContentPane().add(background);
 
+        // 刷新一下界面
+        this.getContentPane().repaint();
     }
 
 
@@ -137,6 +164,125 @@ public class GameJFrame extends JFrame {
 
         // 取消默认的居中方式，只有取消了，才会安装xy轴的形式添加组件
         this.setLayout(null);
+
+        // 给整个界面添加键盘监听事件
+        this.addKeyListener(this);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    // 按下不松时会调用这个方法
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int code = e.getKeyCode();
+        if (code == 65) {
+            // 把界面中所有的图片全部删除
+            this.getContentPane().removeAll();
+            // 加载第一张完整的图片
+            JLabel all = new JLabel(new ImageIcon(path + "all.jpg"));
+            all.setBounds(83, 134, 420, 420);
+            this.getContentPane().add(all);
+
+            // 添加背景图片
+            JLabel background = new JLabel(new ImageIcon("puzzlegame\\image\\background.png"));
+            background.setBounds(40, 40, 508, 560);
+            // 把背景图片添加到界面当中
+            this.getContentPane().add(background);
+            // 刷新界面
+            this.getContentPane().repaint();
+        }
+    }
+
+    //松开按键的时候会调用这个方法
+    @Override
+    public void keyReleased(KeyEvent e) {
+        //对上，下，左，右进行判断
+        //左：37 上：38 右：39 下：40
+        int code = e.getKeyCode();
+        System.out.println(code);
+        if (code == 37) {
+            System.out.println("向左移动");
+            if (y == 3) {
+                return;
+            }
+            //逻辑：
+            //把空白方块右方的数字往左移动
+            data[x][y] = data[x][y + 1];
+            data[x][y + 1] = 0;
+            y++;
+            //调用方法按照最新的数字加载图片
+            initImage();
+        } else if (code == 38) {
+            System.out.println("向上移动");
+            if (x == 3) {
+                //表示空白方块已经在最下方了，他的下面没有图片再能移动了
+                return;
+            }
+            //逻辑：
+            //把空白方块下方的数字往上移动
+            //x，y  表示空白方块
+            //x + 1， y 表示空白方块下方的数字
+            //把空白方块下方的数字赋值给空白方块
+            data[x][y] = data[x + 1][y];
+            data[x + 1][y] = 0;
+            x++;
+            //调用方法按照最新的数字加载图片
+            initImage();
+        } else if (code == 39) {
+            System.out.println("向右移动");
+            if (y == 0) {
+                return;
+            }
+            //逻辑：
+            //把空白方块左方的数字往右移动
+            data[x][y] = data[x][y - 1];
+            data[x][y - 1] = 0;
+            y--;
+            //调用方法按照最新的数字加载图片
+            initImage();
+        } else if (code == 40) {
+            System.out.println("向下移动");
+            if (x == 0) {
+                return;
+            }
+            //逻辑：
+            //把空白方块上方的数字往下移动
+            data[x][y] = data[x - 1][y];
+            data[x - 1][y] = 0;
+            x--;
+            //调用方法按照最新的数字加载图片
+            initImage();
+        } else if (code == 65) {
+            initImage();
+        } else if (code == 87) {
+            data = new int[][]{
+                    {1, 2, 3, 4},
+                    {5, 6, 7, 8},
+                    {9, 10, 11, 12},
+                    {13, 14, 15, 0}
+            };
+            initImage();
+        }
+    }
+
+    //判断data数组中的数据是否跟win数组中相同
+    //如果全部相同，返回true。否则返回false
+    public boolean victory(){
+        for (int i = 0; i < data.length; i++) {
+            //i : 依次表示二维数组 data里面的索引
+            //data[i]：依次表示每一个一维数组
+            for (int j = 0; j < data[i].length; j++) {
+                if(data[i][j] != win[i][j]){
+                    //只要有一个数据不一样，则返回false
+                    return false;
+                }
+            }
+        }
+        //循环结束表示数组遍历比较完毕，全都一样返回true
+        return true;
     }
 }
 
