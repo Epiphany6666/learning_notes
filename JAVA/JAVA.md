@@ -21852,11 +21852,61 @@ public static void startStudentSystem() {
 
 ----
 
-## 三、理解 `不同包下的子类`
+## 三、代码实现
 
-例如下面的 `Dog类`，就是不同包下的子类。
+一共写了四个类，结构如下图
 
-![image-20240417155708783](./assets/image-20240417155708783.png)
+<img src="./assets/image-20240421204422716.png" alt="image-20240421204422716" style="zoom:80%;" />
+
+### ① 同一个类中  ——  `demo1.Animal`
+
+~~~java
+public class Animal {
+   public String name;
+
+   public void show(){
+      System.out.println(name);
+   }
+}
+~~~
+
+### ② 同一个包中的其他类  ——  `demo1.Test`
+
+~~~java
+public class Test {
+    public static void main(String[] args) {
+        Animal a = new Animal();
+        System.out.println(a.name);
+    }
+}
+~~~
+
+### ③ 不同包下的子类  ——  `demo2.Dog`
+
+PS：注意区分！！！如果是用 `Dog的对象` 去直接调用 `name`，就不叫做 `不同包下的子类` 了！
+
+如下图，就算 `Dog类继承了Animal类`，在用 `Dog类` 的对象去调用 `name` 时，依旧会报错。
+
+![image-20240421205920590](./assets/image-20240421205920590.png)
+
+~~~java
+public class Dog extends Animal {
+    public void show() {
+        System.out.println(name);
+    }
+}
+~~~
+
+### ④ 不同包下的无关类  ——  `demo2.Test`
+
+~~~java
+public class Test {
+    public static void main(String[] args) {
+        Animal a = new Animal();
+        System.out.println(a.name);
+    }
+}
+~~~
 
 ----
 
@@ -33868,7 +33918,7 @@ public class Test {
 
 只不过我们会称爷爷是孙子的间接父类，而爸爸则是它的直接父类。
 
-![image-20240421172317452](./C:/Users/52837/Desktop/Java/assets/image-20240421172317452.png)
+![image-20240421172317452](./assets/image-20240421172317452.png)
 
 **Object类中的方法可以被所有的子类访问。所以我们要学习Object类和其中的方法。**
 
@@ -33880,7 +33930,7 @@ public class Test {
 
 在 `Object类` 中它是没有成员变量的，因此没有带参的构造方法，只有一个空参构造。
 
-![image-20240421172525532](./C:/Users/52837/Desktop/Java/assets/image-20240421172525532.png)
+![image-20240421172525532](./assets/image-20240421172525532.png)
 
 为什么Java这么去设计呢？
 
@@ -33898,7 +33948,7 @@ public class Test {
 
 现在我们就可以解释了：因为在顶级父类Object中，它只有无参的构造方法。
 
-![image-20240421172839832](./C:/Users/52837/Desktop/Java/assets/image-20240421172839832.png)
+![image-20240421172839832](./assets/image-20240421172839832.png)
 
 说完构造，我们继续往下来看一下 `Object类` 中的成员方法。
 
@@ -33908,7 +33958,19 @@ public class Test {
 
 `Object类` 中一共有11个成员方法，但是很多方法跟后面的知识点是相关的，因此我们先研究其中三个常见的方法。
 
-### 1）toString()
+1、`toString()`
+
+2、`equals()`
+
+3、`clone()`
+
+接下来我们将会逐一学习它们。
+
+----
+
+# `toString()`
+
+## 一、用法
 
 `toString()` 方法其实很好理解。`to`：变成，`String`：字符串，合在一起就是：变成字符串。
 
@@ -33933,9 +33995,6 @@ System.out.println(str1); // java.lang.Object@119d7047
 **Student.java**
 
 ```java
-package com.itheima.a04objectdemo;
-import java.util.Objects;
-
 public class Student {
     private String name;
     private int age;
@@ -33955,6 +34014,728 @@ System.out.println(str2);//com.itheima.a04objectdemo.student@4eec7777
 ~~~
 
 这里我可以简单带大家去看一下 `Object` 的源代码。
+
+选中 `Object类名` <kbd>ctrl + b</kbd> 跟进，再按快捷键<kbd>ctrl + F12</kbd> 搜一下 `toString()` 然后回车。
+
+![image-20240421181741089](./assets/image-20240421181741089.png)
+
+1、中间的 `@` 是固定格式
+
+2、前面的 `getClass().getName()` 就可以获取它的 `包名 + 类名`
+
+3、后面的 `Integer.toHexString(hashCode());` 就可以获取到 `对象的地址值` 
+
+但是这个地址值获取到不是直接给你的，而是经过一系列的复杂运算，然后将它变成 `16进制`。
+
+但是现在我们可以把 `Integer.toHexString(hashCode())` 简单的理解成是 `对象的地址值`。
+
+~~~java
+getClass().getName() + "@" + Integer.toHexString(hashCode());
+~~~
+
+再往下可以去跟大家说一个小小的细节：
+
+如果在打印 `stu` 的时候没有去调用 `toString()` 方法，而是直接打印一个对象。
+
+你就会发现，你看到的效果其实是一样的
+
+~~~java
+Student stu = new Student();
+String str2 = stu.toString();
+System.out.println(str2);//com.itheima.a04objectdemo.student@4eec7777
+
+//细节:
+System.out.println(stu);//com.itheima.a04objectdemo.student@4eec7777
+~~~
+
+那为什么是这样的呢？这时我就带着你去认识一下输出语句。
+
+----
+
+## 二、输出语句
+
+输出语句 `System.out.println()` 分为三部分：
+
+1、`System`：我们刚刚学习过，它是Java里面的一个类名
+
+选择 `System类名`，<kbd>ctrl + b</kbd> 跟进，往下找，可以发现：`out` 是 `System类` 中的一个静态变量
+
+因此在代码中，我们就可以通过类名直接调用静态变量 `System.out`。
+
+`out` 的初始值是 `null`，但是在下面会给 `out` 赋值。
+
+`out` 的类型是 `PrintStream`，这个类在我们后面学习 `IO流` 的时候会再次细说。
+
+现在我们可以先简单理解 **`System.out` 就是：`类型.静态变量`，这样它就可以获取到打印的对象**
+
+![image-20240421182434812](./assets/image-20240421182434812.png)
+
+获取到 `打印的对象` 后，就可以用这个对象，去调用 `println()` 方法，方法里面的参数就表示我们要打印的内容。
+
+我们可以选中这里的 `println()`，<kbd>ctrl + b</kbd> 看下源码：
+
+<img src="./assets/image-20240421183017348.png" alt="image-20240421183017348" style="zoom:67%;" />
+
+如果你传递了一个对象进来，首先它会调用 `String类` 中的 `valueOf()` 静态方法，把对象传递进去
+
+~~~java
+String s = String.valueOf(x);
+~~~
+
+`valueOf()` 是一个关键点，<kbd>ctrl + b</kbd> 跟进，可以看见它在底层做了一个这样的判断：判断对象为不为空，如果为空，返回字符串 `"null`，如果不是空，就会使用对象去调用 `toString()` 方法，即将对象变成了：`包名 + 类名 + @ + 地址值` 的形式。
+
+![image-20240421183242855](./assets/image-20240421183242855.png)
+
+<kbd>ctrl + alt + ←</kbd> 回到上一步，因此方法的第一行其实就是将`传递过来的对象`变成了`字符串`，在底层调用了 `toString()` 方法。
+
+有了这个字符串后，下面它就会去调用其他的方法将这个字符串打印出来。
+
+![image-20240421183455982](./assets/image-20240421183455982.png)
+
+选中 `writeln()` 方法跟进，这个方法里面其实是有两个核心点的：
+
+① `720行：textOut.write(s);` 其实就是将对象的字符串进行打印
+
+② `721行：textOut.newLine();` 其实就是做了一个换行处理
+
+这些其实就是输出语句的核心逻辑
+
+![image-20240421183657204](./assets/image-20240421183657204.png)
+
+总结：当我们打印一个对象的时候，底层会调用对象的 `toString()` 方法，把对象变成字符串，然后再打印在控制台上，打印完毕后换行处理。
+
+----
+
+## 三、引出 `重写toString()方法`
+
+知道这个结论后，就需要思考了：
+
+默认情况下因为 `Object类` 中的 `toString()` 方法返回的是地址值。所以默认情况下打印一个对象打印的就是地址值。
+
+但是地址值对我来讲是没有意义的，如果我不想看到地址值，而是看到对象内部的属性值，那应该怎么办呢？
+
+在之前我们学习继承的时候曾经说过：父类里面的方法如果不能满足当前的要求，就可以重写该方法。
+
+**解决办法：重写父类中的 `toString()` 方法即可。**
+
+当我直接在 `Student类` 中写 `toString()` 时，选择第二个 `toString()` 
+
+![image-20240421185312305](./assets/image-20240421185312305.png)
+
+然后回车，此时IDEA就会问你：你要不要将两个对象的属性值拼在里面？
+
+<img src="./assets/image-20240421185452256.png" alt="image-20240421185452256" style="zoom:65%;" />
+
+但是它的这种拼接方式，稍微有一点难。
+
+<img src="./assets/image-20240421185554201.png" alt="image-20240421185554201" style="zoom:67%;" />
+
+这里我将它改写一下，这样子看上去就非常的清爽了。
+
+~~~java
+public String toString() {
+    return name + ", " + age;
+}
+~~~
+
+现在我已经对 `toString()` 方法进行了重写，那此时我再次打印 `stu变量` 的时候，它显示的还是地址值吗？
+
+程序运行完毕，可以发现它打印的就是对象内部的属性值。
+
+~~~java
+Student stu = new Student("张三", 23);
+System.out.println(stu); // 张三, 23
+~~~
+
+----
+
+### 四、快捷方式
+
+其实这个书写的代码不需要我们自己去写，之前跟大家分享过 `Ptg` 插件，我们可以用 `Ptg` 自动去完成。
+
+当我们写完私有化成员变量后，下面直接右键 ——> `Ptg To JavaBean`
+
+<img src="./assets/image-20240421190220469.png" alt="image-20240421190220469" style="zoom:67%;" />
+
+往下滑，可以发现插件自动帮我们拼接好了。
+
+![image-20240421190300367](./assets/image-20240421190300367.png)
+
+回到测试类中，右键Run
+
+~~~java
+Student stu = new Student("张三", 23);
+System.out.println(stu); // Student{name = 张三, age = 23}
+~~~
+
+----
+
+## 五、总结
+
+如果我们打印一个对象，想要看到属性值的话，那么就重写 `toString()` 方法即可。
+
+在重写的方法中把对象的属性进行拼接即可。
+
+
+
+----
+
+# `equals(Object obj)`
+
+## 一、用法
+
+作用：比较两个对象地址值是否相等；true表示相同，false表示不相同
+
+~~~java
+public boolean equals(Object obj)
+~~~
+
+代码示例
+
+~~~java
+Student s1 = new Student();
+Student s2 = new Student();
+
+boolean result1 = s1.equals(s2);
+System.out.println(result1); // false
+~~~
+
+那为什么是false呢？
+
+----
+
+## 二、分析
+
+上面代码的 `equalse` 方法是由 `s1` 调用的，而 `s1` 又是 `Student类型` 的，因此在这它肯定会去找 `Student` 里面的 `equals` 。
+
+但是我在 `Student类` 并没有写 `equals()` 方法，因此它就回去调用父类 `Object类` 中的 `equals()` 方法。
+
+<kbd>ctrl  + N</kbd> 搜索 `java.lang包` 下的 `Object类`。
+
+<img src="./assets/image-20240421191759279.png" alt="image-20240421191759279" style="zoom:67%;" />
+
+接着 <kbd>ctrl + F12</kbd> 搜索 `equals()` 方法
+
+<img src="./assets/image-20240421191858865.png" alt="image-20240421191858865" style="zoom:67%;" />
+
+此时发现 `Object类` 里面的 `equals()` 方法默认是用 `==` 比较，而 `==` 在进行引用数据类型比较的时候，比较的是两个对象的地址值！
+
+<img src="./assets/image-20240421192024767.png" alt="image-20240421192024767" style="zoom:67%;" />
+
+而我们刚刚在代码中，两个对象都是 `new` 出来的，它的地址值肯定不一样，因此返回的是 `false`。
+
+----
+
+## 三、引出 `重写equals()方法`
+
+但在之前，我们又说过了，地址值对我们来讲，其实意义不大。
+
+如果我想要比较两个对象，我真正要比较的应该它内部的属性值是不是相同，那这个时候我该怎么办呢？
+
+~~~java
+Student s1 = new Student("zhangsan",23);
+Student s2 = new Student("zhangsan",23);
+
+boolean result1 = s1.equals(s2);
+System.out.println(result1);
+~~~
+
+此时又要说到我们将继承的时候用到的思想：父类里面的方法如果不能满足当前的要求，就可以重写该方法。
+
+**解决办法：重写父类中的  `equals()` 方法即可。**
+
+----
+
+## 四、快捷方式
+
+整个重写的方法其实也不需要我们自己去写，IDEA会自动帮我们生成：<kbd>alt + Insert</kbd> ，然后找到 `equals() and hashCode()`
+
+<img src="./assets/image-20240421192902148.png" alt="image-20240421192902148" style="zoom:67%;" />
+
+不用做任何选择，我们使用 `JDK7` 以上的这个模板去写就可以了，直接点击 `Next`。
+
+<img src="./assets/image-20240421193003986.png" alt="image-20240421193003986" style="zoom:67%;" />
+
+这里会默认把所有的属性全部写上，这里我们也不用去选择，直接也点击 `Next` 就好
+
+<img src="./assets/image-20240421193033276.png" alt="image-20240421193033276" style="zoom:67%;" />
+
+然后 `Create` 即可
+
+<img src="./assets/image-20240421193129024.png" alt="image-20240421193129024" style="zoom:50%;" />
+
+生成之后，底下的 `hashCode()` 对我来讲没有用，没有用直接删掉就好，只留 `equals()` 即可
+
+<img src="./assets/image-20240421193214230.png" alt="image-20240421193214230" style="zoom:50%;" />
+
+在这个 `equals()` 方法中，我们可以简单的来看一下里面的源码。
+
+~~~java
+@Override
+public boolean equals(Object o) {
+    // 一开始它会去判断：你当前的调用者this跟参数里面是不是同一个对象，如果你的地址值是一样的，下面代码都不用执行，直接返回 true
+    if (this == o) return true;
+    // 这句代码其实就是做一些非空判断、类型的判断
+    if (o == null || getClass() != o.getClass()) return false;
+    // 将参数 o 向下强转为 Student 类型
+    Student student = (Student) o;
+    // 最后就可以来比较内部的属性值了
+    return age == student.age && Objects.equals(name, student.name);
+}
+~~~
+
+总结：重写之后的 `equals()` 方法比较的是对象内部的属性值。
+
+回到测试类中，右键Run运行，此时结果就为 `true` 了
+
+~~~java
+Student s1 = new Student("zhangsan",23);
+Student s2 = new Student("zhangsan",23);
+
+boolean result1 = s1.equals(s2);
+System.out.println(result1); // true，这句话就表示 s1 和 s2 对象里面的属性值是一模一样的
+~~~
+
+----
+
+## 五、总结
+
+1、如果没有重写 `equals()` 方法，那么默认使用 `Object类` 中的 `equals()` 方法进行比较，比较的是地址值是否相等。
+
+2、一般来讲，地址值对于我们来说是没有什么太大意义的，所以我们会重写 `equals()` 方法，重写之后比较的就是对象内部的属性值。
+
+----
+
+## 六、小练习
+
+为了验证大家是否真的理解了 `equals()` 方法，这里出一个小练习：下面两个输出语句分别输出的是什么？
+
+~~~java
+String s = "abc";
+StringBuilder sb = new StringBuilder("abc");
+
+System.out.println(s.equals(sb)); // ？？？
+System.out.println(sb.equals(s));// ？？？
+~~~
+
+这个问题的核心点就是这里的 `equals()` 方法
+
+- 第一句 `s.equals(sb)` 中的 `equals()` 方法是 `s` 调用的，因此这个 `equals()` 我看的应该是字符串里面的 `equals()` 方法。
+- 第二句 `sb.equals(s)` 中的 `equals()` 方法是 `sb` 调的，因此这个 `equals()` 我看的应该是 `StringBuilder` 里面的 `equals()` 方法。
+
+程序运行一下，会发现两个输出语句打印出来的都是 `false`。
+
+为什么呢？不着急，我们一个一个来分析
+
+----
+
+### ① `s.equals(sb)`
+
+因为 `equals()` 方法是被 `s` 调用的，而 `s` 是字符串，因此这个 `equals()` 我看的应该是字符串里面的 `equals()` 方法。
+
+选中 `String类` <kbd>ctrl + b</kbd> 跟进，<kbd>ctrl + F12</kbd> 搜索一下 `equals()`。
+
+<img src="./assets/image-20240421194903128.png" alt="image-20240421194903128" style="zoom:67%;" />
+
+我们逐句来分析
+
+~~~java
+public boolean equals(Object anObject ) {
+    // 一上来它就拿着调用者跟参数 anObject 用 `==` 去比较一下这两者是否为同一个对象，如果是同一个对象，那里面的属性值就没必要比了，直接return true
+    if (this == anObject) {
+        return true;
+    }
+    // 如果不是同一个对象，开始执行下面的逻辑
+    // 下面的逻辑相对来讲有点复杂，但是不要慌
+    // 先来判断参数是不是字符串，如果不是字符串，(anObject instanceof String aString) 这个判断就直接返回 false 了
+    return (anObject instanceof String aString)
+        // 如果是字符串，它再去比较内部的属性
+        && (!COMPACT_STRINGS || this.coder == aString.coder)
+        && StringLatin1.equals(value, aString.value);
+}
+~~~
+
+现在我们回到测试类中，总结一下：字符串中的equals方法，先判断参数是否为字符串，如果是字符串，再比较内部的属性；但是如果参数不是字符串，直接返回false。
+
+因此 `s.equals(sb)` 返回的是 `false`，因为 `sb` 是 `StringBuilder` 的对象。
+
+----
+
+### ② `sb.equals(s)` 
+
+因为 `equals()` 方法是被 `sb` 调用的，而 `sb` 是 `StringBuilder`，因此这个 `equals()` 我看的应该是 `StringBuilder` 里面的 `equals()` 方法。
+
+选中 `StringBuilder类` <kbd>ctrl + b</kbd> 跟进，<kbd>ctrl + F12</kbd> 搜索一下 `equals()`。
+
+此时你会发现你找不到 `equals()` 方法，这是因为 `StringBuilder类` 里面压根没有 `equals` 方法。
+
+<img src="./assets/image-20240421195704039.png" alt="image-20240421195704039" style="zoom:67%;" />
+
+那它的父类中有吗？
+
+<img src="./assets/image-20240421195847067.png" alt="image-20240421195847067" style="zoom:67%;" />
+
+选中 `AbstractStringBuilder` ，<kbd>ctrl + F12</kbd> 搜索一下 `equals()`，可以发现同样也没有 `equals()` 方法。
+
+<img src="./assets/image-20240421195955273.png" alt="image-20240421195955273" style="zoom:67%;" />
+
+继续网上看，可以发现 `AbstractStringBuilder` 没有父类了，此时它默认继承 `Object`
+
+<img src="./assets/image-20240421200021743.png" alt="image-20240421200021743" style="zoom:67%;" />
+
+而 `Object` 中的 `equals()` 比较的是地址值，因此第二句打印出的结果还是 `false`。
+
+总结：第二句中的 `equals()` 是被sb调用的，而`sb`是`StringBuilder`，所以这里的`equals方法`要看`StringBuilder`中的`equals方法`。
+
+那么在`StringBuilder`当中，并没有重写`equals方法`，使用的是`Object`中的。
+
+在`Object`当中默认是使用`==号`比较两个对象的地址值，而这里的`s`和`sb`记录的地址值是不一样的，所以结果返回false。
+
+
+
+----
+
+# 160.浅克隆、深克隆和对象工具类 `Objects`
+
+本节来学习 `Object类` 中的最后一个方法：`clone()` ——  对象克隆
+
+~~~java
+protected Object clone()    			//对象克隆
+~~~
+
+## 一、对象克隆
+
+它的作用其实就是字面意思：把 `A对象` 的属性值完全拷贝给 `B对象`，也叫做对象拷贝，对象复制
+
+这个方法有什么实际的用处呢？我们以拼图小游戏为例，我们可以把用户的属性去丰富一下
+
+~~~java
+public class User {
+    int id; // 角色：可以是管理员，也可以是普通用户，也可以是氪金用户....
+    String username; // 用户名
+    String password; // 密码
+    Strinng path; // 游戏图片
+    int[] data = {...}; // 游戏进度，这个我们可以用一维数组记录，也可以使用二维数组记录
+}
+~~~
+
+由于我们的游戏因为上手简单，并且比较好玩，所以有很多用户来玩。
+
+那一个服务器我扛不住了怎么办？因此我们就需要开很多区，如下图。
+
+假如之前有个人的号在二区，但是它在二区喷不过别人，转到了三区，这个时候就可以使用 `对象克隆` 了，将这个人在二区的角色克隆到三区就行了。
+
+<img src="./assets/image-20240421201610106.png" alt="image-20240421201610106" style="zoom: 67%;" />
+
+---
+
+## 二、代码示例
+
+### 1）准备代码
+
+**User.java**
+
+~~~java
+package com.itheima.a04objectdemo;
+
+import java.util.StringJoiner;
+
+public class User {
+    private int id; // 角色：可以是管理员，也可以是普通用户，也可以是氪金用户....
+    private String username; // 用户名
+    private String password; // 密码
+    private String path; // 游戏图片
+    private int[] data; // 游戏进度，这个我们可以用一维数组记录，也可以使用二维数组记录
+
+    // 无参构造、有参构造、get、set方法
+
+    // 这里重写了toString()方法，并且在最后拼接数组的时候单独写了一个 arrToString() 的方法，将数组变成字符串。
+    // 这样子做相当于在展示用户信息里面数组的时候，展示的就不是地址值了。
+    public String toString() {
+        return "角色编号为：" + id + "，用户名为：" + username + "密码为：" + password + ", 游戏图片为:" + path + ", 进度:" + arrToString();
+    }
+
+    public String arrToString() {
+        StringJoiner sj = new StringJoiner(", ", "[", "]");
+
+        for (int i = 0; i < data.length; i++) {
+            sj.add(data[i] + "");
+        }
+        return sj.toString();
+    }
+}
+~~~
+
+`User类`写好后，接下来到测试类中练习 `clone()` 方法。
+
+~~~java
+// 先创建一个对象
+int[] data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0}; // 表示已经玩到最后了
+User u1 = new User(1, "zhangsan", "1234qwer", "girl11", data);
+~~~
+
+接下来就可以克隆对象了。
+
+----
+
+### 2）重写 `clone()` 方法
+
+在克隆的时候不能直接使用 `u1` 去调用 `clone()` 方法，我们可以来看一下 `Object类` 的源码
+
+<kbd>ctrl + N</kbd> 搜索一下 `java.lang包` 下的 `Object类` ，然后 <kbd>ctrl + F12</kbd> 搜索一下 `clone()`。
+
+可以看见 `clone()` 方法前面的修饰符是 `protected`，也就是说 `clone()` 只能被 `本包 / 其他包中的子类` 使用。
+
+![image-20240421203302758](./assets/image-20240421203302758.png)
+
+由于 `Object` 是定义在 `java.lang` 包下的，我们不能把代码写在 `lang包` 下。
+
+又因为 `User类` 属于 `其他包中的子类`，但是 `User类的对象` 就不属于 `其他包中的子类` 了，调用 `clone()` 方法依旧会报错。
+
+因此，如果我们想要用 `clone()` 方法，只能自己去重写，然后在重写中的方法里再去调用父类的 `clone()` 将其结果返回。
+
+这种做法相当于：相当于让Java帮我们克隆一个对象，并把克隆之后的对象返回出去。
+
+**User.java**
+
+<img src="./assets/image-20240421211217802.png" alt="image-20240421211217802" style="zoom:67%;" />
+
+~~~java
+@Override
+protected Object clone() throws CloneNotSupportedException {
+    // 调用父类的 clone()
+    return super.clone();
+}
+~~~
+
+----
+
+### 3）继承 `cloneable` 接口
+
+此时还没完，我们还需要让 `User类` 去实现 `cloneable接口`，这个接口中是没有任何的抽象方法的。
+
+<img src="./assets/image-20240421210705365.png" alt="image-20240421210705365" style="zoom:67%;" />
+
+~~~java
+public class User implements Cloneable {
+}
+~~~
+
+那这个接口是什么意思呢？
+
+如果一个接口里面没有抽象方法，那就表示当前的接口是一个标记性接口。
+
+现在 `Cloneable接口` 就表示：一旦实现了 `Cloneable接口`，那么当前类的对象就可被克隆；如果没有实现 `Cloneable接口`，那么当前类的对象就不能被克隆。
+
+---
+
+### 4）测试
+
+回到测试类中，用 `u1` 去调用重写后的 `clone()` 方法
+
+~~~java
+Object u2 = u1.clone();
+~~~
+
+然后 <kbd>alt + 回车</kbd> 让代码不要报错
+
+<img src="./assets/image-20240421211436421.png" alt="image-20240421211436421" style="zoom:67%;" />
+
+由于现在帮我们克隆出来的对象是一个用户对象，因此我们还需要来做一个强转。
+
+~~~java
+User u2 = (User)u1.clone();
+~~~
+
+此时我们就可以来分别打印一下 `自己创建的u1` 和 `帮我们克隆出来的u2`
+
+~~~java
+System.out.println(u1); 
+System.out.println(u2);
+~~~
+
+结果如下，可以发现克隆成功
+
+![image-20240421211715718](./assets/image-20240421211715718.png)
+
+补充一下 `User u2 = (User)u1.clone();` 的细节：方法在底层会帮我们创建一个对象，并把原对象中的数据拷贝过去。
+
+----
+
+### 5）总结
+
+步骤如下
+
+1、重写 `Object` 中的 `clone()` 方法
+
+2、让JavaBean类实现 `Cloneable接口`
+
+3、创建原对象并调用 `clone()` 即可
+
+----
+
+## 三、对象克隆内存图
+
+### 1）引入
+
+这个代码其实并不是很难，但是里面的细节还是非常多的，因此接下来会去画一个内存，方便大家理解。
+
+在刚刚我们创建了 `User` 的对象，其实就好比我们在堆内存中开辟了一块空间，空间里面记录了对象的属性值，例如 `id` 的属性值是 `1`，`username` 的属性值是 `zhangsan`........
+
+但是呢，这其实还不够细致，在之前我们曾经讲过：
+
+- 如果一个变量是基本数据类型的，那么变量里面存的是真实的数据值
+- 如果一个变量是引用数据类型的，那么变量里面存的是另一个空间的地址值
+
+![image-20240421212654373](./assets/image-20240421212654373.png)
+
+因此真实的内存应该是这样的：字符串是存储在串池中的，数组它也是一个单独的空间。
+
+对象里面的 `id`，它是基本数据类型，因此变量里记录的就是真实的数据 `1`。
+
+而 `username、password、path` 记录的都是串池里面管理的地址值。
+
+`data数组` 记录的就是数组的地址值。
+
+这个就是原对象。
+
+![image-20240421213038131](./assets/image-20240421213038131.png)
+
+接下来我要调用 `clone()方法` 去对这个对象进行克隆。
+
+在Java中，克隆其实有两种方式，我们先说第一种克隆方式。
+
+----
+
+### 2）浅克隆 / 浅拷贝
+
+首先先创建建一个新的对象，然后将原来对象里面记录的数据，全都拷贝过来。
+
+如果是基本数据类型，那就会把变量中所记录的值拷贝过来。
+
+如果是引用数据类型，那就会把变量中记录的地址值拷贝过来（包括字符串和数组）
+
+这种克隆方式会有一个小细节：对于数组而言，上面的原数组记录的地址值是 `0x0044`，下面克隆的对象里面记录的地址值也是 `0x0044`。因此对于数组而言，两个对象使用的是同一个数组。
+
+这种方式的特点：其中有一个对象对数组里面的数据发生了改变，另外一个对象再次访问数组的时候，就是修改之后的结果。
+
+这种方式它有一个专业的称呼：浅克隆 / 浅拷贝
+
+![image-20240421213626654](./assets/image-20240421213626654.png)
+
+----
+
+### 2）深克隆 / 深拷贝
+
+首先先创建建一个新的对象，然后将原来对象里面记录的数据，全都拷贝过来。
+
+如果是基本数据类型，跟原来一样，会把变量中所记录的值直接拷贝过来。
+
+如果是引用数据类型，它就不会拷贝地址值了，它就会在外面重新再创建一个对象。
+
+以 `data数组` 为例，浅克隆中，它是将 `data数组` 的地址值 `0x0044` 直接拷贝过来，但是现在不一样了，在外面它会重新创建一个新的数组，假设新数组的地址值是 `0x0055`，然后将原来数组里面的数据全都拷贝过来。
+
+然后在克隆的对象中的 `data数组` 记录的就是 `新数组的地址值`。
+
+因此在深克隆中，两个对象操作的数据互不干扰。
+
+![image-20240421214214158](./assets/image-20240421214214158.png)
+
+最后还有中间的字符串，字符串其实也是引用数据类型，但是这个引用数据类型它有一个特点：只要不是手动 `new` 的，它都会在串池中进行管理，字符串是会复用的！
+
+因此在克隆这里的 `username、password、path` 时发现：这三个变量里面的值在串池中已经存在了，因此它依旧会继续复用串池中的地址值！
+
+![image-20240421214345547](./assets/image-20240421214345547.png)
+
+----
+
+### 3）总结
+
+在Java中有两种克隆方式：浅克隆 和 深克隆
+
+浅克隆：不管对象内部的属性是基本数据类型还是引用数据类型，它都会完全拷贝过来
+
+深克隆：如果是基本数据类型，它会把记录的值拷贝过来；如果是字符串，那么它会复用串池中的；如果是 `除字符串外的引用数据类型`，它就会创建新的小空间。
+
+而在我们之前讲的 `Object` 中的 `clone()方法` 属于浅克隆。
+
+-----
+
+## 四、验证 `Object` 中的克隆是 `浅克隆`
+
+先来看看一开始 `u1` 和 `u2` 里面的值
+
+![image-20240421211715718](./assets/image-20240421211715718.png)
+
+验证方式：我们可以修改 `u1变量` 中的数组中的值
+
+~~~java
+int[] arr = u1.getData();
+arr[0] = 100;
+~~~
+
+然后再一起打印 `u1` 和 `u2`，观察：`u2` 中数组的值会不会跟着改动？
+
+~~~java
+System.out.println(u1); 
+System.out.println(u2); 
+~~~
+
+程序运行完毕，`u2` 中的数组跟着改变了
+
+![image-20240421214954459](./assets/image-20240421214954459.png)
+
+因此，`Object` 中的 `clone()方法` 属于浅克隆。
+
+如果我们想要深克隆，就必须去重写 `Object` 中的 `clone()` 方法。
+
+----
+
+## 五、深克隆代码
+
+1、我们可以把被克隆对象中的数组获取出来。
+
+2、然后再创建新的数组，将原数组中的数组拷贝到新数组中。
+
+3、调用 `Object` 中的 `clone()方法` 去克隆对象。
+
+4、将新数组的地址值赋值给 `data`
+
+~~~java
+@Override
+protected Object clone() throws CloneNotSupportedException {
+    //先把被克隆对象中的数组获取出来
+    int[] data = this.data;
+    //创建新的数组
+    int[] newData =new int[data.length];
+    //拷贝数组中的数据
+    for (int i = 0; i < data.length; i++) {
+        newData[i] = data[i];
+    }
+    //调用父类中的方法克隆对象
+    User u= (User)super.clone();
+    //因为父类中的克隆方法是浅克隆，替换克隆出来对象中的数组地址值
+    u.data = newData;
+    return u;
+}
+~~~
+
+测试：继续使用刚刚的代码
+
+~~~java
+int[] arr = u1.getData();
+arr[0] = 100;
+System.out.println(u1); 
+System.out.println(u2); 
+~~~
+
+结果：可以很明显看见 `u2` 中数组里的值没有跟着改变！
+
+![image-20240421215542988](./assets/image-20240421215542988.png)
+
+----
+
+## 六、扩展
 
 
 
