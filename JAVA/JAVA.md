@@ -30217,121 +30217,2386 @@ public boolean victory(){
 }
 ~~~
 
+写完后，就养成把方法收起来的习惯。
 
+回到 `initImage()` 方法中，需要调用一下 `victory()` 的方法。
 
+`胜利` 的图片在 `image/win.png` 中，宽高是 `197 × 73` 像素
 
+![image-20240421065506988](./assets/image-20240421065506988.png)
 
+~~~java
+// 初始化图片
+private void initImage() {
+    // 清除原本已经出现的所有图片
+    this.getContentPane().removeAll();
 
+    if (victory()) {
+        // 如果返回true，就显示胜利的图片
+        JLabel winJLabel = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-code\\puzzlegame\\image\\win.png"));
+        winJLabel.setBounds(203, 283, 197, 73);
+        this.getContentPane().add(winJLabel);
+    }
 
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            .....
+        }
+    }
+}
+~~~
 
+代码写完后，打开 `App` 右键运行，就会发现代码此时还有一个小 `bug`：当胜利之后，它还可以继续再玩，而且还多了一个空白
 
+<img src="./assets/image-20240421065937549.png" alt="image-20240421065937549" style="zoom:50%;" />
 
+-----
 
+## 三、优化
 
+如果游戏胜利了，就应该不能再点击 `上下左右键` 去移动图片了，只能重开一把了。
 
+回到 `keyReleased()` 重写方法，在这里需要去判断游戏是否胜利，如果胜利，此方法需要直接结束，不能再执行下面的移动代码了。
 
+`return` 有两层含义：1、返回结果；2、结束方法。
 
+如果当前方法没有返回值类型，是 `void` ，此时它就不需要返回结果，它只有一个作用，那就是：结束方法。
 
+~~~java
+//松开按键的时候会调用这个方法
+@Override
+public void keyReleased(KeyEvent e) {
+    // 判断游戏是否胜利，如果胜利，此方法需要直接结束，不能再执行下面的移动代码了
+    if (victory()) {
+        return;
+    }
+    //对上，下，左，右进行判断
+    //左：37 上：38 右：39 下：40
+    int code = e.getKeyCode();
+    System.out.println(code);
+    if (code == 37) {
+        .....
+    } else if (code == 38) {
+        .....
+    } else if (code == 39) {
+        .....
+    } else if (code == 40) {
+        .....
+    } else if (code == 65) {
+        .....
+    } else if (code == 87) {
+        ....
+    }
+}
+~~~
 
+代码写完后，重新打开 `App` 右键运行，可以发现 `Bug` 已经解决。
 
 
 
+----
 
+# 152.计步功能 & 重新游戏 & 关闭游戏 & 关于我们
 
+## 一、计步功能
+
+### 1）介绍
+
+来看下最终的效果：步数统计其实我们是把它放在了左上角。
+
+<img src="./assets/image-20240421070658369.png" alt="image-20240421070658369" style="zoom:85%;" />
+
+步骤：
+
+1、定义一个变量用来统计已经玩了多少步。
+
+2、每次按 `上下左右` 的时候，计步器自增一次即可。
+
+----
+
+### 2）代码实现
+
+首先来思考，这个变量定义在哪呢？成员位置还是方法中？
+
+告诉你，这个变量不能定义在方法里面，因为方法每调用一次，里面的变量就重新定义了。因此我们需要把它写在成员位置。
+
+~~~java
+// 定义变量，用来统计步数
+int step = 0;
+~~~
+
+<img src="./assets/image-20240421071317180.png" alt="image-20240421071317180" style="zoom:50%;" />
+
+现在我们就能把这个变量加载到界面中了。加载界面就找这里的 `initImage()` 方法。
+
+在方法中，需要创建一个 `JLabel对象` ，之前我们说过 `JLabel` 既可以管理图片，也可以管理文字，而这里的步数其实就是文字。
+
+将要显示的文字直接写在小括号中即可。
+
+~~~java
+// 初始化图片
+private void initImage() {
+    // 清除原本已经出现的所有图片
+    this.getContentPane().removeAll();
+
+    if (victory()) {
+        .....
+    }
+
+    JLabel stepCount = new JLabel("步数：" + step);
+    stepCount.setBounds(50, 30, 100, 20);
+    this.getContentPane().add(stepCount);
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            .....
+        }
+    }
+}
+~~~
+
+这一步只是让它加载到了界面中，但还没有让它动起来。
+
+找到 `keyReleased()` 方法，每当我们按下 `上下左右键` 的时候，`step变量` 都需要自增。
+
+`keyReleased()` 方法完整代码如下
+
+~~~java
+//松开按键的时候会调用这个方法
+@Override
+public void keyReleased(KeyEvent e) {
+    //判断游戏是否胜利，如果胜利，此方法需要直接结束，不能再执行下面的移动代码了
+    if(victory()){
+        //结束方法
+        return;
+    }
+    //对上，下，左，右进行判断
+    //左：37 上：38 右：39 下：40
+    int code = e.getKeyCode();
+    System.out.println(code);
+    if (code == 37) {
+        System.out.println("向左移动");
+        if(y == 3){
+            return;
+        }
+        //逻辑：
+        //把空白方块右方的数字往左移动
+        data[x][y] = data[x][y + 1];
+        data[x][y + 1] = 0;
+        y++;
+        //每移动一次，计数器就自增一次。
+        step++;
+        //调用方法按照最新的数字加载图片
+        initImage();
+
+    } else if (code == 38) {
+        System.out.println("向上移动");
+        if(x == 3){
+            //表示空白方块已经在最下方了，他的下面没有图片再能移动了
+            return;
+        }
+        //逻辑：
+        //把空白方块下方的数字往上移动
+        //x，y  表示空白方块
+        //x + 1， y 表示空白方块下方的数字
+        //把空白方块下方的数字赋值给空白方块
+        data[x][y] = data[x + 1][y];
+        data[x + 1][y] = 0;
+        x++;
+        //每移动一次，计数器就自增一次。
+        step++;
+        //调用方法按照最新的数字加载图片
+        initImage();
+    } else if (code == 39) {
+        System.out.println("向右移动");
+        if(y == 0){
+            return;
+        }
+        //逻辑：
+        //把空白方块左方的数字往右移动
+        data[x][y] = data[x][y - 1];
+        data[x][y - 1] = 0;
+        y--;
+        //每移动一次，计数器就自增一次。
+        step++;
+        //调用方法按照最新的数字加载图片
+        initImage();
+    } else if (code == 40) {
+        System.out.println("向下移动");
+        if(x == 0){
+            return;
+        }
+        //逻辑：
+        //把空白方块上方的数字往下移动
+        data[x][y] = data[x - 1][y];
+        data[x - 1][y] = 0;
+        x--;
+        //每移动一次，计数器就自增一次。
+        step++;
+        //调用方法按照最新的数字加载图片
+        initImage();
+    }else if(code == 65){
+        initImage();
+    }else if(code == 87){
+        data = new int[][]{
+            {1,2,3,4},
+            {5,6,7,8},
+            {9,10,11,12},
+            {13,14,15,0}
+        };
+        initImage();
+    }
+}
+~~~
 
+代码写完后，打开 `App` 右键运行，可以发现计步器正常显示和使用。
 
 
 
+-----
 
+## 二、重新游戏
 
+例如当我玩了一把后，想换一把，就可以点击 `功能` 下面的 `重新游戏`，此时它就需要重新打乱顺序并加载出来。
 
+![image-20240421073123639](./assets/image-20240421073123639.png)
 
+代码该如何实现呢？
 
+1、给 `功能` 下的 `重新游戏` 绑定点击事件（`MouseLisener(鼠标监听事件)`、`ActionListener(动作监听事件)`）
 
+其中 `MouseLisener(鼠标监听事件)` 又包含很多：`划入`、`划出`、`点击`....
 
+其中很多功能我都不需要，我只需要一个 `点击`，因此就可以使用简化的 `ActionListener`，`ActionListener` 包含了两个：鼠标点击和空格。
 
+2、重新打乱二维数组中的数字
+
+3、重新加载图片
+
+4、计步器清零
+
+----
+
+## 三、关闭游戏
+
+当我们点击 `功能` 下的 `关闭游戏` 了之后，就需要退出整个游戏。
 
+步骤：
 
+1、给 `关闭游戏` 绑定事件
 
+2、退出虚拟机（之前写学生管理系统的时候）有过
 
+---
 
+## 四、关于我们
 
+当我点击 `关于我们` 下面的 `公众号` 时，游戏的正中央它会有这样的弹框（如下图），在弹框里面就会弹出黑马程序员的官方公众号。
 
+这个弹框在Java中叫做 `JDialog`，也就是说我们只需要创建 `JDialog` 对象就行了。
 
+在中间其实就是一张图片 `ImageIcon`，但是你别忘了，`ImageIcon` 还需要交给 `JLabel` 去管理的。
 
+最后将 `JLabel` 放在 `JDialog` 弹窗中即可。
+
+
 
+-----
 
+## 五、代码实现
 
+首先找到 `GameJFrame类`，让这个类再去实现 `ActionListener`，实现一个接口需要重写里面所有的抽象方法。
 
+当 `重新开始` 被点击之后，就会自动调用 `actionperformed()` 这个方法了。
 
+![image-20240421074827479](./assets/image-20240421074827479.png)
 
+接下来需要给菜单中的条目去绑定事件：找到 `initJMenuBar()` 方法，在这个方法中，我们要给 `重新游戏`、`关闭游戏` 、`公众号` 去绑定事件。
 
+![image-20240421075257494](./assets/image-20240421075257494.png)
 
+~~~java
+private void initJMenuBar() {
+    //将每一个选项下面的条目添加到选项中
+    .....
 
+    // 给条目绑定事件
+    replayItem.addActionListener(this);
+    reLoginItem.addActionListener(this);
+    closeItem.addActionListener(this);
+    accountItem.addActionListener(this);
 
+    // 将菜单里面的两个选项添加到菜单当中
+    .....
+}
+~~~
 
+除此之外还没完，还需要去完善 `actionPerformed()` 方法。
 
+`e.getSource()`：可以获取当前被操作的对象，接收的时候是使用 `Object(父类类型)` 接收的。
 
+然后将这个获取到的对象1去跟 `条目对象` 做一个比较，这样就可以区分你当前点击的是哪个条目了。
 
+~~~java
+e.getSource() == 条目对象;
+~~~
 
+因此在这个方法中，还需要使用到 `重新游戏`、`关闭游戏` 、`公众号` 这三个对象，所以我们需要将这三个对象全部放到 `成员位置`。
 
+~~~java
+// 3.创建选项下面的条目对象（功能：重新游戏、重新登陆、关闭游戏；关于我们：公众号），合起来一共四个 JMenuItem 对象
+JMenuItem replayItem = new JMenuItem("重新游戏"); // 同样也是调用它的有参构造设置展示文字
+// 快捷键 ctrl + d ：向下复制一行
+JMenuItem reLoginItem = new JMenuItem("重新登录");
+JMenuItem closeItem = new JMenuItem("关闭游戏");
 
+// 由于前三个是一组，最后一个公众号是一组，因此我们在写代码的时候打一个空行，提高阅读性
+JMenuItem accountItem = new JMenuItem("公众号");
+~~~
 
+查看完方法记得养成习惯收起来。
 
+接下来就可以重写 `actionPerformed()` 方法了。
 
+~~~java
+@Override
+public void actionPerformed(ActionEvent e) {
+    // 1.获取当前被点击的条目对象
+    Object obj = e.getSource();
+    // 2.判断你当前点击的是谁
+    if (obj == replayItem) {
+        System.out.println("重新游戏");
+    } else if (obj == reLoginItem) {
+        System.out.println("重新登陆");
+    } else if (obj == closeItem) {
+        System.out.println("关闭游戏");
+    } else if (obj == accountItem) {
+        System.out.println("公众号");
+    }
+}
+~~~
 
+代码写完后运行 `App` 看看效果：点击对应的条目都会输出对应的文字。
 
+<img src="./assets/image-20240421080850577.png" alt="image-20240421080850577" style="zoom:67%;" />
 
+-----
 
+接下来我们要做的就是完善方法里面的代码。
 
+首先来完善 `重新游戏`
 
+### 1）重新游戏
 
+~~~java
+if (obj == replayItem) {
+    System.out.println("重新游戏");
+    // 再次打乱二维数组中的数组
+    initData();
+    // 重新加载图片
+    initImage();
+    // 计步器清零
+    this.step = 0;
+}
+~~~
 
+这么写代码其实会有两个小Bug：① 当游戏游戏时会发现计步器并没有清零；② 空白图片不见了
 
+<img src="./assets/d2pjp-tfqbs.gif" alt="d2pjp-tfqbs" style="zoom:50%;" />
 
+**① 当游戏游戏时会发现计步器并没有清零**
 
+这是因为 `步数清零` 的代码写在了 `加载图片` 的上面，这就导致了 `加载步数` 的时候， `步数` 还没有清零！
 
+因此这个Bug很好解决：只要将 `计步器清零` 放到 `加载图片` 的上面就行了。
 
+~~~java
+// 计步器清零
+this.step = 0;
+// 再次打乱二维数组中的数组
+initData();
+// 重新加载图片
+initImage();
+~~~
 
+**② 空白图片不见了**
 
+图片在加载的时候，是根据 `二维数组里面的数据` 去加载的，此时我们就要思考：这个问题是不是出现在 `initData()` 方法中呢？
 
+问题在这：如果这里为 `0`，我是没有把它交给二维数组的，而是仅仅记录了 `x、y` 的位置
 
+<img src="./assets/image-20240421082143951.png" alt="image-20240421082143951" style="zoom:50%;" />
 
+举例：假设**第一次**打乱后的二维数组为
 
+~~~
+11  8  7  5
+12  0  3  4
+14  1  6  9
+15  2  10  13
+~~~
 
+假设**第二次**打乱后的一维数组为
 
+~~~java
+5   6   8   9   10  11  15  1   4   7   12  13  2   3   0   14
+~~~
 
+然后将第二次打乱后的一维数组赋值给二维数组，此时就会产生数据的覆盖
 
+~~~java
+5   6   8   9
+10  11  15  1
+4   7   12  13
+2   3   10  14
+~~~
 
+注意倒数第二个数字 `0`，此时它就不会给二维数组中的值赋值，于是就不会被覆盖！因此这个位置此时还是原来的数据。
 
+解决也很好解决，将 `else` 删掉即可
 
+~~~java
+for (int i = 0; i < tempArr.length; i++) {
+    if (tempArr[i] == 0) {
+        x = i / 4;
+        y = i % 4;
+    }
+    data[i / 4][i % 4] = tempArr[i];
+}
+~~~
 
+----
 
+### 2）重新登陆
 
+`重新登陆` 也很简单，相当于就是返回登录界面
 
+~~~java
+else if (obj == reLoginItem) {
+    System.out.println("重新登陆");
+    // 关闭当前的游戏界面
+    this.setVisible(false); // 将当前界面隐藏
 
+    // 打开登录界面
+    new LoginJFrame();
+} 
+~~~
 
+----
 
+### 3）关闭游戏
 
+~~~java
+else if (obj == closeItem) {
+    System.out.println("关闭游戏");
+    // 直接关闭虚拟机即可
+    System.exit(0);
+}
+~~~
 
+-----
 
+### 4）公众号
 
+`公众号` 就是以弹窗的形式出现的，`弹窗` 里面加了一张图片，这个图片也是提前准备好的：`image/about.png`，图片大小为：`258 × 258`。
 
+![image-20240421084057751](./assets/image-20240421084057751.png)
 
+弹框中的很多用法都是和 `JFrame` 是一样的
 
+~~~java
+else if (obj == accountItem) {
+    System.out.println("公众号");
+    // 创建一个弹框对象
+    JDialog jDialog = new JDialog();
+    // 创建一个管理图片的容器对象
+    JLabel jLabel = new JLabel(new ImageIcon("puzzlegame\\image\\about.png"));
+    // 设置位置和宽高
+    // PS：这里的位置并不是相对于当前界面而言的，而是相对于弹框而言的
+    jLabel.setBounds(0, 0, 258, 258);
+    // 把图片添加到弹框中，PS：JDialog里面也有一个隐藏容器
+    jDialog.getContentPane().add(jLabel);
+    // 给弹框设置大小
+    jDialog.setSize(344, 344);
+    // 让弹框置顶
+    jDialog.setAlwaysOnTop(true);
+    // 让弹框居中
+    jDialog.setLocationRelativeTo(null);
+    // 弹框不关闭则无法操作下面的界面
+    jDialog.setModal(true);
+    // 让弹框显示出来
+    jDialog.setVisible(true);
+}
+~~~
 
+代码写完后，选择 `App` 右键Run运行，效果如下图。并且弹窗没关闭的时候，如果想要点击游戏界面，也是不可以点击的，这就是这句话的作用 `jDialog.setModal(true);`
 
+<img src="./assets/image-20240421084205690.png" alt="image-20240421084205690" style="zoom:50%;" />
 
 
 
+----
 
+# 153.阶段项目课后练习思路分析
 
+## 一、作业
 
+到目前为止， `拼图小游戏` 项目已经写的差不多了，在这里留了两个作业练练手。
 
+第一题：自行完成切换美女图片的功能。
 
+![image-20240421084829625](./assets/image-20240421084829625.png)
 
+第二题：完成登录界面逻辑
 
+![image-20240421084852014](./assets/image-20240421084852014.png)
 
+以后我们在公司的时候其实也会遇到这样的情景：给你业务需求时你需要学会去分析。
+
+所以接下来我会把这两题单独的给大家做一个分析。
+
+----
+
+## 二、切换游戏图片的业务分析
+
+以后工作的时候拿到一个需求之后需要分析两点：
+
+* 分析当前的业务逻辑
+
+例如当我们点击了某个按钮后，会做什么事情？
+
+* 分析所需要的技术点
+
+### 1）分析所需要的技术点
+
+在这个界面中，我们需要哪些技术点：
+
+整个的菜单就是JMenuBar
+
+功能，关于我们：JMenu
+
+更换图片：JMenu
+
+重新游戏，重新登录，关闭游戏，美女，动物，运动：JMenuItem
+
+特点：如果在菜单中，还需要嵌套二级的菜单，那么可以用JMenu完成，JMenu里面是可以再次添加其他的JMenu的。
+
+写代码的时候如何实现：
+
+~~~java
+第一步：创建JMenuBar对象
+第二步：创建三个JMenu对象（功能，关于我们，更换图片）
+第三步：创建六个JMenuItem对象（重新游戏，重新登录，关闭游戏，美女，动物，运动）
+第四步：把美女，动物，运动放到更换图片当中
+第五步：把更换图片，重新游戏，重新登录，关闭游戏放到功能当中
+第六步：把功能，关于我们放到JMenuBar
+第七步：把JMenuBar放到整个界面当中
+~~~
+
+----
+
+### 2）分析业务逻辑
+
+1，给美女，动物，运动添加单击事件（动作监听）
+
+2，当我们点击了美女之后，就会从13组美女图片中随机选择一组。
+
+3，当我们点击了动物之后，就会从8组动物图片中随机选择一组。
+
+4，当我们点击了运动之后，就会从10组运动图片中随机选择一组。
+
+5，细节1：选择完毕之后，游戏界面中需要加载所有的小图片并且打乱顺序
+
+6，细节2：按A的时候显示的是选择之后的图片
+
+----
+
+### 3）代码实现
+
+#### ① 添加组件
+
+~~~java
+//创建菜单并添加到界面当中
+//1.创建菜单JMenuBar的对象
+JMenuBar jMenuBar = new JMenuBar();
+//2.创建菜单上面的两个选项JMenu
+JMenu functionJMenu = new JMenu("功能");
+JMenu aboutJMenu = new JMenu("关于我们");
+
+//创建更换图片
+JMenu changeImage = new JMenu("更换图片");
+
+//3.创建JMenuItem的对象
+JMenuItem girl = new JMenuItem("美女");
+JMenuItem animal = new JMenuItem("动物");
+JMenuItem sport = new JMenuItem("运动");
+JMenuItem repalyItem = new JMenuItem("重新游戏");
+JMenuItem reLoginItem = new JMenuItem("重新登录");
+JMenuItem closeItem = new JMenuItem("关闭游戏");
+JMenuItem accountItem = new JMenuItem("公众号");
+
+
+
+//4.把美女，动物，运动添加到更换图片当中
+changeImage.add(girl);
+changeImage.add(animal);
+changeImage.add(sport);
+
+//5.把更换图片，重新游戏，重新登录，关闭游戏添加到功能当中
+functionJMenu.add(changeImage);
+functionJMenu.add(repalyItem);
+functionJMenu.add(reLoginItem);
+functionJMenu.add(closeItem);
+//6.把公众号添加到关于我们当中
+aboutJMenu.add(accountItem);
+
+//5.把功能，关于我们添加到JMenuBar当中
+jMenuBar.add(functionJMenu);
+jMenuBar.add(aboutJMenu);
+
+//6.把整个菜单JMenuBar添加到整个界面当中
+this.setJMenuBar(jMenuBar);
+~~~
+
+-----
+
+#### ② 绑定事件
+
+~~~java
+girl.addActionListener(this);
+animal.addActionListener(this);
+sport.addActionListener(this);
+
+
+要在重写的方法中进行判断
+if(点击是否为美女){
+	随机选择图片
+	修改PATH变量记录的值
+	写一些重开一把的逻辑
+}else if(点击是否为动物){
+	随机选择图片
+	修改PATH变量记录的值
+	写一些重开一把的逻辑
+}else if(点击是否为运动){
+	随机选择图片
+	修改PATH变量记录的值
+	写一些重开一把的逻辑
+}
+~~~
+
+
+
+-----
+
+## 三、登录界面的业务分析
+
+这个登录界面做了一些简化：密码后面的小眼睛删掉了，这个东西在我们后面用到的时候还会继续再讲，因此现在我们只需要完成最初步的逻辑就行了。
+
+<img src="./assets/image-20240421090505270.png" alt="image-20240421090505270" style="zoom:50%;" />
+
+### 1）分析所需要的技术点
+
+![image-20240421090803274](./assets/image-20240421090803274.png)
+
+第一排：用户名文字其实是一张图片，还是用JLabel去管理ImageIcon
+
+​		输入框：JTextField(Java Text Field)（明文显示的输入框） 
+
+![image-20240421090836477](./assets/image-20240421090836477.png)
+
+第二排：密码文字其实是一张图片，还是用JLabel去管理ImageIcon
+
+​		输入框：JPasswordField（密文显示的输入框） 
+
+​		`JPasswordField` 是 `JTextField` 的子类
+
+第三排：验证码文字其实是一张图片，还是用JLabel去管理ImageIcon
+
+​		输入框：JTextField（明文显示的输入框）
+
+​		验证码wyS7i：用JLabel去管理文字，需要自己写一个生成验证码的工具类。
+
+第四排：两个都是按钮，绿色跟红色是按钮的背景图
+
+​		当点击按钮不松的时候，按钮变灰，其实就是换一个深色的背景图。
+
+![image-20240421091140399](./assets/image-20240421091140399.png)
+
+----
+
+### 2）分析业务逻辑
+
+1，界面搭建。代码不需要大家写，大家主要完成里面的业务逻辑即可。界面搭建的代码直接复制粘贴即可。
+
+2，用静态代码块准备一些初始的用户信息
+
+3，点击登陆按钮之后的逻辑：
+
+- 按下登陆不松，切换登陆按钮的背景图片
+- 松开登陆按钮，逻辑较为复杂
+  - 获取用户输入的用户名，密码，验证码。
+  - 先比较验证码（正确  错误），如果正确：继续往下走；如果错误：给出弹框提示，与此同时还需要再生成一个新的验证码
+  - 判断用户名和密码是否为空，只要有一个为空就不行
+    - 细节：如果用户没有输入用户名和密码，在代码中获取的不是null，而是长度为0的字符串
+  - 用户名，密码比较正确，显示登陆成功跳转游戏界面
+  - 用户名，密码比较错误，弹框提示错误
+
+4，点击注册按钮之后的逻辑
+
+- 暂时不需要写逻辑，后面学习完IO的时候再补
+
+5，点击验证之后
+
+- 更换一个新的验证码（写一个工具类提供验证码）
+
+-----
+
+### 3）代码实现
+
+项目实现步骤
+
+* 对主界面进行设置
+* 在主界面添加用户名和密码以及登录，注册按钮
+* 对登录按钮绑定鼠标事件
+
+#### ① 主界面设置
+
+小细节：由于我们现在学的知识点还不多，注册额的业务逻辑我们还写不了，因为注册完毕后，需要将用户名跟密码存起来。
+
+因此现在我们只能先写一个静态代码块，然后在静态代码块中给集合添加用户信息。
+
+```java
+public class LoginJFrame extends JFrame {
+    //创建一个集合存储正确的用户名和密码
+    static ArrayList<User> list = new ArrayList<>();
+    static {
+        list.add(new User("zhangsan","123"));
+        list.add(new User("lisi","1234"));
+    }
+    
+    
+    public LoginJFrame() {
+        //初始化界面
+        initJFrame();
+
+        //在这个界面中添加内容
+        initView();
+
+        //让当前界面显示出来
+        this.setVisible(true);
+    }
+
+    public void initView() {
+        //1. 添加用户名文字
+        JLabel usernameText = new JLabel(new ImageIcon("puzzlegame\\image\\login\\用户名.png"));
+        usernameText.setBounds(116, 135, 47, 17);
+        this.getContentPane().add(usernameText);
+
+        //2.添加用户名输入框
+        JTextField username = new JTextField();
+        username.setBounds(195, 134, 200, 30);
+        this.getContentPane().add(username);
+
+        //3.添加密码文字
+        JLabel passwordText = new JLabel(new ImageIcon("puzzlegame\\image\\login\\密码.png"));
+        passwordText.setBounds(130, 195, 32, 16);
+        this.getContentPane().add(passwordText);
+
+        //4.密码输入框
+        JTextField password = new JTextField();
+        password.setBounds(195, 195, 200, 30);
+        this.getContentPane().add(password);
+
+        //验证码提示
+        JLabel codeText = new JLabel(new ImageIcon("puzzlegame\\image\\login\\验证码.png"));
+        codeText.setBounds(133, 256, 50, 30);
+        this.getContentPane().add(codeText);
+
+        //验证码的输入框
+        JTextField code = new JTextField();
+        code.setBounds(195, 256, 100, 30);
+        this.getContentPane().add(code);
+
+        String codeStr = CodeUtil.getCode();
+        JLabel rightCode = new JLabel();
+        //设置内容
+        rightCode.setText(codeStr);
+        //位置和宽高
+        rightCode.setBounds(300, 256, 50, 30);
+        //添加到界面
+        this.getContentPane().add(rightCode);
+
+        //5.添加登录按钮
+        JButton login = new JButton();
+        login.setBounds(123, 310, 128, 47);
+        login.setIcon(new ImageIcon("puzzlegame\\image\\login\\登录按钮.png"));
+        //去除按钮的默认边框
+        login.setBorderPainted(false);
+        //去除按钮的默认背景
+        login.setContentAreaFilled(false);
+        this.getContentPane().add(login);
+
+        //6.添加注册按钮
+        JButton register = new JButton();
+        register.setBounds(256, 310, 128, 47);
+        register.setIcon(new ImageIcon("puzzlegame\\image\\login\\注册按钮.png"));
+        //去除按钮的默认边框
+        register.setBorderPainted(false);
+        //去除按钮的默认背景
+        register.setContentAreaFilled(false);
+        this.getContentPane().add(register);
+
+        //7.添加背景图片
+        JLabel background = new JLabel(new ImageIcon("puzzlegame\\image\\login\\background.png"));
+        background.setBounds(0, 0, 470, 390);
+        this.getContentPane().add(background);
+    }
+
+
+    public void initJFrame() {
+        this.setSize(488, 430);//设置宽高
+        this.setTitle("拼图游戏 V1.0登录");//设置标题
+        this.setDefaultCloseOperation(3);//设置关闭模式
+        this.setLocationRelativeTo(null);//居中
+        this.setAlwaysOnTop(true);//置顶
+        this.setLayout(null);//取消内部默认布局
+    }
+
+    
+    //要展示用户名或密码错误，需要传入要展示的内容
+    public void showJDialog(String content) {
+        //创建一个弹框对象
+        JDialog jDialog = new JDialog();
+        //给弹框设置大小
+        jDialog.setSize(200, 150);
+        //让弹框置顶
+        jDialog.setAlwaysOnTop(true);
+        //让弹框居中
+        jDialog.setLocationRelativeTo(null);
+        //弹框不关闭永远无法操作下面的界面
+        jDialog.setModal(true);
+
+        //创建Jlabel对象管理文字并添加到弹框当中
+        JLabel warning = new JLabel(content);
+        warning.setBounds(0, 0, 200, 150);
+        jDialog.getContentPane().add(warning);
+
+        //让弹框展示出来
+        jDialog.setVisible(true);
+    }
+}
+```
+
+-----
+
+#### ② 添加组件
+
+```java
+创建JLabel添加用户名文字
+对用户名文字设置位置和宽高：116, 135, 51, 19
+    
+创建用户名的文本输入框：JTextField
+对用户名的文本输入框设置位置和宽高：195, 134, 200, 30
+    
+创建JLabel添加密码文字
+对密码文字设置位置和宽高：130, 195, 35, 18
+    
+创建密码的文本输入框：JTextField
+对密码的文本输入框设置位置和宽高：195, 195, 200, 30
+    
+创建登录的按钮：JButton
+利用setIcon方法给登录按钮设置背景色
+对登录的按钮设置位置和宽高：133, 260, 90, 40
+    
+创建注册的按钮：JButton
+利用setIcon方法给注册按钮设置背景色
+对登录的按钮设置位置和宽高：256, 260, 90, 40
+    
+创建背景色：JLabel
+给背景色设置位置和宽高：0, 0, 470, 390
+    
+将上面7个组件添加到主界面的中心面板中
+```
+
+-----
+
+#### ③ 绑定事件
+
+```java
+给登录按钮绑定鼠标事件
+当按下不松的时候：利用setIcon方法，修改登录按钮的背景色为蓝色
+当松开的时候：利用setIcon方法，将按钮的背景色修改为红色
+当点击的时候：校验用户输入的用户名和密码是否正确。
+```
+
+mouseClicked方法详解：
+
+```java
+先判断当前按下的是否为登录按钮。
+如果是登录按钮，获取输入框中的用户名和密码
+判断1：是否为空，如果为空，提示：用户名和密码为空
+判断2：判断用户名和密码是否为zhangsan，123456，如果正确隐藏登录界面，进入游戏界面。
+判断3：判断用户吗和密码，如果错误，就展示弹框，提示：用户名和密码错误
+```
+
+展示弹框步骤：
+
+```java
+成员位置创建JDialog对象
+
+利用isVisible方法判断弹框是否存在，如果不存在则进行下面操作：
+设置弹框的宽和高:100,100
+设置弹框居中    
+设置弹框置顶
+移除弹框中所有文本
+创建一个JLabel去编写文本内容
+把文本JLabel添加到弹框当中
+把弹框展示出来
+```
+
+
+
+-----
+
+# 游戏完整代码
+
+## `com.itheima.domain.User`
+
+~~~java
+package com.itheima.domain;
+
+public class User {
+    private String username;
+    private String password;
+
+
+    public User() {
+    }
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    /**
+     * 获取
+     * @return username
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * 设置
+     * @param username
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
+     * 获取
+     * @return password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * 设置
+     * @param password
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
+~~~
+
+----
+
+## `com.itheima.ui.GameJFrame`
+
+~~~java
+package com.itheima.ui;
+
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Arrays;
+import java.util.Random;
+
+public class GameJFrame extends JFrame implements KeyListener,ActionListener{
+    //JFrame 界面，窗体
+    //子类呢？也表示界面，窗体
+    //规定：GameJFrame这个界面表示的就是游戏的主界面
+    //以后跟游戏相关的所有逻辑都写在这个类中
+
+    //创建一个二维数组
+    //目的：用来管理数据
+    //加载图片的时候，会根据二维数组中的数据进行加载
+    int[][] data = new int[4][4];
+
+    //记录空白方块在二维数组中的位置
+    int x = 0;
+    int y = 0;
+
+    //定义一个变量，记录当前展示图片的路径
+    String path = "puzzlegame\\image\\animal\\animal3\\";
+
+
+
+
+
+    //定义一个二维数组，存储正确的数据
+    int[][] win = {
+            {1,2,3,4},
+            {5,6,7,8},
+            {9,10,11,12},
+            {13,14,15,0}
+    };
+
+    //定义变量用来统计步数
+    int step = 0;
+
+
+    //创建选项下面的条目对象
+    JMenuItem replayItem = new JMenuItem("重新游戏");
+    JMenuItem reLoginItem = new JMenuItem("重新登录");
+    JMenuItem closeItem = new JMenuItem("关闭游戏");
+
+    JMenuItem accountItem = new JMenuItem("公众号");
+
+
+    public GameJFrame() {
+        //初始化界面
+        initJFrame();
+
+        //初始化菜单
+        initJMenuBar();
+
+
+        //初始化数据（打乱）
+        initData();
+
+        //初始化图片（根据打乱之后的结果去加载图片）
+        initImage();
+
+        //让界面显示出来，建议写在最后
+        this.setVisible(true);
+
+    }
+
+
+    //初始化数据（打乱）
+    private void initData() {
+        //1.定义一个一维数组
+        int[] tempArr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+        //2.打乱数组中的数据的顺序
+        //遍历数组，得到每一个元素，拿着每一个元素跟随机索引上的数据进行交换
+        Random r = new Random();
+        for (int i = 0; i < tempArr.length; i++) {
+            //获取到随机索引
+            int index = r.nextInt(tempArr.length);
+            //拿着遍历到的每一个数据，跟随机索引上的数据进行交换
+            int temp = tempArr[i];
+            tempArr[i] = tempArr[index];
+            tempArr[index] = temp;
+        }
+
+        /*
+        *
+        *           5   6   8   9
+        *           10  11  15  1
+        *           4   7   12  13
+        *           2   3   0  14
+        *
+        *           5   6   8   9   10  11  15  1   4   7   12  13  2   3   0   14
+        * */
+
+        //4.给二维数组添加数据
+        //遍历一维数组tempArr得到每一个元素，把每一个元素依次添加到二维数组当中
+        for (int i = 0; i < tempArr.length; i++) {
+            if (tempArr[i] == 0) {
+                x = i / 4;
+                y = i % 4;
+            }
+            data[i / 4][i % 4] = tempArr[i];
+        }
+    }
+
+    //初始化图片
+    //添加图片的时候，就需要按照二维数组中管理的数据添加图片
+    private void initImage() {
+
+        //清空原本已经出现的所有图片
+        this.getContentPane().removeAll();
+
+        if (victory()) {
+            //显示胜利的图标
+            JLabel winJLabel = new JLabel(new ImageIcon("C:\\Users\\moon\\IdeaProjects\\basic-code\\puzzlegame\\image\\win.png"));
+            winJLabel.setBounds(203,283,197,73);
+            this.getContentPane().add(winJLabel);
+        }
+
+
+        JLabel stepCount = new JLabel("步数：" + step);
+        stepCount.setBounds(50,30,100,20);
+        this.getContentPane().add(stepCount);
+
+
+        //路径分为两种：
+        //绝对路径：一定是从盘符开始的。C:\  D：\
+        //相对路径：不是从盘符开始的
+        //相对路径相对当前项目而言的。 aaa\\bbb
+        //在当前项目下，去找aaa文件夹，里面再找bbb文件夹。
+
+        //细节：
+        //先加载的图片在上方，后加载的图片塞在下面。
+        //外循环 --- 把内循环重复执行了4次。
+        for (int i = 0; i < 4; i++) {
+            //内循环 --- 表示在一行添加4张图片
+            for (int j = 0; j < 4; j++) {
+                //获取当前要加载图片的序号
+                int num = data[i][j];
+                //创建一个JLabel的对象（管理容器）
+                JLabel jLabel = new JLabel(new ImageIcon(path + num + ".jpg"));
+                //指定图片位置
+                jLabel.setBounds(105 * j + 83, 105 * i + 134, 105, 105);
+                //给图片添加边框
+                //0:表示让图片凸起来
+                //1：表示让图片凹下去
+                jLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+                //把管理容器添加到界面中
+                this.getContentPane().add(jLabel);
+            }
+        }
+
+
+        //添加背景图片
+        JLabel background = new JLabel(new ImageIcon("puzzlegame\\image\\background.png"));
+        background.setBounds(40, 40, 508, 560);
+        //把背景图片添加到界面当中
+        this.getContentPane().add(background);
+
+
+        //刷新一下界面
+        this.getContentPane().repaint();
+
+
+    }
+
+    private void initJMenuBar() {
+        //创建整个的菜单对象
+        JMenuBar jMenuBar = new JMenuBar();
+        //创建菜单上面的两个选项的对象 （功能  关于我们）
+        JMenu functionJMenu = new JMenu("功能");
+        JMenu aboutJMenu = new JMenu("关于我们");
+
+
+
+        //将每一个选项下面的条目天极爱到选项当中
+        functionJMenu.add(replayItem);
+        functionJMenu.add(reLoginItem);
+        functionJMenu.add(closeItem);
+
+        aboutJMenu.add(accountItem);
+
+        //给条目绑定事件
+        replayItem.addActionListener(this);
+        reLoginItem.addActionListener(this);
+        closeItem.addActionListener(this);
+        accountItem.addActionListener(this);
+
+        //将菜单里面的两个选项添加到菜单当中
+        jMenuBar.add(functionJMenu);
+        jMenuBar.add(aboutJMenu);
+
+
+
+
+        //给整个界面设置菜单
+        this.setJMenuBar(jMenuBar);
+    }
+
+    private void initJFrame() {
+        //设置界面的宽高
+        this.setSize(603, 680);
+        //设置界面的标题
+        this.setTitle("拼图单机版 v1.0");
+        //设置界面置顶
+        this.setAlwaysOnTop(true);
+        //设置界面居中
+        this.setLocationRelativeTo(null);
+        //设置关闭模式
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        //取消默认的居中放置，只有取消了才会按照XY轴的形式添加组件
+        this.setLayout(null);
+        //给整个界面添加键盘监听事件
+        this.addKeyListener(this);
+
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    //按下不松时会调用这个方法
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int code = e.getKeyCode();
+        if (code == 65){
+            //把界面中所有的图片全部删除
+            this.getContentPane().removeAll();
+            //加载第一张完整的图片
+            JLabel all = new JLabel(new ImageIcon(path + "all.jpg"));
+            all.setBounds(83,134,420,420);
+            this.getContentPane().add(all);
+            //加载背景图片
+            //添加背景图片
+            JLabel background = new JLabel(new ImageIcon("puzzlegame\\image\\background.png"));
+            background.setBounds(40, 40, 508, 560);
+            //把背景图片添加到界面当中
+            this.getContentPane().add(background);
+            //刷新界面
+            this.getContentPane().repaint();
+
+
+        }
+    }
+
+    //松开按键的时候会调用这个方法
+    @Override
+    public void keyReleased(KeyEvent e) {
+        //判断游戏是否胜利，如果胜利，此方法需要直接结束，不能再执行下面的移动代码了
+        if(victory()){
+            //结束方法
+            return;
+        }
+        //对上，下，左，右进行判断
+        //左：37 上：38 右：39 下：40
+        int code = e.getKeyCode();
+        System.out.println(code);
+        if (code == 37) {
+            System.out.println("向左移动");
+            if(y == 3){
+                return;
+            }
+            //逻辑：
+            //把空白方块右方的数字往左移动
+            data[x][y] = data[x][y + 1];
+            data[x][y + 1] = 0;
+            y++;
+            //每移动一次，计数器就自增一次。
+            step++;
+            //调用方法按照最新的数字加载图片
+            initImage();
+
+        } else if (code == 38) {
+            System.out.println("向上移动");
+            if(x == 3){
+                //表示空白方块已经在最下方了，他的下面没有图片再能移动了
+                return;
+            }
+            //逻辑：
+            //把空白方块下方的数字往上移动
+            //x，y  表示空白方块
+            //x + 1， y 表示空白方块下方的数字
+            //把空白方块下方的数字赋值给空白方块
+            data[x][y] = data[x + 1][y];
+            data[x + 1][y] = 0;
+            x++;
+            //每移动一次，计数器就自增一次。
+            step++;
+            //调用方法按照最新的数字加载图片
+            initImage();
+        } else if (code == 39) {
+            System.out.println("向右移动");
+            if(y == 0){
+                return;
+            }
+            //逻辑：
+            //把空白方块左方的数字往右移动
+            data[x][y] = data[x][y - 1];
+            data[x][y - 1] = 0;
+            y--;
+            //每移动一次，计数器就自增一次。
+            step++;
+            //调用方法按照最新的数字加载图片
+            initImage();
+        } else if (code == 40) {
+            System.out.println("向下移动");
+            if(x == 0){
+                return;
+            }
+            //逻辑：
+            //把空白方块上方的数字往下移动
+            data[x][y] = data[x - 1][y];
+            data[x - 1][y] = 0;
+            x--;
+            //每移动一次，计数器就自增一次。
+            step++;
+            //调用方法按照最新的数字加载图片
+            initImage();
+        }else if(code == 65){
+            initImage();
+        }else if(code == 87){
+            data = new int[][]{
+                    {1,2,3,4},
+                    {5,6,7,8},
+                    {9,10,11,12},
+                    {13,14,15,0}
+            };
+            initImage();
+        }
+    }
+
+
+    //判断data数组中的数据是否跟win数组中相同
+    //如果全部相同，返回true。否则返回false
+    public boolean victory(){
+        for (int i = 0; i < data.length; i++) {
+            //i : 依次表示二维数组 data里面的索引
+            //data[i]：依次表示每一个一维数组
+            for (int j = 0; j < data[i].length; j++) {
+                if(data[i][j] != win[i][j]){
+                    //只要有一个数据不一样，则返回false
+                    return false;
+                }
+            }
+        }
+        //循环结束表示数组遍历比较完毕，全都一样返回true
+        return true;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        //获取当前被点击的条目对象
+        Object obj = e.getSource();
+        //判断
+        if(obj == replayItem){
+            System.out.println("重新游戏");
+            //计步器清零
+            step = 0;
+            //再次打乱二维数组中的数据
+            initData();
+            //重新加载图片
+            initImage();
+        }else if(obj == reLoginItem){
+            System.out.println("重新登录");
+            //关闭当前的游戏界面
+            this.setVisible(false);
+            //打开登录界面
+            new LoginJFrame();
+        }else if(obj == closeItem){
+            System.out.println("关闭游戏");
+            //直接关闭虚拟机即可
+            System.exit(0);
+        }else if(obj == accountItem){
+            System.out.println("公众号");
+
+            //创建一个弹框对象
+            JDialog jDialog = new JDialog();
+            //创建一个管理图片的容器对象JLabel
+            JLabel jLabel = new JLabel(new ImageIcon("puzzlegame\\image\\about.png"));
+            //设置位置和宽高
+            jLabel.setBounds(0,0,258,258);
+            //把图片添加到弹框当中
+            jDialog.getContentPane().add(jLabel);
+            //给弹框设置大小
+            jDialog.setSize(344,344);
+            //让弹框置顶
+            jDialog.setAlwaysOnTop(true);
+            //让弹框居中
+            jDialog.setLocationRelativeTo(null);
+            //弹框不关闭则无法操作下面的界面
+            jDialog.setModal(true);
+            //让弹框显示出来
+            jDialog.setVisible(true);
+        }
+    }
+}
+~~~
+
+----
+
+## `com.itheima.ui.LoginFrame`
+
+~~~java
+package com.itheima.ui;
+
+import com.itheima.domain.User;
+import com.itheima.util.CodeUtil;
+
+import javax.swing.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+
+public class LoginJFrame extends JFrame implements MouseListener {
+
+    static ArrayList<User> allUsers = new ArrayList<>();
+    static {
+        allUsers.add(new User("zhangsan","123"));
+        allUsers.add(new User("lisi","1234"));
+    }
+
+
+    JButton login = new JButton();
+    JButton register = new JButton();
+
+    JTextField username = new JTextField();
+    //JTextField password = new JTextField();
+    JPasswordField password = new JPasswordField();
+    JTextField code = new JTextField();
+
+    //正确的验证码
+    JLabel rightCode = new JLabel();
+
+
+    public LoginJFrame() {
+        //初始化界面
+        initJFrame();
+
+        //在这个界面中添加内容
+        initView();
+
+
+        //让当前界面显示出来
+        this.setVisible(true);
+    }
+
+    public void initView() {
+        //1. 添加用户名文字
+        JLabel usernameText = new JLabel(new ImageIcon("puzzlegame\\image\\login\\用户名.png"));
+        usernameText.setBounds(116, 135, 47, 17);
+        this.getContentPane().add(usernameText);
+
+        //2.添加用户名输入框
+
+        username.setBounds(195, 134, 200, 30);
+        this.getContentPane().add(username);
+
+        //3.添加密码文字
+        JLabel passwordText = new JLabel(new ImageIcon("puzzlegame\\image\\login\\密码.png"));
+        passwordText.setBounds(130, 195, 32, 16);
+        this.getContentPane().add(passwordText);
+
+        //4.密码输入框
+        password.setBounds(195, 195, 200, 30);
+        this.getContentPane().add(password);
+
+
+        //验证码提示
+        JLabel codeText = new JLabel(new ImageIcon("puzzlegame\\image\\login\\验证码.png"));
+        codeText.setBounds(133, 256, 50, 30);
+        this.getContentPane().add(codeText);
+
+        //验证码的输入框
+        code.setBounds(195, 256, 100, 30);
+        this.getContentPane().add(code);
+
+
+        String codeStr = CodeUtil.getCode();
+        //设置内容
+        rightCode.setText(codeStr);
+        //绑定鼠标事件
+        rightCode.addMouseListener(this);
+        //位置和宽高
+        rightCode.setBounds(300, 256, 50, 30);
+        //添加到界面
+        this.getContentPane().add(rightCode);
+
+        //5.添加登录按钮
+        login.setBounds(123, 310, 128, 47);
+        login.setIcon(new ImageIcon("puzzlegame\\image\\login\\登录按钮.png"));
+        //去除按钮的边框
+        login.setBorderPainted(false);
+        //去除按钮的背景
+        login.setContentAreaFilled(false);
+        //给登录按钮绑定鼠标事件
+        login.addMouseListener(this);
+        this.getContentPane().add(login);
+
+        //6.添加注册按钮
+        register.setBounds(256, 310, 128, 47);
+        register.setIcon(new ImageIcon("puzzlegame\\image\\login\\注册按钮.png"));
+        //去除按钮的边框
+        register.setBorderPainted(false);
+        //去除按钮的背景
+        register.setContentAreaFilled(false);
+        //给注册按钮绑定鼠标事件
+        register.addMouseListener(this);
+        this.getContentPane().add(register);
+
+
+        //7.添加背景图片
+        JLabel background = new JLabel(new ImageIcon("puzzlegame\\image\\login\\background.png"));
+        background.setBounds(0, 0, 470, 390);
+        this.getContentPane().add(background);
+
+    }
+
+
+    public void initJFrame() {
+        this.setSize(488, 430);//设置宽高
+        this.setTitle("拼图游戏 V1.0登录");//设置标题
+        this.setDefaultCloseOperation(3);//设置关闭模式
+        this.setLocationRelativeTo(null);//居中
+        this.setAlwaysOnTop(true);//置顶
+        this.setLayout(null);//取消内部默认布局
+    }
+
+
+
+    //点击
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (e.getSource() == login) {
+            System.out.println("点击了登录按钮");
+            //获取两个文本输入框中的内容
+            String usernameInput = username.getText();
+            String passwordInput = password.getText();
+            //获取用户输入的验证码
+            String codeInput = code.getText();
+
+            //创建一个User对象
+            User userInfo = new User(usernameInput, passwordInput);
+            System.out.println("用户输入的用户名为" + usernameInput);
+            System.out.println("用户输入的密码为" + passwordInput);
+
+            if (codeInput.length() == 0) {
+                showJDialog("验证码不能为空");
+            } else if (usernameInput.length() == 0 || passwordInput.length() == 0) {
+                //校验用户名和密码是否为空
+                System.out.println("用户名或者密码为空");
+
+                //调用showJDialog方法并展示弹框
+                showJDialog("用户名或者密码为空");
+
+
+            } else if (!codeInput.equalsIgnoreCase(rightCode.getText())) {
+                showJDialog("验证码输入错误");
+            } else if (contains(userInfo)) {
+                System.out.println("用户名和密码正确可以开始玩游戏了");
+                //关闭当前登录界面
+                this.setVisible(false);
+                //打开游戏的主界面
+                //需要把当前登录的用户名传递给游戏界面
+                new GameJFrame();
+            } else {
+                System.out.println("用户名或密码错误");
+                showJDialog("用户名或密码错误");
+            }
+        } else if (e.getSource() == register) {
+            System.out.println("点击了注册按钮");
+        } else if (e.getSource() == rightCode) {
+            System.out.println("更换验证码");
+            //获取一个新的验证码
+            String code = CodeUtil.getCode();
+            rightCode.setText(code);
+        }
+    }
+
+
+    public void showJDialog(String content) {
+        //创建一个弹框对象
+        JDialog jDialog = new JDialog();
+        //给弹框设置大小
+        jDialog.setSize(200, 150);
+        //让弹框置顶
+        jDialog.setAlwaysOnTop(true);
+        //让弹框居中
+        jDialog.setLocationRelativeTo(null);
+        //弹框不关闭永远无法操作下面的界面
+        jDialog.setModal(true);
+
+        //创建Jlabel对象管理文字并添加到弹框当中
+        JLabel warning = new JLabel(content);
+        warning.setBounds(0, 0, 200, 150);
+        jDialog.getContentPane().add(warning);
+
+        //让弹框展示出来
+        jDialog.setVisible(true);
+    }
+
+    //按下不松
+    @Override
+    public void mousePressed(MouseEvent e) {
+        if (e.getSource() == login) {
+            login.setIcon(new ImageIcon("puzzlegame\\image\\login\\登录按下.png"));
+        } else if (e.getSource() == register) {
+            register.setIcon(new ImageIcon("puzzlegame\\image\\login\\注册按下.png"));
+        }
+    }
+
+
+    //松开按钮
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (e.getSource() == login) {
+            login.setIcon(new ImageIcon("jigsawgame\\image\\login\\登录按钮.png"));
+        } else if (e.getSource() == register) {
+            register.setIcon(new ImageIcon("jigsawgame\\image\\login\\注册按钮.png"));
+        }
+    }
+
+    //鼠标划入
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    //鼠标划出
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    //判断用户在集合中是否存在
+    public boolean contains(User userInput){
+        for (int i = 0; i < allUsers.size(); i++) {
+            User rightUser = allUsers.get(i);
+            if(userInput.getUsername().equals(rightUser.getUsername()) && userInput.getPassword().equals(rightUser.getPassword())){
+                //有相同的代表存在，返回true，后面的不需要再比了
+                return true;
+            }
+        }
+        //循环结束之后还没有找到就表示不存在
+        return false;
+    }
+}
+~~~
+
+----
+
+## `com.itheima.ui.RegisterJFrame`
+
+~~~java
+package com.itheima.ui;
+
+import javax.swing.*;
+
+public class RegisterJFrame extends JFrame {
+    //跟注册相关的代码，都写在这个界面中
+    public RegisterJFrame(){
+        this.setSize(488,500);
+        //设置界面的标题
+        this.setTitle("拼图 注册");
+        //设置界面置顶
+        this.setAlwaysOnTop(true);
+        //设置界面居中
+        this.setLocationRelativeTo(null);
+        //设置关闭模式
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        //让显示显示出来，建议写在最后
+        this.setVisible(true);
+
+
+        getContentPane();
+    }
+}
+~~~
+
+----
+
+## `com.itheima.util.CodeUtil`
+
+~~~java
+package com.itheima.util;
+
+import java.util.ArrayList;
+import java.util.Random;
+
+public class CodeUtil {
+
+    public static String getCode(){
+        //1.创建一个集合
+        ArrayList<Character> list = new ArrayList<>();//52  索引的范围：0 ~ 51
+        //2.添加字母 a - z  A - Z
+        for (int i = 0; i < 26; i++) {
+            list.add((char)('a' + i));//a - z
+            list.add((char)('A' + i));//A - Z
+        }
+        //3.打印集合
+        //System.out.println(list);
+        //4.生成4个随机字母
+        String result = "";
+        Random r = new Random();
+        for (int i = 0; i < 4; i++) {
+            //获取随机索引
+            int randomIndex = r.nextInt(list.size());
+            char c = list.get(randomIndex);
+            result = result + c;
+        }
+        //System.out.println(result);//长度为4的随机字符串
+
+        //5.在后面拼接数字 0~9
+        int number = r.nextInt(10);
+        //6.把随机数字拼接到result的后面
+        result = result + number;
+        //System.out.println(result);//ABCD5
+        //7.把字符串变成字符数组
+        char[] chars = result.toCharArray();//[A,B,C,D,5]
+        //8.在字符数组中生成一个随机索引
+        int index = r.nextInt(chars.length);
+        //9.拿着4索引上的数字，跟随机索引上的数字进行交换
+        char temp = chars[4];
+        chars[4] = chars[index];
+        chars[index] = temp;
+        //10.把字符数组再变回字符串
+        String code = new String(chars);
+        //System.out.println(code);
+        return code;
+    }
+}
+~~~
+
+
+
+----
+
+# -----------------------------------
+
+# Day18 常用API
+
+# 154.游戏打包成exe
+
+游戏的打包其实是非常复杂的，想要把拼图游戏写好之后发给朋友玩一下，最简单的方式是给它装个 `JDK`、`IDEA`。
+
+但是这样太 `low` 了，最好的办法就是把游戏打包成exe安装包 让你的朋友直接安装就行了。
+
+在打包的时候，有一些元素是我们需要考虑的因素。
+
+## 一、游戏打包exe要考虑的元素
+
+1、一定要包含图形化界面
+
+例如我们之前写的学生管理系统、双色彩票系统，那些代码是不行的，因为在那些代码中我们没有写图形化界面的代码，就算你打包了，用户也没有地方操作。
+
+2、代码要打包起来
+
+3、游戏用到的图片也要打包起来
+
+4、JDK也要打包
+
+----
+
+## 二、游戏打包exe核心步骤
+
+1、把所有代码打包成一个压缩包，Java的压缩包的后缀名是 `jar` ，因此Java的压缩包我们一般也会称之为：`jar包`。
+
+2、把jar包转换为exe安装包
+
+PS：这个exe安装包不是最后一步，因为它里面没有代码，没有图片，也没有Java的运行环境，因此我们还需要额外再做一步
+
+3、把第二步的exe，图片，JDK整合在一起，变成最终的exe安装包
+
+整合完毕后，就可以把第三步的安装包发给朋友就行了，朋友安装就行了。
+
+
+
+----
+
+## 四、准备软件
+
+1，   Idea：将代码打包成jar包（java形式的压缩包）
+
+2，   exe4j：将jar包转换成exe的工具。
+
+3，   innosetup：将游戏用到的图片，Java的运行环境和第二步打包的代码，组合成最终的安装程序。
+
+**备注1：**exe4j和innosetup安装非常简单，傻瓜式下一步即可。
+
+**备注2：**exe4j支持的JDK版本是8~11，其他版本的JDK不行，建议安装JDK11版本（这个JDK11在安装之后是不需要配置环境变量的，直接安装就行了）。但是由于JDK11体积太大，因此请大家自行去官网下载。
+
+**备注3：**64位的操作系统用exe4j_windows-x64_6_0_2.exe
+
+32位的操作系统用exe4j_windows_6_0_2.exe
+
+**备注4：**打开我的电脑，右键空白处，点击属性，在弹出界面的中央就能查看自己电脑是64位的还是32位的。
+
+----
+
+## 五、软件下载地址
+
+在《拼图游戏打包成exe》中
+
+----
+
+## 六、软件安装
+
+1，     确保idea已经安装完毕
+
+2，     安装exe4j
+
+3，     安装innosetup
+
+傻瓜式安装，直接下一步即可，但是要记住安装路径。
+
+----
+
+## 七、代码改写
+
+代码中所有图片用到的路径需要把模块名删除，改写之后如下：
+
+![img](./assets/clip_image002.jpg)
+
+在不同的情况下，相对路径的相对位置是不一样的。
+
+在IDEA中是相对于当前项目而言的，因此我们需要将模块名给加上。
+
+![img](./assets/clip_image003.png)
+
+但是当我们图片打包成 exe 之后，它的相对路径就不是相对于当前项目了，而是相对于当前本身自己。
+
+我们可以来看一下将游戏打包成exe，并且安装完毕后文件夹里面的东西。
+
+![img](./assets/clip_image005.jpg)
+
+游戏的启动图标就是：puzzlegame.exe
+
+它所用到的所有图片都是在上面image文件夹中，因此当我们安装完exe软件后，它的相对路径就是相对于自己而言的。
+
+---
+
+## 八、打包步骤
+
+### 第一步：代码打包成jar包
+
+1，   点击File，再点Project Structure。
+
+2，   点击Artifaces。
+
+3，   下方图片箭头指向位置应为空白，如果有其他内容，可以选中之后，点击减号删除。
+
+![img](./assets/clip_image006.png)
+
+4，   选中左侧的Artifacts ，
+
+点击中间上方位置的+ 
+
+点击JAR
+
+点击From modules with dependencies...
+
+如下图所示：
+
+![img](./assets/clip_image007.png)
+
+5，   Module：选择要打包的项目。
+
+![img](./assets/clip_image008.png)
+
+6，Main Class：点击红框最后的那个小图标，项目中是哪个main方法所在的类去启动项目，这里就选择哪个类。我的项目是由app里面的main方法启动的，所以我就选择App
+
+![img](./assets/clip_image009.png)
+
+7，设置 META-INF/MANIFEST.MF。
+
+点击箭头指向的图标进行设置。
+
+![img](./assets/clip_image010.png)
+
+8，选择当前模块
+
+点击OK
+
+![img](./assets/clip_image011.png)
+
+9，   此时这里的路径就是模块所在路径，点击OK。
+
+![img](./assets/clip_image012.png)
+
+10， 如果没有弹框报错，第十步可以跳过，直接看十一步。
+
+如果出现弹框报错，表示当前模块下已存在META-INF文件夹了。可以在本地找到已存在的META-INF文件夹，右键点击DELETE删除即可。
+
+查找方式如下：
+
+右键模块点击open in
+
+点击Explorer
+
+在模块里面找到META-INF文件删除即可。
+
+![img](./assets/clip_image014.jpg)
+
+11， 如果没有报错，就出现一个puzzlegame：jar的提示。
+
+点击右下角的OK。
+
+![img](./assets/clip_image016.jpg)
+
+12， 在idea主界面上方，点击Build里面的Build Artifacts。
+
+如果是灰色的不能按，请确定在上面第一步~第九步有没有配置好jar包的信息。
+
+如果已经配置好了jar的信息，此处就可以正常点击。
+
+![img](./assets/clip_image017.png)
+
+13， 在主界面正中央。
+
+选择puzzlegame:jar。
+
+再选择Build。
+
+idea会帮我们生成jar包。
+
+![img](./assets/clip_image018.png)
+
+14， 等页面右下角的进度条结束，jar就已经生成完毕。
+
+![img](./assets/clip_image020.jpg)
+
+15， 点击File，再点Project Structure。
+
+点击Artifaces。
+
+在下图红色框中的路径下，可以找到生成好的jar包。
+
+![img](./assets/clip_image022.jpg)
+
+----
+
+### 第二步：整合资源文件
+
+1，   将第一步创建好的jar包拷贝到桌面上。
+
+2，   在桌面上新建一个文件夹resource。
+
+![img](./assets/clip_image023.png)
+
+3，   将《拼图游戏》中的image文件夹粘贴到resource文件夹当中。
+
+此时在桌面中的resource文件夹下的image文件夹下，就会看到游戏里面用到的所有图片。
+
+![img](./assets/clip_image024.png)
+
+----
+
+### 第三步：将jar包打包成exe
+
+1，   双击打开安装好的exe4j.exe，注册软件。
+
+点击下面的Enter License
+
+![img](./assets/clip_image026.jpg)
+
+2，   输入用户名，公司名和注册码后点击ok
+
+用户名，公司名随便填，最好都是小写字母。
+
+注册码：L-g782dn2d-1f1yqxx1rv1sqd
+
+![img](./assets/clip_image027.png)
+
+3，   注册完毕之后点击右下角的next
+
+备注：exe4j.exe只识别JDK8到JDK11，如果安装时出现弹框报错，请检查JDK版本，资料文件夹中给大家提供了JDK11，有需要可以安装。（黑马程序员阿玮老师出品）
+
+![img](./assets/clip_image029.jpg)
+
+4，   选择JAVA转EXE。
+
+点击右下角的next
+
+![img](./assets/clip_image031.jpg)
+
+5，   输入名称puzzlegame
+
+输出保存exe的路径，建议选择到桌面上。
+
+点击右下角的next
+
+![img](./assets/clip_image033.jpg)
+
+6，   选择以图形界面的形式启动游戏
+
+输入应用名称，puzzlegame
+
+点击高级设置Advanced Options，选择32-bit or 64-bit
+
+![img](./assets/clip_image035.jpg)
+
+7，   勾选Generate 64-bit executable
+
+表示要生成64位的exe安装包，如果未勾选默认生成32位的安装包。
+
+点击右下角next
+
+![img](./assets/clip_image037.jpg)
+
+8，    然后一直下一步，一直出现如下界面
+
+在本界面开始jar包并以及配置启动类。（黑马程序员阿玮老师出品）
+
+![img](./assets/clip_image039.jpg)
+
+9，    第一行，VM参数配置的地方加上：-Dfile.encoding=utf-8
+
+![img](./assets/clip_image040.png)
+
+10， 点击右侧绿色的+，添加jar包
+
+![img](./assets/clip_image042.jpg)
+
+11， 添加jar包
+
+![img](./assets/clip_image043.png)
+
+12， 选择桌面上的puzzlegame.jar。
+
+点击下面的打开。（黑马程序员阿玮老师出品）
+
+![img](./assets/clip_image045.jpg)
+
+13， 检查路径，如果无误点击右下角的OK
+
+![img](./assets/clip_image047.jpg)
+
+14， 选择项目启动类
+
+![img](./assets/clip_image049.jpg)
+
+15， 因为程序主入口main方法写在App类中，所有选择app，并点击OK。
+
+![img](./assets/clip_image051.jpg)
+
+16， 本页面中，一共修改了三处。
+
+三处全部操作完毕。点击右下角的next
+
+![img](./assets/clip_image053.jpg)
+
+17， 填写最小启动的JDK版本。输入1.8
+
+配置exe加载的JDK，选择第一个。
+
+![img](./assets/clip_image055.jpg)
+
+18， 点击+
+
+![https://img-blog.csdnimg.cn/20200204003959383.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L20wXzM3NzAxMzgx,size_16,color_FFFFFF,t_70](./assets/clip_image057.png)
+
+19， 选择Directory
+
+下面输入.\jdk
+
+**（注意：输入点杠jdk，都要是英文状态下输入）**
+
+点击OK
+
+![img](./assets/clip_image058.png)
+
+20， 再次点击+
+
+![img](./assets/clip_image060.jpg)
+
+21， 选择Directory
+
+下面输入.\image
+
+**（输入点杠image，都要是英文状态下输入）**
+
+点击OK
+
+![img](./assets/clip_image061.png)
+
+22， 点击右下角的next
+
+![img](./assets/clip_image063.jpg)
+
+23， 选择Client VM
+
+点击右下角的next
+
+![https://img-blog.csdnimg.cn/20200204004404491.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L20wXzM3NzAxMzgx,size_16,color_FFFFFF,t_70](./assets/clip_image065.png)
+
+24， 然后一直下一步，最终出现如下界面
+
+点击右下角的Exit退出。
+
+![img](./assets/clip_image067.jpg)
+
+25， 点击Exit后，会提升是否需要保存刚刚的配置信息，可以点击Yes，并选择一个路径进行保存。
+
+![img](./assets/clip_image069.jpg)
+
+26， 如果第三步选择的exe保存的路径是桌面，那么在桌面上
+
+就能看到生成的puzzlegame.exe文件了。
+
+四个文件分别为：
+
+左一：刚刚用jar生成的exe文件。
+
+左二：idea生成的jar包
+
+左三：游戏用到的资源图片
+
+左四：刚刚用exe4J设置完毕之后保存的信息。
+
+![img](./assets/clip_image070.png)
+
+ 
+
+----
+
+### 第四步：将jdk、资源文件、jar包转换后的exe三者再次打包成最终的exe
+
+刚刚，我们仅仅是把java代码变成了exe。下面我们要把游戏中依赖的资源文件，也就是使用到的所有图片，还有JDK三者再次打包成最终的exe，这样在没有jdk电脑环境下也能运行。
+
+1，打开inno setup
+
+![img](./assets/clip_image072.jpg)
+
+2，在欢迎页面点击右下角的关闭
+
+![img](./assets/clip_image073.png)
+
+4，   点击左上角的File
+
+再点击NEW
+
+![img](./assets/clip_image074.png)
+
+5，   点击next
+
+![img](./assets/clip_image075.png)
+
+6，   输入应用名称puzzlegame
+
+点击next
+
+![img](./assets/clip_image076.png)
+
+7，   不修改任何东西，直接点击next
+
+![img](./assets/clip_image077.png)
+
+8，   点击这里，选择桌面上已经生成好的puzzlegame.exe
+
+![img](./assets/clip_image078.png)
+
+9，   点击Add folder
+
+![img](./assets/clip_image079.png)
+
+10， 选择桌面的resource，再点击确定。
+
+![img](./assets/clip_image080.png)
+
+11， 如果出现下面弹框，则点击是。
+
+如果没有出现也没有任何关系。
+
+![img](./assets/clip_image081.png)
+
+12， 再点击 Add file(s)…
+
+![img](./assets/clip_image082.png)
+
+13， 选中桌面的puzzlegame.exe，再次添加一次。
+
+点击下面的打开。
+
+![img](./assets/clip_image084.jpg)
+
+14， 在本页面中一共设置了三处地方。
+
+全部设置完毕，点击next。
+
+![img](./assets/clip_image085.png)
+
+15， 默认不用选择，点击next
+
+![img](./assets/clip_image086.png)
+
+16， 默认不用选择，点击next
+
+![img](./assets/clip_image087.png)
+
+17， 选择语言，还是默认，点击next
+
+![img](./assets/clip_image088.png)
+
+18， 选择输出路径，还是选择桌面。
+
+输入最终安装包的名字，不能跟已有的puzzlegame重名。
+
+所以我写setup，再点击右下角next
+
+![img](./assets/clip_image089.png)
+
+19， 默认点击next
+
+有部分同学电脑不显示这一步，也没有关系。
+
+![img](./assets/clip_image090.png)
+
+20， 完成，点击finish
+
+![img](./assets/clip_image091.png)
+
+21， 配置到最后一步了，脚本文件，到这里会弹出问你是否马
+
+上编译，选择否，先把脚本写好再自己编译。
+
+![img](./assets/clip_image092.png)
+
+22， 上面红色箭头处添加一行脚本。
+
+\#define MyJdkName "jdk"
+
+添加前：![img](./assets/clip_image093.png)
+
+23， 添加完毕之后，如下图所示
+
+![img](./assets/clip_image095.jpg)
+
+24， 往下拉，把有红色框起来的这一行删掉
+
+![img](./assets/clip_image097.jpg)
+
+25， 在上一步删除位置添加一段行的文字
+
+Source: "自己本地JDK路径\*"; DestDir: "{app}\{#MyJdkName}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+**千万注意：这段文字不要直接复制。根据自己电脑中JDK的安装位置进行修改，添加完毕之后如下图**
+
+![img](./assets/clip_image099.jpg)
+
+26， 点击上方的绿色按钮开始编译。
+
+![https://img-blog.csdnimg.cn/20200204010100205.png](./assets/clip_image100.png)
+
+27， 此时会询问，是否需要保存。
+
+可以点击是，选择一个位置保存一下刚刚修改之后的结果。
+
+![img](./assets/clip_image101.png)
+
+28，  然后等待绿色滚动条结束
+
+![img](./assets/clip_image103.jpg)
+
+29， 当绿色滚动条结束后，会自动安装setup.exe文件。
+
+此时可以点击否，先不安装。
+
+在桌面上，会多了一个setup.exe文件和一个后缀名为iss的文件
+
+setup.exe：打包成功的游戏安装包。
+
+iss文件：就是刚刚设置的脚本文件。
+
+![img](./assets/clip_image104.png)
+
+30， 现在就可以把这个exe文件发给你的好基友了，他的电脑
+
+上不需要安装JDK，直接双击这个安装包就可以玩游戏了。
+
+在安装的时候可以选择安装路径。
+
+还可以在桌面生成快捷方式。
+
+-----
+
+## 九、注意点
+
+1，   安装完毕之后，可以到安装目录去找puzzlegame.exe
+
+双击就可以玩游戏了。刚刚桌面上的5个文件可以全部删除。以后双击puzzlegame.exe就可以玩游戏了。
+
+![img](./assets/clip_image105.png)
+
+2，   如果游戏运行之后，有效果但是无图片，或者部分图片无
+
+法加载。如下图所示：此时背景图片无法加载。
+
+![img](./assets/clip_image106.png)
+
+3，   修改步骤一：
+
+检查安装目录下image文件夹中是否有该图片。如果没有将缺少的图片粘贴进去重新运行游戏。（黑马程序员阿玮老师出品）
+
+修改步骤二：
+
+检查代码，图片的路径需要把模块名删掉。
+
+![img](./assets/clip_image107.jpg)
+
+4，代码修改后，需要重新生成exe安装包，重新安装游戏。
+
+
+
+-----
+
+# 常用API 学习方式
+
+这个章节叫做常用API。
+
+ API (Application Programming Interface) ：应用程序编程接口
+
+简单理解：API就是别人已经写好的东西，我们不需要自己编写，直接使用即可。
+
+java中的API：指的就是 JDK 中提供的各种功能的 Java类。
+
+这些类将底层的实现封装了起来，我们不需要关心这些类是如何实现的，只需要学习这些类如何使用即可，我们可以通过帮助文档来学习这些API如何使用。
+
+每一个 `Java类` 里面会有很多很多方法，这些方法千万不要去背，背也背不完。
+
+我们真正记的应该是：`类名` 和 `类的作用`，里面的方法不需要背，以后用到了，可以查询 `API帮助文档` 。
+
+# 155.Math
+
+## 一、查询API帮助文档
+
+搜索 `Math类`，我们可以从上往下去阅读一下。在阅读这篇的时候一定要自己同时也去打开帮助文档，按照我所介绍的顺序一点点往下读。
+
+`Math类` 是定义在 `java.lang` 包下的，这个包是Java的核心包，使用核心包下的类的时候是不需要导包的。
+
+`类 Math`：表示这个类的名字是 `Math`
+
+![image-20240421104902734](./assets/image-20240421104902734.png)
+
+中间的这一块是 `Math` 的继承结构，表示 `Math` 的父类就是 `Object`
+
+![image-20240421105118584](./assets/image-20240421105118584.png)
+
+这个表示的是 `Math类` 在源码中是怎么定义的。
+
+在定义的时候它用了一个 `final` 去修饰，那就表示这个类是一个最终类，它不能被继承。
+
+![image-20240421105148314](./assets/image-20240421105148314.png)
+
+下面这一堆，就是对 `Math类` 的解释，但我们一般只需要看第一句话就行了：``Math` 类包含用于执行基本数学运算的方法，如初等指数、对数、平方根和三角函数。`。
+
+这就表示以后，如果我们想要数学计算，就可以使用 `Math类` 去完成。
+
+![image-20240421105353585](./assets/image-20240421105353585.png)
+
+这个是它的版本，表示 `Math类` 在 `Java1.0` 的时候就出现了
+
+![image-20240421105648025](./assets/image-20240421105648025.png)
+
+`字段摘要` 就表示这个类中的属性，`Math类` 中的属性一共有两个
+
+`E` ：跟微积分相关的。
+
+`PI`：π
+
+![image-20240421105725311](./assets/image-20240421105725311.png)
+
+``
 
 
 
