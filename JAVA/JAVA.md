@@ -33999,7 +33999,7 @@ public class Student {
     private String name;
     private int age;
 
-    //无参构造、有参构造、get、set方法
+    // 无参构造、有参构造、get、set方法
 }
 ```
 
@@ -34395,7 +34395,7 @@ public boolean equals(Object anObject ) {
 
 ----
 
-# 160.浅克隆、深克隆和对象工具类 `Objects`
+# 160.浅克隆、深克隆
 
 本节来学习 `Object类` 中的最后一个方法：`clone()` ——  对象克隆
 
@@ -34736,6 +34736,969 @@ System.out.println(u2);
 ----
 
 ## 六、扩展
+
+我们来看一下我们自己写的深克隆这个代码，这个代码自己写起来太麻烦了，而且它还有一个弊端：如果这个数组是一个二维数组，那么此时循环中拷贝过来的数据还是地址值，还是会有两个对象指向同一个数组的情况。
+
+因此，真正在实际开发中的克隆，如何一劳永逸的进行深克隆呢？
+
+----
+
+### 1）导入jar包
+
+此时我们会用到一个第三方的工具。
+
+第三方：不是我们自己写的，而是Java / 别人写的。
+
+因此第一步就应该将第三方写的代码导入到当前项目中。
+
+别人写的代码在今天的资料中也提供了：
+
+![image-20240421220145561](./assets/image-20240421220145561.png)
+
+我们选中它 <kbd>ctrl + C</kbd>，在我当前模块下需要新建一个包：`lib`，是 `library` 单词的缩写，就表示：以后如果我要用到别人写的代码了，就会放到 `lib` 文件夹中。
+
+![image-20240422070845364](./assets/image-20240422070845364.png)
+
+选中 `lib` 文件夹，<kbd>ctrl + V</kbd> 然后点击 `OK`，这个就是别人写的代码。
+
+![image-20240422070927467](./assets/image-20240422070927467.png)
+
+最后一步：右键点击 `gson-2.6.2.jvar`，选择 `Add as Library...` ，然后点击 `OK` 即可
+
+![image-20240422071208068](./assets/image-20240422071208068.png)
+
+在jar包下面有一个小箭头，点开之后可以看见里面写的类，一旦可以展开，那就代表别人写的代码已经在我的项目中了
+
+<img src="./assets/image-20240422071433053.png" alt="image-20240422071433053" style="zoom:67%;" />
+
+----
+
+### 2）编写代码
+
+代码非常的简单，我们先简单的了解一下，在后面的课程中还是会用到的。
+
+~~~java
+// 首先创建工具的对象
+Gson gson = new Gson();
+~~~
+
+然后我们可以用对象去调用里面的 `toJson()` 方法，将要克隆的对象 `u1` 传递进去。
+
+这句话的意思就是：把对象变成一个字符串。因此方法给我们返回的也是字符串。
+
+~~~java
+String s = gson.toJson(u1);
+~~~
+
+我们把这个字符串来打印一下
+
+~~~java
+System.out.println(s);
+~~~
+
+程序运行结果如下：将 `u1` 对象变成了字符串
+
+![image-20240422072046124](./assets/image-20240422072046124.png)
+
+在以后我们想进行对象克隆的时候，再把字符串变成对象就行了
+
+参数1：把谁变为对象？
+
+参数2：变成谁的对象？传入的时候需要传入 `.class` 为后缀的
+
+方法就会返回一个 `User` 的对象
+
+~~~java
+User user = gson.fromJson(s, User.class);
+~~~
+
+最后再来打印一下它生成的 `User` 对象
+
+~~~java
+System.out.println(user);
+~~~
+
+程序运行结果如下
+
+![image-20240422072413952](./assets/image-20240422072413952.png)
+
+验证是否真的是深克隆：修改 `u1` 中数组的值，分别打印 `u1` 和 `user`，看 `user` 是否会跟着 `u1` 变化
+
+~~~java
+Gson gson =new Gson();
+String s=gson.toJson(u1);
+User user = gson.fromJson(s, User.class);
+
+int[] arr= u1.getData();
+arr[0] = 100;
+
+//打印对象
+System.out.println(u1);
+System.out.println(user);
+~~~
+
+程序结果如下图，`user` 并没有跟着 `u1` 一起改。因此我们就利用了第三方工具实现了深克隆
+
+![image-20240422073027055](./assets/image-20240422073027055.png)
+
+-----
+
+# `Object` 总结
+
+1、`Object` 是Java中的顶级父类
+
+所有的类都直接或间接的继承于 `Object类`
+
+2、`toString()` 当你打印一个对象，不想看到它的地址值，而是看到属性值的时候，就可以重写。
+
+3、`equals()` 当你在比较对象的时候，你想比较对象的属性值而不是地址值，就需要重写 `equals()` 方法
+
+4、`clone()` 表示对象的克隆。`Object` 中默认是浅克隆。如果需要深克隆，可以自己去重写 `clone()` 方法，或者使用第三方工具类。
+
+----
+
+
+
+# `Objects` 工具类
+
+## 一、引入
+
+在正式学习之前，我们先来看一段代码
+
+~~~java
+package com.itheima.a05objectsdemo;
+
+import java.util.Objects;
+
+public class Student {
+    private String name;
+    private int age;
+
+    // 无参构造、有参构造、get、set方法
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return age == student.age && Objects.equals(name, student.name);
+    }
+
+    public String toString() {
+        return name + ", " + age;
+    }
+}
+~~~
+
+在测试类中创建两个学生类的对象
+
+~~~java
+Student s1 = new Student("zhangsan", 23);
+Student s2 = new Student("zhangsan", 23);
+~~~
+
+需求：比较两个对象属性值是否相同
+
+~~~java
+boolean result = s1.equals(s2);
+System.out.println(result);
+~~~
+
+由于在 `Student类` 中，我已经重写了 `equals()` 方法，因此上面比较的肯定是属性值。
+
+程序运行结果为 `true`。
+
+但是我们在书写代码的时候，有的时候这个对象有可能不是你创建的，而是别人创建的，别人在写代码的时候没有写 `new`，而是 `null`
+
+~~~java
+boolean result = s1.equals(s2);
+System.out.println(result);
+boolean result = s1.equals(s2);
+System.out.println(result);
+~~~
+
+这种情况下再来运行，此时就会直接空指针异常。
+
+因为在Java中，`null` 表示什么都没有，你既然什么都没有，你能去调用方法吗？肯定是不行的，在Java中不能用 `null` 去调用方法。
+
+![image-20240422074955330](./assets/image-20240422074955330.png)
+
+因此如果你想要不报错，就需要对调用者 `s1` 做一个非空判断
+
+~~~java
+if(s1 != null) {
+    boolean result = s1.equals(s2);
+    System.out.println(result);
+} else {
+    System.out.println("调用者为空");
+}
+~~~
+
+但是这样写感觉有点麻烦，其实Java已经有帮我们做非空判断的方法了，这就是我们今天要学习的 `Objects`
+
+----
+
+## 二、概念
+
+`Objects` 是一个工具类，提供了一些方法去完成一些功能。
+
+例如在我们重写的 `equals()` 方法中，它使用的就是 `Objects` 中的方法。
+
+![image-20240422075813926](./assets/image-20240422075813926.png)
+
+`Objects` 中有三个成员方法要知道
+
+~~~java
+public static boolean equals(Object a, Object b)			// 在底层先做了非空判断，然后再去比较两个对象
+public static boolean isNull(Object obj)					// 判断对象是否为null，为空返回true，不为空返回false
+public static boolean nonNull(Object obj)					// 判断对象是否不为null，跟isNull的结果相反
+~~~
+
+----
+
+## 三、代码实现
+
+### 1）`equals(对象1, 对象2)`
+
+~~~java
+public static boolean equals(Object a, Object b)			// 在底层先做了非空判断，然后再去比较两个对象
+~~~
+
+此时我们就可以解决 `一、引入` 中的问题了，我们可以使用 `Objects` 中的方法去对它做一个改进
+
+<img src="./assets/image-20240422080219274.png" alt="image-20240422080219274" style="zoom:67%;" />
+
+~~~java
+boolean result = Objects.equals(s1, s2);
+System.out.println(result);
+~~~
+
+接下来我们可以简单的去阅读一下它的原码，选中 `Objects` 中的 `equals()` ，<kbd>ctrl + b</kbd> 跟进。
+
+在这个方法中，它先用 `==号` 判断一下，传进来的这两个对象是不是同一个对象，如果是同一个对象，直接用 `短路逻辑运算符` 短路掉了，直接返回 `true`。
+
+如果不是同一个对象，才会走到后面。
+
+先判断 `a` 为不为 `null`，如果是 `null`，直接返回 `false`；如果不是 `null`，就会调用对象里面的 `equals()` 进行比较。
+
+如果没有重写，比较地址值，如果重写了，就比较属性值。
+
+![image-20240422080323181](./assets/image-20240422080323181.png)
+
+----
+
+### 2）`isNull(对象)`
+
+~~~java
+public static boolean isNull(Object obj)					// 判断对象是否为null，为空返回true，不为空返回false
+~~~
+
+代码示例
+
+~~~java
+Student s3 = new Student();
+Student s4 = null;
+
+System.out.println(Objects.isNull(s3));//false
+System.out.println(Objects.isNull(s4));//true
+~~~
+
+----
+
+### 3）`nonNull(对象)`
+
+~~~java
+public static boolean nonNull(Object obj)					// 判断对象是否 不为null，跟isNull的结果相反
+~~~
+
+代码示例
+
+~~~java
+Student s3 = new Student();
+Student s4 = null;
+
+System.out.println(Objects.isNull(s3));//false
+System.out.println(Objects.isNull(s4));//true
+
+System.out.println(Objects.nonNull(s3));//true
+System.out.println(Objects.nonNull(s4));//false
+~~~
+
+`底层的源代码判断` 和 `我们自己判断是否为空` 的方式是一样的。
+
+<img src="./assets/image-20240422081113588.png" alt="image-20240422081113588" style="zoom:67%;" />
+
+用这个工具类相当于就是省的我们自己判断了。
+
+-----
+
+## 四、总结
+
+1、`Objects` 是一个对象工具类，在这个类中提供了一些操作对象的方法
+
+2、`equals(对象1, 对象2)`：在底层先做了非空判断，然后再去比较两个对象
+
+3、`isNull(对象)`：判断对象是否为空
+
+4、`nonNull(对象)`：判断对象是否不是空，跟上面的 `isNull(对象)` 结果是反的
+
+----
+
+# 161.BigInteger类
+
+`BigInteger类` 看它的名字我们也能才出来它表示什么意思，`Big`：大，`Integer`：整数，合起来就是：`BigInterger` 表示的就是一个大的整数。
+
+## 一、引入
+
+在Java中，整数一共有四种类型：`byte、short、int、long`。
+
+它们最本质的区别就是，在底层占用的字节个数是不一样；`byte 1个字节`、`short 2个字节`、`int 4个字节`、`long 8个字节`。
+
+现在我们以最大的 `long` 为例，`long` 占用 `8个字节`，每个字节占用 `8个比特位`，因此 `long` 一共占用 `64个比特位`。
+
+因此 `long` 的二进制最多就表示这么多
+
+![image-20240422082722645](./assets/image-20240422082722645.png)
+
+如果将它转成十进制，它就是一个十九位的整数
+
+<img src="./assets/image-20240422083053216.png" alt="image-20240422083053216" style="zoom:67%;" />
+
+如果你想表示的数字比它还大，那么 `long` 就不够用了，此时我们就需要用到 `BigInterger`。
+
+`BigInterger` 表示的范围非常的广，比较小的数字可以表示，如果数字比较大，超出了 `long类型` 的取值范围，`BigInterger` 也可以表示，只要你不是小数，`BigInteger` 都可以表示。
+
+<img src="./assets/image-20240422083445713.png" alt="image-20240422083445713" style="zoom:40%;" />
+
+那 `BigInterger` 它没有上限的吗？它其实有，只不过上线非常非常大，可以看做是无限的的，在本篇最后会跟你讲一下原理，我们先来学习最基本的。
+
+查看API文档，我们可以看到`API文档`中关于`BigInteger类`的定义如下： 
+
+ ![Snipaste_2022-09-04_21-36-01](./assets/Snipaste_2022-09-04_21-36-01.png)
+
+`BigInteger`所在包是在`java.math`包下，因此在使用的时候就需要进行导包。我们可以使用`BigInteger类`进行大整数的计算
+
+使用一个类，肯定要先创建这个类的对象，获取 `BigInterger` 的对象会有以下几种方式。
+
+----
+
+## 二、构造方法
+
+### 1）第一种构造
+
+第一个参数 `num` 就表示随机数的范围。
+
+第二个参数 `rnd` 就表示Random对象
+
+~~~java
+public BigInteger(int num, Random rnd) 		// 获取随机大整数，范围：[0 ~ 2的num次方-1]
+~~~
+
+-----
+
+### 2）第二种构造
+
+这种构造我们可以传递一个字符串类型的数据，在字符串里面我们可以指定一个大的整数。
+
+要注意的是：字符串里面必须是整数，不能写小数或者字符串，否则就会报错。
+
+~~~java
+public BigInteger(String val) 				//获取指定的大整数
+~~~
+
+----
+
+### 3）第三种构造
+
+第三种构造用的不多，我们了解一下就行了。
+
+第一个参数：跟第二种构造是一样的，传递字符串形式的数字
+
+第二个参数：表示的就是进制。如果写 `10`，就表示 `十进制`，此时跟第二种构造获取出来的 `BigInteger` 的对象是一样的，因为默认就是十进制。
+
+~~~java
+public BigInteger(String val, int radix) 	//获取指定进制的大整数
+~~~
+
+----
+
+### 4）静态方法
+
+除此之外在 `BigInteger` 中，它还有一个静态方法：`valueOf`，也可以获取到 `BigInteger` 的对象。
+
+~~~java
+下面这个不是构造，而是一个静态方法获取BigInteger对象
+public static BigInteger valueOf(long val) 	// 静态方法获取BigInteger的对象，内部有优化
+~~~
+
+---
+
+### 5）细节
+
+`BigInteger` 在内部还有一个小小的细节：对象一旦创建，内部记录的值是不能发生改变的。
+
+
+
+----
+
+
+
+## 三、构造方法代码实现
+
+### 1）获取随机大整数
+
+~~~java
+public BigInteger(int num, Random rnd) 		// 获取随机大整数，范围：[0 ~ 2的num次方-1]
+~~~
+
+代码示例
+
+~~~java
+Random r = new Random();
+for (int i = 0; i < 100; i++) {
+    BigInteger bd1 = new BigInteger(4, r);
+    System.out.println(bd1); // [0 ~ 15]
+}
+~~~
+
+---
+
+### 2）获取指定的大整数
+
+~~~java
+public BigInteger(String val) 				//获取指定的大整数
+~~~
+
+代码示例
+
+~~~java
+BigInteger bd2 = new BigInteger("999999999999999999999999999999999");
+System.out.println(bd2); // 999999999999999999999999999999999
+~~~
+
+但是如果，你在括号中写的是一个小数 / "abc" 这种，就会报错！
+
+~~~java
+BigInteger bd2 = new BigInteger("1.1");
+System.out.println(bd2);
+~~~
+
+异常解释：`main方法` 的 `29行` 报 `NumberFormatException(数字格式化异常)` ，后面有一个异常的解释：`For input string: "1.1"`，也就是说 `"1.1" 它不是一个整数`。
+
+![image-20240422085524395](./assets/image-20240422085524395.png)
+
+但如果我在括号中写的是 `"abc"`，右键再来运行
+
+~~~java
+BigInteger bd2 = new BigInteger("abc");
+System.out.println(bd2);
+~~~
+
+异常解释：`main方法` 的 `29行` 报 `NumberFormatException(数字格式化异常)` ，后面有一个异常的解释：`For input string: "abc"`，也就是说 `"abc" 它不是一个整数`。
+
+![image-20240422085921885](./assets/image-20240422085921885.png)
+
+----
+
+### 3）获取指定进制的大整数
+
+~~~java
+public BigInteger(String val, int radix) 	//获取指定进制的大整数
+~~~
+
+第三种方式以后用的不多，了解一下即可。
+
+如果你第二个参数写的是 `10`，那么打印出来的就是 `十进制` 的100。
+
+~~~java
+BigInteger bd4 = new BigInteger("100", 10);
+System.out.println(bd4);
+~~~
+
+如果你第二个参数写的是 `2`，那么打印出来的就是 `二进制` 的 `100`。
+
+~~~java
+BigInteger bd4 = new BigInteger("100", 2);
+System.out.println(bd4);
+~~~
+
+但是在打印的时候，它会把数字给你转成十进制的数字打印出来，`100` 对应的二进制数是 `4` 没有问题。 
+
+![image-20240422090437494](./assets/image-20240422090437494.png)
+
+但如果我第一个数字写的是 `"123"`，但第二个参数写的又是 `2` 呢？
+
+~~~java
+BigInteger bd4 = new BigInteger("123", 2);
+System.out.println(bd4);
+~~~
+
+此时就会报错，因为二进制中只有 `0 / 1`。
+
+![image-20240422090614794](./assets/image-20240422090614794.png)
+
+总结：
+
+1、字符串中的数字必须是数字
+
+2、字符串中的数字必须要跟进制吻合。例如二进制中只能写 `0 / 1`，写其他的就报错。
+
+----
+
+### 4）`valueOf(long val)`
+
+下面这个不是构造，而是一个静态方法获取BigInteger对象
+
+~~~java
+public static BigInteger valueOf(long val) 	// 静态方法获取BigInteger的对象，内部有优化
+~~~
+
+**代码示例**
+
+参数类型是 `long类型` 的，因此参数中写 `100` 是可以的。
+
+~~~java
+BigInteger bd5 = BigInteger.valueOf(100);
+System.out.println(bd5); // 100
+~~~
+
+----
+
+那这种方式和第二种方式有什么区别呢？
+
+#### ① `valueOf(long val)` 表示的范围比较小，需要在 `long` 的取值范围之内，如果超出 `long` 的范围就不行了
+
+因为它的参数就是 `long` 类型的，如果写了一个比 `long` 大的数字，这个参数接收不了，就会报错。
+
+`long` 的最大取值可以使用 `Long.MAX_VALUE` 获取到：`9223372036854775807`
+
+<img src="./assets/image-20240422091426403.png" alt="image-20240422091426403" style="zoom:67%;" />
+
+在代码中默认是 `int类型` 的，这个数字明显超出 `int` 的范围了，因此需要在最后加一个 `L`
+
+~~~java
+BigInteger bd5 = BigInteger.valueOf(9223372036854775807L);
+System.out.println(bd5); // 100
+~~~
+
+这个是 `long` 的最大值，所以程序没有报错。
+
+<img src="./assets/image-20240422091820781.png" alt="image-20240422091820781" style="zoom:60%;" />
+
+但是如果我让它 `加1`，还没有运行，代码就直接报错了
+
+![image-20240422091928745](./assets/image-20240422091928745.png)
+
+但是第二种方式，是完全可以打印出来的
+
+~~~java
+BigInteger bd2 = new BigInteger("9223372036854775808");
+System.out.println(bd2); // 9223372036854775808
+~~~
+
+-----
+
+#### ② 在内部对常用的数字：`-16 ~ 16` 进行了优化
+
+它会提前把 `-16 ~ 16` 创建好BigInteger的对象，如果多次通过 `valueOf()` 获取，它不会创建新的对象，而是返回已经准备好的对象，从而进行了优化。
+
+~~~java
+BigInteger bd5 = BigInteger.valueOf(16);
+BigInteger bd6 = BigInteger.valueOf(16);
+// ==号 比较的是地址值，一旦返回true，就表示前后地址值是一样的
+System.out.println(bd5 == bd6);//true
+~~~
+
+如果我将数字变大，大于 `16`，这个结果就为 `false` 了
+
+~~~java
+BigInteger bd7 = BigInteger.valueOf(17);
+BigInteger bd8 = BigInteger.valueOf(17);
+System.out.println(bd7 == bd8);//false
+~~~
+
+我们可以简单的来阅读一下它的源码。
+
+<kbd>ctrl + b</kbd> 跟进 `BigInteger` 的 `valueOf()` 方法，在看这个方法之前，需要先来看一下它的静态代码块。
+
+<kbd>ctrl + F12</kbd> 找到它的静态代码块。
+
+![image-20240422092823433](./assets/image-20240422092823433.png)
+
+在静态代码块中，有一个循环
+
+<img src="./assets/image-20240422092922693.png" alt="image-20240422092922693" style="zoom:70%;" />
+
+这个 `MAX_CONSTANT` 是什么呢？往上翻，可以发现是 `16`
+
+<img src="./assets/image-20240422093005878.png" alt="image-20240422093005878" style="zoom:67%;" />
+
+因此这个循环就是 `从1开始，到16结束` ，在循环的过程中，它就是不断的去创建对象。
+
+当 `i = 1` 的时候，它 `new` 的 `BigInteger` 就是 `1的对象`，把 `1的对象` 放到 `postConst[]` 数组中，这个数组存的就是正数，从 `1` 开始，一直到 `16` 的 `BigInteger` 的对象。
+
+如果是 `-1`，它会把它放到 `negConst[]` 数组中，`neg 是 negtive 的缩写` ，在这个数组中装的就是负数，从 `-1` 开始，一直到 `-16` 的 `BigInteger` 的对象。
+
+<img src="./assets/image-20240422093515199.png" alt="image-20240422093515199" style="zoom:67%;" />
+
+还没完，`0` 在哪呢？<kbd>ctrl + F12</kbd> 搜索一下，在 `BigInteger` 中有一个静态的 `ZERO` 常量。
+
+<img src="./assets/image-20240422093632197.png" alt="image-20240422093632197" style="zoom:67%;" />
+
+可以看见它是用 `public static final` 修饰的，它表示的就是 `0` 这个 `BigInteger` 的对象。
+
+![image-20240422093652927](./assets/image-20240422093652927.png)
+
+知道这个数组的存在后，我们再去看 `valueOf()` 。
+
+----
+
+在方法中它做了一个判断：如果你传递过来的是 `0`，它就会直接返回 `ZERO常量`，就是我们刚刚看到的 `0` 这个 `BigInteger` 的对象。
+
+再往下，如果你是在 `(0, MAX_CONSTANT(16)]` 之间，它就会在 `posConst[]` 数组中找到对象给你返回。
+
+如果你是在 `[-MAX_CONSTANT(116), 0)` 之间，它就会在 `negConst[]` 数组中找到对象给你返会。
+
+但如果上面三个范围你都不满足，它才给你 `new` 一个 `BigInteger` 的对象。
+
+<img src="./assets/image-20240422094207605.png" alt="image-20240422094207605" style="zoom:67%;" />
+
+-----
+
+那我们以后该怎么选择构造方法去使用呢？
+
+最常用的是下面这两个：
+
+- 如果你要表示的数字比较小，在 `long` 的取值范围之类，就可以用 `valueOf()` 静态方法获取
+- 如果你要获取的非常大 / 不确定这个数字到底有多大，我们就会使用构造方法去获取
+
+~~~java
+public BigInteger(int num, Random rnd) 		// 获取随机大整数，范围：[0 ~ 2的num次方-1]
+public static BigInteger valueOf(long val) 	// 静态方法获取BigInteger的对象，内部有优化
+~~~
+
+-----
+
+### 5）对象一旦创建，内部记录的值是不能发生改变的
+
+如下代码，在调用 `add()` 进行相加的时候，它不会调用参与计算的 `BigInteger对象` 中的值，而是产生了一个新的 `BigInteger对象`，用来记录 `3`
+
+~~~java
+BigInteger bd9 = BigInteger.valueOf(1);
+BigInteger bd10 = BigInteger.valueOf(2);
+// add()相当于就是拿调用者跟参数相加，方法返回类型是BigInteger
+BigInteger result = bd9.add(bd10);
+System.out.println(result); // 3
+~~~
+
+如果你不相信，我们可以用 `==号` 做一个对象的对比，可以发现结果都是 `false`
+
+~~~java
+System.out.println(bd9 == bd8); // false
+System.out.println(bd10 == bd8); // false
+~~~
+
+----
+
+### 6）总结
+
+1、如果 `BigInteger` 表示的数字 `没有超出long` 的范围，可以用静态方法 `valueOf()` 获取。
+
+2、如果 `BigInteger` 表示的数字 `超出long` 的范围，就可以使用构造方法获取。
+
+3、对象一旦创建，`BigInteger` 内部记录的值是不能发生改变的。
+
+4、在代码中，只要你进行了计算（加减乘除），都会产生一个新的 `BigInteger` 对象。
+
+-----
+
+## 四、常见成员方法
+
+`BigInteger` 是一个对象，对象是不能直接做 `加减乘除运算` 的，所有的操作必须通过方法完成。
+
+~~~java
+public BigInteger add(BigInteger val)					//加法
+public BigInteger subtract(BigInteger val)				//减法
+public BigInteger multiply(BigInteger val)				//乘法
+public BigInteger divide(BigInteger val)				//除法，获取商
+public BigInteger[] divideAndRemainder(BigInteger val)	 //除法，获取商和余数，因为结果有两个，所以返回的就是数组，0索引表示商，1索引表示余数
+public  boolean equals(Object x) 					    //比较是否相同。在BigInteger类中Java重写了equals方法，因此这里的equals比较的是内部的属性值
+public  BigInteger pow(int exponent) 					//次幂、次方
+public  BigInteger max/min(BigInteger val) 				//返回较大值/较小值
+public  int intValue(BigInteger val) 					//转为int类型整数，超出范围数据会有误
+public  int intValue(BigInteger val) 					//转为long类型整数，超出范围数据会有误
+~~~
+
+----
+
+## 五、成员方法代码实现
+
+首先来创建两个 `BigInteger` 对象
+
+~~~java
+BigInteger bd1 = BigInteger.valueOf(10);
+BigInteger bd2 = BigInteger.valueOf(5);
+~~~
+
+### 1）加法
+
+~~~java
+BigInteger bd3 = bd1.add(bd2);
+System.out.println(bd3); // 15
+~~~
+
+其余的 减法、乘法、除法都是一样的，这里就不举例了
+
+----
+
+### 2）获取商和余数  ——  `divideAndRemainder(BigInteger val)`
+
+返回的数组长度为 `2`，`0索引` 表示商，`1索引` 表示余数
+
+~~~java
+BigInteger[] arr = bd1.divideAndRemainder(bd2);
+System.out.println(arr.length); // 2
+System.out.println(arr[0]); // 商 2
+System.out.println(arr[1]); // 余 0
+~~~
+
+----
+
+### 3）比较是否相同  ——  `equals(Object x)`
+
+~~~java
+boolean result = bd1.equals(bd2);
+System.out.println(result); // false，表示的是：bd1和bd2里面的值是不一样的
+~~~
+
+----
+
+### 3）次幂  ——  `pow(int exponent)`
+
+PS：`pow()` 中参数传递的并不是 `BigInteger` 的对象，应该是 `int类型` 的。
+
+~~~java
+BigInteger bd4 = bd1.pow(2);
+System.out.println(bd4); // 100(10的2次方)
+~~~
+
+----
+
+### 4）最大值  ——  `max(BigInteger val)`
+
+~~~java
+BigInteger bd1 = BigInteger.valueOf(10);
+BigInteger bd2 = BigInteger.valueOf(5);
+BigInteger bd5 = bd1.max(bd2); // 10
+~~~
+
+在这里，我将 `bd5` 和 `bd1、bd2` 分别做一个比较，结果如下
+
+~~~java
+System.out.println(bd5 == bd1); // true
+System.out.println(bd5 == bd2); // false
+~~~
+
+因此，`max()` 方法底层会把 `比较大的BigInteger对象` 做一个返回，它不会创建新的 `BigInteger对象`。
+
+因为在这，它并没有改变原来 `BigInteger对象` 里的值，它仅仅只是做了一个判断比较而已。
+
+----
+
+### 5）转为整数  ——  `intValue(BigInteger val)`
+
+~~~java
+public  int intValue(BigInteger val) 					//转为int类型整数，超出范围数据有误
+public  int intValue(BigInteger val) 					//转为long类型整数，超出范围数据有误
+~~~
+
+在转换的时候需要注意，如果超出了形参类型能接收的范围，它是会有误的。
+
+~~~java
+BigInteger bd6 = BigInteger.valueOf(2147483647L);
+int i = bd6.intValue();
+System.out.println(i);
+~~~
+
+<img src="./assets/image-20240422104557228.png" alt="image-20240422104557228" style="zoom:67%;" />
+
+当你将数据范围改小一点，在 `int取值范围之内`，可以发现数据就是对的了
+
+<img src="./assets/image-20240422104756310.png" alt="image-20240422104756310" style="zoom:67%;" />
+
+----
+
+但如果我不想返回 `int类型`，而是返回 `long类型`，就可以使用 `longValue()` ，返回一个 `long` 类型的整数
+
+<img src="./assets/image-20240422104919941.png" alt="image-20240422104919941" style="zoom:67%;" />
+
+~~~java
+BigInteger bd6 = BigInteger.valueOf(2147483647L);
+long i = bd6.longValue();
+System.out.println(i);
+~~~
+
+除此之外，它还有一个方法：`doubleValue()`，返回的是 `double` 类型的小数
+
+<img src="./assets/image-20240422105009261.png" alt="image-20240422105009261" style="zoom:67%;" />
+
+如果传入的是一个整数，那如何把它变成小数呢？例如 `200`，就可以变成 `2oo.0`
+
+~~~java
+BigInteger bd6 = BigInteger.valueOf(200);
+double v = bd6.doubleValue();
+System.out.println(v); // 200.0
+~~~
+
+----
+
+## 六、`BigInteger` 底层存储方式
+
+### 1）引出问题
+
+对于计算机而言，它其实是没有数据类型的概念的。在计算机眼中都是0101010101，数据类型是编程语言（例如Java、C）自己规定的，既然我们在学 Java，那这里就以Java为例。
+
+现在我有一个大的整数，将它转成二进制后如下图。
+
+这个二进制我把它每 `32位` 分了一组，后面两段都是 `32位`，左边这里还有一位，一共就是 `65位`。
+
+![image-20240422105622418](./assets/image-20240422105622418.png)
+
+在Java中，`long类型` 是 `8个字节`，最多 `64位比特位`，因此我们上面的这个数字已经超出了 `long` 的取值范围。
+
+那这个数组我们用 `BigInteger` 它是怎么存的呢？
+
+----
+
+### 2）查看源码
+
+选中 `BigInteger` <kbd>ctrl + b</kbd> 跟进。
+
+我想要大家看的其实就是两个成员变量。
+
+<img src="./assets/image-20240422110253695.png" alt="image-20240422110253695" style="zoom:67%;" />
+
+- 第一个成员变量：`signum`，它记录的是 `BigInteger` 的正负号
+
+  <img src="./assets/image-20240422110046853.png" alt="image-20240422110046853" style="zoom:67%;" />
+
+- 第二个成员变量：`mag[]`：在这个数组里面存储的就是 `BigInteger` 里面的数据
+
+  由于这个数据太大了，因此 `BigInteger` 会把它进行拆分：将一个很大的数拆成很多小段，每一个小段都会单独放到数组中。
+
+说完了它的存储方式之后，我们现在肯定很好奇，它是怎么拆的呢？这个不需要掌握，了解一下就行了，接下来我们来介绍一下。
+
+----
+
+### 3）如何拆？
+
+我们还是以刚刚的长整数为例。
+
+在存储的时候，`BigInteger` 会先把这个数字转为二进制的**补码**，然后从右往左，每 `32位` 分为一组，剩下的数字当成第三组，把它分为N组。例如这里就是将它分为了三组。
+
+然后再去把这三组分别转为各自的十进制，注意这里是**将补码转为十进制**。
+
+然后把它们按顺序放到数组中就行了。
+
+![image-20240422110924960](./assets/image-20240422110924960.png)
+
+然后再结合我们之前在源码中看到的 `signum`，用来记录符号的这个变量，两个一结合，就可以表示一个大整数了。
+
+现在我们可以回到IDEA中，用断点调试的方式去验证一下这个结论。
+
+----
+
+### 4）断点调试
+
+所谓 `断点调试`，也叫作 `debug模式` 去运行代码。
+
+它的作用就是：查看程序是如何一步一步执行的。
+
+我们可以在想要看的方法前面打上断点，然后右键选择 `Debug`
+
+~~~java
+BigInteger bd = new BigInteger("27670116110564327424");
+System.out.println(bd);
+~~~
+
+<img src="./assets/image-20240422111523276.png" alt="image-20240422111523276" style="zoom:50%;" />
+
+此时在下面会弹出两个界面
+
+左边的界面：表示当前执行的是哪个方法
+
+右边的界面：表示方法里面的 参数 / 数据 是怎么变化的
+
+![image-20240422111711007](./assets/image-20240422111711007.png)
+
+现在程序已经停留在 `第7行`，我想让它往下走一步，点击下面的第二个按钮即可，快捷键是 `F7`，但是还是建议大家用鼠标去点
+
+<img src="./assets/image-20240422111816019.png" alt="image-20240422111816019" style="zoom:67%;" />
+
+点一下，此时 `第7行` 就执行完毕了，准备执行 `第10行`，但是现在第 `10` 行现在还没走。
+
+<img src="./assets/image-20240422112005219.png" alt="image-20240422112005219" style="zoom:67%;" />
+
+现在我们的目的是看 `BigInteger bd = new BigInteger("27670116110564327424");` 在内存中是怎么存的。
+
+这里的 `bd` 就是我们刚刚创建的 `BigInteger` 的对象，后面 `724` 就表示 `bd对象` 的地址值，但是这个地址值是一个虚拟的，并不是真实的，对象里面的数据是 `"27670116110564327424"`
+
+<img src="./assets/image-20240422112104364.png" alt="image-20240422112104364" style="zoom:67%;" />
+
+它前面有个箭头，我们可以将其展开，展开后就是对象里面所有的数据。
+
+<img src="./assets/image-20240422112254308.png" alt="image-20240422112254308" style="zoom:80%;" />
+
+----
+
+`signum`：表示符号的意思，如果是整数，它就为 `1`，但如果它是负数呢？可以发现它变成了 `-1`。
+
+由此我们就知道了：`BigInteger` 的正负是由一个变量进行体现的。
+
+<img src="./assets/image-20240422112410524.png" alt="image-20240422112410524" style="zoom:60%;" />
+
+----
+
+`mag[]`：将大的整数分段进行存储，可以发现它存储的数据跟我们刚刚推断的是一模一样的。
+
+<img src="./assets/image-20240422112639988.png" alt="image-20240422112639988" style="zoom:67%;" />
+
+----
+
+## 七、`BigInteger` 到底有没有存储上线呢？
+
+答案：它是有的。
+
+在Java中，数组它其实有最大长度，数组的最大长度是 `int的最大值：2147483647`，但是在真实情况下，电脑内存是扛不住这么大数组的，也就是说你的内存是创建不了这么大的数组的。
+
+在这个数组中，每一位数字，最小是 `-2147483648`，最大也是 `2147483647`，因此我们就可以这么认为：
+
+数组中最多能存储元素个数：21亿多
+
+数组中每一位能表示的数字：42亿多
+
+理论上，BigInteger能表示的最大数字为：42亿的21亿次方。
+
+但是还没到这个数字，电脑的内存就会撑爆，所以一般认为BigInteger是无限的。 
+
+----
+
+## 八、总结
+
+1、`BigInteger` 表示一个大整数。
+
+2、如何获取 `BigInteger` 的对象？
+
+~~~java
+public BigInteger(String val) // 构造方法
+public static BigInteger valueOf(long val) // 静态方法
+~~~
+
+3、常见操作
+
+![image-20240422113627285](./assets/image-20240422113627285.png)
+
+
 
 
 
