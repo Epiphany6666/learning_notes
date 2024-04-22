@@ -35412,7 +35412,7 @@ System.out.println(bd10 == bd8); // false
 
 -----
 
-## 四、常见成员方法
+## 四、常见的成员方法
 
 `BigInteger` 是一个对象，对象是不能直接做 `加减乘除运算` 的，所有的操作必须通过方法完成。
 
@@ -35700,1073 +35700,423 @@ public static BigInteger valueOf(long val) // 静态方法
 
 
 
+-----
 
 
 
+----
 
- 4 Object类
+# 162.BigDecimal类
 
-## 4.1 概述
+## 一、引入
 
-> tips：重点讲解内容
+我们先来看一段代码，程序结果如下
 
-查看API文档，我们可以看到API文档中关于Object类的定义如下：
+~~~java
+System.out.println(0.09 + 0.01); // 0.09999999999999999
+System.out.println(0.216 - 0.1); // 0.11599999999999999
+System.out.println(0.226 * 0.01); // 0.0022600000000000003
+System.out.println(0.09 / 0.1); // 0.8999999999999999
+~~~
 
-![1576053677194](./assets/1576053677194-1713669897181-5.png) 
+可以发现得到的结果和我们想要得到的结果不一样！这是为什么呢？
 
+想要知道为什么计算结果不精确，首先我们就需要来看一看在计算机中小数是如何存的
 
+----
 
-Object类所在包是java.lang包。Object 是类层次结构的根，每个类都可以将 Object 作为超类。所有类都直接或者间接的继承自该类；换句话说，该类所具备的方法，其他所有类都继承了。
+## 二、计算机中的小数
 
+在计算机中，不管是运算，还是存储，都是转为二进制再进行操作。
 
+假设现在有一个十进制的数据：`69.875`，它转成二进制是什么样的呢？
 
-查看API文档我们可以看到，在Object类中提供了一个无参构造方法，如下所示：
+它会有两部分：
 
-![1576053871503](./assets/1576053871503-1713669897181-7.png) 
+- 整数部分的二进制：`0100 0101`
+- 小数部分的二进制：`111`
 
-但是一般情况下我们很少去主动的创建Object类的对象，调用其对应的方法。更多的是创建Object类的某个子类对象，然后通过子类对象调用Object类中的方法。
+<img src="./assets/image-20240422124219127.png" alt="image-20240422124219127" style="zoom:67%;" />
 
-## 4.2 常见方法
+为什么是这样的呢？
 
-> tips：重点讲解内容
+我们可以把二进制再转回十进制来看一看。
 
-<font color="red" size="3">**常见方法介绍**</font>
+小数部分转十进制的方式和整数部分是一样的，都是乘以 `基数的权次幂`， 然后再相加。
 
-我们要学习的Object类中的常见方法如下所示：
+要注意的是：整数部分的权是 `0、1、2、3、4...` 这样依次递增的；而小数部分这里的权是 `-1、-2、-3` 这样依次递减的。
 
-```java
-public String toString()				//返回该对象的字符串表示形式(可以看做是对象的内存地址值)
-public boolean equals(Object obj)		//比较两个对象地址值是否相等；true表示相同，false表示不相同
-protected Object clone()    			//对象克隆
-```
+![image-20240422124350496](./assets/image-20240422124350496.png)
 
-<font color="red" size="3">**案例演示**</font>
+因此知道了，我们刚刚转为的二进制数是没有任何问题的。
 
-接下来我们就来通过一些案例演示一下这些方法的特点。
+但是由于现在我们研究的是小数部分的不精确性，因此现在只看小数部分的二进制。
 
-<font color="blue" size="2">**案例1**</font>：演示toString方法
+----
 
-实现步骤：
+`0.875` 是一个比较特殊的数字，小数部分用 `111` 就能表示了。
 
-1. 创建一个学生类，提供两个成员变量（name ， age）；并且提供对应的无参构造方法和有参构造方法以及get/set方法
-2. 创建一个测试类（ObjectDemo01），在测试类的main方法中去创建学生对象，然后调用该对象的toString方法获取该对象的字符串表现形式，并将结果进行输出
+<img src="./assets/image-20240422124718926.png" alt="image-20240422124718926" style="zoom:67%;" />
 
-如下所示：
+但假如此时我换一个数字：`0.9`，此时它小数部分的二进制就非常非常长了，需要使用 `45位` 才能够表示。
 
-Student类
+![image-20240422124806763](./assets/image-20240422124806763.png)
 
-```java
-public class Student {
+如果再换一个数字 `0.226`，它小数部分的二进制就更长了，需要用 `55位` 才能表示。
 
-    private String name ;       // 姓名
-    private String age ;        // 年龄
+![image-20240422124923838](./assets/image-20240422124923838.png)
 
-    // 无参构造方法和有参构造方法以及get和set方法略
-    ...
-        
-}
-```
+由此可见，如果我们把十进制的小数转成二进制，那么它的结果有可能会很长很长很长很长
 
-ObjectDemo01测试类
+而在Java中，`float` 和 `double` 在底层占用的字节数是有限的。
 
-```java
-public class ObjectDemo01 {
+如果超出了小数部分bit位数，就会进行舍弃。
 
-    public static void main(String[] args) {
+<img src="./assets/image-20240422125055171.png" alt="image-20240422125055171" style="zoom:67%;" />
 
-        // 创建学生对象
-        Student s1 = new Student("itheima" , "14") ;
+我们用这个理论去看上面的 `0.226`，它的小数部分一共有 `55位`，如果我用 `double` 去记录它，前面的 `52` 位我可以留着，但是后面还有三位，就只能舍弃了。
 
-        // 调用toString方法获取s1对象的字符串表现形式
-        String result1 = s1.toString();
+因此小数在存储的时候，有可能就是不精确的。
 
-        // 输出结果
-        System.out.println("s1对象的字符串表现形式为：" + result1);
+当我用一个不精确的数据去参与计算，不管是 `加减乘除`，结果都有可能是不精确的。
 
-    }
+但是在实际开发中如果你的数据不精确，大多数情况下可能问题不大。
 
-}
-```
+但是有些特殊的场景它的问题就很大了，它是需要我们进行精确运算的。
 
-运行程序进行测试，控制台输出结果如下所示：
+例如在银行里就是这样的：假设以后我们买房子，贷款 `100万`，按照 `4.9%` 的利息还 `30年`，计算出每个月要还的钱，结果就是右边的图。
 
-```java
-s1对象的字符串表现形式为：com.itheima.api.system.demo04.Student@3f3afe78
-```
+这个时候就需要精确运算了，而且小数点需要保留后面的两位。
 
-为什么控制台输出的结果为：com.itheima.api.system.demo04.Student@3f3afe78； 此时我们可以查看一下Object类中toString方法的源码，如下所示：
+![image-20240422125605039](./assets/image-20240422125605039.png)
 
-```java
-public String toString() {		// Object类中toString方法的源码定义
-	return getClass().getName() + "@" + Integer.toHexString(hashCode());
-}
-```
+除此之外，在飞机、火箭这些精密零件上，也必须要有精确运算。
 
-其中getClass().getName()对应的结果就是：com.itheima.api.system.demo04.Student；Integer.toHexString(hashCode())对应的结果就是3f3afe78。
+所以说在实际开发中，像一些金融、证券、精密零件计算..... 都需要用到小数点精确运算。
 
-我们常常将"com.itheima.api.system.demo04.Student@3f3afe78"这一部分称之为对象的内存地址值。但是一般情况下获取对象的内存地址值没有太大的意义。获取对象的成员变量的字符串拼接形式才
+为了解决这个问题，Java就提供了一个类：`BigDecimal`，这个类就可以帮助我们进行小数的精确运算。
 
-算有意义，怎么实现呢？此时我们就需要在Student类中重写Object的toString方法。我们可以通过idea开发工具进行实现，具体步骤如下所示：
 
-1. 在空白处使用快捷键：alt + insert。此时会弹出如下的对话框
 
-![1576055135105](./assets/1576055135105-1713669897181-8.png) 
+----
 
-2. 选择toString，此时会弹出如下的对话框
+## 三、`BigDecimal` 的作用
 
-![1576055198877](./assets/1576055198877-1713669897181-9.png) 
+- 用于小数的精确计算
 
-同时选择name和age属性，点击OK。此时就会完成toString方法的重写，代码如下所示：
+- 用来表示很大的小数
 
-```java
-@Override
-public String toString() {
-    return "Student{" +
-        "name='" + name + '\'' +
-        ", age='" + age + '\'' +
-        '}';
-}
-```
+  这个特点跟 `BigInteger` 是一样的
 
-这段代码就是把Student类中的成员变量进行了字符串的拼接。重写完毕以后，再次运行程序，控制台输出结果如下所示：
+那么 `BigDecimal` 这个类该如何用呢？我们可以到 `API帮助文档` 中查看一下。
 
-```java
-s1对象的字符串表现形式为：Student{name='itheima', age='14'}
-```
+---
 
-此时我们就可以清楚的查看Student的成员变量值，因此重写toString方法的意义就是以良好的格式，更方便的展示对象中的属性值
-
-
-
-我们再来查看一下如下代码的输出：
-
-```java
-// 创建学生对象
-Student s1 = new Student("itheima" , "14") ;
-
-// 直接输出对象s1
-System.out.println(s1);
-```
-
-运行程序进行测试，控制台输出结果如下所示：
-
-```java
-Student{name='itheima', age='14'}
-```
-
-我们可以看到和刚才的输出结果是一致的。那么此时也就证明直接输出一个对象，那么会默认调用对象的toString方法，因此如上代码的等同于如下代码：
-
-```java
-// 创建学生对象
-Student s1 = new Student("itheima" , "14") ;
-
-// 调用s1的toString方法，把结果进行输出
-System.out.println(s1.toString());
-```
-
-因此后期为了方便进行测试，我们常常是通过输出语句直接输出一个对象的名称。
-
-
-
-小结：
-
-1. 在通过输出语句输出一个对象时，默认调用的就是toString()方法
-2. 输出地址值一般没有意义，我们可以通过重写toString方法去输出对应的成员变量信息（快捷键：atl + insert ， 空白处 右键 -> Generate -> 选择toString）
-3. toString方法的作用：以良好的格式，更方便的展示对象中的属性值
-4. 一般情况下Jdk所提供的类都会重写Object类中的toString方法
-
-<font color="blue" size="2">**案例2**</font>：演示equals方法
-
-实现步骤：
-
-1. 在测试类（ObjectDemo02）的main方法中，创建两个学生对象，然后比较两个对象是否相同
-
-代码如下所示：
-
-```java
-public class ObjectDemo02 {
-
-    public static void main(String[] args) {
-
-        // 创建两个学生对象
-        Student s1 = new Student("itheima" , "14") ;
-        Student s2 = new Student("itheima" , "14") ;
-
-        // 比较两个对象是否相等
-        System.out.println(s1 == s2);
-
-    }
-
-}
-```
-
-运行程序进行测试，控制台的输出结果如下所示：
-
-```java
-false
-```
-
-因为"=="号比较的是对象的地址值，而我们通过new关键字创建了两个对象，它们的地址值是不相同的。因此比较结果就是false。
-
-
-
-我们尝试调用Object类中的equals方法进行比较，代码如下所示：
-
-```java
-// 调用equals方法比较两个对象是否相等
-boolean result = s1.equals(s2);
-
-// 输出结果
-System.out.println(result);
-```
-
-运行程序进行测试，控制台的输出结果为：
-
-```java
-false
-```
-
-为什么结果还是false呢？我们可以查看一下Object类中equals方法的源码，如下所示：
-
-```java
-public boolean equals(Object obj) {		// Object类中的equals方法的源码
-    return (this == obj);
-}
-```
-
-通过源码我们可以发现默认情况下equals方法比较的也是对象的地址值。比较内存地址值一般情况下是没有意义的，我们希望比较的是对象的属性，如果两个对象的属性相同，我们认为就是同一个对象；
-
-那么要比较对象的属性，我们就需要在Student类中重写Object类中的equals方法。equals方法的重写，我们也可以使用idea开发工具完成，具体的操作如下所示：
-
-1. 在空白处使用快捷键：alt + insert。此时会弹出如下的对话框
-
- ![1576056718392](./assets/1576056718392-1713669897181-10.png) 
-
-2. 选择equals() and hashCode()方法，此时会弹出如下的对话框
-
-![1576057779458](./assets/1576057779458-1713669897181-11.png) 
-
-点击next，会弹出如下对话框：
-
-![1576057813175](./assets/1576057813175-1713669897181-12.png) 
-
-选择neme和age属性点击next，此时就会弹出如下对话框：
-
-![1576057892814](./assets/1576057892814-1713669897181-13.png) 
-
-取消name和age属性（因为此时选择的是在生成hashCode方法时所涉及到的属性，关于hashCode方法后期再做重点介绍），点击Finish完成生成操作。生成的equals方法和hashCode方法如下：
-
-```java
-@Override
-public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    Student student = (Student) o;
-    return Objects.equals(name, student.name) && Objects.equals(age, student.age);	// 比较的是对象的name属性值和age属性值
-}
-
-@Override
-public int hashCode() {
-    return 0;
-}
-```
-
-hashCode方法我们暂时使用不到，可以将hashCode方法删除。重写完毕以后运行程序进行测试，控制台输出结果如下所示：
-
-```java
-true
-```
-
-此时equals方法比较的是对象的成员变量值，而s1和s2两个对象的成员变量值都是相同的。因此比较完毕以后的结果就是true。
-
-小结：
-
-1. 默认情况下equals方法比较的是对象的地址值
-2. 比较对象的地址值是没有意义的，因此一般情况下我们都会重写Object类中的equals方法
-
-<font color="blue" size="2">**案例2**</font>：对象克隆
-
-​	把A对象的属性值完全拷贝给B对象，也叫对象拷贝,对象复制
-
-**对象克隆的分类：**
-
->深克隆和浅克隆
-
-**浅克隆：**
-
-​	不管对象内部的属性是基本数据类型还是引用数据类型，都完全拷贝过来 
-
-​	基本数据类型拷贝过来的是具体的数据，引用数据类型拷贝过来的是地址值。
-
-​	Object类默认的是浅克隆
-
-![浅克隆](./assets/浅克隆-1713669897181-14.png)
-
-**深克隆：**
-
-​	基本数据类型拷贝过来，字符串复用，引用数据类型会重新创建新的
-
-![深克隆](./assets/深克隆-1713669897181-15.png)
-
-代码实现：
-
-```java
-package com.itheima.a04objectdemo;
-
-public class ObjectDemo4 {
-    public static void main(String[] args) throws CloneNotSupportedException {
-        // protected object clone(int a) 对象克隆 
-
-        //1.先创建一个对象
-        int[] data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0};
-        User u1 = new User(1, "zhangsan", "1234qwer", "girl11", data);
-
-        //2.克隆对象
-        //细节:
-        //方法在底层会帮我们创建一个对象,并把原对象中的数据拷贝过去。
-        //书写细节:
-        //1.重写Object中的clone方法
-        //2.让javabean类实现Cloneable接口
-        //3.创建原对象并调用clone就可以了
-        //User u2 =(User)u1.clone();
-
-        //验证一件事情：Object中的克隆是浅克隆
-        //想要进行深克隆，就需要重写clone方法并修改里面的方法体
-        //int[] arr = u1.getData();
-        //arr[0] = 100;
-
-        //System.out.println(u1);
-        //System.out.println(u2);
-
-
-        //以后一般会用第三方工具进行克隆
-        //1.第三方写的代码导入到项目中
-        //2.编写代码
-        //Gson gson =new Gson();
-        //把对象变成一个字符串
-        //String s=gson.toJson(u1);
-        //再把字符串变回对象就可以了
-        //User user =gson.fromJson(s, User.class);
-
-        //int[] arr=u1.getData();
-        //arr[0] = 100;
-
-        //打印对象
-        //System.out.println(user);
-
-    }
-}
-
-package com.itheima.a04objectdemo;
-
-import java.util.StringJoiner;
-
-
-
-//Cloneable
-//如果一个接口里面没有抽象方法
-//表示当前的接口是一个标记性接口
-//现在Cloneable表示一旦实现了，那么当前类的对象就可以被克降
-//如果没有实现，当前类的对象就不能克隆
-public class User implements Cloneable {
-    private int id;
-    private String username;
-    private String password;
-    private String path;
-    private int[] data;
-
-
-
-
-    public User() {
-    }
-
-    public User(int id, String username, String password, String path, int[] data) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.path = path;
-        this.data = data;
-    }
-
-    /**
-     * 获取
-     *
-     * @return id
-     */
-    public int getId() {
-        return id;
-    }
-
-    /**
-     * 设置
-     *
-     * @param id
-     */
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    /**
-     * 获取
-     *
-     * @return username
-     */
-    public String getUsername() {
-        return username;
-    }
-
-    /**
-     * 设置
-     *
-     * @param username
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    /**
-     * 获取
-     *
-     * @return password
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * 设置
-     *
-     * @param password
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    /**
-     * 获取
-     *
-     * @return path
-     */
-    public String getPath() {
-        return path;
-    }
-
-    /**
-     * 设置
-     *
-     * @param path
-     */
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    /**
-     * 获取
-     *
-     * @return data
-     */
-    public int[] getData() {
-        return data;
-    }
-
-    /**
-     * 设置
-     *
-     * @param data
-     */
-    public void setData(int[] data) {
-        this.data = data;
-    }
-
-    public String toString() {
-        return "角色编号为：" + id + "，用户名为：" + username + "密码为：" + password + ", 游戏图片为:" + path + ", 进度:" + arrToString();
-    }
-
-
-    public String arrToString() {
-        StringJoiner sj = new StringJoiner(", ", "[", "]");
-
-        for (int i = 0; i < data.length; i++) {
-            sj.add(data[i] + "");
-        }
-        return sj.toString();
-    }
-
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        //调用父类中的clone方法
-        //相当于让Java帮我们克隆一个对象，并把克隆之后的对象返回出去。
-
-        //先把被克隆对象中的数组获取出来
-        int[] data = this.data;
-        //创建新的数组
-        int[] newData =new int[data.length];
-        //拷贝数组中的数据
-        for (int i = 0; i < data.length; i++) {
-            newData[i] = data[i];
-        }
-        //调用父类中的方法克隆对象
-            User u=(User)super.clone();
-        //因为父类中的克隆方法是浅克隆，替换克隆出来对象中的数组地址值
-        u.data =newData;
-        return u;
-    }
-}
-
-```
-
-
-
-# 5 Objects类
-
-## 5.1 概述
-
-> tips：了解内容
-
-查看API文档，我们可以看到API文档中关于Objects类的定义如下：
-
-![1576058492444](./assets/1576058492444-1713669897181-16.png) 
-
-Objects类所在包是在java.util包下，因此在使用的时候需要进行导包。并且Objects类是被final修饰的，因此该类不能被继承。
-
-Objects类提供了一些对象常见操作的方法。比如判断对象是否相等，判断对象是否为null等等。
-
-
-
-接下来我们来查看一下API文档，看一下Objects类中的成员，如下所示：
-
-![1576058659628](./assets/1576058659628-1713669897181-17.png) 
-
-我们可以发现Objects类中无无参构造方法，因此我们不能使用new关键字去创建Objects的对象。同时我们可以发现Objects类中所提供的方法都是静态的。因此我们可以通过类名直接去调用这些方法。
-
-## 5.2 常见方法
-
-> tips：重点讲解内容
-
-<font color="red" size="3">**常见方法介绍**</font>
-
-我们要重点学习的Objects类中的常见方法如下所示：
-
-```java
-public static String toString(Object o) 					// 获取对象的字符串表现形式
-public static boolean equals(Object a, Object b)			// 比较两个对象是否相等
-public static boolean isNull(Object obj)					// 判断对象是否为null
-public static boolean nonNull(Object obj)					// 判断对象是否不为null
-```
-
-
-
-我们要了解的Objects类中的常见方法如下所示：
-
-```java
-public static <T> T requireNonNull(T obj)					// 检查对象是否不为null,如果为null直接抛出异常；如果不是null返回该对象；
-public static <T> T requireNonNullElse(T obj, T defaultObj) // 检查对象是否不为null，如果不为null，返回该对象；如果为null返回defaultObj值
-public static <T> T requireNonNullElseGet(T obj, Supplier<? extends T> supplier)	// 检查对象是否不为null，如果不为null，返回该对象；如果															 // 为null,返回由Supplier所提供的值
-```
-
-上述方法中的T可以理解为是Object类型。
-
-<font color="red" size="3">**案例演示**</font>
-
-接下来我们就来通过一些案例演示一下Objects类中的这些方法特点。
-
-<font color="blue" size="2">**案例1**</font>：演示重点学习方法
-
-实现步骤：
-
-1. 创建一个学生类，提供两个成员变量（name ， age）；并且提供对应的无参构造方法和有参构造方法以及get/set方法，并且重写toString方法和equals方法
-2. 创建一个测试类（ObjectsDemo01）, 在该类中编写测试代码
-
-如下所示：
-
-Student类
-
-```java
-public class Student {
-
-    private String name ;       // 姓名
-    private String age ;        // 年龄
-
-    // 其他代码略
-    ...
-        
-}
-```
-
-ObjectsDemo01测试类
-
-```java
-public class ObjectsDemo01 {
-
-    public static void main(String[] args) {
-
-        // 调用方法
-        method_04() ;
-
-    }
-
-    // 测试nonNull方法
-    public static void method_04() {
-
-        // 创建一个学生对象
-        Student s1 = new Student("itheima" , "14") ;
-
-        // 调用Objects类中的nonNull方法
-        boolean result = Objects.nonNull(s1);
-
-        // 输出结果
-        System.out.println(result);
-
-    }
-
-    // 测试isNull方法
-    public static void method_03() {
-
-        // 创建一个学生对象
-        Student s1 = new Student("itheima" , "14") ;
-
-        // 调用Objects类中的isNull方法
-        boolean result = Objects.isNull(s1);
-
-        // 输出结果
-        System.out.println(result);
-
-    }
-
-    // 测试equals方法
-    public static void method_02() {
-
-        // 创建两个学生对象
-        Student s1 = new Student("itheima" , "14") ;
-        Student s2 = new Student("itheima" , "14") ;
-
-        // 调用Objects类中的equals方法，比较两个对象是否相等
-        boolean result = Objects.equals(s1, s2);     // 如果Student没有重写Object类中的equals方法，此处比较的还是对象的地址值
-
-        // 输出结果
-        System.out.println(result);
-
-    }
-
-    // 测试toString方法
-    public static void method_01() {
-
-        // 创建一个学生对象
-        Student s1 = new Student("itheima" , "14") ;
-
-        // 调用Objects中的toString方法,获取s1对象的字符串表现形式
-        String result = Objects.toString(s1);       // 如果Student没有重写Object类中的toString方法，此处还是返回的对象的地址值
-
-        // 输出结果
-        System.out.println(result);
-
-    }
-
-}
-```
-
-<font color="blue" size="2">**案例2**</font>：演示需要了解的方法
-
-```java
-public class ObjectsDemo02 {
-
-    public static void main(String[] args) {
-
-        // 调用方法
-        method_03();
-
-    }
-
-    // 演示requireNonNullElseGet
-    public static void method_03() {
-
-        // 创建一个学生对象
-        Student s1 = new Student("itheima" , "14") ;
-
-        // 调用Objects对象的requireNonNullElseGet方法,该方法的第二个参数是Supplier类型的，查看源码我们发现Supplier是一个函数式接口,
-        // 那么我们就可以为其传递一个Lambda表达式，而在Supplier接口中所定义的方法是无参有返回值的方法，因此具体调用所传入的Lambda表达式如下所示
-        Student student = Objects.requireNonNullElseGet(s1, () -> {
-            return new Student("itcast", "14");
-        });
-
-        // 输出
-        System.out.println(student);
-
-    }
-
-    // 演示requireNonNullElse
-    public static void method_02() {
-
-        // 创建一个学生对象
-        Student s1 = new Student("itheima" , "14") ;
-
-        // 调用Objects对象的requireNonNullElse方法
-        Student student = Objects.requireNonNullElse(s1, new Student("itcast", "14"));
-
-        // 输出
-        System.out.println(student);
-
-    }
-
-    // 演示requireNonNull
-    public static void method_01() {
-
-        // 创建一个学生对象
-        Student s1 = new Student("itheima" , "14") ;
-
-        // 调用Objects对象的requireNonNull方法
-        Student student = Objects.requireNonNull(s1);
-
-        // 输出
-        System.out.println(student);
-
-    }
-
-}
-```
-
-注：了解性的方法可以可以作为扩展视频进行下发。
-
-# 6 BigInteger类
-
-## 6.1 引入
-
-​	平时在存储整数的时候，Java中默认是int类型，int类型有取值范围：-2147483648 ~ 2147483647。如果数字过大，我们可以使用long类型，但是如果long类型也表示不下怎么办呢？
-
-​	就需要用到BigInteger，可以理解为：大的整数。
-
-​	有多大呢？理论上最大到42亿的21亿次方
-
-​	基本上在内存撑爆之前，都无法达到这个上限。
-
-## 6.2  概述
-
-查看API文档，我们可以看到API文档中关于BigInteger类的定义如下：
-
- ![Snipaste_2022-09-04_21-36-01](./assets/Snipaste_2022-09-04_21-36-01-1713669897181-18.png)
-
-BigInteger所在包是在java.math包下，因此在使用的时候就需要进行导包。我们可以使用BigInteger类进行大整数的计算
-
-## 6.3 常见方法
-
-<font color="red" size="3">**构造方法**</font>
-
-```java
-public BigInteger(int num, Random rnd) 		//获取随机大整数，范围：[0 ~ 2的num次方-1]
-public BigInteger(String val) 				//获取指定的大整数
-public BigInteger(String val, int radix) 	//获取指定进制的大整数
-    
-下面这个不是构造，而是一个静态方法获取BigInteger对象
-public static BigInteger valueOf(long val) 	//静态方法获取BigInteger的对象，内部有优化
-```
-
-**构造方法小结：**
-
-* 如果BigInteger表示的数字没有超出long的范围，可以用静态方法获取。
-* 如果BigInteger表示的超出long的范围，可以用构造方法获取。
-* 对象一旦创建，BigInteger内部记录的值不能发生改变。
-* 只要进行计算都会产生一个新的BigInteger对象
-
-
-
-<font color="red" size="3">**常见成员方法**</font>
-
-BigDecimal类中使用最多的还是提供的进行四则运算的方法，如下：
-
-```java
-public BigInteger add(BigInteger val)					//加法
-public BigInteger subtract(BigInteger val)				//减法
-public BigInteger multiply(BigInteger val)				//乘法
-public BigInteger divide(BigInteger val)				//除法
-public BigInteger[] divideAndRemainder(BigInteger val)	 //除法，获取商和余数
-public  boolean equals(Object x) 					    //比较是否相同
-public  BigInteger pow(int exponent) 					//次幂、次方
-public  BigInteger max/min(BigInteger val) 				//返回较大值/较小值
-public  int intValue(BigInteger val) 					//转为int类型整数，超出范围数据有误
-```
-
-代码实现：
-
-```java
-package com.itheima.a06bigintegerdemo;
-
-import java.math.BigInteger;
-
-public class BigIntegerDemo1 {
-    public static void main(String[] args) {
-        /*
-            public BigInteger(int num, Random rnd) 获取随机大整数，范围:[0~ 2的num次方-11
-            public BigInteger(String val) 获取指定的大整数
-            public BigInteger(String val, int radix) 获取指定进制的大整数
-
-            public static BigInteger valueOf(long val) 静态方法获取BigInteger的对象，内部有优化
-
-            细节:
-            对象一旦创建里面的数据不能发生改变。
-        */
-
-
-        //1.获取一个随机的大整数
-        /* Random r=new Random();
-            for (int i = e; i < 100; i++) {
-            BigInteger bd1 = new BigInteger(4,r);
-            System.out.println(bd1);//[@ ~ 15]}
-            }
-        */
-
-        //2.获取一个指定的大整数，可以超出long的取值范围
-        //细节:字符串中必须是整数，否则会报错
-        /* BigInteger bd2 = new BigInteger("1.1");
-            System.out.println(bd2);
-        */
-
-        /*
-            BigInteger bd3 = new BigInteger("abc");
-            System.out.println(bd3);
-         */
-
-        //3.获取指定进制的大整数
-        //细节:
-        //1.字符串中的数字必须是整数
-        //2.字符串中的数字必须要跟进制吻合。
-        //比如二进制中，那么只能写日和1，写其他的就报错。
-        BigInteger bd4 = new BigInteger("123", 2);
-        System.out.println(bd4);
-
-        //4.静态方法获取BigInteger的对象，内部有优化
-        //细节:
-        //1.能表示范围比较小，只能在long的取值范围之内，如果超出long的范围就不行了。
-        //2.在内部对常用的数字: -16 ~ 16 进行了优化。
-        //  提前把-16~16 先创建好BigInteger的对象，如果多次获取不会重新创建新的。
-        BigInteger bd5 = BigInteger.valueOf(16);
-        BigInteger bd6 = BigInteger.valueOf(16);
-        System.out.println(bd5 == bd6);//true
-
-
-        BigInteger bd7 = BigInteger.valueOf(17);
-        BigInteger bd8 = BigInteger.valueOf(17);
-        System.out.println(bd7 == bd8);//false
-
-
-        //5.对象一旦创建内部的数据不能发生改变
-        BigInteger bd9 =BigInteger.valueOf(1);
-        BigInteger bd10 =BigInteger.valueOf(2);
-        //此时，不会修改参与计算的BigInteger对象中的借，而是产生了一个新的BigInteger对象记录
-        BigInteger result=bd9.add(bd10);
-        System.out.println(result);//3
-
-    }
-}
-
-```
-
-```java
-package com.itheima.a06bigintegerdemo;
-
-import java.math.BigInteger;
-
-public class BigIntegerDemo2 {
-    public static void main(String[] args) {
-        /*
-            public BigInteger add(BigInteger val) 加法
-            public BigInteger subtract(BigInteger val) 减法
-            public BigInteger multiply(BigInteger val) 乘法
-            public BigInteger divide(BigInteger val) 除法，获取商
-            public BigInteger[] divideAndRemainder(BigInteger val) 除法，获取商和余数
-            public boolean equals(Object x) 比较是否相同
-            public BigInteger pow(int exponent) 次幂
-            public BigInteger max/min(BigInteger val) 返回较大值/较小值
-            public int intValue(BigInteger val) 转为int类型整数，超出范围数据有误
-        */
-
-        //1.创建两个BigInteger对象
-        BigInteger bd1 = BigInteger.valueOf(10);
-        BigInteger bd2 = BigInteger.valueOf(5);
-
-        //2.加法
-        BigInteger bd3 = bd1.add(bd2);
-        System.out.println(bd3);
-
-        //3.除法，获取商和余数
-        BigInteger[] arr = bd1.divideAndRemainder(bd2);
-        System.out.println(arr[0]);
-        System.out.println(arr[1]);
-
-        //4.比较是否相同
-        boolean result = bd1.equals(bd2);
-        System.out.println(result);
-
-        //5.次幂
-        BigInteger bd4 = bd1.pow(2);
-        System.out.println(bd4);
-
-        //6.max
-        BigInteger bd5 = bd1.max(bd2);
-
-
-        //7.转为int类型整数，超出范围数据有误
-        /* BigInteger bd6 = BigInteger.valueOf(2147483647L);
-         int i = bd6.intValue();
-         System.out.println(i);
-         */
-
-        BigInteger bd6 = BigInteger.valueOf(200);
-        double v = bd6.doubleValue();
-        System.out.println(v);//200.0
-    }
-}
-
-```
-
-
-
-## 6.4 底层存储方式：
-
-对于计算机而言，其实是没有数据类型的概念的，都是0101010101，数据类型是编程语言自己规定的，所以在实际存储的时候，先把具体的数字变成二进制，每32个bit为一组，存储在数组中。 
-
-数组中最多能存储元素个数：21亿多
-
-数组中每一位能表示的数字：42亿多
-
-理论上，BigInteger能表示的最大数字为：42亿的21亿次方。
-
-但是还没到这个数字，电脑的内存就会撑爆，所以一般认为BigInteger是无限的。 
-
-存储方式如图所示：
-
-![bigInteger的底层原理](./assets/bigInteger的底层原理-1713669897181-19.png)
-
-
-
-
-
-
-
-
-
-# 7 BigDecimal类
-
-## 7.1 引入
-
-首先我们来分析一下如下程序的执行结果：
-
-```java
-public class BigDecimalDemo01 {
-
-    public static void main(String[] args) {
-        System.out.println(0.09 + 0.01);
-    }
-
-}
-```
-
-这段代码比较简单，就是计算0.09和0.01之和，并且将其结果在控制台进行输出。那么按照我们的想法在控制台输出的结果应该为0.1。那么实际的运行结果是什么呢？我们来运行一下程序，控制台的输出
-
-结果如下所示：
-
-```java
-0.09999999999999999
-```
-
-这样的结果其实就是一个丢失精度的结果。为什么会产生精度丢失呢？
-
-在使用float或者double类型的数据在进行数学运算的时候，很有可能会产生精度丢失问题。我们都知道计算机底层在进行运算的时候，使用的都是二进制数据； 当我们在程序中写了一个十进制数据 ，在
-
-进行运算的时候，计算机会将这个十进制数据转换成二进制数据，然后再进行运算，计算完毕以后计算机会把运算的结果再转换成十进制数据给我们展示； 如果我们使用的是整数类型的数据进行计算，那
-
-么在把十进制数据转换成二进制数据的时候不会存在精度问题； 如果我们的数据是一个浮点类型的数据，有的时候计算机并不会将这个数据完全转换成一个二进制数据，而是将这个将其转换成一个无限的
-
-趋近于这个十进数的二进制数据； 这样使用一个不太准确的数据进行运算的时候， 最终就会造成精度丢失；为了提高精度，Java就给我们提供了BigDecimal供我们进行数据运算。
-
-## 7.2 概述
+## 四、阅读 `API帮助文档`
 
 查看API文档，我们可以看到API文档中关于BigDecimal类的定义如下：
 
- ![1576132679789](./assets/1576132679789-1713669897181-20.png)
+![image-20240422130149962](./assets/image-20240422130149962.png)
 
-BigDecimal所在包是在java.math包下，因此在使用的时候就需要进行导包。我们可以使用BigDecimal类进行更加精准的数据计算。
+首先看它的包，它是在 `java.math包` 下的。
 
-## 7.3 常见方法
+<img src="./assets/image-20240422130220683.png" alt="image-20240422130220683" style="zoom:67%;" />
 
-<font color="red" size="3">**构造方法**</font>
+再往下，就是它的继承结构：它的父类是 `Number`，爷爷是 `Object`
 
-要用BigDecimal类，那么就需要首先学习一下如何去创建BigDecimal的对象。通过查看API文档，我们可以发现Jdk中针对BigDecimal类提供了很多的构造方法，但是最常用的构造方法是：
+![image-20240422130240453](./assets/image-20240422130240453.png)
 
- ![1576134383441](./assets/1576134383441-1713669897181-21.png)
+再往下，去看它的一些描述：`BigDecimal` 是不可变的、任意精度的有符号十进制数。
 
-了解完常见的构造方法以后，我们接下来就重点介绍一下常见的成员方法。
+看 `不可变` ，这个特点跟 `BigInteger` 的特点是一样的，一旦创建对象之后，不管是做 `加减乘除` 等操作，它原本的值就不会再变了，而是显示一个新的 `BigDecimal对象`；并且 `任意精度` 可知，`精度` 也可以得到保证。
 
-<font color="red" size="3">**常见成员方法**</font>
+再往下，我们就要去看它的构造方法。
 
-BigDecimal类中使用最多的还是提供的进行四则运算的方法，如下：
+可以发现它有很多很多的构造，你可以根据不同的情况去选择不同的构造，在这里我会跟大家介绍几个构造。
 
-```java
-public BigDecimal add(BigDecimal value)				// 加法运算
-public BigDecimal subtract(BigDecimal value)		// 减法运算
-public BigDecimal multiply(BigDecimal value)		// 乘法运算
-public BigDecimal divide(BigDecimal value)			// 触发运算
-```
+下面这个构造是将一个小数变成 `BigDecimal` 对象，我们用鼠标点击一下这个蓝色的。
 
-接下来我们就来通过一些案例演示一下这些成员方法的使用。
+![image-20240422130805179](./assets/image-20240422130805179.png)
 
-<font color="blue" size="2">**案例1**</font>：演示基本的四则运算
+就可以看到这个构造方法的介绍。
 
-代码如下所示：
+将 `double` 转换为 `BigDecimal`，后者是 `double` 的二进制浮点值准确的十进制表示形式。
 
-```java
-public class BigDecimalDemo01 {
+但是在这，它会有一个小小的注意点：此构造方法的结果有一定的不可预知性。
 
-    public static void main(String[] args) {
+![image-20240422131339775](./assets/image-20240422131339775.png)
 
-        // 创建两个BigDecimal对象
-        BigDecimal b1 = new BigDecimal("0.3") ;
-        BigDecimal b2 = new BigDecimal("4") ;
+也就是说如果你用这种方式去创建一个 `BigDecimal` 对象的话，它的结果还有可能是不精确的。
 
-        // 调用方法进行b1和b2的四则运算，并将其运算结果在控制台进行输出
-        System.out.println(b1.add(b2));         // 进行加法运算
-        System.out.println(b1.subtract(b2));    // 进行减法运算
-        System.out.println(b1.multiply(b2));    // 进行乘法运算
-        System.out.println(b1.divide(b2));      // 进行除法运算
+那怎么办？我需要精确运算。
 
-    }
+---
 
+如果你想要精确运算，那就需要用到下面这个构造：跟 `BigInteger` 一样，它还是通过一个字符串的表示形式将它变成 `BigDecimal` 的对象，我们用鼠标点击一下它，它就会跳转到详情界面。
+
+![image-20240422131044238](./assets/image-20240422131044238.png)
+
+往下翻，这里它也有一个注意点：它不会遇到 `BigDecimal(double)` 构造方法的不可预知问题。 
+
+![image-20240422131226483](./assets/image-20240422131226483.png)
+
+也就是说我们用这种方式去计算的话，它的结果就是精确的。
+
+----
+
+## 五、构造方法代码示例
+
+### 1）`BigDecimal(double)`
+
+首先，通过传递double类型的小数来创建对象
+
+~~~java
+BigDecimal bd1 = new BigDecimal(0.01);
+BigDecimal bd2 = new BigDecimal(0.09);
+~~~
+
+将 `bd1` 和 `bd2` 分别来做一个打印
+
+~~~java
+System.out.println(bd1);
+System.out.println(bd2);
+~~~
+
+程序运行结果如下，都不用我们去进行 `加减乘除` 运算，结果已经就不精确了。
+
+<img src="./assets/image-20240422131533560.png" alt="image-20240422131533560" style="zoom:67%;" />
+
+因此，这种方式有可能是不精确的，所以不建议使用。因此接下来说第二个，建议大家使用的。
+
+----
+
+### 2）`BigDecimal(String)`
+
+通过传递字符串表示的小数来创建对象
+
+~~~java
+BigDecimal bd3 = new BigDecimal("0.01");
+BigDecimal bd4 = new BigDecimal("0.09");
+System.out.println(bd3);
+System.out.println(bd4);
+~~~
+
+程序运行完毕，可以看见数据是精确的。
+
+<img src="./assets/image-20240422131900134.png" alt="image-20240422131900134" style="zoom:70%;" />
+
+并且我们可以来运算一下，看产生的新的 `BigDecimal`对象 结果是否准确
+
+~~~java
+BigDecimal bd3 = new BigDecimal("0.01");
+BigDecimal bd4 = new BigDecimal("0.09");
+BigDecimal bd5 = bd3.add(bd4);
+System.out.println(bd3);
+System.out.println(bd4);
+System.out.println(bd5);
+~~~
+
+程序运行完毕，可以看见，结果也是精确的
+
+<img src="./assets/image-20240422132033548.png" alt="image-20240422132033548" style="zoom:67%;" />
+
+我们反过来来看看 `一、引入` 中写的案例：小数直接运算，它的结果就是不精确的。
+
+<img src="./assets/image-20240422132127844.png" alt="image-20240422132127844" style="zoom:67%;" />
+
+但是我现在使用 `BigDecimal` 运算，它的结果就是精确的，这个就是 `BigDecimal` 最大的特点。
+
+----
+
+### 3）通过静态方法 `valueOf(double val)` 获取对象
+
+`BigDecimal` 跟 `BigInteger` 一样，在 `BigDecimal类` 中，它也有一个静态方法：`valueOf(double val)`，可以帮助我们去获取一个 `BigDecimal` 的对象。
+
+~~~java
+public static BigDecimal valueOf(double val)
+~~~
+
+我们可以在静态方法中传递整数也可以传递小数，如果传递整数，例如 `10`，它实际上是以 `10.0` 的方式参与计算的。
+
+~~~java
+BigDecimal bd6 = BigDecimal.valueOf(10);
+System.out.println(bd6); // 10
+~~~
+
+----
+
+### 4）`2) 和 3)` 的区别
+
+① 如果要表示的数字不大，没要超出 `double` 的取值范围，建议使用静态方法
+
+② 如果要表示的数字比较大，超出了 `double` 的取值范围，建议使用构造方法
+
+③ 如果我们传递的是0~10之间的整数，包含0，包含10，那么方法会返回已经创建好的对象，不会重新new
+
+`value(double val)` 在底层其实也做了一些小小的判断，我们简单的来阅读一下源码
+
+----
+
+### 5）查看源码
+
+选中 `BigDecimal` ，<kbd>ctrl + b</kbd> 跟进，<kbd>ctrl  + F12</kbd> 搜一下 `valueOf`，我们先带着大家去看参数是 `double` 类型的这个方法。
+
+<img src="./assets/image-20240422133401770.png" alt="image-20240422133401770" style="zoom:67%;" />
+
+这个方法的原码非常的简单，它是直接把传递过来的数字，变成字符串，然后再传递给构造方法创建对象就行了。
+
+因此它底层其实也是 `new` 出来的。
+
+<img src="./assets/image-20240422133506140.png" alt="image-20240422133506140" style="zoom:67%;" />
+
+----
+
+另一个 `valueOf` 方法我们也来看一下，这次我们要找的是参数是 `long类型` 的。
+
+<img src="./assets/image-20240422133624157.png" alt="image-20240422133624157" style="zoom:80%;" />
+
+这个方法的底层稍微来讲就复杂很多。
+
+<img src="./assets/image-20240422133703552.png" alt="image-20240422133703552" style="zoom:67%;" />
+
+下面我们来逐行分析一下
+
+~~~java
+// 首先拿着参数val来做一个判断：如果在 [0, ZERO_THROUGH_TEN.length) 之间
+if (val >= 0 && val < ZERO_THROUGH_TEN.length)
+~~~
+
+我们先来看一下 `ZERO_THROUGH_TEN.length` 是什么，选中 `ZERO_THROUGH_TEN` <kbd>ctrl + b</kbd> 。
+
+可以发现它就是一个数组，在数组里面它提前创建好了很多 `BigDecimal` 的对象。
+
+例如：第一个 `BigDecimal` 表示的是 `0`，第二个 `BigDecimal` 表示的是 `1`..........
+
+由此可见，它其中把 `0 ~ 10` 都已经创建好了对象，数组的长度是 `11`。
+
+<img src="./assets/image-20240422134023036.png" alt="image-20240422134023036" style="zoom:67%;" />
+
+回到上一步，继续分析 `valueOf(long val)` 的源代码
+
+~~~java
+public static BigDecimal valueOf(long val) {
+    // 如果你传递过来的整数在 [0, 11) 之间，就从数组中去拿已经创建好了的对象返回数据
+    if (val >= 0 && val < ZERO_THROUGH_TEN.length)
+        return ZERO_THROUGH_TEN[(int)val];
+    // 如果是其他情况，都是 new 出来的
+    else if (val != INFLATED)
+        return new BigDecimal(null, val, 0, 0);
+    return new BigDecimal(INFLATED_BIGINT, val, 0, 0);
 }
-```
+~~~
 
-运行程序进行测试，控制台输出结果如下：
+这样做的目的其实跟 `BigInteger` 是一样的，也是为了节约内存，将经常使用的数据已经提前准备好了，你下次要用的时候直接给你就好了，不会重新创建。
 
-```java
-4.3
--3.7
-1.2
-0.075
-```
+我们也可以用代码来做一个验证，运行结果为 `true`，表示 `b6` 跟 `b7` 其实是同一个对象。
 
-此时我们可以看到使用BigDecimal类来完成浮点数的计算不会存在损失精度的问题。
+~~~java
+BigDecimal bd6 = BigDecimal.valueOf(10);
+BigDecimal bd7 = BigDecimal.valueOf(10);
+System.out.println(bd6 == bd7); // true
+~~~
 
-<font color="blue" size="2">**案例2**</font>：演示除法的特殊情况
+但如果我传入的参数是 `10.0`，结果还会是 `true` 吗？显然，结果为 `false`
 
-如果使用BigDecimal类型的数据进行除法运算的时候，得到的结果是一个无限循环小数，那么就会报错：ArithmeticException。 如下代码所示：
+~~~java
+BigDecimal bd6 = BigDecimal.valueOf(10.0);
+BigDecimal bd7 = BigDecimal.valueOf(10.0);
+System.out.println(bd6 == bd7);
+~~~
 
-```java
-public class BigDecimalDemo02 {
+因为在底层，如果你的参数是一个 `double` 类型的**小数**，都是 `new` 出来的。
 
-    public static void main(String[] args) {
+如果你传递的是0~10之间的**整数**，包含0，包含10，那么方法才会返回已经创建好的对象，不会重新new
 
-        // 创建两个BigDecimal对象
-        BigDecimal b1 = new BigDecimal("1") ;
-        BigDecimal b2 = new BigDecimal("3") ;
+![image-20240422134851874](./assets/image-20240422134851874.png)
 
-        // 调用方法进行b1和b2的除法运算，并且将计算结果在控制台进行输出
-        System.out.println(b1.divide(b2));
+----
 
-    }
+## 六、常见的成员方法
 
-}
-```
+它的成员方法跟 `BigInteger` 是类似的
 
-运行程序进行测试，控制台输出结果如下所示：
+~~~java
+public static BigDecimal valueOf(double val)		// 获取对象
+public BigDecimal add(BigDecimal value)				// 加法
+public BigDecimal subtract(BigDecimal value)		// 减法
+public BigDecimal multiply(BigDecimal value)		// 乘法
+public BigDecimal divide(BigDecimal value)			// 除法
+~~~
+
+除法它有两个重载的，还有一个除法我们可以设置：`精确几位(小数点后你要保留几位)`、`舍入模式(进一法 / 去尾法 / 四舍五入)`
+
+~~~java
+public BigDecimal divide(BigDecimal val, 精确几位, 舍入模式)   // 除法
+~~~
+
+----
+
+## 七、成员方法代码实现
+
+### 1）加法
+
+~~~java
+BigDecimal bd1 = BigDecimal.valueOf(10.0);
+BigDecimal bd2 = BigDecimal.valueOf(2.0);
+BigDecimal bd3 = bd1.add(bd2);
+System.out.println(bd3); // 12.0
+~~~
+
+----
+
+### 2）减法
+
+~~~java
+BigDecimal bd4 = bd1.subtract(bd2);
+System.out.println(bd4); // 8.0
+~~~
+
+----
+
+### 3）乘法
+
+~~~java
+BigDecimal bd5 = bd1.multiply(bd2);
+System.out.println(bd5);//20.00
+~~~
+
+----
+
+### 4）除法
+
+~~~java
+BigDecimal bd6 = bd1.divide(bd2);
+System.out.println(bd6); // 5
+~~~
+
+上面的除法，运算完后是一个整数，结果是精确的。
+
+但如果，我运算完后，它是一个小数怎么办？
+
+程序运行完毕，发现结果也是没有问题的
+
+~~~java
+BigDecimal bd1 = BigDecimal.valueOf(10.0);
+BigDecimal bd2 = BigDecimal.valueOf(4.0);
+BigDecimal bd6 = bd1.divide(bd2);
+System.out.println(bd6); // 2.5
+~~~
+
+上面两个都是可以除尽的情况，但如果除不尽会怎么样？
+
+~~~java
+BigDecimal bd1 = BigDecimal.valueOf(10.0);
+BigDecimal bd2 = BigDecimal.valueOf(3.0);
+BigDecimal bd6 = bd1.divide(bd2);
+System.out.println(bd6); // 2.5
+~~~
+
+运行程序进行测试，控制台输出结果如下所示：在 `main方法的32行` 报错
 
 ```java
 Exception in thread "main" java.lang.ArithmeticException: Non-terminating decimal expansion; no exact representable decimal result.
@@ -36782,76 +36132,319 @@ BigDecimal divide(BigDecimal divisor, int scale, int roundingMode)
 
 上述divide方法参数说明：
 
-```
-divisor:			除数对应的BigDecimal对象；
-scale:				精确的位数；
-roundingMode:		取舍模式；
-取舍模式被封装到了RoundingMode这个枚举类中（关于枚举我们后期再做重点讲解），在这个枚举类中定义了很多种取舍方式。最常见的取舍方式有如下几个：
-UP(直接进1) ， FLOOR(直接删除) ， HALF_UP(4舍五入),我们可以通过如下格式直接访问这些取舍模式：枚举类名.变量名
-```
-
-接下来我们就来演示一下这些取舍模式，代码如下所示：
-
 ```java
-public class BigDecimalDemo02 {
-
-    public static void main(String[] args) {
-
-        // 调用方法
-        method_03() ;
-
-    }
-
-    // 演示取舍模式HALF_UP
-    public static void method_03() {
-
-        // 创建两个BigDecimal对象
-        BigDecimal b1 = new BigDecimal("0.3") ;
-        BigDecimal b2 = new BigDecimal("4") ;
-
-        // 调用方法进行b1和b2的除法运算，并且将计算结果在控制台进行输出
-        System.out.println(b1.divide(b2 , 2 , RoundingMode.HALF_UP));
-
-    }
-
-    // 演示取舍模式FLOOR
-    public static void method_02() {
-
-        // 创建两个BigDecimal对象
-        BigDecimal b1 = new BigDecimal("1") ;
-        BigDecimal b2 = new BigDecimal("3") ;
-
-        // 调用方法进行b1和b2的除法运算，并且将计算结果在控制台进行输出
-        System.out.println(b1.divide(b2 , 2 , RoundingMode.FLOOR));
-
-    }
-
-    // 演示取舍模式UP
-    public static void method_01() {
-
-        // 创建两个BigDecimal对象
-        BigDecimal b1 = new BigDecimal("1") ;
-        BigDecimal b2 = new BigDecimal("3") ;
-
-        // 调用方法进行b1和b2的除法运算，并且将计算结果在控制台进行输出
-        System.out.println(b1.divide(b2 , 2 , RoundingMode.UP));
-
-    }
-
-}
+divisor:			除数对应的BigDecimal对象
+scale:				精确的位数，小数点后面要保留几位
+roundingMode:		 取舍模式，最为常用的就是四舍五入
 ```
 
-小结：后期在进行两个数的除法运算的时候，我们常常使用的是可以设置取舍模式的divide方法。
+在以前，我们会这么写：`ROUND_HALF_UP` 就表示 `四舍五入`
 
-## 7.4 底层存储方式：
+~~~java
+BigDecimal bd6 = bd1.divide(bd2, 2, BigDecimal.ROUND_HALF_UP);
+System.out.println(bd6); // 3.33 —— 小数点后面保留两位小数，舍去的部分用四舍五入
+~~~
 
-把数据看成字符串，遍历得到里面的每一个字符，把这些字符在ASCII码表上的值，都存储到数组中。
+但是细心的同学发现，这个常量上面有一个横线，出现这种标记，就表示你的代码已经过时。
 
- ![bigdecimal存储原理](./assets/bigdecimal存储原理-1713669897181-22.png)
+<img src="./assets/image-20240422140303244.png" alt="image-20240422140303244" style="zoom:67%;" />
+
+JDK9的时候这种使用 `BigDecimal中的常量` 的写法已经过时了
+
+<img src="./assets/image-20240422140518587.png" alt="image-20240422140518587" style="zoom:67%;" />
+
+Java 觉得这些东西是一些计算的保留方式，如果直接将它放到 `BigDecimal` 中感觉不太好，因此Java就将这些 `计算的摄入模式`，单独的写到一个类中，这个类叫：`RoundingMode`。
+
+<img src="./assets/image-20240422140837539.png" alt="image-20240422140837539" style="zoom:60%;" />
+
+在这个枚举类中定义了很多种取舍方式。
+
+![image-20240422140911763](./assets/image-20240422140911763.png)
+
+这里用 `四舍五入` 举例，程序运行完毕，可以发现还是 `3.33`
+
+~~~java
+BigDecimal bd6 = bd1.divide(bd2, 2, RoundingMode.HALF_UP);
+System.out.println(bd6); // 3.33
+~~~
+
+----
+
+## 八、舍入模式
+
+在Java中它其实给我们规定了很多舍入模式，打开一下文档来看一下
+
+找到成员方法 `divide()` ，参数为 `RoundingMode` 的重载方法，用鼠标点击一下这里的 `RoundingMode`
+
+![image-20240422141118337](./assets/image-20240422141118337.png)
+
+`RoundingMode` 是一个枚举，枚举我们还没有学习，现在我们可以把它也理解成是一个类，它里面用到的这些东西，就可以把它理解为：用 `public static final` 所修饰的常量，后面会有一个单独的章节去讲解这个枚举的。
+
+此时就可以看见，在Java中给我们规定了这么多的舍入模式
+
+<img src="./assets/image-20240422141331585.png" alt="image-20240422141331585" style="zoom:60%;" />
+
+往下拉，它对每一种舍入模式都做了一个详解，这个解释光用嘴巴说说不清楚，我们需要通过数轴的方式来理解。
+
+-----
+
+### 1）UP
+
+左右一边画图一边对比API文档。
+
+`UP`：远离零方向舍入的舍入模式。
+
+什么叫做 `远离零`？
+
+针对于正数来讲，向右是远离零。针对负数来讲，向左是远离零，这个就是 `UP`。
+
+![image-20240422141548579](./assets/image-20240422141548579.png)
+
+在下面它会有一些举例：如果你是用 `5.5` 采用 `UP` 这种舍入模式的话，`远离零` 那不就是 `6` 吗。
+
+![image-20240422141830401](./assets/image-20240422141830401.png)
+
+我们来看个负数：`-1.1` 采用 `UP` 这种舍入模式的话，`远离零` 那不就是 `-2` 吗。
+
+![image-20240422141933994](./assets/image-20240422141933994.png)
+
+----
+
+### 2）DOWN
+
+`DOWN`：向零方向舍入的舍入模式。
+
+可以发现跟上面的 `UP` 刚好是反过来的。
+
+针对整数来说，`向零方向` 应该是向左。
+
+针对于负数来说，`向零方向` 应该是向右。
+
+![image-20240422142333075](./assets/image-20240422142333075.png)
+
+看右边的举例：如果你是用 `5.5` 采用 `DOWN` 这种舍入模式的话，`向零方向` 那不就是 `5` 吗。
+
+![image-20240422142441766](./assets/image-20240422142441766.png)
+
+我们来看个负数：`-1.6` 采用 `DOWN` 这种舍入模式的话，`向零方向` 那不就是 `-1` 吗。
+
+![image-20240422142532095](./assets/image-20240422142532095.png)
+
+-----
+
+### 3）CEILING
+
+`CEILING`：向正无限大方向舍入的舍入模式。
+
+`正无限大` 跟我们以前在数学中说的 `正无穷大` 是一样的。
+
+`向正无限大方向` 这个就很简单了，不管你是正数，还是负数，都是向右的方向。
+
+![image-20240422142839610](./assets/image-20240422142839610.png)
+
+看右边的举例：如果你是用 `5.5` 采用 `CEILING` 这种舍入模式的话，`向正无限大方向` 那不就是 `6` 吗。
+
+<img src="./assets/image-20240422142907117.png" alt="image-20240422142907117" style="zoom:67%;" />
+
+再来看一个负数，如果你是用 `-2.5` 采用 `CEILING` 这种舍入模式的话，`向正无限大方向` 那不就是 `-2` 吗。
+
+<img src="./assets/image-20240422142943485.png" alt="image-20240422142943485" style="zoom:67%;" />
+
+
+
+----
+
+### 4）FLOOR
+
+`FLOOR`：向负无限大方向舍入的舍入模式。
+
+`FLOOR` 的结果跟 `CEILING` 就是反过来的。
+
+`向负无限大方向` 不管你是正数，还是负数，都是向左的方向。
+
+![image-20240422143104252](./assets/image-20240422143104252.png)
+
+看右边的举例：如果你是用 `5.5` 采用 `FLOOR` 这种舍入模式的话，`向负无限大方向` 那不就是 `5` 吗。
+
+<img src="./assets/image-20240422143150650.png" alt="image-20240422143150650" style="zoom:80%;" />
+
+再来看一个负数，如果你是用 `-5.5` 采用 `CEILING` 这种舍入模式的话，`向负无限大方向` 那不就是 `-6` 吗。
+
+<img src="./assets/image-20240422143309707.png" alt="image-20240422143309707" style="zoom:67%;" />
+
+---
+
+### 5）HALE_UP
+
+这个就是我们用到最多的 `四舍五入`。
+
+`HALF_UP`：此舍入模式就是通常学校里讲的四舍五入。 
+
+在前面也有它的说明：向最接近数字方向舍入的舍入模式，如果与两个相邻数字的距离相等(例如 `0.5` 跟 `1` 和 `2` 距离都相等），则向上舍入（进一）。如果被舍弃部分 >= 0.5，则舍入行为同 `RoundingMode.UP`(进一)；否则舍入行为同 `RoundingMode.DOWN`(舍去）。
+
+![image-20240422143806076](./assets/image-20240422143806076.png)
+
+----
+
+### 6）HALF_DOWN
+
+跟 `HALE_UP` 四舍五入所类似的还有一个：`HALF_DOWN`，这两种方式唯一的区别就是：在数字等于 `0.5` 的时候是不一样的。
+
+`HALF_DOWN`：如果与两个相邻数字的距离相等，则向下舍入。
+
+![image-20240422143816216](./assets/image-20240422143816216.png)
+
+----
+
+这些舍入模式不需要大家去背，只要大家记住 `四舍五入：HALE_UP` 即可。
+
+但如果我们在实际开发中用到了其他的舍入模式，学会找就行了。
+
+先找 `BigDecimal类` ——>  找到除法 `divide()`，这个方法里面需要我们指定舍入模式  ——>  点击 `RoundingMode`，然后找你需要的舍入模式就行了。
+
+但一般来说，没有什么特殊的需求，一般我们用的都是 `HALE_UP`。
+
+----
+
+## 九、扩展
+
+### 1）引出结论
+
+我们要来看一下 `BigDecimal` 在计算机中到底是怎么存储的，它跟 `BigInteger` 还不太一样。
+
+在这里我还是以 `0.226` 为例，它的小数部分变成二进制后有 `55位`。
+
+<img src="./assets/image-20240422145051319.png" alt="image-20240422145051319" style="zoom:67%;" />
+
+如果我们是按照之前的 `BigInteger` 的方式，每三十二位去分成一组进行计算的话，这样其实是有一些小弊端的。
+
+`0.226` 的小数位置其实还不够长，如果我换一个小数，它的二进制更长，有几百位，几千位怎么办？那这种分段进行存储的方式效率就非常的低，因此在Java中，`BigDecimal` 采取了另外一种存储方式。
+
+我们在获取 `BigDecimal` 对象的时候，不管你是用 `valueOf()` 获取，还是 `new` 通过构造方法获取，其实最终它都是 `new` 出来的，参数都是一个字符串形式的小数。
+
+<img src="./assets/image-20240422145318361.png" alt="image-20240422145318361" style="zoom:67%;" />
+
+Java拿到这个字符串后，它会做这样的事情：遍历，然后得到里面的每一个字符，然后再把这些字符转换成 `ASCII码表` 中对应的数值再来进行存储。
+
+![image-20240422145513379](./assets/image-20240422145513379.png)
+
+所以说 `BigDecimal` 在底层其实也是一个数组，数组里存的是 `每一个字符` 在 `ASCII码表` 中所对应的数字。
+
+倘若我现在把数字变一变，变成：`123.226`，它就是以一个长度为 `7` 的数组进行存储的。
+
+![image-20240422145601432](./assets/image-20240422145601432.png)
+
+那如果我现在存的是一个负数，负数在前面还有一个负号，此时在数组当中，它就会把负号所对应的 `ASCII码表值` 存过来。
+
+PS：如果你存的是正数，它是不会将负号存进去的。
+
+![image-20240422145726902](./assets/image-20240422145726902.png)
+
+----
+
+### 2）验证
+
+我们来到IDEA中采用 `Debug模式` 验证一下。
+
+将代码赋值到测试类中，右键 `Debug`
+
+~~~java
+BigDecimal bd1 = BigDecimal.valueOf(0.226);
+BigDecimal bd2 = BigDecimal.valueOf(123.226);
+BigDecimal bd3 = BigDecimal.valueOf(-1.5);
+~~~
+
+一直点击下一步，直接让断点走完这三行
+
+<img src="./assets/image-20240422150040007.png" alt="image-20240422150040007" style="zoom:67%;" />
+
+先来看 `bd1` 里面，可以看见它是一个 `byte类型` 的数组，长度是 `5`，数组中的数据为：`[48, 46, 50, 50, 54]`。
+
+跟我们刚刚推断的完全一模一样。
+
+<img src="./assets/image-20240422150413448.png" alt="image-20240422150413448" style="zoom:80%;" />
+
+再来看 `bd2`，它里面也是一个 `byte` 类型的数组，长度是 `7`，里面的内容是 `[49, 50, 51, 46, 50, 50, 54]`
+
+跟我们刚刚推断的也是一模一样的。
+
+![image-20240422150519131](./assets/image-20240422150519131.png)
+
+再来看 `bd3`，它里面存储的也是一个 `byte` 类型的数组，长度是 `4`，里面的内容是 `[45, 49, 46, 53]`。
+
+其中 `45` 表示的是负号，`49` 是 `1`，`46` 是 `.`，`53` 是 `5`。
+
+![image-20240422150714273](./assets/image-20240422150714273.png)
+
+那 `BigDecimal` 有上限吗？
+
+----
+
+## 十、`BigDecimal` 的上限
+
+答案是：有的。
+
+在Java中数组的长度是有上线的：`int` 的最大值。
+
+因此你要记录的小数，它的总长度超过了 `int的最大值`，那么 `BigDecimal` 还是记录不了的。
+
+但之前我们又说了，你的电脑内存是扛不住这么大的数的，因此我们可以把 `BigDecimal` 认为是无限的。
+
+----
+
+## 十一、总结
+
+**1、`BigDecimal` 的作用是什么？**
+
+- 表示较大的小数
+
+- 解决小数运算精度失真的问题
+
+  简单理解：就是可以让小数进行精确运算
+
+**2、`BigDecimal` 的对象如何获取？**
+
+- 如果小数比较大，超过了 `double` 的取值范围，就可以直接通过构造方法 `new` 出来 
+
+  `BigDecimal bd1 = new BigDecimal("较大的小数");`
+
+- 但是如果没有超出 `double` 的范围，就可以通过 `valueOf(val)` 的方式来获取
+
+**3、常见操作**
+
+在除的时候我们要知道，我们是可以给它设置 `舍入模式` 的，最为常见的就是四舍五入：`RoundingMode.HALF_UP`
+
+<img src="./assets/image-20240422151447229.png" alt="image-20240422151447229" style="zoom:67%;" />
+
+
+
+----
+
+# 163.
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 
 
 
