@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/basic-code.iml" filepath="$PROJECT_DIR$/basic-code.iml" />
       <module fileurl="file://$PROJECT_DIR$/day02-code/day02-code.iml" filepath="$PROJECT_DIR$/day02-code/day02-code.iml" />
       <module fileurl="file://$PROJECT_DIR$/myapi/myapi.iml" filepath="$PROJECT_DIR$/myapi/myapi.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mydate/mydate.iml" filepath="$PROJECT_DIR$/mydate/mydate.iml" />
       <module fileurl="file://$PROJECT_DIR$/puzzlegame/puzzlegame.iml" filepath="$PROJECT_DIR$/puzzlegame/puzzlegame.iml" />
     </modules>
   </component>

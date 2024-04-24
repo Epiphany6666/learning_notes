@@ -2396,7 +2396,7 @@ IDEA全称IntelliJ IDEA，是用于Java语言开发的集成环境，它是业�
 
 ---
 
-# 29.扩展设置和项目、模块的操作
+# 29.IDEA扩展设置和项目、模块的操作
 
 在刚刚我们已经使用IDEA编写了第一个代码：HelloWorld，但是在写完之后我发现，我用起来感觉有点不太爽，例如：字体太小了，看的有点难受。再比如说背景设置。
 
@@ -22238,8 +22238,6 @@ public class App2 {
 
 # Day15 抽象类&接口&内部类
 
-
-
 # 135.抽象类
 
 ## 一、回顾面向对象三大特征
@@ -38930,11 +38928,2534 @@ getTime();
 
 ----
 
-# 170.
+# 170.`SimpleDateFormat` 类
+
+## 一、已经有了 `Date`，为什么还要学习 `SimpleDateFormat`？
+
+`Date类` 只能按照默认的格式来进行展示，这样的格式是不符合我们的阅读习惯的。
+
+![image-20240424071555169](./assets/image-20240424071555169.png)
+
+因此，我们就需要来学习 `SimpleDateFormat` 类。这个类它有两个作用
+
+----
+
+## 二、SimpleDateFormat 类的作用
+
+- 格式化：把时间变成我们喜欢的格式
+
+<img src="./assets/image-20240424072256817.png" alt="image-20240424072256817" style="zoom:67%;" />
+
+- 解析：把字符串表示的时间变成 `Date对象`
+
+变成 `Date对象` 之后，我们就可以对时间进行计算 / 判断。
+
+在实际开发中，应用场景也非常多：微信的聊天记录中日期的格式，备忘录中日期的格式，相册中日期的格式。
+
+这就是 `SimpleDateFormat类` 第一个作用：格式化时间。
+
+<img src="./assets/image-20240424072533223.png" alt="image-20240424072533223" style="zoom:47%;" />
+
+第二个作用：解析。例如下图，时间间隔五年，那么这个五年，怎么用代码去计算出来？
+
+你要知道，字符串本身它是不能直接相减的，此时就可以用到 `SimpleDateFormat` 第二个作用了：先将字符串形式的时间去变成 `Date对象`，在 `Date对象` 中，可以通过 `get方法` 获取到里面的毫秒值，就可以进行计算了。
+
+<img src="./assets/image-20240424072803114.png" alt="image-20240424072803114" style="zoom:50%;" />
+
+知道这个类的作用后，我们就可以来用它了。用一个类需要先知道它的构造方法，它的构造方法常用的有两个。
+
+-----
+
+## 三、方法
+
+- `public simpleDateFormat()`：构造一个 `SimpleDateFormat对象`，使用Java中的默认格式
+
+- `public SimpleDateFormat(String pattern)`：用给定的模式和默认语言环境的日期格式符号构造SimpleDateFormat。
+
+  参数pattern是一个字符串，代表日期时间的自定义格式。
+
+构造方法有了后，我们就可以调用里面的成员方法
+
+- `public String format(Date date)`：格式化（Date日期对象 ——> 字符串）。
+- `public Date parse(String source)`：解析（字符串 ——> Date日期对象）。
+
+那么在格式化的时候，我们如何指定它的格式呢？这个格式我们通常也会叫做模式。
+
+| 标识字母（区分大小写） | 含义 |
+| :--------------------- | :--- |
+| y                      | 年   |
+| M                      | 月   |
+| d                      | 日   |
+| H                      | 时   |
+| m                      | 分   |
+| s                      | 秒   |
+
+例如下图，如果在展示的时候中间有空格，那么下面格式中也得加上空格
+
+<img src="./assets/image-20240424074101045.png" alt="image-20240424074101045" style="zoom:50%;" />
+
+如果我不想要这种格式，只想要年月日怎么办？也很简单，你在指定格式的时候，你就使用年月日就行了。
+
+<img src="./assets/image-20240424074201240.png" alt="image-20240424074201240" style="zoom:50%;" />
+
+这些模式记不住怎么办？没关系，不需要背，打开 `API帮助文档`，搜索 `SimpleDateFormat`。
+
+找到后往下拉，可以发现所有的模式都给你展示出来。
+
+<img src="./assets/image-20240424074528688.png" alt="image-20240424074528688" style="zoom:80%;" />
+
+-----
+
+## 四、代码实现
+
+### 1）利用空参构造创建 `SimpleDateFormat` 对象
+
+要注意，空参构造使用的是默认的格式
+
+~~~java
+SimpleDateFormat sdf = new SimpleDateFormat();
+~~~
+
+那这个默认的格式长什么样呢？这个也不需要你背，打印一下即可。
+
+用 `sdf` 调用里面的 `format()`，`format` 表示的就是格式化的意思。
+
+~~~java
+sdf.format();
+~~~
+
+调用 `public String format(Date date)` 方法的时候，注意看，它的参数需要有一个 `Date对象`，因此我们可以先创建一个 `Date对象`。
+
+在括号中写 `0L`，表示用的是计算机中时间的原点。
+
+~~~java
+Date d = new Date(0L);
+~~~
+
+然后把 `d` 传递过去就行了，<kbd>ctrl + alt + v</kbd> 自动生成左边
+
+~~~java
+String str = sdf.format(d);
+~~~
+
+最后打印一下 `str` 即可
+
+~~~java
+System.out.println(str);
+~~~
+
+右键运行看下结果，可以发现，它的默认格式是这种斜线的格式。
+
+<img src="./assets/image-20240424080803375.png" alt="image-20240424080803375" style="zoom:67%;" />
+
+那如果我不想默认，我要指定怎么办呢？这个时候你就不能用空参了，而是使用带参构造去创建 `SimpleDateFormat对象`。
+
+----
+
+### 2）利用给定的模式创建 `SimpleDateFormat`
+
+~~~java
+SimpleDateFormat sdf2 = new SimpleDateFormat();
+~~~
+
+在括号中指定格式即可（小yyyy年大MM月小dd日 大HH:小mm:小ss）
+
+~~~java
+SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy年MM月dd日HH:mm:ss");
+~~~
+
+然后使用 `sdf2` 调用 `format()` 方法，将对象传递进去就行了
+
+~~~java
+String str2 = sdf2.format(d1);
+~~~
+
+然后打印一下 `str2` 就行了。程序运行完毕，可以看见跟我们想要的格式是一模一样的。
+
+~~~java
+System.out.println(str2); // 1970年01月01日 08:00:00
+~~~
+
+-----
+
+### 3）练习：要展示的格式变为 —— yyyy年MM月dd日 时:分:秒 星期
+
+到 `API帮助文档` 中查一下哪个字母是表示星期，然后改一下构造方法中参数的格式就行了
+
+<img src="./assets/image-20240424081841831.png" alt="image-20240424081841831" style="zoom:80%;" />
+
+由于它的输出的时候会输出 `周四` 这样的两个字，为了对应输出的字符个数，建议下面使用两个 `E`
+
+~~~java
+SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy年MM月dd日HH:mm:ss EE");
+System.out.println(str2); // 1970年01月01日 08:00:00 周四
+~~~
+
+另外有一个小扩展：`a` 表示 `Am/pm 标记`
+
+<img src="./assets/image-20240424082024164.png" alt="image-20240424082024164" style="zoom:70%;" />
+
+-----
+
+### 4）解析 —— `parse`
+
+解析的作用就是：把字符串表示的时间变成 `Date对象`。`parse`：解析
+
+因此第一步：应该定义一个字符串用来表示时间。
+
+~~~java
+String str = "2023-11-11 11:11:11";
+~~~
+
+然后利用构造方法去创建 `SimpleDateFormat对象`，这个时候要注意了，你**创建对象的这个格式，要跟字符串里面的格式一模一样，否则就会报错。**
+
+![image-20240424083849664](./assets/image-20240424083849664.png)
+
+~~~java
+SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+~~~
+
+然后使用 `sdf` 调用 `parse()` 方法，此时我们就可以将要解析的字符串传递过去，最后打印结果就行了。
+
+~~~java
+Date date = sdf.parse(str);
+System.out.println(date);
+~~~
+
+代码写完后你会发现，方法下面有一个红色波浪线：用鼠标点击一下红色波浪线，<kbd>alt + 回车</kbd> 就会出现两个选择，选择第一个即可。
+
+让代码先不要报错，后面我们会有一个专门的章节讲解它的。
+
+![image-20240424083317701](./assets/image-20240424083317701.png)
+
+接下来右键运行，可以发现 `Date对象` 已经解析出来了。
+
+<img src="./assets/image-20240424083937231.png" alt="image-20240424083937231" style="zoom:80%;" />
+
+然后调用 `date` 中 `getTime()` 将当前时间的毫秒值获取出来。
+
+<img src="./assets/image-20240424084045426.png" alt="image-20240424084045426" style="zoom:67%;" />
+
+有了毫秒值之后，就可以对时间进行加减、判断了，这就是解析的目的。
+
+-----
+
+## 五、练习1：按照指定格式展示
+
+需求
+
+```
+假设，你初恋的出生年月日为:2000-11-11
+请用字符串表示这个数据，并将其转换为:2000年11月11日
+```
+
+看到这个需求的时候有点一脸懵逼无从下手。在之前我们给大家推荐过一个方法：逆推法，我们可以用这种方式去思考当前的需求。
+
+逆推法其实就是反过来想，你先想最终要达成什么样的结果：把时间变成2000年11月11日。
+
+你想要这种方式，你需要什么？ ——  创建一个 `SimpleDateFormat对象`，并制格式为：年月日。
+
+除了 `SimpleDateFormat对象`，你在格式化的时候，还需要 `Date对象` 来表示 `2000年11月11日`。那这个对象从哪来呢？
+
+题目中已经给了你 `2000-11-11`，因此我们可以通过 `2000-11-11` 进行解析，解析成一个 `Date对象`，此时就可以了。
+
+写代码的时候从推导出的结论往前写就行了：有了 `Date对象` 后，我们就可以创建  `SimpleDateFormat对象`，然后就可以转成 `年月日` 这种形式了。
+
+代码示例
+
+~~~java
+//1.可以通过2000-11-11进行解析，解析成一个Date对象
+String str = "2000-11-11";
+//2.解析。PS：创建格式的对象需要跟字符串中保持完全一致。
+SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+Date date = sdf1.parse(str);
+//3.格式化。这里注意，我要的是 年月日 这种格式的时间，此时就不能再用 sdf1 去调用format方法了。如果你使用 sdf1 调用 fromat方法，那么还是按照 `-` 的形式来进行格式化。因此这里我们需要重新创建一个 SimpleDateFormat对象。
+SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy年MM月dd日");
+String result = sdf2.format(date);
+System.out.println(result);
+~~~
+
+右键运行，结果如下
+
+<img src="./assets/image-20240424085351451.png" alt="image-20240424085351451" style="zoom:67%;" />
+
+---
+
+## 六、练习2：秒杀活动
+
+<img src="./assets/image-20240424085708334.png" alt="image-20240424085708334" style="zoom:50%;" />
+
+```
+需求:肯打鸡品牌要做一个限时秒杀
+ 秒杀活动开始时间:2023年11月11日 0:0:0(毫秒值)
+ 秒杀活动结束时间:2023年11月11日 0:10:0(毫秒值)
+ 小贾下单并付款的时间为:2023年11月11日 0:01:0
+ 小皮下单并付款的时间为:2023年11月11日 0:11:0
+ 用代码说明这两位同学有没有参加上秒杀活动?
+```
+
+----
+
+代码实现
+
+首先来想：这个题目的核心点是要来比较两个时间：将 `下单并付款的时间` 跟 `开始时间和结束时间` 比较。
+
+在之前我们曾经说过，字符串本身，它是不能比较的，你想要比，就需要先转为基本数据类型。
+
+因此我们需要将字符串表示的时间去进行转换，把它转成对应的毫秒值才可以进行比较，因为毫秒值是 `long`(基本数据类型) 的。
+
+因此在这我们要做的就是：解析时间得到毫秒值。
+
+~~~java
+//1.定义字符串表示三个时间
+String startstr = "2023年11月11日 0:0:0";
+String endstr = "2023年11月11日 0:10:0";
+String orderstr = "2023年11月11日 0:01:00";
+
+//2.解析上面的三个时间，得到Date对象
+SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+Date startDate = sdf.parse(startstr);
+Date endDate = sdf.parse(endstr);
+Date orderDate = sdf.parse(orderstr);
+
+//3.得到三个时间的毫秒值
+long startTime = startDate.getTime();
+long endTime = endDate.getTime();
+long orderTime = orderDate.getTime();
+
+//4.判断
+if (orderTime >= startTime && orderTime <= endTime) {
+    System.out.println("参加秒杀活动成功");
+} else {
+    System.out.println("参加秒杀活动失败");
+}
+~~~
+
+----
+
+## 七、总结
+
+**1、`SimpleDateFormat` 的两个作用**
+
+① 格式化
+
+在格式化的时候，我们是把时间按照我们想要的方式进行展示
+
+② 解析
+
+将字符串表示的时间变成 `Date对象`，但是变成 `Date对象` 不是我最终想要的，我最终想要的是时间里面的毫秒值，把毫秒值拿出来后，我才可以对它进行计算、判断.....。
+
+**2、如何指定 `SimpleDateFormat` 格式**
+
+最为常用的就是 `yyyy年MM月dd日 HH:mm:ss`。
+
+如果在以后，你还要展示上下午、星期、其他元素，这些元素千万不要去背，到 `API帮助文档` 中查 `SimpleDateFormat` 类就行了。
 
 
 
+----
 
+# 171.`Canlendar` 类
+
+## 一、为什么要学习 `Canlendar` 类？
+
+既然现在已经有了 `Date`、`SimpleDateFormat`，那为什么还要再学习这个类呢？其实也是有它的业务应用场景的。
+
+需求：将 `2023年09月10日` 增加一个月，用已有的时间点其实也能做
+
+<img src="./assets/image-20240424092432680.png" alt="image-20240424092432680" style="zoom:50%;" />
+
+但是感觉太麻烦了，那在这些步骤中，能不能简化一些代码的书写呢？
+
+怎么简化呢？你要来观察这个时间，在这个时间中，其他的数据我们其实是不想变的，我想要变的只有这里的月份。
+
+<img src="./assets/image-20240424092613530.png" alt="image-20240424092613530" style="zoom:50%;" />
+
+在Java中是否存在一个跟日历类似的对象呢？
+
+在日历对象中，我是不是就可以获取到月份，在原来的基础上 `+1` 就行了。所以这就是 `Calendar` 的作用。
+
+----
+
+## 二、概述
+
+`Canlendar类` 表示了系统当前时间的日历对象，利用这个对象可以单独修改、获取日历中的 `年、月、日、星期......` 信息。
+
+但是你要注意一个小细节：`Canlendar` 是一个抽象类，不能直接 `new` 它的对象。
+
+而是通过一个静态方法 `getInstance()` 来获取它的子类对象。
+
+<img src="./assets/image-20240424093558362.png" alt="image-20240424093558362" style="zoom:50%;" />
+
+为什么这么设计呢？不着急，一会带着你去看源码就知道了。
+
+通过  `getInstance()` 就可以获取到日历对象，在对象里面就封装了当前时间的各种各样的信息。
+
+有了这个对象之后，就可以调用这个类里面各种各样的方法了。
+
+---
+
+## 三、常用方法
+
+<img src="./assets/image-20240424093832061.png" alt="image-20240424093832061" style="zoom:50%;" />
+
+方法比较多，但是它是有规律的。
+
+----
+
+### 第一组
+
+首先，先来看上面两个跟 `Date对象` 相关的 `get` 和 `set` 方法。
+
+**① `public final Date getTime()`：获取日期对象**。
+
+相当于就是通过 `Calendar日历` 获取到 `Date对象`，因此这个方法的返回值是 `Date`。
+
+**② `public final setTime(Date date)`：给日历设置日期对象**。
+
+相当于就是根据 `Date对象` 去修改日历所代表的时间，相当于是一个修改的方法。
+
+----
+
+### 第二组
+
+第二组是跟 `毫秒值` 相关的 `get` 跟 `set` 方法。
+
+**③ `public long getTimeInMillis()`：获取当前日期表示的时间毫秒值**
+
+**④ `public void setTimeInMillis(long millis)`：根据毫秒值把日历对象所代表的时间进行修改。**
+
+----
+
+### 第三组
+
+**⑤ `public int get(int field)`：获取到日历中某个字段的信息。**（这里的字段就表示 `属性 / 成员变量`，因此我们可以通过 `get方法` 去获取到日历里面每一个属性的值，例如：年、月、日、时、分、秒........）
+
+**⑥ `public int get(int field, int value)`：修改日历的某个字段信息。**
+
+参数一：你要修改哪个 `字段 / 属性`。
+
+参数二：你要将这个属性修改为多少。
+
+**⑦ `public void add(int field, int amount)`：在原本的基础上对某个字段进行增加 / 减少。**
+
+例如我们一开始的案例：在 `9月10日` 的基础上加一个月，此时就可以使用 `add()` 来操作。
+
+参数一：你要修改哪个 `字段 / 属性`。
+
+参数二：你要将这个属性需要加多少。（如果传的是负数，那就是往前减）
+
+-----
+
+## 四、创建 `Calendar` 对象 & 查看源码
+
+PS：Calendar是一个抽象类，不能直接`new`，而是通过一个静态方法获取到子类对象。
+
+~~~java
+Calendar c = Calendar.getInstance();
+~~~
+
+我们可以选中 `getInstance()` <kbd>ctrl + b</kbd> 跟进一下
+
+在方法的底层会调用 `createCalendar()` 方法，选中它 <kbd>ctrl + b</kbd>
+
+<img src="./assets/image-20240424100511528.png" alt="image-20240424100511528" style="zoom:67%;" />
+
+在这个方法里面，它有一个 `switch`，它会先得到你当前系统的时区信息，根据你当前系统的是取消，再来创建不同的子类对象
+
+<img src="./assets/image-20240424100836159.png" alt="image-20240424100836159" style="zoom:67%;" />
+
+它里面有三个：
+
+- `buddhist`：创建的是 `BuddhistCalendar(佛历)`
+
+- `japanese`：创建的是 `JapaneseImperialCalendar(日本历)`
+
+  `日本历` 跟我们中国的 `阴历 / 农历` 有点类似
+
+但是上面这两个我们用的非常非常的少，了解一下就行。
+
+更多的是返回第三个
+
+- `gregory`：创建的是 `GregorianCalendar(格里高利历)`
+
+因此 **`getInstance()` 会根据系统的不同的时区，获取不同的日历对象，默认表示当前时间。**
+
+**在对象中，会把时间中的 `纪元，年，月，日，时，分，秒，星期` 等等信息都放到一个数组中。**
+
+因此我们可以直接打印一下 `c`。
+
+看下面打印出来的方括号，它就表示是一个数组，数组里面就是日历对象所表示的所有的信息。
+
+![image-20240424101935796](./assets/image-20240424101935796.png)
+
+例如找 `年`
+
+![image-20240424102033129](./assets/image-20240424102033129.png)
+
+-----
+
+## 五、修改 / 获取日历代表的时间
+
+修改有两种方式。获取的话就是它们各自对应的 `get方法`。
+
+第一种 `public final setTime(Date date)`：给日历设置日期对象，根据 `Date对象` 来进行修改
+
+第二种 `public void setTimeInMillis(long millis)` ：根据毫秒值把日历对象所代表的时间进行修改。
+
+---
+
+### ①  根据 `Date对象` 进行修改
+
+~~~java
+Calendar c = Calendar.getInstance();
+Date d = new Date(0L); // 里面传入0L表示计算机的时间原点
+c.setTime(d); // 将日期对象放进去
+System.out.println(c);
+~~~
+
+程序运行完毕，我们来看下面控制台中的数组，往后拉，可以发现 `YEAR` 为 `1970` 是正确的，但是 `MONTH` 怎么是 `0` ，时间原点应该是 `1` 才对呀？
+
+![image-20240424103111666](./assets/image-20240424103111666.png)
+
+因此在这，它在获取时间的时候，它里面还有一些小细节。
+
+1、在日历对象中，如果你获取的是月份，它的范围是 `0 ~ 11`。
+
+例如：如果获取出来的是 `0`，那么实际上是 `1月`。同理，如果你获取出来的是 `1`，实际上就是 `2月`.....如果你获取出来的是 `11`，实际上就是 `12月`，因此**需要在你获取出来的基础上 `+ 1` 才是真正的月份。**
+
+2、在老外的眼里，星期日是一周中的第一天。
+
+因此在获取的时候，它会有  `1   2   3   4   5   6   7` 这七个数据，但是这里的 `1` 不是星期一，而是星期日，因为在老外的眼里，星期日是一周中的第一天。
+
+如果它返回的是 `2`，真实的其实是 `星期一`.......  对应如下
+
+`1(星期天)   2(星期一)   3(星期二)   4(星期三)   5(星期四)   6(星期五)   7(星期六)`
+
+----
+
+### ② `public final Date getTime()`
+
+`get方法` 非常的简单，如果用 `c` 调用 `getTime()`，获取的其实就是我们创建出来的这个日期对象
+
+<img src="./assets/image-20240424104205942.png" alt="image-20240424104205942" style="zoom:67%;" />
+
+----
+
+### ③ 根据 `毫秒值` 进行修改
+
+`public long getTimeInMillis()`
+
+`public void setTimeInMillis(long millis)`
+
+这个修改方式跟上面是一样的，有兴趣的同学可以课后自己练习一下。
+
+----
+
+## 六、`获取 / 修改` 日历中某个字段的信息
+
+**① `public int get(int field)`：获取到日历中某个字段的信息。**（这里的字段就表示 `属性 / 成员变量`，因此我们可以通过 `get方法` 去获取到日历里面每一个属性的值，例如：年、月、日、时、分、秒........）
+
+**② `public int get(int field, int value)`：修改日历的某个字段信息。**
+
+参数一：你要修改哪个 `字段 / 属性`。
+
+参数二：你要将这个属性修改为多少。
+
+**③ `public void add(int field, int amount)`：在原本的基础上对某个字段进行增加 / 减少。**
+
+----
+
+### 1）`get` 方法
+
+因为在 `Calendar类` 中其实是存在一个数组的，数组里面就是日历里面所有的信息。
+
+在数组中，`0索引` 就是代表当前时间的纪元，但是纪元这个东西我们一般不会使用。我们从 `1索引` 开始使用的。
+
+`1索引`：当前年份
+
+`2索引`：当前月份
+
+`3索引`：一年中的第几周
+
+`4索引`：一个月中的第几周
+
+`5索引`：一个月中的第几天，也就是我们平时所说的几号，也就是日期
+
+.............以此类推，它里面一共装了17个属性，因此数组的索引范围就是 `[0, 16]`
+
+因此如果我们要获取 `年`，只需要将 `年所对应的索引`  `1` 写在 `get()` 就行。
+
+~~~java
+int year = c.get(1);
+int month = c.get(2);
+int date = c.get(5);
+System.out.println(year + ", " + month + ", " + date);
+~~~
+
+程序运行结果如下图。由于月的范围是 `[0, 11]`，它返回的是 `0`，其实真正的返回的是 `1月` 。
+
+<img src="./assets/image-20240424105159185.png" alt="image-20240424105159185" style="zoom:67%;" />
+
+因此我们需要在获取出来的月份上再 `+1`，这个才是它真正获取出来的月份。
+
+~~~java
+int month = c.get(2) + 1;
+~~~
+
+重新运行，查看效果。可以发现已经没有问题了。
+
+<img src="./assets/image-20240424105523375.png" alt="image-20240424105523375" style="zoom:70%;" />
+
+---
+
+在刚刚我们还说了一个细节：在老外的眼里，星期日是一周中的第一天。
+
+我们也可以来演示一下。
+
+但是在这会出现一个问题：星期的索引我不知道是多少。就算我现在知道了，过了一段时间后，我也很容易会忘。
+
+~~~java
+int week = c.get(???);
+~~~
+
+因此 **Java为了防止我们遗忘，在 `Calendar类` 底层把索引所对应的数字都定义成了常量。**
+
+所以以后我们在书写的时候，没必要写 `0、1、2、3.....` 这些数字，这样写起来虽然代码也可以，但是阅读性太低。因此我们需要找到 `Canlendar` 中的常量，用常量就好了。
+
+选中 `Calendar` <kbd>ctrl +b</kbd> 跟进，然后往下拉，可以看见 `YEAR的索引是1，MONTH的索引是2.....`
+
+![image-20240424110305587](./assets/image-20240424110305587.png)
+
+翻到日期的时候，可以发现它有两个，它们两个表示的都是 `5索引`，为什么会有两个，其实是有一个小故事的：在一开始的时候，Java的设计者只写了一个 `	DATE`，但是时间长了，他觉得这个单词不够见名知意，所以它又加了一个：`DATE_OF_MONTH`，表示：`一个月中的第几天`，这样就非常见名知意了。
+
+![image-20240424110639073](./assets/image-20240424110639073.png)
+
+再往下，`DAY_OF_YEAR`：一年中的第几天，这也不是我想要的
+
+![image-20240424110715119](./assets/image-20240424110715119.png)
+
+再往下，`DAY_OF_WEEK`：一周中的第几天。这个就是我们想要的星期，它的排列在上面也已经展示出来了，一开始一周中的第一天是 `SUNDAY(星期天)`，然后再是 `MONDAY(星期一)`......以此类推
+
+![image-20240424110854569](./assets/image-20240424110854569.png)
+
+因此我们刚刚用索引写的代码就可以用 `Calendar类` 中的常量进行表示了。
+
+~~~java
+int year = c.get(Calendar.YEAR);
+int month = c.get(Calendar.MONTH) + 1;
+int date = c.get(Calendar.DAY_OF_MONTH);
+int week = c.get(Calendar.DAY_OF_WEEK);
+System.out.println(year + ", " + month + ", " + date + ", " + week);
+~~~
+
+右键运行，效果如下图所示。最后一个 `5` 表示星期四。
+
+![image-20240424111221967](./assets/image-20240424111221967.png)
+
+但是这种感觉不太好，这个 `5` 我不想看见 `5`，我就想看见 `星期四` 这种中文该怎么办呢？
+
+其实我们也可以让它进行一个对应：我们自己写一个方法，往这个方法里面传入对应的数字 `1 ~ 7`，然后返回对应的星期。
+
+在方法里面我们就可以定义一个数组让`汉字星期几` 跟 `1~7` 产生对应关系。
+
+由于 `0索引` 没有东西和它对应，因此 `0索引` 我们直接写一个长度为 `0` 的字符串就行了。
+
+这个思路在Java中有一个专业的名称：查表法。
+
+这里的表就是我们的容器，在这种写法中，让数据跟索引产生对应的关系就行了
+
+~~~java
+public static String getWeek(int index) {
+    //定义一个数组,让汉字星期几 跟1~7产生对应关系
+    String[] arr = {"", "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"};
+    //根据索引返回对应的星期
+    return arr[index];
+}
+~~~
+
+于是在刚刚打印星期的地方就不要打印 `week` 了，而是调用 `getWeek()` 将 `week` 数据当做索引给它传递进行，然后查了这个表之后，返回真实的字符串。
+
+~~~java
+int week = c.get(Calendar.DAY_OF_WEEK);
+System.out.println(year + ", " + month + ", " + date + ", " + getWeek(week));
+~~~
+
+运行结果如下
+
+<img src="./assets/image-20240424111950835.png" alt="image-20240424111950835" style="zoom:67%;" />
+
+---
+
+### 2）`set` 方法
+
+我们已经有 `get方法` 作为基础，`set方法` 就很简单了。
+
+`public int set(int field, int value)`：修改日历的某个字段信息。
+
+这个方法的第一个参数：字段，同样可以传入 `索引` 或者 `Calendar类的常量`
+
+~~~java
+c.set(Calendar.YEAR, 2023);
+~~~
+
+程序运行结果如下
+
+<img src="./assets/image-20240424112641405.png" alt="image-20240424112641405" style="zoom:50%;" />
+
+但如果我想要修改月份，例如我要修改成 `12`，那么在参数中不能传入 `12`，而是应该写 `11`，因为在 `Calendar类` 中，月份的范围是 `[0, 11]`
+
+~~~java
+c.set(Calendar.MONTH, 11);
+~~~
+
+<img src="./assets/image-20240424113026779.png" alt="image-20240424113026779" style="zoom:67%;" />
+
+但是当你将月份写的超级大，例如：`2000年的999月`，它也不会报错，而是将时间顺着往后排
+
+~~~java
+c.set(Calendar.MONTH, 999);
+~~~
+
+运行程序，效果如下图：连带着前面的年份也进行了调整
+
+<img src="./assets/image-20240424113148305.png" alt="image-20240424113148305" style="zoom:67%;" />
+
+----
+
+### 3）`add` 方法
+
+`public void add(int field, int amount)`：在原本的基础上对某个字段进行增加 / 减少。
+
+如果传的是正数，那就是往后加；如果传的是负数，那就是往前减。
+
+我们以 `2023年9月10日` 为基础，增加一个月，此时我们用日历类就可以这么去玩了
+
+~~~java
+//调用方法在这个基础上增加一个月
+c.add(Calendar.MONTH, 1);
+~~~
+
+右键运行，可以发现已经变成了 `10月10日` 了
+
+<img src="./assets/image-20240424113525277.png" alt="image-20240424113525277" style="zoom:67%;" />
+
+如果传递的是负数，那就是往前 `减一个月`
+
+~~~java
+//调用方法在这个基础上减少一个月
+c.add(Calendar.MONTH, -1);
+~~~
+
+运行程序，发现结果已经变成了 `8月10日`
+
+<img src="./assets/image-20240424113705814.png" alt="image-20240424113705814" style="zoom:67%;" />
+
+----
+
+## 七、总结
+
+1、`Canlendar` 代表什么？
+
+`Canlendar` 表示时间的日历对象
+
+2、如何获取对象？
+
+不是 `new` 的，而是通过静态方法 `getInstance()` 获取到这个类的对象。
+
+3、常见方法
+
+`setXXX`：修改
+
+`getXXX`：获取
+
+`add`：在原有的基础上进行增加 / 减少
+
+4、细节
+
+日历类中月份的范围是 `[0, 11]`，因此我们需要在获取出来的基础上 `+ 1`
+
+因为在老外的眼里，星期日是一周中的第一天。如果我们想要看到符合这个人习惯的 `星期一、星期二....`，就可以使用 `查表法`。
+
+
+
+-----
+
+# --------------------------------
+
+# 172.JDK8新增时间相关类
+
+在学习之前，肯定很多同学都会想：JDK7前的三个相关类感觉已经能解决所有问题了，为什么到了 `JDK8` 的时候又新增了呢？
+
+不着急，我们来看一个案例：在之前，我们写了一个 `肯打鸡品牌的秒杀活动`，当时的代码写的非常的多。
+
+<img src="./assets/image-20240424114459377.png" alt="image-20240424114459377" style="zoom:70%;" />
+
+这样做代码也能写，但是写起来非常痛苦。
+
+但是我现在换一下，我用JDK8的时间相关类写起来就非常简单了：在代码中，我可以先定义开始时间、结束时间、下单时间，然后我们用对象就可以直接进行判断了。
+
+<img src="./assets/image-20240424114537790.png" alt="image-20240424114537790" style="zoom:50%;" />
+
+因此，`JDK8` 的时间类用起来非常的方便。
+
+它的好处主要体现在两点：代码层面、安全层面。
+
+代码层面看图就很好理解了，我们来解释一下 `JKD7在多线程环境下会导致数据安全的问题`。
+
+假设我现在利用 `JDK7` 以前的 `Date对象` 创建了一个时间对象，记录时间是 `2038年1月1日`。
+
+现在下面有两个人都需要去修改时间，左边的男孩想要把时间修改成 `2038年10月1日`，右边的女孩想要把时间修改成 `2038年2月1日`。
+
+那问题就来了，你说最终上面的时间它到底听谁的？因此JDK7的时间类有可能会出现这样的问题。
+
+![image-20240424123110371](./assets/image-20240424123110371.png)
+
+因此JDK8在设计的时候就屏蔽了这个问题，利用 `JDK8` 获取的时间和日期对象都是不可变的，如果你想修改时间，那么原来对象里面的值是不会发生变化的，它会产生一个新的时间对象。这也是JDK8新增的时间类最大的特点。
+
+说到这个地方，有同学会想：那JDK7的时间相关类，我们是不是不用去学了？其实也不是，因为JDK7以前的时间相关类在一些老的项目中还是有应用的，所以我们也要知道。但是在一些新的项目中，用的比较多的还是 `JDK8` 新增的时间相关类。
+
+JDK8新增的时间相关类会比较多，常用的有以下十个。
+
+| JDK8时间类类名    | 作用                   |
+| ----------------- | ---------------------- |
+| ZoneId            | 时区                   |
+| Instant           | 时间戳                 |
+| ZoneDateTime      | 带时区的时间           |
+| DateTimeFormatter | 用于时间的格式化和解析 |
+| LocalDate         | 年、月、日             |
+| LocalTime         | 时、分、秒             |
+| LocalDateTime     | 年、月、日、时、分、秒 |
+| Duration          | 时间间隔（秒，纳，秒） |
+| Period            | 时间间隔（年，月，日） |
+| ChronoUnit        | 时间间隔（所有单位）   |
+
+但是你不用一个个去背，我将它们分成了四组让你来学习。
+
+第一组：有三个类，跟JDK7以前的Date类是一样的，分别是 
+
+- `ZoneId`：表示时区
+
+- `Instant表示时间戳`
+
+  即表示一个特定的时间，例如 `2023年1月1日` 我们就可以用 `Instant类的对象` 去进行表示，但是这个类有一个特点：它表示的时间是不带时区的，它表示的是世界标准时间。如果你想展示我天朝大国的时间，还需要在它的基础上加 `8个小时` 才行。
+
+- `ZoneDateTime`：带时区的时间
+
+  `zone`：时区
+
+![image-20240424123902475](./assets/image-20240424123902475.png)
+
+因此接下来我们先学习第一个：`ZoneId`
+
+----
+
+# Date类
+
+# ZoneId 时区 
+
+## 一、介绍
+
+我们知道，全世界一共是分为24个时区的，每一个时区的时间都是一样的
+
+但是Java在定义时区的时候，不是根据 `东一区、东二区、东三区...` 这样去定义的，它在定义的时候格式如下：`洲名 / 城市名` 或者是 `国家名 / 城市名`。
+
+我们来举个例子：
+
+`Asia/Shanghai`，前面的第一个单词：`Asia(亚洲)`，后面的第二个单词：`Shanghai(上海)`。
+
+`Asia/Taipei`：亚洲 / 台北
+
+`Asia/Chongqing`：亚洲 / 重庆
+
+以上三个都是我们国家的，只不过我们要注意的是：Java在定义的时候是**没有北京**的 `Asia/Beijing`，因此我们一般使用的都是 `Asia/Shanghai`。
+
+![image-20240424125123436](./assets/image-20240424125123436.png)
+
+当然，Java给其他国家也有定义时区，例如：`Australia/Canberra` 表示的是澳大利亚的首都堪培拉、`America/New_York` 表示的是美洲的纽约。
+
+<img src="./assets/image-20240424125502823.png" alt="image-20240424125502823" style="zoom:67%;" />
+
+所以说在以后我们要指定时区，就直接按照这种格式来进行书写就行了。
+
+-----
+
+## 二、常用方法
+
+下面三个方法都是静态方法。
+
+Java一共定义了 `603个` 时区，这些时区的名字是不需要你去背的，在 `ZoneId` 这个类中有一个方法可以获取到：`getAvailableZoneIds()`，这个方法是 `static` 静态方法，因此我们直接用类名直接调用就行了。
+
+方法会返回一个集合，集合中的就是所有时区的名称。
+
+~~~java
+static Set<string> getAvailableZoneIds()  // 获取Java中支持的所有时区名称
+~~~
+
+再往下，第二个方法，用来获取系统默认时区
+
+~~~java
+static ZoneId systemDefault()	// 获取当前系统默认时区
+~~~
+
+第三个，它可以用来指定一个时区
+
+~~~java
+static Zoneld of(string zoneld)  // 指定一个时区
+~~~
+
+-----
+
+### 1）获取所有的时区名称
+
+~~~java
+static Set<string> getAvailableZoneIds()  // 获取Java中支持的所有时区
+~~~
+
+这个方法返回的是一个集合，这个集合是没有索引的
+
+~~~java
+Set<String> zoneIds = ZoneId.getAvailableZoneIds();
+System.out.println(zoneIds);
+~~~
+
+运行程序，可以发现集合中都是时区的名称
+
+![image-20240424131551870](./assets/image-20240424131551870.png)
+
+我们可以先点一下控制台，然后 <kbd>ctrl + F</kbd> 搜索一下 `Shanghai`
+
+<img src="./assets/image-20240424131742870.png" alt="image-20240424131742870" style="zoom:67%;" />
+
+除此之外，我们还可以将集合的长度打印一下，结果是 `603`
+
+~~~java
+System.out.println(zoneIds.size()); // 603
+~~~
+
+在这么多时区中，不需要背，你只要知道我们可以通过这个方法来获取到所有的时区就行了。
+
+以后如果想要获取的话，直接调用方法，然后打印一下就行了
+
+----
+
+### 2）获取当前系统默认时区
+
+~~~java
+static ZoneId systemDefault()	// 获取当前系统默认时区
+~~~
+
+静态方法直接只用类名调用就好了
+
+~~~java
+ZoneId zoneId = ZoneId.systemDefault();
+System.out.println(zoneId); //Asia/Shanghai
+~~~
+
+如果我们想要更改当前系统的默认时区其实也是有办法的。
+
+在搜索栏中搜索：`时间`，点击一下 `日期和时间设置`
+
+<img src="./assets/image-20240424132239365.png" alt="image-20240424132239365" style="zoom:47%;" />
+
+在弹出来的窗口中就可以对时区进行修改了
+
+![image-20240424132456916](./assets/image-20240424132456916.png)
+
+例如我这里就修改为台北的。
+
+![image-20240424132516282](./assets/image-20240424132516282.png)
+
+回到代码中，右键Run，程序运行完毕，可以发现打印出来的时区已经是 `Asia/Taipei` 了
+
+<img src="./assets/image-20240424132601938.png" alt="image-20240424132601938" style="zoom:60%;" />
+
+PS：测试完别忘记将系统默认时区改回来哦 ~
+
+----
+
+### 3）获取一个指定的时区
+
+~~~java
+static Zoneld of(string zoneld)  // 指定一个时区
+~~~
+
+直接使用 `ZoneId` 调用 `of()` 方法
+
+~~~java
+ZoneId zoneId1 = ZoneId.of("");
+~~~
+
+如果不知道当前的时区怎么写，没关系，只需要将第一个方法返回的集合打印一下就行了，然后在控制台中随便复制粘贴一个就行了。
+
+![image-20240424131551870](./assets/image-20240424131551870.png)
+
+~~~java
+ZoneId zoneId1 = ZoneId.of("Asia/Pontianak");
+System.out.println(zoneId1); // Asia/Pontianak
+~~~
+
+但假设你没有指定时区的话，那么代码是会报错的。
+
+![image-20240424133659861](./assets/image-20240424133659861.png)
+
+有了时区之后，我们就可以用 `ZoneId` 跟后面一些类结合起来，获取到某个时区真实的时间了。
+
+
+
+-----
+
+# Instant 时间戳
+
+它就表示是某一个固定的时间的对象。
+
+在这个类中，它有常见的一系列的方法
+
+~~~java
+static Instant now() // 获取当前时间的Instant对象(它获取的是标准时间，是不带时区的！如果想要获取到中国的时间，需要在这个基础上加8个小时)
+static Instant ofXxxx(long epochMilli) 	// 根据(秒/毫秒/纳秒)获取指定时间的Instant对象
+ZonedDateTime atZone(ZoneIdzone) // 指定时区，方法的返回值是ZonedDateTime，它是一个带时区的事件对象
+boolean isxxx(Instant otherInstant) // 判断系列的方法
+Instant minusXxx(long millisToSubtract) // 减少时间系列的方法
+Instant plusXxx(long millisToSubtract) // 增加时间系列的方法
+~~~
+
+----
+
+## 一、获取当前时间的Instant对象(标准时间)
+
+它获取的是标准时间，是不带时区的！如果想要获取到中国的时间，需要在这个基础上加8个小时。
+
+~~~java
+static Instant now() // 获取当前时间的Instant对象
+~~~
+
+代码示例
+
+~~~java
+Instant now = Instant.now();
+System.out.println(now);
+~~~
+
+程序运行完毕，看控制台，年月日、时分秒、纳秒。这个就是当前的世界标准时间。
+
+<img src="./assets/image-20240424134756323.png" alt="image-20240424134756323" style="zoom:80%;" />
+
+---
+
+## 二、获取指定的时间
+
+~~~java
+static Instant ofXxxx(long epochMilli) 	// 根据(秒/毫秒/纳秒)获取指定时间的Instant对象
+~~~
+
+注意，这里是 `ofXXX`，用 `Instant类` 去调用 `of` 开头的方法，方法有三个
+
+---
+
+## ① `ofEpochMilli(long epochMilli)`
+
+我们先来看第一个：`ofEpochMilli(long epochMilli)`
+
+<img src="./assets/image-20240424135146142.png" alt="image-20240424135146142" style="zoom:80%;" />
+
+这个方法的第三个单词：`Milli` 就是毫秒的意思，因此后面的参数就表示时间的毫秒，我可以通过时间的毫秒值来获取到一个Instant的对象。
+
+~~~java
+Instant instant1 = Instant.ofEpochMilli(0L);
+System.out.println(instant1); // 1970-01-01T00:00:00z
+~~~
+
+程序运行外部，看见获取的是计算机时间原点的Instant对象，而且是世界的标准时间，这个是不带时区的。
+
+<img src="./assets/image-20240424135634866.png" alt="image-20240424135634866" style="zoom:80%;" />
+
+----
+
+## ② `ofEpochSecond(long epochSecond)`
+
+`second`：秒钟。
+
+因此你调用这个方法，括号中传入的就是秒钟。
+
+假设我在这里传入 `1L`：表示计算机时间原点开始后过了 `1秒` 的时间。
+
+~~~java
+Instant instant2 = Instant.ofEpochSecond(1L);
+System.out.println(instant2); // 1970-01-01T00:00:01Z
+~~~
+
+----
+
+## ③ `ofEpochSecond(long epochSecond, long nanoAdjustment)`
+
+这个方法有两个参数：
+
+- `epochSecond`：跟刚刚一样，表示的也是秒钟
+
+- `nanoAdjustment`：纳秒。
+
+  `nano` 就是 `纳秒的意思`
+
+下面代码表示：从计算机时间原点开始，多了这么多时间（1秒 + 1000000000纳秒）的那个时间点。
+
+PS：`1秒 = 1000000000纳秒`，因此下面刚好就是过了两秒钟。
+
+~~~java
+Instant instant3 = Instant.ofEpochSecond(1L, 1000000000L);
+System.out.println(instant3); // 1970-01-01T00:00:027
+~~~
+
+----
+
+## 三、指定时区
+
+~~~java
+ZonedDateTime atZone(ZoneIdzone) // 指定时区，方法的返回值是ZonedDateTime，它是一个带时区的事件对象
+~~~
+
+由于 `atZone()方法` 不是静态的，因此我们需要通过 `Instant.now()` 获取到当前时间的对象，然后再用时间对象去调用 `atZone()` 方法。
+
+~~~java
+Instant.now().atZone();
+~~~
+
+`atZone()` 需要传入时区，但是这个方法的参数类型并不是一个字符串，而是 `ZoneId`，因此就可以用到我们刚刚学习的 `ZoneId.of()` 方法来获取时区对象。
+
+<img src="./assets/image-20240424141228956.png" alt="image-20240424141228956" style="zoom:67%;" />
+
+~~~java
+ZonedDateTime time = Instant.now().atZone(ZoneId.of("Asia/Shanghai"));
+System.out.println(time);
+~~~
+
+程序运行完毕，可以发现已经在标准时间之上加上8小时了。
+
+<img src="./assets/image-20240424141427645.png" alt="image-20240424141427645" style="zoom:67%;" />
+
+---
+
+## 四、判断系列的方法
+
+~~~java
+boolean isxxx(Instant otherInstant) // 判断系列的方法
+isBefore()：判断调用者代表的时间是否在参数表示时间的前面
+isAfter()：判断调用者代表的时间是否在参数表示时间的后面
+~~~
+
+既然是判断，那我就先获取到两个 `Instant的对象` 
+
+~~~java
+Instant instant4 = Instant.ofEpochMilli(0L); // 表示计算机的时间原点
+Instant instant5 = Instant.ofEpochMilli(1000L); // 表示计算机的时间原点上加上1000毫秒的时间点
+~~~
+
+然后我想要比较这两个时间，谁在前，谁在后。
+
+此时我们不需要去获取到里面的毫秒值，而是调用 `isAfter() / isBefore()` 方法
+
+~~~java
+//isBefore:判断调用者代表的时间是否在参数表示时间的前面
+boolean result1=instant4.isBefore(instant5);
+System.out.println(result1); // true，表示当前的调用者 instant4 在 instant5 之前
+
+//isAfter:判断调用者代表的时间是否在参数表示时间的后面
+boolean result2 = instant4.isAfter(instant5);
+System.out.println(result2);// false，表示 instant4 不在 instant5 之后
+~~~
+
+-----
+
+## 五、减少时间系列的方法
+
+方法表示以当前时间为基准，往前去减少时间
+
+细节：JDK8新增的这些时间的对象，它是不可变的，如果你对它发生了减少 / 增加，那么原有的时间对象是不会变的，它会产生一个新的 `Instant对象`，所以说方法的返回值就是 `Instant的对象`
+
+~~~java
+Instant minusXxx(long millisToSubtract) // 减少时间系列的方法
+~~~
+
+首先我们先来获取一个时间对象
+
+~~~java
+Instant instant6 =Instant.ofEpochMilli(3000L);
+System.out.println(instant6); // 1970-01-01T00:00:03Z
+~~~
+
+然后就可以调用 `minusXXX` 方法来减。
+
+它在减的时候，可以减秒钟(`minusSeconds()`)，也可以减毫秒(`minusMillis`)，还可以减纳秒(`minusNanos`)
+
+<img src="./assets/image-20240424142852944.png" alt="image-20240424142852944" style="zoom:80%;" />
+
+我这里就来减1s了
+
+~~~java
+Instant instant7 = instant6.minusSeconds(1);
+System.out.println(instant7); // 1970-01-01T00:00:02Z
+~~~
+
+`plus方法` 与 `minus方法` 同理
+
+~~~java
+Instant plusXxx(long millisToSubtract) // 增加时间系列的方法
+~~~
+
+方法稍微有一点多，但是这些方法千万不要背，根据方法名取猜一猜它的意思就行了。
+
+
+
+-----
+
+在刚刚，我们已经学习完了JDK8的前两个 `ZoneId`、`Instant`，用这两个类为基础再来学习下面其他类的时候，你就会觉得非常的简单了。因为每个类里面的方法它是有共同性的。
+
+# `ZoneDateTime` 带时区的时间
+
+常用的方法会有以下几个
+
+~~~java
+static ZonedDateTime now() // 获取当前时间的ZonedDateTime对象
+static ZonedDateTime ofXxxx(....) // 获取指定时间的ZonedDateTime对象
+~~~
+
+在以后，凡是看到 `with` 开头的，就表示 `修改时间`
+
+~~~java
+ZonedDateTime withXxx(时间) // 修改时间系列的方法
+~~~
+
+看到 `minus` 开头的就是减少时间
+
+~~~java
+ZonedDateTime minusXxx(时间) // 减少时间系列的方法
+~~~
+
+看到 `plus` 开头的就是增加时间
+
+~~~java
+ZonedDateTime plusXxx(时间) // 增加时间系列的方法
+~~~
+
+-----
+
+## 一、获取当前时间对象（带时区）
+
+~~~java
+static ZonedDateTime now() // 获取当前时间的ZonedDateTime对象
+~~~
+
+调用 `ZonedDateTime` 的 `now()` 方法获取到的也是当前时间的对象，只不过这个时候它是带时区的。
+
+~~~java
+ZonedDateTime now = ZonedDateTime.now();
+System.out.println(now); // 2024-04-24T14:35:54.799126+08:00[Asia/Shanghai]
+~~~
+
+---
+
+## 二、获取指定的事件对象
+
+~~~java
+static ZonedDateTime ofXxxx(....) // 获取指定时间的ZonedDateTime对象
+~~~
+
+方法都是 `of` 开头的，在获取的时候会有两种方式。
+
+### 1）`of()`
+
+在括号中可以传入 `年月日时分秒纳秒`，最后别忘了，还要加上时区，这样就可以获取到一个指定的时间。
+
+~~~java
+ZonedDateTime time1 = ZonedDateTime.of(2023, 10, 1,
+                                       11, 12, 12, 0, ZoneId.of("Asia/Shanghai"));
+System.out.println(time1); // 2023-10-01T11:12:12+08:00[Asia/Shanghai]
+~~~
+
+----
+
+### 2）`ofInstant()`
+
+过Instant + 时区的方式指定获取时间对象
+
+~~~java
+Instant instant = Instant.ofEpochMilli(0L); // 表示计算机时间原点
+ZoneId zoneId = ZoneId.of("Asia/Shanghai");
+ZonedDateTime time2 = ZonedDateTime.ofInstant(instant, zoneId); // 获取到的时间就是带有时区的时间原点
+System.out.println(time2); // 1970-01-01T08:00+08:00[Asia/Shanghai]
+~~~
+
+----
+
+## 三、修改时间系列的方法
+
+`with` 表示修改
+
+~~~java
+ZonedDateTime withXxx(时间) // 修改时间系列的方法
+~~~
+
+下面代码就是将 `time2` 的时间修改为 `2000年`
+
+~~~java
+ZonedDateTime time3 = time2.withYear(2000);
+System.out.println(time3);
+~~~
+
+当然它除了修改年，还可以修改其他的
+
+<img src="./assets/image-20240424144329579.png" alt="image-20240424144329579" style="zoom:67%;" />
+
+----
+
+## 四、减少时间系列的方法
+
+它是在当前的基础上往前减
+
+~~~java
+ZonedDateTime minusXxx(时间) // 减少时间系列的方法
+~~~
+
+例如下面代码减年份
+
+~~~java
+ZonedDateTime time4 = time3.minusYears(1);
+~~~
+
+但不仅仅可以减年份，还可以减其他的
+
+<img src="./assets/image-20240424144625556.png" alt="image-20240424144625556" style="zoom:70%;" />
+
+-----
+
+## 五、增加时间系列的方法
+
+同理 `minusXXX` 系列的方法一样。
+
+~~~java
+ZonedDateTime time5 = time4.plusYears(1);
+System.out.println(time5);
+~~~
+
+细节：JDK8新增的时间对象都是不可变的，如果我们修改了 / 减少了 / 增加了时间，那么调用者是不会发生改变的，它会产生一个新的时间。
+
+
+
+----
+
+# `DateTimeFormatter` 用于时间的格式化和解析
+
+现在我们学完了 JDK8新增时间类的第一部分，接下来我们继续往下，开始学习第二部分。
+
+![image-20240424145313163](./assets/image-20240424145313163.png)
+
+在第二部分中，它涉及到的只有一个类 `DateTimeFormatter`，它的作用就是对时间进行格式化。
+
+在这个类中有两个方法需要我们知道。
+
+- `static DateTimeFormatter ofPattern(格式)`：静态方法。它可以指定时间的格式，等格式有了后，方法会返回 `DateTimeFormatter`，相当于就是那个格式的对象。
+- `String format(时间对象)`：获取到时间格式的对象后，就可以通过 `format()` 方法，将时间转为我们想要的字符串形式了。
+
+~~~java
+// 获取时间对象，它是带时区的
+ZonedDateTime time = Instant.now().atZone(ZoneId.of("Asia/Shanghai"));
+
+// 解析/格式化器，调用静态方法 ofPattern 获取到 DateTimeFormatter 的对象，在这个方法里面我们可以指定格式
+DateTimeFormatter dtf1= DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss EE a");
+// 调用对象里面的 format方法进行格式化
+System.out.println(dtf1.format(time)); // 2024-04-24 14:58:42 周三 下午
+~~~
+
+
+
+-----
+
+# 173.日历类
+
+## 一、引入
+
+在刚刚我们已经学习完了新增时间类的前两部分。
+
+第一部分，它跟JDK7以前的 `Date类` 是类似的，它们的对象就表示当前时间的对象 / 指定时间的对象。
+
+第二部分 `DateTimeFormatter`，它跟JDK7以前的 `SimpleDateFormat` 是类似的，可以用于时间日期的格式化。
+
+再往下，我们接下来学习第三类。在JDK7以前的时间类中，还有一个 `Calendar` 日历类，通过这个日历类，就可以对时间里面单独的年、月、日进行单独的操作。
+
+![image-20240424123902475](./assets/image-20240424123902475.png)
+
+JDK8同样也有类似的跟日历相关的类，一共有三个。
+
+- `LocalDate`，它里面包含了 `年、月、日`，这个类是没有 `时、分、秒` 的
+- `LocalTime`：它里面包含了 `时、分、秒`，这个类是没有 `年、月、日` 的
+- `LocalDateTime`：它就包含了所有 `年、月、日、时、分、秒`
+
+在这三个类中，它里面的方法也是非常有特点的，跟之前一样。
+
+<img src="./assets/image-20240424155651825.png" alt="image-20240424155651825" style="zoom:50%;" />
+
+除此之外，`LocalDateTime` 还可以转成 `LocalDate`、`LocalTime`，因为它是最长的，用的方法就是 `to` 开头的方法。
+
+![image-20240424155841977](./assets/image-20240424155841977.png)
+
+----
+
+## 二、`LocalDate` 
+
+它只包含 `年、月、日`，没有 `时、分、秒`
+
+### 1）获取当前时间的日历对象
+
+如果我们调用静态方法 `now()`，就可以获取到当前时间的日历对象。
+
+~~~java
+LocalDate nowDate = LocalDate.now();
+System.out.println("今天的日期:" + nowDate); // 今天的日期:2024-04-24
+~~~
+
+
+
+----
+
+### 2）获取指定时间的日历对象
+
+`of()` 方法中可以传递 `年、月、日`，将指定的时间写进去。
+
+<img src="./assets/image-20240424160424257.png" alt="image-20240424160424257" style="zoom:67%;" />
+
+~~~java
+LocalDate ldDate = LocalDate.of(2023, 1, 1);
+System.out.println("指定日期:" + ldDate);
+~~~
+
+----
+
+### 3）获取到日历中的每一个属性值
+
+`getXXX` 的方法可以获取到日历中的每一个属性值
+
+~~~java
+int year = ldDate.getYear();
+System.out.println("year: " + year);
+~~~
+
+----
+
+要注意，在获取月的时候，获取到的是月的对象
+
+~~~java
+Month m = ldDate.getMonth();
+~~~
+
+如果直接打印的话，打印到的是对象里面的信息
+
+~~~java
+System.out.println(m); // JANUARY
+~~~
+
+但如果我不行看到这个，我只想看到阿拉伯数字，有两种办法。
+
+方法一：用月的对象再去调用 `getValue()` 方法
+
+~~~java
+System.out.println(m.getValue()); // 1
+~~~
+
+方式二：我们在用 `LocalDate对象` 获取数据的时候换一个方法：`getMonthValue()`，即获取月份的数据信息。
+
+此时方法会返回一个`int值`，这个值就是阿拉伯数字
+
+~~~java
+int month = ldDate.getMonthValue();
+System.out.println("month: " + month); // month: 1
+~~~
+
+---
+
+获取日期，`getDayOfMonth`：月中的某一天，即几号
+
+~~~java
+int day = ldDate.getDayOfMonth();
+System.out.println("day:" + day);
+~~~
+
+---
+
+获取一年中的第几天
+
+~~~java
+int dayofYear = ldDate.getDayOfYear();
+System.out.println("dayOfYear:" + dayofYear);
+~~~
+
+---
+
+获取星期，只不过这个方法返回的也是星期的对象
+
+~~~java
+DayOfWeek dayOfWeek = ldDate.getDayOfWeek();
+System.out.println(dayOfWeek);
+~~~
+
+如果想要看到阿拉伯数字，还需要再调用 `getValue()` 方法就行了，跟上面的 `Month` 是类似的
+
+~~~java
+System.out.println(dayOfWeek.getValue());
+~~~
+
+----
+
+PS：上面的方法不需要去背，你只要知道 `get` 开头的就是获取就行了，我们直接使用 `对象` 调用 `get`，IDEA都会有自动提示，然后根据提示出来的方法名自己猜也能猜到。
+
+<img src="./assets/image-20240424161922558.png" alt="image-20240424161922558" style="zoom:70%;" />
+
+---
+
+### 4）判断系列的方法
+
+`is` 开头的方法表示判断，判断两个时间谁在前谁在后。
+
+~~~java
+System.out.println(ldDate.isBefore(ldDate));
+System.out.println(ldDate.isAfter(ldDate));
+~~~
+
+---
+
+### 5）修改时间系列的方法
+
+with开头的方法表示修改。PS：只能修改年月日。
+
+下面例子就是将年修改为 `2000`。
+
+~~~java
+LocalDate withLocalDate = ldDate.withYear(2000);
+System.out.println(withLocalDate);
+~~~
+
+验证：跟之前一样，对象里面的数据是不能发生改变的，如果你要修改，它会产生一个新的 `LocalDate对象`。
+
+我们可以拿原来的日期对象跟修改之后的日期对象做一个 `==号` 的比较
+
+~~~java
+System.out.println(withLocalDate == ldDate); // false，false就代表它们两个不是同一个对象
+~~~
+
+----
+
+### 6）减少时间系列的方法
+
+minus开头的方法表示减少，只能减少年月日
+
+<img src="./assets/image-20240424162723170.png" alt="image-20240424162723170" style="zoom:67%;" />
+
+PS：如果参数传入的是负数，那就是往前加，但是这种方式比较反人类
+
+~~~java
+LocalDate minusLocalDate = ldDate.minusYears(1);
+System.out.println(minusLocalDate);
+~~~
+
+----
+
+### 7）增加时间系列的方法
+
+plus开头的方法表示增加，只能增加年月日
+
+PS：如果参数传入的是负数，那就是往前减，但是这种方式比较反人类
+
+~~~java
+LocalDate plusLocalDate = ldDate.plusDays(1);
+System.out.println(plusLocalDate);
+~~~
+
+----
+
+### 8）扩展
+
+利用这个类就可以解释我们平时在玩手机的时候遇到的一个场景：每年你过生日的时候那些银行、移动、联通都会给你发一些短信，它是怎么实现的呢？
+
+其实就可以用我们刚刚所学习的 `LocalDate` 表示。
+
+判断你今天是不是过生日，跟后面的 `时、分、秒` 没关系，我只要 `月、日` 就行了。
+
+因此在这就可以写两个对象。
+
+第一个：用 `LocalDate` 调用 `of()`，把你的出生年月日封装成 `LocalDate对象`
+
+第二个：将当前时间封装成 `LocalDate对象` 。
+
+~~~java
+LocalDate birDate = LocalDate.of(2000, 1, 1);
+LocalDate nowDate1 = LocalDate.now();
+~~~
+
+还没完，这里又出现了一个新的类：`MonthDay`，它表示的是 `月、日` 对象。
+
+我们可以选中 `MonthDay` <kbd>ctrl + b</kbd> 看下源码
+
+![image-20240424163437978](./assets/image-20240424163437978.png)
+
+在 `MonthDay` 的 `of()` 中可以指定月份、日期，将它们两个封装成 `月、日` 对象。
+
+然后再把今天的时间去封装成 `月、日` 对象
+
+~~~java
+MonthDay birMd = MonthDay.of(birDate.getMonthValue(), birDate.getDayOfMonth());
+MonthDay nowMd = MonthDay.from(nowDate1);
+~~~
+
+最后将两个 `月、日` 对象进行比较，如果相同，就表示你过生日；如果为 `false`，就表示你今天不过生日，明天再判断就行了。
+
+~~~java
+System.out.println("今天是你的生日吗? " + birMd.equals(nowMd)); // 今天是你的生日吗?
+~~~
+
+
+
+----
+
+## 三、`LocalTime`
+
+它的用法跟 `LocalDate` 一样，只不过它里面包含的是 `时、分、秒`
+
+### 1）代码示例
+
+~~~java
+// 获取本地时间的日历对象。(包含 时分秒)
+LocalTime nowTime = LocalTime.now();
+System.out.println("今天的时间:" + nowTime);
+
+int hour = nowTime.getHour();//时
+System.out.println("hour: " + hour);
+
+int minute = nowTime.getMinute();//分
+System.out.println("minute: " + minute);
+
+int second = nowTime.getSecond();//秒
+System.out.println("second:" + second);
+
+int nano = nowTime.getNano();//纳秒
+System.out.println("nano:" + nano);
+System.out.println("------------------------------------");
+System.out.println(LocalTime.of(8, 20));//时分
+System.out.println(LocalTime.of(8, 20, 30));//时分秒
+System.out.println(LocalTime.of(8, 20, 30, 150));//时分秒纳秒
+LocalTime mTime = LocalTime.of(8, 20, 30, 150);
+
+//is系列的方法
+System.out.println(nowTime.isBefore(mTime));
+System.out.println(nowTime.isAfter(mTime));
+
+//with系列的方法，只能修改时、分、秒
+System.out.println(nowTime.withHour(10));
+
+//plus系列的方法，只能修改时、分、秒
+System.out.println(nowTime.plusHours(10));
+~~~
+
+----
+
+### 2）应用场景
+
+这个类只关注 `时、分、秒、纳秒`，所以在计算时间的时候，它比较精确。
+
+例如之前说过的秒杀活动。在秒杀活动中，差一秒钟都会导致你这个活动没有参加上，因此在这种情况下，对时间的精确性非常的有要求，并且此时 `年月日` 在这里也是没有用的，这种情况下关注更多的是 `时分秒`，因此此时会使用 `LocalTime` 更多一些。
+
+
+
+----
+
+## 四、`LocalDateTime`
+
+这个类中包含的东西是最全的： `年、月、日、时、分、秒`，并且用法跟之前一样。
+
+这些代码不用自己写，将下面示例代码导入IDEA中看看它们的作用就行了。
+
+~~~java
+// 当前时间的的日历对象(包含年月日时分秒)
+LocalDateTime nowDateTime = LocalDateTime.now();
+
+System.out.println("今天是:" + nowDateTime);//今天是：
+System.out.println(nowDateTime.getYear());//年
+System.out.println(nowDateTime.getMonthValue());//月
+System.out.println(nowDateTime.getDayOfMonth());//日
+System.out.println(nowDateTime.getHour());//时
+System.out.println(nowDateTime.getMinute());//分
+System.out.println(nowDateTime.getSecond());//秒
+System.out.println(nowDateTime.getNano());//纳秒
+// 日:当年的第几天
+System.out.println("dayofYear:" + nowDateTime.getDayOfYear());
+//星期
+System.out.println(nowDateTime.getDayOfWeek());
+System.out.println(nowDateTime.getDayOfWeek().getValue());
+//月份
+System.out.println(nowDateTime.getMonth());
+System.out.println(nowDateTime.getMonth().getValue());
+
+LocalDate ld = nowDateTime.toLocalDate();
+System.out.println(ld);
+
+LocalTime lt = nowDateTime.toLocalTime();
+System.out.println(lt.getHour());
+System.out.println(lt.getMinute());
+System.out.println(lt.getSecond());
+~~~
+
+
+
+----
+
+# 工具类
+
+## 一、引入
+
+继续往下，我们来学习JDK8新增时间类的第四部分。
+
+第四部分它是三个工具类，可以用来计算时间的间隔。
+
+- `Duration`：它在计算时间的时候侧重于 `秒` 跟 `纳秒` 的计算
+- `Period`：在计算时间间隔的时候，只能算 `年、月、日`
+- `ChronoUnit`：它可以计算所有单位的间间隔
+
+![image-20240424123902475](./assets/image-20240424123902475.png)
+
+因此在学习的时候，我们只需要知道这三个各自的特点就行了
+
+<img src="./assets/image-20240424165433588.png" alt="image-20240424165433588" style="zoom:50%;" />
+
+
+
+----
+
+## 二、`Period`
+
+可以计算 `年、月、日` 之间的时间间隔，看下面代码
+
+~~~java
+// 通过LocalDate.now()获取到当前本地的日历对象 年月日
+LocalDate today = LocalDate.now();
+System.out.println(today);
+
+// 生日的 年月日
+LocalDate birthDate = LocalDate.of(2000, 1, 1);
+System.out.println(birthDate);
+
+// 此时可以通过 between() 计算两个时间的间隔
+// PS：在计算的时候是用第二个参数减第一个参数，因此birthDate应该放到第一个参数，today放到第二个参数
+// 方法会返回一个 `period` 对象，这个就表示时间间隔对象
+Period period = Period.between(birthDate, today);
+
+System.out.println("相差的时间间隔对象:" + period); // 相差的时间间隔对象:P24Y3M23D（24年3月23天）
+// 如果我们通过 get方法 去获取，就可以把上面的 24、3、23 获取出来
+System.out.println(period.getYears());
+System.out.println(period.getMonths());
+System.out.println(period.getDays());
+
+// 获取这个时间间隔中总共有多少个月
+System.out.println(period.toTotalMonths()); // 291
+~~~
+
+----
+
+## 三、`Duration`
+
+它更加侧重于 `秒` 跟 `纳秒` 的计算，侧重点相对来讲比较精确一点。
+
+~~~java
+// 使用LocalDateTime获取到当前时间的日历对象
+LocalDateTime today = LocalDateTime.now();
+System.out.println(today);
+
+// 再定义一个LocalDateTime用来指定出生的日历对象
+LocalDateTime birthDate = LocalDateTime.of(2000, 1, 1, 0, 0, 0);
+System.out.println(birthDate);
+
+// 利用 Duration 调用静态方法 between() 计算两个时间的间隔
+// 在计算的时候跟刚刚一样，还是用第二个参数减第一个参数
+// 方法会返回时间间隔对象 Duration
+Duration duration = Duration.between(birthDate, today);
+System.out.println("相差的时间间隔对象:" + duration); // 相差的时间间隔对象:PT213137H3M22.4781845S —— 这两个时间直接间隔 213137小时，3分钟，22.4781845秒
+
+System.out.println("============================================");
+// 下面我们可以将这个时间转换成整体的天数、小时、毫秒、纳秒，用的是 to 开头的方法
+System.out.println(duration.toDays());// 两个时间差的天数
+System.out.println(duration.toHours());// 两个时间差的小时数
+System.out.println(duration.toMinutes());// 两个时间差的分钟数
+System.out.println(duration.toMillis());// 两个时间差的毫秒数
+System.out.println(duration.toNanos());// 两个时间差的纳秒数
+~~~
+
+---
+
+## 四、`ChronoUnit`
+
+第三个类是我们最为常用的，因为它能计算的单位非常的多，是最全面的一个，因此这个类是需要大家重点掌握的。
+
+~~~java
+// 同样的，还是获取到当前时间的日历对象
+LocalDateTime today = LocalDateTime.now();
+System.out.println(today);
+// 生日的日历对象
+LocalDateTime birthDate = LocalDateTime.of(2000, 1, 1,
+                                           0, 0, 0);202
+System.out.println(birthDate);
+
+// 再往下就可以计算两个时间的间隔了
+// 用 ChronoUnit 去调用里面的属性 YEARS，调用 YEARS 就表示：我要计算两个时间之间相差多少年
+// 在计算的时候跟刚刚一样，还是用第二个参数减第一个参数
+System.out.println("相差的年数:" + ChronoUnit.YEARS.between(birthDate, today));
+// 如果调用 MONTHS，就表示两个时间之间相差多少月
+System.out.println("相差的月数:" + ChronoUnit.MONTHS.between(birthDate, today));
+// 调用 WEEKS，表示两个时间之前相差多少周
+System.out.println("相差的周数:" + ChronoUnit.WEEKS.between(birthDate, today));
+System.out.println("相差的天数:" + ChronoUnit.DAYS.between(birthDate, today));
+System.out.println("相差的时数:" + ChronoUnit.HOURS.between(birthDate, today));
+System.out.println("相差的分数:" + ChronoUnit.MINUTES.between(birthDate, today));
+System.out.println("相差的秒数:" + ChronoUnit.SECONDS.between(birthDate, today));
+System.out.println("相差的毫秒数:" + ChronoUnit.MILLIS.between(birthDate, today));
+System.out.println("相差的微秒数:" + ChronoUnit.MICROS.between(birthDate, today));
+System.out.println("相差的纳秒数:" + ChronoUnit.NANOS.between(birthDate, today));
+System.out.println("相差的半天数:" + ChronoUnit.HALF_DAYS.between(birthDate, today));
+System.out.println("相差的十年数:" + ChronoUnit.DECADES.between(birthDate, today));
+System.out.println("相差的世纪(百年)数:" + ChronoUnit.CENTURIES.between(birthDate, today));
+System.out.println("相差的千年数:" + ChronoUnit.MILLENNIA.between(birthDate, today));
+System.out.println("相差的纪元数:" + ChronoUnit.ERAS.between(birthDate, today));
+~~~
+
+
+
+----
+
+# 总结
+
+在 `JDK8新增的时间类` 相对来讲比较多，但是不用怕，我们知道在这么多类中它其实是分为四组的。
+
+第一组：跟JDK7的 `Date类` 是类似的，这些类的对象它就表示当前时间 / 指定时间的对象。
+
+涉及到三个类：`ZoneId 时区`、`Instant 时间戳(表示某一个事件的的对象，但是这个时间是不带时区的，是世界的标准时间)`、`ZoneDateTime 带时区的时间`。
+
+第二组：只有一个类 `DateTimeFormatter`，它可以把时间进行格式化，按照我们指定的格式进行输出。
+
+第三组：日历类。它里面分为三个：`LocalDate 年月日`、`LocalTime 时分秒`、`LocalDateTime 年月日时分秒`
+
+第四组：计算时间间隔的三个工具，其中要求大家重点掌握的是最后一个 `ChronoUnit`。
+
+在这些类中，它里面的方法都是有共同性的，例如获取当前的时间都是 `now()`，获取指定的时间都是 `of() / ofXXX()`，修改当前时间 `withXXX()`，将当前时间往前推 `minusXXX()`，将时间往后加 `plusXXX()`。
+
+![image-20240424123902475](./assets/image-20240424123902475.png)
+
+
+
+----
+
+# ---------------------------------------
+
+# 174.包装类
+
+## 一、什么是包装类？
+
+包装类：基本数据类型对应的引用数据类型。
+
+说白了，就是把基本数据类型变成了一个对象。
+
+----
+
+## 二、如何理解包装类？
+
+从内存的角度来看，其实非常容易理解。
+
+首先，我们先来看基本数据类型，所谓基本数据类型，在变量中记录的是真实的数据值。
+
+例如下图的 `int i = 10;`，真实的数据值就是 `10`，那么在内存中变量里面记录的也是 `10`。
+
+<img src="./assets/image-20240424172450958.png" alt="image-20240424172450958" style="zoom:80%;" />
+
+而整数 `int类型` 所对应的包装类名字叫做 `Integer`。
+
+可以认为：在Java中，是用 `Integer` 这个类去描述整数。
+
+在 `Integer` 类中，有一个属性：`value`，用来记录整数的数据值。
+
+在创建对象的时候，跟以前其实是一样的，也是用 `new` 关键字去创建对象。
+
+此时在内存中栈里面就有一个变量，假设叫做 `n`，类型就是 `Integer`。
+
+![image-20240424173147265](./assets/image-20240424173147265.png)
+
+又因为此时，有 `new` 关键字了，所以在堆中，需要开辟一块小空间，成员变量 `value` 就记录数据 `10`，而左边的栈中，变量 `n` 记录的就是对象的地址值。
+
+此时，上面的 `a` 就是基本数据类型，下面的 `n` 就是引用数据类型，也就是我们平时所说的 `包装类`。
+
+因此，包装类本质上其实就是创建了一个对象，对象中记录对应的数据值。
+
+![image-20240424173417011](./assets/image-20240424173417011.png)
+
+包装类我们可以这么去理解：用一个对象，把数据给包起来。
+
+----
+
+## 三、为什么要学习包装类？
+
+在Java中，万物皆对象，也就是所有的东西，我都可以把它看做是一个对象，整数也不例外。
+
+而且由于多态的存在，所有的对象都可以用 `Object` 来进行表示。
+
+那如果说没有包装类，此时传递过来一个整数，`Object` 就接收不了，程序就会有局限性。
+
+而且，在集合中，它是不能存基本数据类型的，只能存对象。
+
+<img src="./assets/image-20240424173654608.png" alt="image-20240424173654608" style="zoom:67%;" />
+
+因此，我们要往集合中存储基本数据类型的时候，实际上也要用到包装类。
+
+<img src="./assets/image-20240424173831971.png" alt="image-20240424173831971" style="zoom:50%;" />
+
+在Java中，八种基本数据类型都有其对应的包装类。
+
+| 基本类型 | 对应的包装类（位于java.lang包中） |
+| -------- | --------------------------------- |
+| byte     | Byte                              |
+| short    | Short                             |
+| char     | **Character**                     |
+| int      | **Integer**                       |
+| long     | Long                              |
+| float    | Float                             |
+| double   | Double                            |
+| boolean  | Boolean                           |
+
+在以后我们用的最多的就是 `Integer`，所以我们以 `Integer` 进行讲解，其他类都是类似的。
+
+----
+
+## 四、获取Integer对象的方式（了解）
+
+### 1）介绍
+
+但是这个知识点只需要大家了解一下就行了，因为在JDK5的时候，对获取对象的方式进行了优化。
+
+在JDK5以前，如果我们要获取包装类的对象，需要通过构造方法自己 `new`。
+
+或者通过一个静态方法 `valueOf()` 来获取。
+
+![image-20240424174217041](./assets/image-20240424174217041.png)
+
+----
+
+### 2）利用构造方法获取 `Integer` 对象
+
+这种方式是JDK5以前的方式
+
+括号中可以传入整数，也可以传入一个字符串
+
+~~~java
+Integer i1 = new Integer(1);
+Integer i2 = new Integer("1");
+System.out.println(i1);
+System.out.println(i2);
+~~~
+
+然后将它们分别打印，程序运行结果如下图。
+
+可以看见，虽然会报错：`"Integer（java.lang.String）"自版本 9 起已弃用，并标记为删除`，但是程序是可以正常打印的。
+
+<img src="./assets/image-20240424174624307.png" alt="image-20240424174624307" style="zoom:67%;" />
+
+----
+
+### 3）利用静态方法获取 `Integer` 对象
+
+这种方式其实也是JDK5以前的方式。
+
+调用静态方法 `valueOf()`，在括号中可以传入 `整数 / 字符串`
+
+~~~java
+Integer i3 = Integer.valueOf(123);
+Integer i4 = Integer.valueOf("123");
+System.out.println(i3); // 123
+System.out.println(i4); // 123
+~~~
+
+除此之外，我们还可以去指定进制
+
+~~~java
+Integer i5 = Integer.valueOf("123", 8);
+~~~
+
+然后对它做一个打印。
+
+它是将前面的 `123` 当做是八进制的，在打印的时候就会把这个八进制的 `123` 转成 `十进制进行打印`，所以它的结果就是 `83`。
+
+~~~java
+System.out.println(i5); // 83
+~~~
+
+----
+
+### 4）这两种获取对象的区别（掌握）
+
+这点是需要大家掌握的，因为在一些面试题中会进行出现。
+
+我们先来看一段代码。
+
+首先我们需要知道，`==号` 比较的是地址值，如果它的结果是 `true`，就表示：前后是同一个对象。
+
+如果是 `false`，就表示前后不是同一个对象。
+
+~~~java
+Integer i6 = Integer.valueOf(127);
+Integer i7 = Integer.valueOf(127);
+System.out.println(i6 == i7); // true
+
+Integer i8 = Integer.valueOf(128);
+Integer i9 = Integer.valueOf(128);
+System.out.println(i8 == i9); // false
+
+Integer i10 = new Integer(127);
+Integer i11 = new Integer(127);
+System.out.println(i10 == i11); // false
+
+Integer i12 = new Integer(128);
+Integer i13 = new Integer(128);
+System.out.println(i12 == i13); // false
+~~~
+
+为什么结果是上面这样呢？
+
+如果没有看源码，那么下面两段很好理解，因为看到了 `new` 关键字，在Java中，每一次 `new` 都是创建了一个新的对象，所以下面的两个对象都是 `new` 出来的，地址值不一样，因此比较的时候肯定就是 `false` 了。
+
+---
+
+但是上面两个，用静态方法 `valueOf()` 获取出来的，为什么有一个是 `true` 呢？
+
+此时我们就需要来看一下 `valueOf()` 的底层源码。选中 `valueOf()` <kbd>ctrl + b</kbd> 跟进。
+
+在源码中，形参叫 `i`，这个就是我们传递过来的整数。
+
+在下面，它会对 `i` 来做一个判断，如果 `i` 在 `[IntegerCache.low, IntegerCache.high]`，那么就从这里去获取 `Integer` 的对象。
+
+如果不在这个范围里面，才自己 `new`。
+
+在 `1080行` 的代码中有一个方括号，即数组，所以我就猜，这里的 `cache` 是不是表示一个数组。
+
+<img src="./assets/image-20240424183533880.png" alt="image-20240424183533880" style="zoom:70%;" />
+
+选中 `cache` <kbd>ctrl +b</kbd>，此时就能很直观的看见了，它是一个 `Integer` 类型的数组，数组的名字叫做：`cache`
+
+<img src="./assets/image-20240424183747591.png" alt="image-20240424183747591" style="zoom:80%;" />
+
+<kbd>ctrl + alt + ←</kbd> 回到上一步。此时我们就知道了，如果传递过来的参数在一个范围中，我们就不会自己 `new`，而是从一个数组中去获取 `Integer对象` 返回。
+
+那么这个范围是多少呢？<kbd>ctrl +b</kbd> 跟进 `low`。可以发现它的值是 `-128`
+
+<img src="./assets/image-20240424183937269.png" alt="image-20240424183937269" style="zoom:70%;" />
+
+然后 <kbd>ctrl + alt + ←</kbd> ，<kbd>ctrl +b</kbd> 跟进 `high`，就可以看见 `high` 是一个成员变量。
+
+下面有一块静态代码块，在静态代码块中，它定义了一个变量 `h` ，记录的值是 `127`。
+
+然后在 `1039行` 中，它将 `127` 赋值给了 `high`，因此我们知道了，刚刚看到的范围其实是 `byte类型` 的取值范围：`[-128, 127]`
+
+<img src="./assets/image-20240424184157030.png" alt="image-20240424184157030" style="zoom:67%;" />
+
+静态代码块中首先会创建一个 `Integer` 数组，数组的长度 `size` 它是这么计算的 `(high - low) + 1`，`+ 1` 是因为在 `-128 - 127` 之间，它还有一个数据 `0`，也就是说在这个范围内，一共有 `256` 个数据。
+
+那么下面数组长度也是 `256`。
+
+<img src="./assets/image-20240424184822433.png" alt="image-20240424184822433" style="zoom:60%;" />
+
+在下面有一个数组，然后遍历数组，给数组中的每个值进行赋值，这里就是通过创建对象来赋值的 `c[i] = new Integer(j++)`。
+
+`j` 的初始值是 `low`，即 `-128`，然后将 `-128` 创建一个 `Integer` 的对象，方法数组的 `0` 索引.
+
+创建完后，`j++` 变成 `-127`，`i` 也 `++`，变成 `1索引`，将 `-127` 放到了 `1索引` 中。
+
+<img src="./assets/image-20240424185144892.png" alt="image-20240424185144892" style="zoom:67%;" />
+
+这样我们就知道了，`Integer` 在底层实际上会把 `[-128, 127]` 之间所有的数据都创建好 `Integer` 的对象放到 `cache` 数组中。
+
+当我们用 `valueOf()` 方法去获取到对象的时候，它会判断你的这个数据是不是在 `[-128, 127]` 之间，如果在，它不会创建新的，而是从数组中将已经创建好的对象给你返回。
+
+如果不在这个范围内，它才会去 `new`。
+
+<img src="./assets/image-20240424185400636.png" alt="image-20240424185400636" style="zoom:67%;" />
+
+因此在刚刚的代码中我们就知道了，`127` 是在范围内，因此获取的都是同一个对象。而 `128` 超出范围了，那么每次都是 `new` 的。
+
+那Java为什么这么设计呢？
+
+因为在我们实际开发中， `[-128, 127]` 之间的数据它用的比较多，如果每次使用都是 `new`，那么太浪费内存了，因此Java就将 `[-128, 127]` 范围内的每一个数据都创建好对象，如果要用到了不会创建新的，而是返回已经创建好的对象。
+
+-----
+
+### 5）包装类如何进行计算？
+
+#### ① 以前的方式
+
+~~~java
+Integer i1 = new Integer(1);
+Integer i2 = new Integer(2);
+~~~
+
+需求：要把两个数据进行相加得到结果 3
+
+对象直接是不能直接进行计算的，在以前，如果我们想要计算的话，步骤如下：
+
+1、把对象进行拆箱（变成基本数据类型），调用 `intValue()` 方法。
+
+2、相加
+
+~~~java
+int result = i1.intValue() + i2.intValue();
+~~~
+
+3、把得到的结果再次进行装箱（再变回包装类）
+
+~~~java
+Integer i3 = new Integer(result);
+~~~
+
+最后再来打印 `i3`
+
+~~~java
+System.out.println(i3); // 3
+~~~
+
+上面是以前的写法，写起来太麻烦了。用的不爽，就需要改进。
+
+因此在 `JDK5` 的时候提出了一个机制：自动装箱和自动拆箱。
+
+----
+
+#### ② 现在的方式
+
+首先来解释一下 `自动装箱和自动拆箱`，所谓自动，就是不需要我们额外去写代码，Java底层都帮你做好了。
+
+自动装箱：基本数据类型会自动的变成其对应的包装类
+
+自动拆箱：包装类自动的变成其对象的基本数据类型
+
+因此，现在我们就能这么去写
+
+~~~java
+Integer i1 = 10;
+~~~
+
+在底层，此时还会去自动调用静态方法 `valueof()` 得到一个 `Integer对象`，只不过这个动作不需要我们自己去操作了。
+
+`Integer i2 = new Integer(10);`，此时可以直接将 `i2` 赋值给一个基本数据类型 `i`。这个就是自动拆箱。
+
+~~~java
+int i = i2;
+~~~
+
+因此，在JDK5以后，`int` 和 `Integer` 可以看做是同一个东西，因为在内部可以自动转换。
+
+----
+
+### 6）总结
+
+**1、什么是包装类？**
+
+包装类其实就是基本数据类型所对应的对象。
+
+**2、JDK5以后对包装类新增了什么特性？**
+
+自动装箱（基本数据类型会自动的变成其对应的包装类）、自动拆箱（包装类自动的变成其对象的基本数据类型）
+
+**3、我们以后如何获取包装类对象？**
+
+获取对象我们以后不需要 `new`，也不需要调用方法，直接赋值就行了
+
+~~~java
+Integer i = 10;
+~~~
+
+如果想要让包装类进行计算，我们也不需要手动拆箱，直接拿对象 `i1` 和 `i2` 进行相加就行了，它的底层会先进行拆箱，然后进行计算，最后再进行装箱赋值给 `i3`，这些操作都是Java底层自动去完成的。
+
+~~~java
+Integer i1 = 10;
+Integer i2 = 10;
+Integer i3 = i1 + i2;
+~~~
+
+-----
+
+## 五、`Integer` 成员方法
+
+### 1）总述
+
+常见的成员方法一共有 `4个`，前面三个都是类似的：将一个整数分别变成二进制、八进制、十六进制。
+
+我们要注意的是：方法的返回值是 `String`。
+
+但是为什么返回值是字符串呢？而不是 `int / long` 类型的呢？
+
+- 二进制有可能是 `010101` 这种形式，如果是一个整数类型，`0` 是不能开头的。
+
+- `int / long` 它们是有长度的限制的，以 `int类型` 为例，它最多可以取到 `21个亿`，也就是说 `int类型` 最多只能有十位。
+
+  但是二进制有可能是20多位、40多位....因此 `int / long` 有可能装不下，只有 `String` 才可以。
+
+| 方法名                                | 说明         |
+| ------------------------------------- | ------------ |
+| `static string tobinarystring(int i)` | 得到二进制   |
+| `static string tooctalstring(int i)`  | 得到八进制   |
+| `static string toHexstring(int i)`    | 得到十六进制 |
+
+再来看最后一个方法：`parseInt()`，利用这个方法，我们就可以做类型的转换。
+
+| `static int parseInt(string s)` | 将字符串类型的整数转成int类型的整数 |
+| ------------------------------- | ----------------------------------- |
+
+常见的这四个方法都是静态的，所以我们在调用的时候，就可以用类名直接调用。
+
+----
+
+### 2）把整数转为二进制、八进制、十六进制
+
+~~~java
+//1.把整数转成二进制，十六进制
+String str1 = Integer.toBinaryString(100);
+System.out.println(str1);//1100100
+
+//2.把整数转成八进制
+String str2 = Integer.toOctalString(100);
+System.out.println(str2);//144
+
+//3.把整数转成十六进制
+String str3 = Integer.toHexString(100);
+System.out.println(str3);//64
+~~~
+
+这三个方法我们在看源码的时候就会经常看见，我们之前在看 `Object源码` 的时候就看见过，我们可以再来看一下。
+
+<kbd>ctrl + N</kbd> 搜索 `java.lang包` 下的 `Object`
+
+<img src="./assets/image-20240424193032115.png" alt="image-20240424193032115" style="zoom:67%;" />
+
+然后再找里面的 `toString()` 方法，这里就用到了  `Interger.toHexString()`，它会将对象的地址值转成十六进制的形式给你进行返回。
+
+<img src="./assets/image-20240424193247027.png" alt="image-20240424193247027" style="zoom:67%;" />
+
+
+
+----
+
+### 3）将字符串参数转换为对应的基本类型
+
+这个方法是非常非常非常重要的，在以后我们会大量去用到。
+
+因为Java是一种强类型语言。
+
+强类型语言：每种数据在Java中都有各自的数据类型。
+
+在计算的时候，如果不是同一种数据类型，是无法直接计算的，需要转成一样的才可以。
+
+例如现在有个字符串类型的 `"123"` 和 整数类型的 `123` 相加，结果我想得到 `246`，这该怎么办呢？
+
+如果字符串和整数直接相加，它是不会直接进行计算的，而是做一个拼接
+
+~~~java
+"123" + 123 // 123123
+~~~
+
+但如果你要将前面的字符串当成整数，你就必须得先将字符串变成整数才能计算。
+
+因此此时我们需要使用 `Integer.parseInt()` 进行字符串的类型转换。
+
+~~~java
+int i = Integer.parseInt("123");
+System.out.println(i); // 123
+// 为了判断 i 是否真的转成了整数123，在这里打印 123 + 1，如果它真的转成了整数123，那么打印结果应该为124
+System.out.println(i + 1);//124
+
+String str = "true";
+boolean b = Boolean.parseBoolean(str);
+System.out.println(b);
+~~~
+
+**细节1：在类型转换的时候，括号中的参数只能是数字不能是其他，否则代码会报错 `java.lang.NumberFormatException`（数字格式化异常）：For input string: "abc"（对于输入字符串：“abc”）**
+
+<img src="./assets/image-20240424193958879.png" alt="image-20240424193958879" style="zoom:80%;" />
+
+**细节2：8种包装类当中除了Character类之外，其他所有包装类都具有parseXxx静态方法可以将字符串参数转换为对应的基本类型**
+
+- `public static byte parseByte(String s)`：将字符串参数转换为对应的byte基本类型。
+- `public static short parseShort(String s)`：将字符串参数转换为对应的short基本类型。
+- **`public static int parseInt(String s)`：将字符串参数转换为对应的int基本类型。**
+- **`public static long parseLong(String s)`：将字符串参数转换为对应的long基本类型。**
+- `public static float parseFloat(String s)`：将字符串参数转换为对应的float基本类型。
+- `public static double parseDouble(String s)`：将字符串参数转换为对应的double基本类型。
+- `public static boolean parseBoolean(String s)`：将字符串参数转换为对应的boolean基本类型。
+
+注意:如果字符串参数的内容无法正确转换为对应的基本类型，则会抛出 `java.lang.NumberFormatException` 异常。
+
+有了这个类型转换之后，在以后我们就要改写键盘录入的代码了。
+
+----
+
+### 4）改写键盘录入
+
+在正式学习之前，先回顾一下之前讲的键盘录入。
+
+~~~java
+System.out.println("请输入一个整数"); 
+int i = sc.nextInt();
+System.out.println(i);
+~~~
+
+如果我要接收一个字符串，方法就要变成 `next()`
+
+~~~java
+Scanner sc = new Scanner(System.in);
+System.out.println("请输入一个字符串");
+String str = sc.next();
+System.out.println(str);
+~~~
+
+但是这种输入方式其实是有一些小小的弊端的。
+
+当我们在使用 `next，nextInt，nextDouble` 在接收数据的时候，遇到空格，回车，制表符的时候就停止了。
+
+如果键盘录入的是 `123 123` 那么此时只能接收到空格前面的数据，但这不是我想要的，我想要的是接收一整行数据。
+
+因此在这我们跟大家来做一个约定：以后我们如果想要键盘录入，不管什么类型，统一使用 `nextLine()`，这个方法会接受一整行数据，将空格、制表符全部接收完毕，它的特点是：遇到回车才停止
+
+~~~java
+String line = sc.nextLine(); // 输入：123 123
+System.out.println(line); // 123 123
+~~~
+
+但如果想要整数 / 小数，拿到字符串后再去进行数据转换
+
+~~~java
+int i = Integer.parseInt(line);
+System.out.println(i);
+
+double v = Double.parseDouble(line);
+System.out.println(v);
+~~~
+
+
+
+-----
+
+# 175.两道综合练习
+
+## 一、练习一
+
+需求：键盘录入一些1~100之间的整数，并添加到集合中。直到集合中所有数据和超过200为止。
+
+代码示例：
+
+```java
+public class Test1 {
+    public static void main(String[] args) {
+        //1.创建一个集合用来添加整数
+        ArrayList<Integer> list = new ArrayList<>();
+        //2.键盘录入数据添加到集合中
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            System.out.println("请输入一个整数");
+            String numStr = sc.nextLine();
+            int num = Integer.parseInt(numStr);//先把异常数据先进行过滤
+            if (num < 1 || num > 100){
+                System.out.println("当前数字不在1~100的范围当中，请重新输入");
+                continue;
+            }
+            //添加到集合中//细节:
+            //num:基本数据类型，集合里面的数据是Integer
+            //因此在添加数据的时候触发了自动装箱
+            //因此list.add(Integer.valueOf(num))等价于下面一行代码
+            list.add(num);
+            //统计集合中所有的数据和
+            int sum = getSum(list);
+            //对sum进行判断
+            if(sum > 200){
+                System.out.println("集合中所有的数据和已经满足要求");
+                break;
+            }
+        }
+    }
+
+    private static int getSum(ArrayList<Integer> list) {
+        int sum = 0;
+        for (int i = 0; i < list.size(); i++) {
+            //i :索引
+            //list.get(i);
+            // 这里从集合中拿出来的数据是Integer类型的，这里会做一个自动拆箱
+            int num = list.get(i);
+            sum = sum + num; // +=
+        }
+        return sum;
+    }
+}
+```
+
+----
+
+## 二、练习二：实现 `parseInt方法` 的效果
+
+需求：自己实现 `parseInt方法` 的效果，将字符串形式的数据转成整数。
+
+要求:字符串中只能是数字不能有其他字符最少一位，最多10位，`0` 不能开头
+
+代码示例：
+
+```java
+public static String tobinarystring(int number) {//6
+    //核心逻辑:
+    //不断的去除以2，得到余数，一直到商为0就结束。
+    //还需要把余数倒着拼接起来
+
+    //定义一个StringBuilder用来拼接余数
+    StringBuilder sb = new StringBuilder();
+    //利用循环不断的除以2获取余数
+    while (true) {
+        if (number == 0) {
+            break;
+        }
+        //获取余数 %
+        int remaindar = number % 2;//倒着拼接
+        sb.insert(0, remaindar);
+        //除以2 /
+        number = number / 2;
+    }
+    return sb.toString();
+}
+```
+
+
+
+----
+
+# 176.三道综合练习
+
+## 一、练习三：实现 `toBinaryString方法` 的效果
+
+需求：定义一个方法自己实现 `toBinaryString方法` 的效果，将一个十进制整数转成字符串表示的二进制
+
+之前我们讲过一个方法：除基取余法。不断的除以基数（几进制，基数就是几）得到余数，直到商为0，再将余数倒着拼起来即可。
+
+`StringBuilder` 中还有一个方法：`insert()`，方法中有两个参数。
+
+参数一：`offset`，即插入到的索引位置。
+
+参数二：`c`，插的数字
+
+<img src="./assets/image-20240424205059178.png" alt="image-20240424205059178" style="zoom:67%;" />
+
+代码示例：
+
+```java
+public static String tobinarystring(int number) {
+    //核心逻辑:
+    //不断的去除以2，得到余数，一直到商为0就结束。
+    //还需要把余数倒着拼接起来
+
+    //定义一个StringBuilder用来拼接余数
+    StringBuilder sb = new StringBuilder();
+    //利用循环不断的除以2获取余数
+    while (true) {
+        if (number == 0) {
+            break;
+        }
+        //获取余数 %
+        int remaindar = number % 2;//倒着拼接
+        sb.insert(0, remaindar);
+        //除以2 /
+        number = number / 2;
+    }
+    return sb.toString();
+}
+```
+
+----
+
+## 二、练习四：使用代码实现计算你活了多少天
+
+需求：请使用代码实现计算你活了多少天，用JDK7和JDK8两种方式完成
+
+代码示例：
+
+```java
+public class Test4 {
+    public static void main(String[] args) throws ParseException {
+        //JDK7有一个小小的规则:只要对时间进行计算或者判断，都需要先获取当前时间的毫秒值
+        //1.计算出生年月日的毫秒值
+        String birthday = "2000年1月1日";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
+        Date date = sdf.parse(birthday);
+        long birthdayTime = date.getTime();
+        //2.获取当前时间的毫秒值
+        long todayTime = System.currentTimeMillis();
+        //3.计算间隔多少天
+        long time = todayTime - birthdayTime;
+        System.out.println(time / 1000 / 60 / 60 / 24);
+
+
+        //JDK8
+        LocalDate ld1 = LocalDate.of(2000, 1, 1);
+        LocalDate ld2 = LocalDate.now();
+        long days = ChronoUnit.DAYS.between(ld1, ld2); // 注意它的计算方式是第二个参数减去第一个参数
+        System.out.println(days);
+    }
+}
+```
+
+----
+
+## 三、练习五：判断任意的一个年份是闰年还是平年
+
+需求：判断任意的一个年份是闰年还是平年
+
+要：用JDK7和JDK8两种方式判断
+
+提示：二月有29天是闰年，一年有366天是闰年，因此这题有两个思路
+
+代码示例：
+
+```java
+public class Test5 {
+    public static void main(String[] args) {
+        //jdk7
+        //我们可以把时间设置为2000年3月1日
+        Calendar c = Calendar.getInstance();
+        c.set(2000, 2, 1);
+        //月份的范围:0~11
+        //再把日历往前减一天
+        c.add(Calendar.DAY_OF_MONTH, -1);
+        //看当前的时间是28号还是29号?
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        System.out.println(day);
+
+        //jdk8
+        //月份的范围:1~12
+        //设定时间为2000年的3月1日
+        LocalDate ld = LocalDate.of(2001, 3, 1);
+        //把时间往前减一天
+        LocalDate ld2 = ld.minusDays(1);
+        //获取这一天是一个月中的几号
+        int day2 = ld2.getDayOfMonth();
+        System.out.println(day2);
+    }
+}
+```
+
+以上代码就可以完成本题了，但是JDK8还定义了一个非常好的方法：`isLeapYear()` 就是用来判断是不是闰年
+
+~~~java
+//true:闰年
+//false:平年
+System.out.println(ld.isLeapYear());
+~~~
+
+
+
+------
+
+# 177.
 
 
 
