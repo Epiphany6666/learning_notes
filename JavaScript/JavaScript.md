@@ -30,7 +30,7 @@ shift+回车，直接跳过后面的字符直接新开一行
 
    在控制里可以自定义快捷键
 
-   <img src="O:\BaiduSyncdisk\other\StudyNote\HTML+CSS+移动web\assets\image-20231227214435809.png" alt="image-20231227214435809" style="zoom:50%;" />
+   <img src=".\assets\image-20231227214435809.png" alt="image-20231227214435809" style="zoom:50%;" />
 
 2. 画图：Zoomit64
 
@@ -7473,7 +7473,7 @@ input.addEventListener('blur', function () {
 
 ### 预定义类
 
-预定义：指的是 某些常见模式的简写方式，区分字母和数字
+预定义：就是提前已经定义好的，它自己有一些特殊的含义
 
 ![67608035363](./assets/1676080353637.png)
 
