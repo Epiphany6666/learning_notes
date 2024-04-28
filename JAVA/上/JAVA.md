@@ -47199,10 +47199,10 @@ JDK8及JDK8以后：数组 ＋ 链表 ＋ 红黑树
 
 要求：学生对象的成员变量值相同，我们就认为是同一个对象
 
-**Student2.java**
+**Student.java**
 
 ~~~java
-public class Student2 {
+public class Student {
     //姓名
     private String name;
     //年龄
@@ -47902,6 +47902,34 @@ for (Student2 t : ts) {
 ![image-20240427215840960](./assets/image-20240427215840960.png)
 
 
+
+------
+
+# 源码分析
+
+接下来就把我们刚刚所学习的 `HashSet、LinkedHashSet、TreeSet` 的底层源码看看，它们的源码非常的简单。
+
+选中 `HashSet` <kbd>ctrl + b。
+
+可以发现，在底层 `HashSet` 其实是 `new` 了一个 `HashMap`
+
+<img src="./assets/image-20240428073617803.png" alt="image-20240428073617803" style="zoom:67%;" />
+
+并且在添加的时候，也是调用了 `Map集合` 中的添加方法。
+
+再来看 `LinedHashSet`，在底层它会调用父类里面的构造。
+
+<img src="./assets/image-20240428073742607.png" alt="image-20240428073742607" style="zoom:67%;" />
+
+选中 `super` <kbd>ctrl + b</kbd> ，可以发现在父类中它是 `new` 了一个 `LinkedHashMap`，又跟 `Map集合` 有关。
+
+<img src="./assets/image-20240428073851885.png" alt="image-20240428073851885" style="zoom:67%;" />
+
+再来看最后一个，`TreeSet` 同理，`new` 的是 `TreeMap`
+
+<img src="./assets/image-20240428073955138.png" alt="image-20240428073955138" style="zoom:67%;" />
+
+因此，如果我们想知道 `Set集合` 的底层源码做了哪些事，那么首先就需要先学习 `Map集合`。
 
 
 
