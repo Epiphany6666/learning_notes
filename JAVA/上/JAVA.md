@@ -26986,7 +26986,6 @@ public class App {
 
 ~~~java
 package com.itheima.ui;
-
 public class LoginJFrame {
     //LoginJFrame 表示登录界面
     //以后所有跟登录相关的代码，都写在这里
@@ -31212,7 +31211,8 @@ mouseClicked方法详解：
 ```java
 先判断当前按下的是否为登录按钮。
 如果是登录按钮，获取输入框中的用户名和密码
-判断1：是否为空，如果为空，提示：用户名和密码为空
+判断1：是否为空，如果为空，提示：用户名和密码为空，我们获取到的并不是null，而是 ""。
+	要注意的是，我们判断是否为空，其实是对 "" 进行判断，因此只需要判断长度是否为0即可。
 判断2：判断用户名和密码是否为zhangsan，123456，如果正确隐藏登录界面，进入游戏界面。
 判断3：判断用户吗和密码，如果错误，就展示弹框，提示：用户名和密码错误
 ```
@@ -33772,6 +33772,9 @@ public class MyJframe extends JFrame implements ActionListener {
 
         JLabel text = new JLabel("你觉得自己帅吗？");
         // 给这段文本设置字体
+        // 参数一：字体，如果写 null ，表示使用默认字体
+        // 参数二：样式。0：普通汉字，不加粗，不斜体；1：加粗；2：斜体
+        //参数三：字体大小
         text.setFont(new Font("微软雅黑", 0, 30));
         text.setBounds(120, 150, 300, 50);
 
@@ -41332,6 +41335,41 @@ public class Test1 {
 要求:字符串中只能是数字不能有其他字符最少一位，最多10位，`0` 不能开头
 
 代码示例：
+
+~~~java
+package com.itheima.a04test;
+
+public class Test2 {
+    public static void main(String[] args) {
+        //1.定义一个字符串
+        String str = "123";
+        //2.校验字符串
+        //习惯:会先把异常数据进行过滤，剩下来就是正常的数据。
+        if (!str.matches("[1-9]\\d{0,9}")) {
+            //错误的数据
+            System.out.println("数据格式有误");
+        } else {
+            //正确的数据
+            System.out.println("数据格式正确");
+            //3.定义一个变量表示最终的结果
+            int number = 0;
+            //4.遍历字符串得到里面的每一个字符
+            for (int i = 0; i < str.length(); i++) {
+                int c = str.charAt(i) - '0';//把每一位数字放到number当中
+                number = number * 10 + c;
+            }
+            System.out.println(number);
+            System.out.println(number + 1);
+        }
+    }
+}
+~~~
+
+----
+
+## 三、练习三
+
+定义一个方法自己实现toBinaryString方法的效果，将一个十进制整数转成字符串表示的二进制
 
 ```java
 public static String tobinarystring(int number) {//6
