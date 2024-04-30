@@ -1,4 +1,4 @@
-# day24 集合（Map&可变参数&集合工具类）
+# 	day24 集合（Map&可变参数&集合工具类）
 
 # 2.双列集合的特点
 
@@ -1598,7 +1598,7 @@ hashCode和equals方法是跟HashMap的键有关的。
 
 只不过下面的方法我们平时几乎不怎么用，因此了解一下知道有它的存在就行了。
 
-**此时putIfAbsent本身不重要，主要的是在这里主要是想和大家传递一个思想：**
+**此时 `putIfAbsent` 本身不重要，主要的是在这里主要是想和大家传递一个思想：**
 
 代码中的逻辑都有两面性，如果我们只知道了其中的A面，而且代码中还发现了有变量可以控制两面性的发生，那么该逻辑一定会有B面。
 
@@ -3812,7 +3812,7 @@ list1.stream().filter(name->name.startsWith("张")).filter(name -> name.length()
 
 ----
 
-# 36.`Stream流` 的思想和获取 `Stream流`
+# 36.`Stream流` 的思想
 
 ## 一、什么是流？
 
@@ -3852,7 +3852,7 @@ Java中的 `Stream流` 跟它的思想是一样，以刚刚的练习为例。
 
 因此完整的 `Steam流` 的使用步骤如下
 
-① 先得到一条 `Steam流`(流水线) ，并把数据放到流水线上
+① 获取 `Stream流对象` （先得到一条 `Steam流`(流水线) ，并把数据放到流水线上）
 
 ② 使用 **中间方法** 对流水线上的数据进行操作
 
@@ -3860,7 +3860,7 @@ Java中的 `Stream流` 跟它的思想是一样，以刚刚的练习为例。
 
 ----
 
-## 三、先得到一条 `Steam流`(流水线) ，并把数据放到流水线上
+# 获取 `Stream流`
 
 如何获取一条流水线，并将数据放上去呢？
 
@@ -3878,7 +3878,7 @@ Java中的 `Stream流` 跟它的思想是一样，以刚刚的练习为例。
 
 ----
 
-### 1）单列集合获取Stream流
+## 一、单列集合获取Stream流
 
 方法的返回值就是一个 `Steam流`，并且流水线上的数据就是 `字符串`。
 
@@ -3907,7 +3907,7 @@ list.stream().forEach(s -> System.out.println(s));
 
 ----
 
-### 2）双列集合获取 `Steam流`
+## 二、双列集合获取 `Steam流`
 
 双列集合是不能直接使用 `steam()`，它需要通过 `keySet()` / `entrySet` 先转成单列集合，再获取 `Steam流`。
 
@@ -3929,7 +3929,7 @@ hm.entrySet().stream().forEach(s-> System.out.println(s));
 
 ----
 
-### 3）数组获取 `Steam流`
+## 三、数组获取 `Steam流`
 
 数组无论是基本数据类型还是引用数据类型，都是可以使用 `Steam流` 的。
 
@@ -3951,7 +3951,7 @@ Arrays.stream(arr2).forEach(s-> System.out.println(s));
 
 ---
 
-### 4）`一堆零散的数据` 获取 `Steam流`
+## 四、`一堆零散的数据` 获取 `Steam流`
 
 前提条件：这些 `零散的数据` 需要是同种数据类型。
 
@@ -3968,7 +3968,7 @@ Stream.of("a","b","c","d","e").forEach(s-> System.out.println(s));
 
 ----
 
-### 5）`Steam` 中的静态方法 `of()` 的细节
+## 五、`Steam` 中的静态方法 `of()` 的细节
 
 很多课程中，如果想要获取数组中的  `Steam流` ，会建议大家使用 `Stream.of()`，也就是下面 `一堆零散的数据` 的处理方案。
 
@@ -4001,6 +4001,8 @@ Stream.of(arr1).forEach(s-> System.out.println(s));//[I@41629346
 -----
 
 # 37.`Stream流`的中间方法
+
+概念：中间操作的意思是,执行完此方法之后,Stream流依然可以继续执行其他操作
 
 ## 一、总述
 
@@ -4189,390 +4191,675 @@ PS：`distinct()` 在底层是依赖 `hashCode()` 和 `equals()` 进行去重的
 
 <img src="./assets/image-20240430095637839.png" alt="image-20240430095637839" style="zoom:67%;" />
 
-点进去后，可以发现它的源码超级多。
+它底层会调用 `makeRef()`，继续跟进
+
+<img src="./assets/image-20240430144721811.png" alt="image-20240430144721811" style="zoom:80%;" />
+
+点进去后，可以发现它的源码超级多，但不要慌，我们真正看的是里面的一个核心点：`keys = new HashSet<>(keys);`。
+
+所以我们就知道，在底层是通过 `HashSet` 进行去重的。
+
+<img src="./assets/image-20240430144821310.png" alt="image-20240430144821310" style="zoom:80%;" />
+
+`HashSet` 在存储自定义元素的时候，需要重写 `hashCode()` 和 `equals()`。
+
+----
+
+## 七、合并a和b两个流为一个大流
+
+**在合并的时候，尽可能要保证两个流中的数据类型是一致的。**
+
+如果第一个流数据类型是 `a`，第二个流数据类型是 `b`，那么这个时候在合并的时候，它的类型就是 `a` 跟 `b` 共同的父类了，这样就相当于它做了一个类型的提升，在提升之后，它是无法使用子类里面的特有功能的。
+
+~~~java
+static <T> Stream<T> concat(Stream a, Stream b)
+~~~
+
+这个方法是 `Stream` 里面的静态方法，所以在使用的时候需要使用类名调用
+
+~~~java
+ArrayList<String> list1 = new ArrayList<>();
+Collections.addAll(list1, "张无忌","张无忌","张无忌", "张强", "张三丰", "张翠山", "张良", "王二麻子", "谢广坤");
+
+ArrayList<String> list2 = new ArrayList<>();
+Collections.addAll(list2, "周芷若", "赵敏");
+
+// 方法参数中传递需要合并的两个流，程序运行完毕发现，前面是第一个流里面的数据，后面就是第二个流中的
+Stream.concat(list1.stream(),list2.stream()).forEach(s -> System.out.println(s)); // 张无忌 张无忌 张无忌 张强 张三丰 张翠山 张良 王二麻子 谢广坤 周芷若 赵敏 
+~~~
+
+-----
+
+## 八、转换流中的数据类型
+
+~~~java
+Stream<R> map(Function<T, R> mapper)
+~~~
+
+需求：只获取里面的年龄并进行打印
+
+~~~java
+ArrayList<String> list = new ArrayList<>();
+Collections.addAll(list, "张无忌-15", "周芷若-14", "赵敏-13", "张强-20", "张三丰-100", "张翠山-40", "张良-35", "王二麻子-37", "谢广坤-41");
+~~~
+
+分析：流里面原本的数据是 `String` 类型的，最终我需要获得 `int` 类型的。
+
+因此需求其实就是将 `String` 变成 `int类型`。
+
+`map()` 的形参是 `Function`，而 `Function` 又是函数式接口。接口中有一个 `apply()`
+
+<img src="./assets/image-20240430150416812.png" alt="image-20240430150416812" style="zoom:67%;" />
+
+在 `Function` 中有两个泛型：
+
+- 第一个类型：流中原本的数据类型
+- 第二个类型：要转成之后的类型
+
+`apply`的 `形参s`：依次表示流里面的每一个数据；`返回值`：表示转换之后的数据。
+
+我们的需求是将字符串变成 `int类型`，但是不能直接将 `int` 写在泛型里，因为泛型里面不能写基本数据类型。
+
+<img src="./assets/image-20240430151307912.png" alt="image-20240430151307912" style="zoom:67%;" />
+
+因此正确写法应该是写成：`Integer`，同样 `apply()` 的返回值需要与 `Function` 的泛型相对应，这两个都表示转换之后的类型。
+
+<img src="./assets/image-20240430151431118.png" alt="image-20240430151431118" style="zoom:80%;" />
+
+~~~java
+list.stream().map(new Function<String, Integer>() {
+    @Override
+    public Integer apply(String s) {
+        String[] arr = s.split("-");
+        String ageString = arr[1];
+        int age = Integer.parseInt(ageString);
+        return age;
+    }
+})
+    //当map方法执行完毕之后，流上的数据就变成了整数
+	//所以在下面forEach当中，s依次表示流里面操作完毕后的每一个数据，这个数据现在就是整数了
+    .forEach(s-> System.out.println(s));
+~~~
+
+改成 `Lambda表达式`
+
+~~~java
+list.stream()
+    .map(s-> Integer.parseInt(s.split("-")[1]))
+    .forEach(s-> System.out.println(s));
+~~~
 
 
 
-- 概念
+-----
 
-  中间操作的意思是,执行完此方法之后,Stream流依然可以继续执行其他操作
+# 38.`Stream流`的终结方法
 
-- filter代码演示
+概念：终结操作的意思是,执行完此方法之后,Stream流将不能再执行其他操作
 
-  ```java
-  public class MyStream3 {
-      public static void main(String[] args) {
-  //        Stream<T> filter(Predicate predicate)：过滤
-  //        Predicate接口中的方法	boolean test(T t)：对给定的参数进行判断，返回一个布尔值
-  
-          ArrayList<String> list = new ArrayList<>();
-          list.add("张三丰");
-          list.add("张无忌");
-          list.add("张翠山");
-          list.add("王二麻子");
-          list.add("张良");
-          list.add("谢广坤");
-  
-          //filter方法获取流中的 每一个数据.
-          //而test方法中的s,就依次表示流中的每一个数据.
-          //我们只要在test方法中对s进行判断就可以了.
-          //如果判断的结果为true,则当前的数据留下
-          //如果判断的结果为false,则当前数据就不要.
-  //        list.stream().filter(
-  //                new Predicate<String>() {
-  //                    @Override
-  //                    public boolean test(String s) {
-  //                        boolean result = s.startsWith("张");
-  //                        return result;
-  //                    }
-  //                }
-  //        ).forEach(s-> System.out.println(s));
-  
-          //因为Predicate接口中只有一个抽象方法test
-          //所以我们可以使用lambda表达式来简化
-  //        list.stream().filter(
-  //                (String s)->{
-  //                    boolean result = s.startsWith("张");
-  //                        return result;
-  //                }
-  //        ).forEach(s-> System.out.println(s));
-  
-          list.stream().filter(s ->s.startsWith("张")).forEach(s-> System.out.println(s));
-  
-      }
-  }
-  ```
+## 一、总述
 
-- limit&skip代码演示
+常见的终结方法会有以下四个
 
-  ```java
-  public class StreamDemo02 {
-      public static void main(String[] args) {
-          //创建一个集合，存储多个字符串元素
-          ArrayList<String> list = new ArrayList<String>();
-  
-          list.add("林青霞");
-          list.add("张曼玉");
-          list.add("王祖贤");
-          list.add("柳岩");
-          list.add("张敏");
-          list.add("张无忌");
-  
-          //需求1：取前3个数据在控制台输出
-          list.stream().limit(3).forEach(s-> System.out.println(s));
-          System.out.println("--------");
-  
-          //需求2：跳过3个元素，把剩下的元素在控制台输出
-          list.stream().skip(3).forEach(s-> System.out.println(s));
-          System.out.println("--------");
-  
-          //需求3：跳过2个元素，把剩下的元素中前2个在控制台输出
-          list.stream().skip(2).limit(2).forEach(s-> System.out.println(s));
-      }
-  }
-  ```
+| 方法名                          | 说明                       |
+| ------------------------------- | -------------------------- |
+| `void forEach(Consumer action)` | 遍历                       |
+| `long count()`                  | 统计                       |
+| `toArray()`                     | 收集流中的数据，放到数组中 |
+| `collect(Collector collector)`  | 收集流中的数据，放到集合中 |
 
-- concat&distinct代码演示
+思考为什么要收集？
 
-  ```java
-  public class StreamDemo03 {
-      public static void main(String[] args) {
-          //创建一个集合，存储多个字符串元素
-          ArrayList<String> list = new ArrayList<String>();
-  
-          list.add("林青霞");
-          list.add("张曼玉");
-          list.add("王祖贤");
-          list.add("柳岩");
-          list.add("张敏");
-          list.add("张无忌");
-  
-          //需求1：取前4个数据组成一个流
-          Stream<String> s1 = list.stream().limit(4);
-  
-          //需求2：跳过2个数据组成一个流
-          Stream<String> s2 = list.stream().skip(2);
-  
-          //需求3：合并需求1和需求2得到的流，并把结果在控制台输出
-  //        Stream.concat(s1,s2).forEach(s-> System.out.println(s));
-  
-          //需求4：合并需求1和需求2得到的流，并把结果在控制台输出，要求字符串元素不能重复
-          Stream.concat(s1,s2).distinct().forEach(s-> System.out.println(s));
-      }
-  }
-  ```
+我们使用 `Stream流` 可以用来处理 `集合 / 数组` 中的数据，那你处理完了之后，肯定要将这些数据保存起来，因此我们需要将它们收集起来。
 
-### 2.4Stream流终结操作方法【应用】
+---
 
-- 概念
+## 二、遍历
 
-  终结操作的意思是,执行完此方法之后,Stream流将不能再执行其他操作
+~~~java
+void forEach(Consumer action)
+~~~
 
-- 常见方法
 
-  | 方法名                        | 说明                     |
-  | ----------------------------- | ------------------------ |
-  | void forEach(Consumer action) | 对此流的每个元素执行操作 |
-  | long count()                  | 返回此流中的元素数       |
 
-- 代码演示
+~~~java
+ArrayList<String> list = new ArrayList<>();
+Collections.addAll(list, "张无忌", "周芷若", "赵敏", "张强", "张三丰", "张翠山", "张良", "王二麻子", "谢广坤");
 
-  ```java
-  public class MyStream5 {
-      public static void main(String[] args) {
-          ArrayList<String> list = new ArrayList<>();
-          list.add("张三丰");
-          list.add("张无忌");
-          list.add("张翠山");
-          list.add("王二麻子");
-          list.add("张良");
-          list.add("谢广坤");
-  
-          //method1(list);
-          
-  //        long count()：返回此流中的元素数
-          long count = list.stream().count();
-          System.out.println(count);
-      }
-  
-      private static void method1(ArrayList<String> list) {
-          //  void forEach(Consumer action)：对此流的每个元素执行操作
-          //  Consumer接口中的方法void accept(T t)：对给定的参数执行此操作
-          //在forEach方法的底层,会循环获取到流中的每一个数据.
-          //并循环调用accept方法,并把每一个数据传递给accept方法
-          //s就依次表示了流中的每一个数据.
-          //所以,我们只要在accept方法中,写上处理的业务逻辑就可以了.
-          list.stream().forEach(
-                  new Consumer<String>() {
-                      @Override
-                      public void accept(String s) {
-                          System.out.println(s);
-                      }
-                  }
-          );
-        
-          System.out.println("====================");
-          //lambda表达式的简化格式
-          //是因为Consumer接口中,只有一个accept方法
-          list.stream().forEach(
-                  (String s)->{
-                      System.out.println(s);
-                  }
-          );
-          System.out.println("====================");
-          //lambda表达式还是可以进一步简化的.
-          list.stream().forEach(s->System.out.println(s));
-      }
-  }
-  ```
+//用list调用stream()获取到一个流水线，并把集合里面的数据放到流水线上
+list.stream()
+~~~
 
-### 2.5Stream流的收集操作【应用】
+可以发现 `forEach()` 的返回值是 `void`，因此调用 `forEach()` 结束后就不能调用流里面的其他方法了，它是终结方法。
 
-- 概念
+<img src="./assets/image-20240430153920243.png" alt="image-20240430153920243" style="zoom:80%;" />
 
-  对数据使用Stream流的方式操作完毕后,可以把流中的数据收集到集合中
+跟进 `forEach()` ，可以发现它的形参是 `Consumer`，继续跟进 `Consumer`。
 
-- 常用方法
+发现它是一个函数式接口，因此一会我们会将它改写成 `Lambda表达式`。
 
-  | 方法名                         | 说明               |
-  | ------------------------------ | ------------------ |
-  | R collect(Collector collector) | 把结果收集到集合中 |
+<img src="./assets/image-20240430153734914.png" alt="image-20240430153734914" style="zoom:80%;" />
 
-- 工具类Collectors提供了具体的收集方式
+我们先写匿名内部类
 
-  | 方法名                                                       | 说明                   |
-  | ------------------------------------------------------------ | ---------------------- |
-  | public static <T> Collector toList()                         | 把元素收集到List集合中 |
-  | public static <T> Collector toSet()                          | 把元素收集到Set集合中  |
-  | public static  Collector toMap(Function keyMapper,Function valueMapper) | 把元素收集到Map集合中  |
+~~~java
+//Consumer的泛型：表示流中数据的类型
+//accept方法的形参s：依次表示流里面的每一个数据
+//方法体：对每一个数据的处理操作（打印）
+list.stream().forEach(new Consumer<String>() {
+    @Override
+    public void accept(String s) {
+        System.out.println(s);
+    }
+});
+~~~
 
-- 代码演示
+改写为 `Lambda表达式`
 
-  ```java
-  // toList和toSet方法演示 
-  public class MyStream7 {
-      public static void main(String[] args) {
-          ArrayList<Integer> list1 = new ArrayList<>();
-          for (int i = 1; i <= 10; i++) {
-              list1.add(i);
-          }
-  
-          list1.add(10);
-          list1.add(10);
-          list1.add(10);
-          list1.add(10);
-          list1.add(10);
-  
-          //filter负责过滤数据的.
-          //collect负责收集数据.
-                  //获取流中剩余的数据,但是他不负责创建容器,也不负责把数据添加到容器中.
-          //Collectors.toList() : 在底层会创建一个List集合.并把所有的数据添加到List集合中.
-          List<Integer> list = list1.stream().filter(number -> number % 2 == 0)
-                  .collect(Collectors.toList());
-  
-          System.out.println(list);
-  
-      Set<Integer> set = list1.stream().filter(number -> number % 2 == 0)
-              .collect(Collectors.toSet());
-      System.out.println(set);
-  }
-  }
-  /**
-  Stream流的收集方法 toMap方法演示
-  创建一个ArrayList集合，并添加以下字符串。字符串中前面是姓名，后面是年龄
-  "zhangsan,23"
-  "lisi,24"
-  "wangwu,25"
-  保留年龄大于等于24岁的人，并将结果收集到Map集合中，姓名为键，年龄为值
-  */
-  public class MyStream8 {
-  	public static void main(String[] args) {
-        	ArrayList<String> list = new ArrayList<>();
-          list.add("zhangsan,23");
-          list.add("lisi,24");
-          list.add("wangwu,25");
-  
-          Map<String, Integer> map = list.stream().filter(
-                  s -> {
-                      String[] split = s.split(",");
-                      int age = Integer.parseInt(split[1]);
-                      return age >= 24;
-                  }
-  
-           //   collect方法只能获取到流中剩余的每一个数据.
-           //在底层不能创建容器,也不能把数据添加到容器当中
-  
-           //Collectors.toMap 创建一个map集合并将数据添加到集合当中
-  
-            // s 依次表示流中的每一个数据
-  
-            //第一个lambda表达式就是如何获取到Map中的键
-            //第二个lambda表达式就是如何获取Map中的值
-          ).collect(Collectors.toMap(
-                  s -> s.split(",")[0],
-                  s -> Integer.parseInt(s.split(",")[1]) ));
-  
-          System.out.println(map);
-  	}
-  }
-  ```
+~~~java
+list.stream().forEach(s -> System.out.println(s));
+~~~
 
-### 2.6Stream流综合练习【应用】
+----
 
-- 案例需求
+## 三、统计
 
-  现在有两个ArrayList集合，分别存储6名男演员名称和6名女演员名称，要求完成如下的操作
+~~~java
+long count()
+~~~
 
-  - 男演员只要名字为3个字的前三人
-  - 女演员只要姓林的，并且不要第一个
-  - 把过滤后的男演员姓名和女演员姓名合并到一起
-  - 把上一步操作后的元素作为构造方法的参数创建演员对象,遍历数据
+`count()` 的返回值是一个 `long类型` 的整数，因此 `count()` 结束后，也不能再调用流里面的其他方法了，它也是一个终结方法。
 
-  演员类Actor已经提供，里面有一个成员变量，一个带参构造方法，以及成员变量对应的get/set方法
+<img src="./assets/image-20240430154059261.png" alt="image-20240430154059261" style="zoom:80%;" />
 
-- 代码实现
+~~~java
+long count = list.stream().count();
+System.out.println(count); // 9
+~~~
 
-  演员类
+----
 
-  ```java
-  public class Actor {
-      private String name;
-  
-      public Actor(String name) {
-          this.name = name;
-      }
-  
-      public String getName() {
-          return name;
-      }
-  
-      public void setName(String name) {
-          this.name = name;
-      }
-  }
-  ```
+## 四、收集流中的数据，放到数组中
 
-  测试类
+~~~java
+toArray()
+~~~
 
-  ```java
-  public class StreamTest {
-      public static void main(String[] args) {
-          //创建集合
-          ArrayList<String> manList = new ArrayList<String>();
-          manList.add("周润发");
-          manList.add("成龙");
-          manList.add("刘德华");
-          manList.add("吴京");
-          manList.add("周星驰");
-          manList.add("李连杰");
-    
-          ArrayList<String> womanList = new ArrayList<String>();
-          womanList.add("林心如");
-          womanList.add("张曼玉");
-          womanList.add("林青霞");
-          womanList.add("柳岩");
-          womanList.add("林志玲");
-          womanList.add("王祖贤");
-    
-          //男演员只要名字为3个字的前三人
-          Stream<String> manStream = manList.stream().filter(s -> s.length() == 3).limit(3);
-    
-          //女演员只要姓林的，并且不要第一个
-          Stream<String> womanStream = womanList.stream().filter(s -> s.startsWith("林")).skip(1);
-    
-          //把过滤后的男演员姓名和女演员姓名合并到一起
-          Stream<String> stream = Stream.concat(manStream, womanStream);
-    
-        	// 将流中的数据封装成Actor对象之后打印
-        	stream.forEach(name -> {
-              Actor actor = new Actor(name);
-              System.out.println(actor);
-          }); 
-      }
-  }
-  ```
+调用 `toArray()` 的时候会有两个，最简单的是空参的，表示我们需要收集到 `Object类型` 的数组中。
 
-## 3.方法引用
+但是我们需要的是放到具体类型的数组中，就可以使用下面的方法。
+
+<img src="./assets/image-20240430154335652.png" alt="image-20240430154335652" style="zoom:80%;" />
+
+首先来讲最简单的空参，返回的是 `Object类型` 的数组中。
+
+~~~java
+Object[] arr1 = list.stream().toArray();
+System.out.println(Arrays.toString(arr1));
+~~~
+
+接下来讲有参的，跟进 `toArray()` 往下滑
+
+![image-20240430154757072](./assets/image-20240430154757072.png)
+
+点击 `IntFunction`，可以发现它也是一个函数式接口
+
+<img src="./assets/image-20240430154841984.png" alt="image-20240430154841984" style="zoom:80%;" />
+
+这里先写匿名内部类
+
+~~~~~java
+list.stream().toArray(new IntFunction<? extends Object[]>() {
+    @Override
+    public Object[] apply(int value) {
+        return new Object[0];
+    }
+});
+~~~~~
+
+这个接口相对来将比较复杂。
+
+`IntFunction` 的泛型是 `? extends Object[]`，前面的 `? extends Object` 表示数据的类型，后面的 `[]` 表示数组，因此这个整体就表示具体类型的数组。
+
+由于我们要的是 `String` 类型的，因此写 `String[]` 就行了。
+
+~~~java
+list.stream().toArray(new IntFunction<String[]>() {
+    @Override
+    public Object[] apply(int value) {
+        return new Object[0];
+    }
+});
+~~~
+
+接下来看里面的 `apply()`。
+
+```
+apply的形参:流中数据的个数，要跟数组的长度保持一致
+apply的返回值：具体类型的数组，这个需要跟IntFunction的泛型类型对应
+方法体：就是创建数组
+```
+
+```java
+toArray方法的参数的作用：负责创建一个指定类型的数组
+toArray方法的底层，会依次得到流里面的每一个数据，并把数据放到数组当中
+toArray方法的返回值：是一个装着流里面所有数据的数组
+```
+
+~~~java
+String[] arr = list.stream().toArray(new IntFunction<String[]>() {
+    @Override
+    public String[] apply(int value) {
+        return new String[value];
+    }
+});
+System.out.println(Arrays.toString(arr)); // [张无忌, 周芷若, 赵敏, 张强, 张三丰, 张翠山, 张良, 王二麻子, 谢广坤]
+~~~
+
+改写成 `Lambda表达式`
+
+~~~java
+String[] arr2 = list.stream().toArray(value -> new String[value]);
+System.out.println(Arrays.toString(arr2)); // [张无忌, 周芷若, 赵敏, 张强, 张三丰, 张翠山, 张良, 王二麻子, 谢广坤]
+~~~
+
+-----
+
+## 五、收集流中的数据，放到集合中
+
+这个方法可以收集到 `单列集合List / Set`、`双列集合Map`
+
+~~~java
+collect(Collector collector)
+~~~
+
+准备数据
+
+~~~java
+ArrayList<String> list = new ArrayList<>();
+Collections.addAll(list, "张无忌-男-15", "周芷若-女-14", "赵敏-女-13", "张强-男-20",
+        "张三丰-男-100", "张翠山-男-40", "张良-男-35", "王二麻子-男-37", "谢广坤-男-41");
+~~~
+
+### 1）收集到 `List集合` 当中
+
+需求：我要把所有的男性收集起来
+
+PS：我们在比较的时候也可以将 `s.split("-")[1]` 放在前面跟 `"男"` 进行比较也是可以的，只不过我们在比较的时候有一个习惯：能用这种固定数据去调用的尽量就使用固定数据调用，因为前面的不可能是 `null`，但是后面的 `s.split("-")[1]` 就有可能是不确定的，不确定的东西就有可能是 `null`，`null` 的话就会导致空指针异常。
+
+~~~java
+List<String> newList1 = list.stream()
+    .filter(s -> "男".equals(s.split("-")[1]))
+    // Collectors是Stream里面的工具类，它里面有个静态方法叫：tolist()，这个方法底层可以帮我们创建一个ArrayList集合，这样就可以将流里面所有的数据都放到这个ArrayList集合中了
+    .collect(Collectors.toList());
+System.out.println(newList1); // [张无忌-男-15, 张强-男-20, 张三丰-男-100, 张翠山-男-40, 张良-男-35, 王二麻子-男-37, 谢广坤-男-41]
+~~~
+
+----
+
+### 2）收集到 `Set集合` 当中
+
+~~~java
+Set<String> newList2 = list.stream().filter(s -> "男".equals(s.split("-")[1]))
+    // toSet() 底层会帮我们创建一个HashSet集合，并将流里面的数据放到这个HashSet集合中
+    .collect(Collectors.toSet());
+System.out.println(newList2);
+~~~
+
+****
+
+### 3）收集到 `List集合`、`Set集合` 中的区别
+
+当我将 `list` 集合中的数据改为
+
+~~~java
+"张无忌-男-15", "张无忌-男-15", "周芷若-女-14", "赵敏-女-13", "张强-男-20",
+        "张三丰-男-100", "张翠山-男-40", "张良-男-35", "王二麻子-男-37", "谢广坤-男-41"
+~~~
+
+此时数据就重复了，这时我们将 `newList1` 和 `newList2` 同时打印。
+
+可以发现如果将数据收集到 `HashSet` 中，数据会去重。
+
+~~~java
+System.out.println(newList1); // [张无忌-男-15, 张无忌-男-15, 张强-男-20, 张三丰-男-100, 张翠山-男-40, 张良-男-35, 王二麻子-男-37, 谢广坤-男-41]
+System.out.println(newList2); // [张强-男-20, 张良-男-35, 张三丰-男-100, 张无忌-男-15, 谢广坤-男-41, 张翠山-男-40, 王二麻子-男-37]
+~~~
+
+----
+
+### 4）收集到 `Map集合` 当中
+
+收集到 `Map` 时，需要规定一件事情：谁作为键，谁作为值。
+
+```
+需求：
+我要把所有的男性收集起来
+键：姓名。 值：年龄。
+性别就不要了，因为既然是将所有的男性收集起来，那么收集起来的肯定是男性。
+```
+
+在 `toMap()` 中，我们需要传入键和值的规则
+
+~~~java
+//收集Map集合当中
+//谁作为键,谁作为值.
+//我要把所有的男性收集起来
+//键：姓名。 值：年龄
+Map<String, Integer> map = list.stream()
+    .filter(s -> "男".equals(s.split("-")[1]))
+    .collect(键的规则, 值的规则);
+~~~
+
+跟进 `toMap()` 看一下，可以发现集合中有两个形参，形参一：`keyMapper`（键的规则），形参二：`valueMapper`(值的规则)。
+
+在底下有一段代码，虽然我们看不懂，但是可以猜。
+
+`HashMap::new`：`new` 了一个 `HashMap`，然后将键、值的规则传递进去，传递给 `uniqKeysMapAccumulator()`
+
+<img src="./assets/image-20240430162916018.png" alt="image-20240430162916018" style="zoom:80%;" />
+
+跟进 `uniqKeysMapAccumulator()`，可以看见它里面调用了 `putIfAbsent()`，将数据添加到 `Map集合` 中。
+
+<img src="./assets/image-20240430163233187.png" alt="image-20240430163233187" style="zoom:80%;" />
+
+`Function接口` 和 `apply()` 的对应关系如下
+
+<img src="./assets/image-20240430164619339.png" alt="image-20240430164619339" style="zoom:67%;" />
+
+**注意点：如果我们要收集到Map集合当中，键不能重复，否则会报错。**
+
+![image-20240430164745484](./assets/image-20240430164745484.png)
+
+报错的原因就是因为它底层调用了 `putIfAbsent()`，这个方法里面会做一个判断：根据键先找值，如果值为 `null`，表示当前的键是不存在的，此时就将数据添加到 `Map集合` 中，但是在添加第二次的时候，这里的 `v` 就不是 `null` 了，直接返回 `v`。
+
+<img src="./assets/image-20240430164959096.png" alt="image-20240430164959096" style="zoom:80%;" />
+
+<kbd>ctrl + alt + ←</kbd> 返回上一步，可以发现它在下面又做了一个判断：如果 `u` 不是 `null`，它就会产生异常
+
+<img src="./assets/image-20240430165221007.png" alt="image-20240430165221007" style="zoom:67%;" />
+
+~~~java
+Map<String, Integer> map = list.stream()
+        .filter(s -> "男".equals(s.split("-")[1]))
+        /*
+         *   toMap : 参数一表示键的生成规则
+         *           参数二表示值的生成规则
+         *
+         * 参数一：
+         *       Function泛型一：表示流中每一个数据的类型
+         *               泛型二：表示Map集合中键的数据类型
+         *
+         *        方法apply形参：依次表示流里面的每一个数据
+         *               方法体：生成键的代码
+         *               返回值：已经生成的键
+         *
+         *
+         * 参数二：
+         *        Function泛型一：表示流中每一个数据的类型
+         *                泛型二：表示Map集合中值的数据类型
+         *
+         *       方法apply形参：依次表示流里面的每一个数据
+         *               方法体：生成值的代码
+         *               返回值：已经生成的值
+         *
+         * */
+        .collect(Collectors.toMap(new Function<String, String>() {
+                                      @Override
+                                      public String apply(String s) {
+                                          //张无忌-男-15
+                                          return s.split("-")[0];
+                                      }
+                                  },
+                new Function<String, Integer>() {
+                    @Override
+                    public Integer apply(String s) {
+                        return Integer.parseInt(s.split("-")[2]);
+                    }
+                }));
+~~~
+
+改写为 `lambda表达式`
+
+~~~java
+Map<String, Integer> map2 = list.stream()
+    .filter(s -> "男".equals(s.split("-")[1]))
+    .collect(Collectors.toMap(
+        s -> s.split("-")[0],
+        s -> Integer.parseInt(s.split("-")[2])));
+~~~
+
+----
+
+# `Stream流` 总结
+
+**1、`Stream流` 的作用**
+
+结合了 `Lambda表达式` 去简化集合、数组的操作
+
+**2、`Stream流` 的使用步骤**
+
+① 获取 `Stream流对象` （先得到一条 `Steam流`(流水线) ，并把数据放到流水线上）
+
+② 使用 **中间方法** 对流水线上的数据进行操作
+
+③ 使用 **终结方法** 对流水线上的数据进行操作
+
+**3、如何获取 `Stream流对象`**
+
+单列集合利用 `Collection` 中的默认方法 `steam()`，这样就可以获取到一条流水线，并把集合中的数据放到流水线上。
+
+双列集合是不能直接使用 `steam()`，它需要通过 `keySet()` / `entrySet` 先转成单列集合，再获取 `Steam流`。
+
+数组可以使用 `Arrays` 中的静态方法 `steam()`。
+
+如果是 `一堆零散的数据`，也就是说这些数据是没有放到 `集合 / 数组` 中的，这些数据可以使用 `Steam接口` 中的 `of()` 来进行处理，但是这些数据需要是同种数据类型的。
+
+![image-20240430083216759](./assets/image-20240430083216759.png)
+
+**4、常见方法**
+
+中间方法：filter、limit、skip、distinct、concat、map
+
+终结方法：forEach、count、collect
+
+----
+
+# --------------------------------------------
+
+# 40.练习：数据过滤
+
+~~~java
+定义一个集合，并添加一些整数  1,2,3,4,5,6,7,8,9,10
+过滤奇数，只留下偶数。
+并将结果保存起来
+~~~
+
+代码示例
+
+~~~java
+//1. 定义一个集合
+ArrayList<Integer> list = new ArrayList<>();
+//2.添加一些整数
+Collections.addAll(list, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+//3.过滤奇数，只留下偶数
+//进行判断，如果是偶数，返回true 保留
+List<Integer> newList = list.stream()
+    .filter(n -> n % 2 == 0)
+    .collect(Collectors.toList());
+//4.打印集合
+System.out.println(newList);
+~~~
+
+
+
+----
+
+# 41.练习：数据操作1
+
+~~~java
+创建一个ArrayList集合，并添加以下字符串，字符串中前面是姓名，后面是年龄
+    "zhangsan,23",
+    "lisi,24",
+    "wangwu,25"
+保留年龄大于等于24岁的人，并将结果收集到Map集合中，姓名为键，年龄为值
+~~~
+
+代码示例
+
+~~~java
+//1.创建一个ArrayList集合
+ArrayList<String> list = new ArrayList<>();
+//2.添加以下字符串
+list.add("zhangsan,23");
+list.add("lisi,24");
+list.add("wangwu,25");
+//3.保留年龄大于等于24岁的人
+list.stream()
+    .filter(s -> Integer.parseInt(s.split(",")[1]) >= 24)
+    .collect(Collectors.toMap(new Function<String, String>() {
+        @Override
+        public String apply(String s) {
+            return s.split(",")[0];
+        }
+    }, new Function<String, Integer>() {
+        @Override
+        public Integer apply(String s) {
+            return Integer.parseInt(s.split(",")[1]);
+        }
+    }));
+
+Map<String, Integer> map = list.stream()
+    .filter(s -> Integer.parseInt(s.split(",")[1]) >= 24)
+    .collect(Collectors.toMap(
+        s -> s.split(",")[0],
+        s -> Integer.parseInt(s.split(",")[1])));
+
+System.out.println(map);
+~~~
+
+
+
+-----
+
+# 42.练习：数据操作2
+
+~~~java
+现在有两个ArrayList集合，分别存储6名男演员的名字和年龄以及6名女演员的名字和年龄。
+姓名和年龄中间用逗号隔开。
+比如：张三,23
+要求完成如下的操作：
+1，男演员只要名字为3个字的前两人
+2，女演员只要姓杨的，并且不要第一个
+3，把过滤后的男演员姓名和女演员姓名合并到一起
+4，将上一步的演员信息封装成Actor对象。
+5，将所有的演员对象都保存到List集合中。
+备注：演员类Actor，属性有：name，age
+男演员：  "蔡坤坤,24" , "叶齁咸,23", "刘不甜,22", "吴签,24", "谷嘉,30", "肖梁梁,27"
+女演员：  "赵小颖,35" , "杨颖,36", "高元元,43", "张天天,31", "刘诗,35", "杨小幂,33"
+~~~
+
+代码示例
+
+~~~java
+//1.创建两个ArrayList集合
+ArrayList<String> manList = new ArrayList<>();
+ArrayList<String> womenList = new ArrayList<>();
+//2.添加数据
+Collections.addAll(manList, "蔡坤坤,24", "叶齁咸,23", "刘不甜,22", "吴签,24", "谷嘉,30", "肖梁梁,27");
+Collections.addAll(womenList, "赵小颖,35", "杨颖,36", "高元元,43", "张天天,31", "刘诗,35", "杨小幂,33");
+//3.男演员只要名字为3个字的前两人
+Stream<String> stream1 = manList.stream()
+    .filter(s -> s.split(",")[0].length() == 3)
+    .limit(2);
+//4.女演员只要姓杨的，并且不要第一个
+Stream<String> stream2 = womenList.stream()
+    .filter(s -> s.split(",")[0].startsWith("杨"))
+    .skip(1);
+//5.把过滤后的男演员姓名和女演员姓名合并到一起
+//演员信息封装成Actor对象。
+
+//String -> Actor对象 （类型转换）
+Stream.concat(stream1,stream2).map(new Function<String, Actor>() {
+    @Override
+    public Actor apply(String s) {
+        //"赵小颖,35"
+        String name = s.split(",")[0];
+        int age = Integer.parseInt(s.split(",")[1]);
+        return new Actor(name,age);
+    }
+}).forEach(s-> System.out.println(s));
+
+// 变成Lambda表达式
+List<Actor> list = Stream.concat(stream1, stream2)
+    .map(s -> new Actor(s.split(",")[0], Integer.parseInt(s.split(",")[1])))
+    .collect(Collectors.toList());
+System.out.println(list);
+~~~
+
+
+
+-----
+
+# 43.方法引用概述
+
+很多人在学习方法引用的时候都会觉得非常的反人类，并且很多老师都会觉得它很奇葩。
+
+但是并不是这样的，当你写熟了以后，你就会觉得这种写法太香了。
+
+方法引用非常的重要，并且在以后会经常用到。
+
+## 一、概述
+
+`方法引用` 可以分成两个词语理解：1、方法：就是以前学习的方法；2、引用：把已经有的方法拿过来用，把它当做函数式接口中抽象方法的方法体。
+
+总而言之一句话：方法引用就是把已经有的方法拿过来用，当做函数式接口中抽象方法的方法体。
+
+
+
+
+
+
 
 ### 3.1体验方法引用【理解】
 
-- 方法引用的出现原因
+方法引用的出现原因
 
-  在使用Lambda表达式的时候，我们实际上传递进去的代码就是一种解决方案：拿参数做操作
+在使用Lambda表达式的时候，我们实际上传递进去的代码就是一种解决方案：拿参数做操作
 
-  那么考虑一种情况：如果我们在Lambda中所指定的操作方案，已经有地方存在相同方案，那是否还有必要再写重复逻辑呢？答案肯定是没有必要
+那么考虑一种情况：如果我们在Lambda中所指定的操作方案，已经有地方存在相同方案，那是否还有必要再写重复逻辑呢？答案肯定是没有必要
 
-  那我们又是如何使用已经存在的方案的呢？
+那我们又是如何使用已经存在的方案的呢？
 
-  这就是我们要讲解的方法引用，我们是通过方法引用来使用已经存在的方案
+这就是我们要讲解的方法引用，我们是通过方法引用来使用已经存在的方案
 
-- 代码演示
+代码演示
 
-  ```java
-  public interface Printable {
-      void printString(String s);
-  }
-  
-  public class PrintableDemo {
-      public static void main(String[] args) {
-          //在主方法中调用usePrintable方法
-  //        usePrintable((String s) -> {
-  //            System.out.println(s);
-  //        });
-  	    //Lambda简化写法
-          usePrintable(s -> System.out.println(s));
-  
-          //方法引用
-          usePrintable(System.out::println);
-  
-      }
-  
-      private static void usePrintable(Printable p) {
-          p.printString("爱生活爱Java");
-      }
-  }
-  
-  ```
+```java
+public interface Printable {
+    void printString(String s);
+}
+
+public class PrintableDemo {
+    public static void main(String[] args) {
+        //在主方法中调用usePrintable方法
+//        usePrintable((String s) -> {
+//            System.out.println(s);
+//        });
+	    //Lambda简化写法
+        usePrintable(s -> System.out.println(s));
+
+        //方法引用
+        usePrintable(System.out::println);
+
+    }
+
+    private static void usePrintable(Printable p) {
+        p.printString("爱生活爱Java");
+    }
+}
+
+```
 
 ### 3.2方法引用符【理解】
 
