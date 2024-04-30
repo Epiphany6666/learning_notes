@@ -3564,6 +3564,10 @@ list.set(0,"aaa");
 
 <img src="./assets/image-20240429215920381.png" alt="image-20240429215920381" style="zoom:67%;" />
 
+细节：当我们要获取一个不可变的Set集合时，里面的参数一定要保证唯一性，否则就会报错
+
+<img src="./assets/image-20240430065645597.png" alt="image-20240430065645597" style="zoom:80%;" />
+
 ~~~java
 //一旦创建完毕之后，是无法进行修改的，在下面的代码中，只能进行查询操作
 Set<String> set = Set.of("张三", "张三", "李四", "王五", "赵六");
@@ -3589,336 +3593,609 @@ System.out.println("-----------------------");
 
 ## 六、创建不可变的 `Map集合` 
 
+Java会把第一个参数和第二个参数认为是一个键值对对象，第三个参数和第四个参数认为是一个键值对对象.......
 
+<img src="./assets/image-20240430065852710.png" alt="image-20240430065852710" style="zoom:80%;" />
+
+### 细节1：键是不能重复的，如果重复就会报错。
+
+----
+
+### 细节2：Map里面的of方法，参数是有上限的，最多只能传递20个参数，即10个键值对。
+
+`List` 跟 `Set` 能传递多个，就是因为它的形参是 `可变参数`。
+
+但是 `Map`，选中 `Map` 跟进，搜索 `of()`，可以发现它并没有带可变参数的 `of()`。
+
+<img src="./assets/image-20240430070632698.png" alt="image-20240430070632698" style="zoom:67%;" />
+
+参数最多的就是 `20个参数`。
+
+<img src="./assets/image-20240430070723205.png" alt="image-20240430070723205" style="zoom:67%;" />
+
+那为什么它没有设计带有可变参数的方法呢？我们自己来写个方法试试。
+
+如果我们想让 `Map` 的 `of方法` 也能接收多个键和值，那么键和值都需要写成可变参数。
+
+但键和值的类型不确定，因此可以使用泛型方法来解决，写完就会发现立马报错：`Vararg parameter must be the last in the list`（必须在形参的最后）。
+
+<img src="./assets/image-20240430071224132.png" alt="image-20240430071224132" style="zoom:67%;" />
 
 ~~~java
+//一旦创建完毕之后，是无法进行修改的，在下面的代码中，只能进行查询操作
+Map<String, String> map = Map.of("张三", "南京", "张三", "北京", "王五", "上海",
+                                 "赵六", "广州", "孙七", "深圳", "周八", "杭州",
+                                 "吴九", "宁波", "郑十", "苏州", "刘一", "无锡",
+                                 "陈二", "嘉兴");
+
+
+Set<String> keys = map.keySet();
+for (String key : keys) {
+    String value = map.get(key);
+    System.out.println(key + "=" + value);
+}
+
+System.out.println("--------------------------");
+
+Set<Map.Entry<String, String>> entries = map.entrySet();
+for (Map.Entry<String, String> entry : entries) {
+    String key = entry.getKey();
+    String value = entry.getValue();
+    System.out.println(key + "=" + value);
+}
+System.out.println("--------------------------");
+}
+~~~
+
+----
+
+### 细节3：如果我们要传递多个键值对对象，数量大于10个，在Map接口中还有一个方法。
+
+我们可以将 `键值` 看做是一个整体，传递给 `ofEntries()`，这个方法就可以给你返回一个不可变集合。
+
+<img src="./assets/image-20240430071438703.png" alt="image-20240430071438703" style="zoom:80%;" />
+
+~~~java
+//创建一个普通的Map集合
+HashMap<String, String> hm = new HashMap<>();
+hm.put("张三", "南京");
+hm.put("李四", "北京");
+hm.put("王五", "上海");
+hm.put("赵六", "北京");
+hm.put("孙七", "深圳");
+hm.put("周八", "杭州");
+hm.put("吴九", "宁波");
+hm.put("郑十", "苏州");
+hm.put("刘一", "无锡");
+hm.put("陈二", "嘉兴");
+hm.put("aaa", "111");
+~~~
+
+利用上面的数据来获取一个不可变的集合，首先需要获取到所有的键值对对象（Entry对象）
+
+~~~java
+Set<Map.Entry<String, String>> entries = hm.entrySet();
+~~~
+
+由于`ofEntries方法`的形参是一个可变参数，可变参数实际上就是一个数组，因此我们需要把entries变成一个数组。
+
+我们可以用 `entries` 调用里面的 `toArray()`，`to：变成，array：数组`。
+
+首先来调用一下没有参数的 `toArray()`，没有参数就表示没有指定类型，那么它返回的就是 `Object类型` 的。
+
+但此时我们想要给这个数组指定类型，就可以使用下面的第二个带形参的方法，我们需要对这个数组指定类型。
+
+<img src="./assets/image-20240430072817743.png" alt="image-20240430072817743" style="zoom:67%;" />
+
+~~~java
+//toArray方法在底层会比较集合的长度跟数组的长度两者的大小
+//如果集合的长度 > 数组的长度 ：数据在数组中放不下，此时会根据实际数据的个数，重新创建数组
+//如果集合的长度 <= 数组的长度：数据在数组中放的下，此时不会创建新的数组，而是直接用
+//假设数组初始化长度为20，11个键值对会填满前11个位置，后面的9个默认初始化值为null
+//因此数组的长度直接写0就行了，我们不用去关心它的长度，因为底层它会自己判断8
+Map.Entry[] arr = entries.toArray(new Map.Entry[0]);
+//不可变的map集合
+//可变参数实际上就是一个数组，因此我们直接将数组传递过去也是可以的
+Map map = Map.ofEntries(arr);
+map.put("bbb","222"); // 这行代码会报错
+~~~
+
+---
+
+上面这种写法代码太多太麻烦了，我们试着将它简化一下
+
+~~~java
+Map<Object, Object> map = Map.ofEntries(hm.entrySet().toArray(new Map.Entry[0]));
+~~~
+
+----
+
+### `Map.copyOf()`
+
+但是这样写还是太麻烦了，因此Java给我们在 `Map接口` 中还提供了一个 `copyOf()`。
+
+在这个方法中它会做一个判断
+
+~~~java
+static <K, V> Map<K, V> copyOf(Map<? extends K, ? extends V> map) {
+    // 当你传过来的 Map集合 就是一个不可变的集合，那么它直接把本身的集合给你返回
+    if (map instanceof ImmutableCollections.AbstractImmutableMap) {
+        return (Map<K,V>)map;
+    } else { // 但如果你传递过来的 Map集合 是可变的，这段代码就跟我们刚刚写的一模一样
+        return (Map<K,V>)Map.ofEntries(map.entrySet().toArray(new Entry[0]));
+    }
+}
+~~~
+
+因此在以后，如果我们要生成不可变的 `Map集合` 直接使用 `copyOf` 就行了，只不过它是在 `JDK10` 的时候才出现的。
+
+<img src="./assets/image-20240430074351587.png" alt="image-20240430074351587" style="zoom:80%;" />
+
+~~~java
+Map<String, String> map = Map.copyOf(hm);
+map.put("bbb","222"); // 报错
+~~~
+
+----
+
+## 七、总结
+
+1、不可变集合的特点？
+
+定义完成后只能查询，不能修改 / 添加 / 删除
+
+2、如何创建不可变集合？
+
+`List`、`Set`、`Map` 接口中，都存在静态的 `of()` 可以创建不可变集合
+
+3、三种方式的细节
+
+- `List`：直接用
+
+- `Set`：元素不能重复
+
+- `Map`：元素不能重复、键值对数量最多是10个，超过10个用 `ofEntries方法`
+
+  如果你的JDK版本大于等于10，可以用 `copyOf()` 简化代码
+
+-----
+
+# 35.初爽 `Stream流`
+
+案例需求
+
+按照下面的要求完成集合的创建和遍历
+
+- 创建一个集合，存储多个字符串元素
+- 把集合中所有以"张"开头的元素存储到一个新的集合
+- 把"张"开头的集合中的长度为3的元素存储到一个新的集合
+- 遍历上一步得到的集合
+
+~~~java
+ArrayList<String> list1 = new ArrayList<>();
+list1.add("张无忌");
+list1.add("周芷若");
+list1.add("赵敏");
+list1.add("张强");
+list1.add("张三丰");
+
+//1.把所有以“张”开头的元素存储到新集合中
+ArrayList<String> list2 = new ArrayList<>();
+for (String name : list1) {
+    if(name.startsWith("张")){
+        list2.add(name);
+    }
+}
+//2.把“张”开头的，长度为3的元素再存储到新集合中
+ArrayList<String> list3 = new ArrayList<>();
+for (String name : list2) {
+    if(name.length() == 3){
+        list3.add(name);
+    }
+}
+
+//3.遍历打印最终结果
+for (String name : list3) {
+    System.out.println(name);
+}
+~~~
+
+运行上面代码，结果是对的，但是代码太多太繁杂了。
+
+等今天我们学习完 `Stream流` 后，这个代码就非常简单了
+
+~~~java
+list1.stream().filter(name->name.startsWith("张")).filter(name -> name.length() == 3).forEach(name-> System.out.println(name));
 ~~~
 
 
 
+----
 
+# 36.`Stream流` 的思想和获取 `Stream流`
 
-### 1.3 不可变集合分类
+## 一、什么是流？
 
-* 不可变的list集合
-* 不可变的set集合
-* 不可变的map集合
+这个 `流` 我们可以把它理解成：工厂的流水线。
 
-### 1.4 不可变的list集合
+假设现在有这么一条制造饮料的流水线，首先需要将空瓶子放到流水线上，进行第一步操作：检查瓶子，不合格的牌子就要丢掉。
 
-```java
-public class ImmutableDemo1 {
-    public static void main(String[] args) {
-        /*
-            创建不可变的List集合
-            "张三", "李四", "王五", "赵六"
-        */
+再进行第二步：消毒；消完毒后再进行第三部：灌装，然后密封、包装出厂。
 
-        //一旦创建完毕之后，是无法进行修改的，在下面的代码中，只能进行查询操作
-        List<String> list = List.of("张三", "李四", "王五", "赵六");
+![image-20240430081011960](./assets/image-20240430081011960.png)
 
-        System.out.println(list.get(0));
-        System.out.println(list.get(1));
-        System.out.println(list.get(2));
-        System.out.println(list.get(3));
+Java中的 `Stream流` 跟它的思想是一样，以刚刚的练习为例。
 
-        System.out.println("---------------------------");
+首先将要操作的数据都放到流水线上，然后进行过滤操作，留下以张开头的，其他的数据舍弃不要。
 
-        for (String s : list) {
-            System.out.println(s);
-        }
+然后进行长度的过滤，将长度为 `3` 的留下，其他的数据舍弃不要。
 
-        System.out.println("---------------------------");
+最后进行输出操作。
 
+<img src="./assets/image-20240430081735014.png" alt="image-20240430081735014" style="zoom:80%;" />
 
-        Iterator<String> it = list.iterator();
-        while(it.hasNext()){
-            String s = it.next();
-            System.out.println(s);
-        }
-        System.out.println("---------------------------");
+---
 
-        for (int i = 0; i < list.size(); i++) {
-            String s = list.get(i);
-            System.out.println(s);
-        }
-        System.out.println("---------------------------");
+`Steam流` 在使用的时候一般会结合 `Lambda表达式` 去简化集合、数组的操作
 
-        //list.remove("李四");
-        //list.add("aaa");
-        list.set(0,"aaa");
+## 二、`Stream流` 的使用步骤
+
+1、先得到一条 `Steam流`(流水线) ，并把数据放到流水线上
+
+2、利用 `Steam流` 中的API进行各种操作
+
+例如过滤、转换、统计、打印 等等，这些操作又可以分为两种：`中间方法` 和 `终结方法`
+
+`中间方法`：方法调用完毕后，还可以调用其他方法
+
+`终结方法`：也就是 `Steam流` 中的最后一步，方法调用完毕后，不能再调用其他方法了。
+
+因此完整的 `Steam流` 的使用步骤如下
+
+① 先得到一条 `Steam流`(流水线) ，并把数据放到流水线上
+
+② 使用 **中间方法** 对流水线上的数据进行操作
+
+③ 使用 **终结方法** 对流水线上的数据进行操作
+
+----
+
+## 三、先得到一条 `Steam流`(流水线) ，并把数据放到流水线上
+
+如何获取一条流水线，并将数据放上去呢？
+
+不同的情况会有不同的处理方案。
+
+单列集合利用 `Collection` 中的默认方法 `steam()`，这样就可以获取到一条流水线，并把集合中的数据放到流水线上。
+
+双列集合是不能直接使用 `steam()`，它需要通过 `keySet()` / `entrySet` 先转成单列集合，再获取 `Steam流`。
+
+数组可以使用 `Arrays` 中的静态方法 `steam()`。
+
+如果是 `一堆零散的数据`，也就是说这些数据是没有放到 `集合 / 数组` 中的，这些数据可以使用 `Steam接口` 中的 `of()` 来进行处理，但是这些数据需要是同种数据类型的。
+
+![image-20240430083216759](./assets/image-20240430083216759.png)
+
+----
+
+### 1）单列集合获取Stream流
+
+方法的返回值就是一个 `Steam流`，并且流水线上的数据就是 `字符串`。
+
+<img src="./assets/image-20240430083909290.png" alt="image-20240430083909290" style="zoom:87%;" />
+
+~~~java
+ArrayList<String> list = new ArrayList<>();
+Collections.addAll(list,"a","b","c","d","e");
+//获取到一条流水线，并把集合中的数据放到流水线上
+Stream<String> stream1 = list.stream();
+//使用终结方法打印一下流水线上的所有数据
+stream1.forEach(new Consumer<String>() {
+    @Override
+    public void accept(String s) {
+        //s:依次表示流水线上的每一个数据
+        System.out.println(s);
     }
-}
+});
+~~~
+
+上面的写法不是最终代码，我们一般会直接采取链式编程
+
+~~~java
+list.stream().forEach(s -> System.out.println(s));
+~~~
+
+----
+
+### 2）双列集合获取 `Steam流`
+
+双列集合是不能直接使用 `steam()`，它需要通过 `keySet()` / `entrySet` 先转成单列集合，再获取 `Steam流`。
+
+~~~java
+//1.创建双列集合
+HashMap<String,Integer> hm = new HashMap<>();
+//2.添加数据
+hm.put("aaa",111);
+hm.put("bbb",222);
+hm.put("ccc",333);
+hm.put("ddd",444);
+
+//第一种获取stream流
+hm.keySet().stream().forEach(s -> System.out.println(s));
+
+//第二种获取stream流，相当于是将所有的键值对对象放到了Steam流中
+hm.entrySet().stream().forEach(s-> System.out.println(s));
+~~~
+
+----
+
+### 3）数组获取 `Steam流`
+
+数组无论是基本数据类型还是引用数据类型，都是可以使用 `Steam流` 的。
+
+如果数组是`基本数据类型`的，调用的就是下面的这些方法。
+
+如果数组是`引用数据类`型的，那么它调用的就是上面带有泛型的泛型方法。
+
+<img src="./assets/image-20240430084625862.png" alt="image-20240430084625862" style="zoom:80%;" />
+
+~~~java
+//1.创建数组
+int[] arr1 = {1,2,3,4,5,6,7,8,9,10};
+String[] arr2 = {"a","b","c"};
+//2.获取stream流
+Arrays.stream(arr1).forEach(s-> System.out.println(s));
+System.out.println("============================");
+Arrays.stream(arr2).forEach(s-> System.out.println(s));
+~~~
+
+---
+
+### 4）`一堆零散的数据` 获取 `Steam流`
+
+前提条件：这些 `零散的数据` 需要是同种数据类型。
+
+方法的形参是 `可变参数`，并且返回的是一个 `Steam流`。
+
+<img src="./assets/image-20240430085001281.png" alt="image-20240430085001281" style="zoom:80%;" />
+
+`引用数据类型` 和 `基本数据类型` 都是支持的
+
+~~~java
+Stream.of(1,2,3,4,5).forEach(s-> System.out.println(s));
+Stream.of("a","b","c","d","e").forEach(s-> System.out.println(s));
+~~~
+
+----
+
+### 5）`Steam` 中的静态方法 `of()` 的细节
+
+很多课程中，如果想要获取数组中的  `Steam流` ，会建议大家使用 `Stream.of()`，也就是下面 `一堆零散的数据` 的处理方案。
+
+它会这么将是因为 `Stream.of()` 的形参是一个可变参数，可变参数的底层其实就是一个数组，因此如果直接将数组传递给这个方法，看上去好像也没有问题。
+
+<img src="./assets/image-20240430085001281.png" alt="image-20240430085001281" style="zoom:80%;" />
+
+用起来发现，这种方式好像也没问题，但是这种方式是错误的。
+
+~~~java
+Stream.of(arr2).forEach(s-> System.out.println(s));
+~~~
+
+因为数组不仅仅只有引用数据类型，还有基本数据类型的数组，如果我们将`基本数据类型的数组`传入进去，这个时候就会有问题了。
+
+可以发现打印出来的是一个地址值。
+
+~~~java
+Stream.of(arr1).forEach(s-> System.out.println(s));//[I@41629346
+~~~
+
+这个就是 `Steam` 中的静态方法 `of()` 里面的一个小细节：方法的形参是一个可变参数，可以传递一堆零散的数据，也可以传递数组。
+
+但是数组必须是引用数据类型的，如果传递基本数据类型，它是不会整体自动装箱的，它是会把整个数组当做一个元素，放到Stream当中。但我们真正想要的是将数组里面的数据放到 `Stream流` 中，而不是将数组这个整体放到 `Stream流` 中。
+
+在以后，我们要获取 `Steam流`，需要想好是 `单列集合还是双列集合、数组、一堆零散的数据`，这四种方式它的用法是不一样的，两者之间不能互相混用。
+
+
+
+-----
+
+# 37.`Stream流`的中间方法
+
+## 一、总述
+
+常见方法会有以下六个
+
+| 方法名                                            | 说明                                       |
+| ------------------------------------------------- | ------------------------------------------ |
+| `Stream<T> filter(Predicate predicate)`           | 过滤                                       |
+| `Stream<T> limit(long maxSize)`                   | 获取前几个元素                             |
+| `Stream<T> skip(long n)`                          | 跳过前几个元素                             |
+| `Stream<T> distinct()`                            | 元素去重，依赖(`hashCode()` 和 `equals()`) |
+| `static <T> Stream<T> concat(Stream a, Stream b)` | 合并a和b两个流为一个大流                   |
+| `Stream<R> map(Function<T, R> mapper)`            | 转换流中的数据类型                         |
+
+注意1：中间方法会返回新的 `Stream流`，原来的 `Steam流` 只能使用一次，建议使用链式编程
+
+注意2：修改 `Steam流` 中的数据，是不会影响原来集合或者数组中的数据
+
+----
+
+## 二、过滤
+
+~~~java
+Stream<T> filter(Predicate predicate)
+~~~
+
+方法的形参是 `Predicate`，选中它跟进，可以发现它是一个函数式接口。
+
+<img src="./assets/image-20240430092043367.png" alt="image-20240430092043367" style="zoom:87%;" />
+
+我们先使用匿名内部类，然后再使用 `Lambda表达式` 简化
+
+~~~java
+ArrayList<String> list = new ArrayList<>();
+Collections.addAll(list, "张无忌", "周芷若", "赵敏", "张强", "张三丰", "张翠山", "张良", "王二麻子", "谢广坤");
+
+//filter   过滤  把张开头的留下，其余数据过滤不要
+list.stream().filter(new Predicate<String>() {
+    @Override
+    public boolean test(String s) {
+        //如果返回值为true，表示当前数据留下
+        //如果返回值为false，表示当前数据舍弃不要
+        return s.startsWith("张");
+    }
+}).forEach(s -> System.out.println(s));
+~~~
+
+简化为 `Lambda表达式`
+
+~~~java
+list.stream()
+    .filter(s -> s.startsWith("张"))
+    .filter(s -> s.length() == 3)
+    .forEach(s -> System.out.println(s));
+~~~
+
+----
+
+## 注意1：中间方法会返回新的 `Stream流`，原来的 `Steam流` 只能使用一次，建议使用链式编程
+
+例如下面不用链式编程，而是直接获取到返回值为 `stream1`，然后再使用 `stream1` 来进行过滤。
+
+过滤完成后，再将数据打印，可以发现是没有任何的问题的。
+
+~~~java
+Stream<String> stream1 = list.stream().filter(s -> s.startsWith("张"));
+Stream<String> stream2 = stream1.filter(s -> s.length() == 3);
+stream2.forEach(s -> System.out.println(s));
+~~~
+
+但是在下面的代码中，如果还想再次使用 `stream1`，可以发现就会报错：`stream has already been operated upon or closed（流已经关闭了）`
+
+![image-20240430092957105](./assets/image-20240430092957105.png)
+
+原因是因为，在 `42行` 这里，`stream1` 已经用过了，就不能再次使用了。
+
+**所以一定要切记：原来的 `Steam流` 只能使用一次。**
+
+既然只能使用一次，那么我们就没有必要再去用一个变量去记录了，因此**建议使用链式编程。**
+
+因此当 `Stream流` 写熟了后发现，所以的操作一行就搞定了，代码非常的简单。
+
+但是代码变少了也会有一个小弊端：代码的阅读性降低。
+
+因此我们一般都会将链式编程的每一个操作都折行，这样就会提高代码的阅读性。
+
+~~~java
+list.stream()
+    .filter(s -> s.startsWith("张"))
+    .filter(s -> s.length() == 3)
+    .forEach(s -> System.out.println(s));
+~~~
+
+----
+
+## 注意2：修改 `Steam流` 中的数据，是不会影响原来集合或者数组中的数据
+
+例如上面我们对集合做了两次过滤，此时再来打印集合，此时集合里面的数据是不会改变的。
+
+----
+
+## 三、获取前几个元素
+
+`maxSize` 跟索引没有关系，就是字面意思：几个元素
+
+~~~java
+Stream<T> limit(long maxSize)
+~~~
+
+代码示例
+
+~~~java
+// "张无忌", "周芷若", "赵敏", "张强", "张三丰", "张翠山", "张良", "王二麻子", "谢广坤"
+list.stream().limit(3).forEach(s -> System.out.println(s)); // 张无忌 周芷若 赵敏 
+~~~
+
+-----
+
+## 四、跳过前几个元素
+
+参数 `n` 表示的也是个数
+
+~~~java
+Stream<T> skip(long n)
+~~~
+
+代码示例
+
+~~~java
+// "张无忌", "周芷若", "赵敏", "张强", "张三丰", "张翠山", "张良", "王二麻子", "谢广坤"
+list.stream().skip(4).forEach(s -> System.out.println(s)); // 张三丰 张翠山 张良 王二麻子 谢广坤 
+~~~
+
+----
+
+## 五、`limit` 和 `skip` 练习
+
+```
+课堂练习：在 "张无忌", "周芷若", "赵敏", "张强", "张三丰", "张翠山", "张良", "王二麻子", "谢广坤" 中获取以下元素
+"张强", "张三丰", "张翠山"
 ```
 
-### 1.5 不可变的Set集合
+代码示例
 
-```java
-public class ImmutableDemo2 {
-    public static void main(String[] args) {
-        /*
-           创建不可变的Set集合
-           "张三", "李四", "王五", "赵六"
+~~~java
+//第一种思路：
+//先获取前面6个元素："张无忌", "周芷若", "赵敏", "张强", "张三丰", "张翠山",
+//然后跳过前面3个元素
+list.stream().limit(6).skip(3).forEach(s -> System.out.println(s));
 
+//第二种思路：
+//先跳过3个元素："张强", "张三丰", "张翠山", "张良", "王二麻子", "谢广坤"
+//然后再获取前面3个元素："张强", "张三丰", "张翠山"
+list.stream().skip(3).limit(3).forEach(s -> System.out.println(s));
+~~~
 
-           细节：
-                当我们要获取一个不可变的Set集合时，里面的参数一定要保证唯一性
-        */
+----
 
-        //一旦创建完毕之后，是无法进行修改的，在下面的代码中，只能进行查询操作
-        Set<String> set = Set.of("张三", "张三", "李四", "王五", "赵六");
+## 六、元素去重
 
-        for (String s : set) {
-            System.out.println(s);
-        }
+~~~java
+Stream<T> distinct()
+~~~
 
-        System.out.println("-----------------------");
+代码示例
 
-        Iterator<String> it = set.iterator();
-        while(it.hasNext()){
-            String s = it.next();
-            System.out.println(s);
-        }
+~~~java
+ArrayList<String> list1 = new ArrayList<>();
+Collections.addAll(list1, "张无忌","张无忌","张无忌", "张强", "张三丰", "张翠山", "张良", "王二麻子", "谢广坤");
+list1.stream().distinct().forEach(s -> System.out.println(s));
+~~~
 
-        System.out.println("-----------------------");
-        //set.remove("王五");
-    }
-}
-```
+PS：`distinct()` 在底层是依赖 `hashCode()` 和 `equals()` 进行去重的。
 
-### 1.6 不可变的Map集合
+由于在 `String` 中，Java已经帮我们重写好了这两个方法，因此我们直接使用就行了。
 
-#### 1.6.1：键值对个数小于等于10
+但如果集合中装的是 `自定义对象`，那么一定要手动重写。
 
-```java
-public class ImmutableDemo3 {
-    public static void main(String[] args) {
-       /*
-        创建Map的不可变集合
-            细节1：
-                键是不能重复的
-            细节2：
-                Map里面的of方法，参数是有上限的，最多只能传递20个参数，10个键值对
-            细节3：
-                如果我们要传递多个键值对对象，数量大于10个，在Map接口中还有一个方法
-        */
+我们可以简单看一下 `distinct()` 里面的源码，源码非常的复杂，我们只需要找里面的核心点就行了。
 
-        //一旦创建完毕之后，是无法进行修改的，在下面的代码中，只能进行查询操作
-        Map<String, String> map = Map.of("张三", "南京", "张三", "北京", "王五", "上海",
-                "赵六", "广州", "孙七", "深圳", "周八", "杭州",
-                "吴九", "宁波", "郑十", "苏州", "刘一", "无锡",
-                "陈二", "嘉兴");
+选中 `distinct()` <kbd>ctrl + b</kbd>，如果直接 <kbd>ctrl +b</kbd> ，那么它就是跳到接口里面的方法。
 
-        Set<String> keys = map.keySet();
-        for (String key : keys) {
-            String value = map.get(key);
-            System.out.println(key + "=" + value);
-        }
+<img src="./assets/image-20240430095559034.png" alt="image-20240430095559034" style="zoom:67%;" />
 
-        System.out.println("--------------------------");
+而我们需要看的是它的实体类，因此需要采用以下方法，或者 <kbd>ctrl + alt + b</kbd>
 
-        Set<Map.Entry<String, String>> entries = map.entrySet();
-        for (Map.Entry<String, String> entry : entries) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            System.out.println(key + "=" + value);
-        }
-        System.out.println("--------------------------");
-    }
-}
-```
+<img src="./assets/image-20240430095637839.png" alt="image-20240430095637839" style="zoom:67%;" />
 
-#### 1.6.2：键值对个数大于10
-
-```java
-public class ImmutableDemo4 {
-    public static void main(String[] args) {
-
-        /*
-            创建Map的不可变集合,键值对的数量超过10个
-        */
-
-        //1.创建一个普通的Map集合
-        HashMap<String, String> hm = new HashMap<>();
-        hm.put("张三", "南京");
-        hm.put("李四", "北京");
-        hm.put("王五", "上海");
-        hm.put("赵六", "北京");
-        hm.put("孙七", "深圳");
-        hm.put("周八", "杭州");
-        hm.put("吴九", "宁波");
-        hm.put("郑十", "苏州");
-        hm.put("刘一", "无锡");
-        hm.put("陈二", "嘉兴");
-        hm.put("aaa", "111");
-
-        //2.利用上面的数据来获取一个不可变的集合
-/*
-        //获取到所有的键值对对象（Entry对象）
-        Set<Map.Entry<String, String>> entries = hm.entrySet();
-        //把entries变成一个数组
-        Map.Entry[] arr1 = new Map.Entry[0];
-        //toArray方法在底层会比较集合的长度跟数组的长度两者的大小
-        //如果集合的长度 > 数组的长度 ：数据在数组中放不下，此时会根据实际数据的个数，重新创建数组
-        //如果集合的长度 <= 数组的长度：数据在数组中放的下，此时不会创建新的数组，而是直接用
-        Map.Entry[] arr2 = entries.toArray(arr1);
-        //不可变的map集合
-        Map map = Map.ofEntries(arr2);
-        map.put("bbb","222");*/
+点进去后，可以发现它的源码超级多。
 
 
-        //Map<Object, Object> map = Map.ofEntries(hm.entrySet().toArray(new Map.Entry[0]));
-
-        Map<String, String> map = Map.copyOf(hm);
-        map.put("bbb","222");
-    }
-}
-```
-
-## 2.Stream流
-
-### 2.1体验Stream流【理解】
-
-- 案例需求
-
-  按照下面的要求完成集合的创建和遍历
-
-  - 创建一个集合，存储多个字符串元素
-  - 把集合中所有以"张"开头的元素存储到一个新的集合
-  - 把"张"开头的集合中的长度为3的元素存储到一个新的集合
-  - 遍历上一步得到的集合
-
-- 原始方式示例代码
-
-  ```java
-  public class MyStream1 {
-      public static void main(String[] args) {
-          //集合的批量添加
-          ArrayList<String> list1 = new ArrayList<>(List.of("张三丰","张无忌","张翠山","王二麻子","张良","谢广坤"));
-          //list.add()
-  
-          //遍历list1把以张开头的元素添加到list2中。
-          ArrayList<String> list2 = new ArrayList<>();
-          for (String s : list1) {
-              if(s.startsWith("张")){
-                  list2.add(s);
-              }
-          }
-          //遍历list2集合，把其中长度为3的元素，再添加到list3中。
-          ArrayList<String> list3 = new ArrayList<>();
-          for (String s : list2) {
-              if(s.length() == 3){
-                  list3.add(s);
-              }
-          }
-          for (String s : list3) {
-              System.out.println(s);
-          }      
-      }
-  }
-  ```
-
-- 使用Stream流示例代码
-
-  ```java
-  public class StreamDemo {
-      public static void main(String[] args) {
-          //集合的批量添加
-          ArrayList<String> list1 = new ArrayList<>(List.of("张三丰","张无忌","张翠山","王二麻子","张良","谢广坤"));
-  
-          //Stream流
-          list1.stream().filter(s->s.startsWith("张"))
-                  .filter(s->s.length() == 3)
-                  .forEach(s-> System.out.println(s));
-      }
-  }
-  ```
-
-- Stream流的好处
-
-  - 直接阅读代码的字面意思即可完美展示无关逻辑方式的语义：获取流、过滤姓张、过滤长度为3、逐一打印
-  - Stream流把真正的函数式编程风格引入到Java中
-  - 代码简洁
-
-### 2.2Stream流的常见生成方式【应用】
-
-- Stream流的思想
-
-  ![01_Stream流思想](./assets/01_Stream流思想-1714397952176-1.png)
-
-- Stream流的三类方法
-
-  - 获取Stream流
-    - 创建一条流水线,并把数据放到流水线上准备进行操作
-  - 中间方法
-    - 流水线上的操作
-    - 一次操作完毕之后,还可以继续进行其他操作
-  - 终结方法
-    - 一个Stream流只能有一个终结方法
-    - 是流水线上的最后一个操作
-
-- 生成Stream流的方式
-
-  - Collection体系集合
-
-    使用默认方法stream()生成流， default Stream<E> stream()
-
-  - Map体系集合
-
-    把Map转成Set集合，间接的生成流
-
-  - 数组
-
-    通过Arrays中的静态方法stream生成流
-
-  - 同种数据类型的多个数据
-
-    通过Stream接口的静态方法of(T... values)生成流
-
-- 代码演示
-
-  ```java
-  public class StreamDemo {
-      public static void main(String[] args) {
-          //Collection体系的集合可以使用默认方法stream()生成流
-          List<String> list = new ArrayList<String>();
-          Stream<String> listStream = list.stream();
-  
-          Set<String> set = new HashSet<String>();
-          Stream<String> setStream = set.stream();
-  
-          //Map体系的集合间接的生成流
-          Map<String,Integer> map = new HashMap<String, Integer>();
-          Stream<String> keyStream = map.keySet().stream();
-          Stream<Integer> valueStream = map.values().stream();
-          Stream<Map.Entry<String, Integer>> entryStream = map.entrySet().stream();
-  
-          //数组可以通过Arrays中的静态方法stream生成流
-          String[] strArray = {"hello","world","java"};
-          Stream<String> strArrayStream = Arrays.stream(strArray);
-        
-        	//同种数据类型的多个数据可以通过Stream接口的静态方法of(T... values)生成流
-          Stream<String> strArrayStream2 = Stream.of("hello", "world", "java");
-          Stream<Integer> intStream = Stream.of(10, 20, 30);
-      }
-  }
-  ```
-
-### 2.3Stream流中间操作方法【应用】
 
 - 概念
 
   中间操作的意思是,执行完此方法之后,Stream流依然可以继续执行其他操作
-
-- 常见方法
-
-  | 方法名                                          | 说明                                                       |
-  | ----------------------------------------------- | ---------------------------------------------------------- |
-  | Stream<T> filter(Predicate predicate)           | 用于对流中的数据进行过滤                                   |
-  | Stream<T> limit(long maxSize)                   | 返回此流中的元素组成的流，截取前指定参数个数的数据         |
-  | Stream<T> skip(long n)                          | 跳过指定参数个数的数据，返回由该流的剩余元素组成的流       |
-  | static <T> Stream<T> concat(Stream a, Stream b) | 合并a和b两个流为一个流                                     |
-  | Stream<T> distinct()                            | 返回由该流的不同元素（根据Object.equals(Object) ）组成的流 |
 
 - filter代码演示
 
