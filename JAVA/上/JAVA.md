@@ -17479,7 +17479,7 @@ public class StudentUtil {
 
 总结：
 
-- 静态方法中没有this关键字
+- 静态方法中没有this关键字和super关键字的
 - 静态方法中，只能访问静态。
 - 非静态方法可以访问所有。
 

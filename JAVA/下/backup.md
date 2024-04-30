@@ -4813,9 +4813,355 @@ System.out.println(list);
 
 `方法引用` 可以分成两个词语理解：1、方法：就是以前学习的方法；2、引用：把已经有的方法拿过来用，把它当做函数式接口中抽象方法的方法体。
 
-总而言之一句话：方法引用就是把已经有的方法拿过来用，当做函数式接口中抽象方法的方法体。
+总而言之一句话：**方法引用就是把已经有的方法拿过来用，当做函数式接口中抽象方法的方法体。**
+
+例如 `Arrays` 中的 `sort()`，正常书写的时候，第一个参数表示要排序的数组；第二个参数表示排序的规则，在代码中，需要传递 `Comparator接口` 的实现类对象。
+
+<img src="./assets/image-20240430192921283.png" alt="image-20240430192921283" style="zoom:67%;" />
+
+又因为 `Comparator` 是一个函数式接口，因此我们可以使用 `lambda表达式` 进行简化。
+
+但其实 `lambda表达式` 还不是最简单的，它还可以进一步简化。
+
+这里的排序规则我们甚至不用写，可以把已经存在的方法直接拿过来用，即将这个已经存在的方法当做是函数式接口中抽象方法的方法体。
+
+假设我们现在有已经写好的 `subtraction()`，那么在 `sort()` 的第二个参数中，我们就可以直接去使用它，这就是方法引用。
+
+<img src="./assets/image-20240430192209918.png" alt="image-20240430192209918" style="zoom:57%;" />
+
+但是并不是所有的方法都能引用的，需要满足一下的四个条件才可以。
+
+1、应用处必须是函数式接口
+
+剩下来的三个要求是对被引用的方法有一个限制。
+
+1、被引用的方法必须是已经存在的
+
+如果它没有存在，那么还需要自己写，非常的麻烦
+
+2、被引用方法的形参和返回值需要跟抽象方法保持一致
+
+3、被引用方法的功能要满足当前的需求
+
+例如之前的 `Comparator接口` 中的 `compare()` 功能是返回一个作为判断的整数，那么被引用的方法的功能也应该是返回一个作为判断的整数。
+
+----
+
+## 二、代码示例
+
+需求：创建一个数组，进行倒序排列
+
+~~~java
+Integer[] arr = {3, 5, 4, 1, 6, 2};
+~~~
+
+匿名内部类
+
+~~~java
+Arrays.sort(arr, new Comparator<Integer>() {
+    @Override
+    public int compare(Integer o1, Integer o2) {
+        return o2 - o1;
+    }
+});
+~~~
+
+因为第二个参数的类型Comparator是一个函数式接口，因此可以使用 `lambda表达式` 进行简化。
+
+~~~java
+Arrays.sort(arr, (Integer o1, Integer o2)->{
+    return o2 - o1;
+});
+~~~
+
+lambda表达式简化格式
+
+~~~java
+Arrays.sort(arr, (o1, o2) -> o2 - o1);
+~~~
+
+方法引用
+
+~~~java
+//1.引用处需要是函数式接口
+//2.被引用的方法需要已经存在
+//3.被引用方法的形参和返回值需要跟抽象方法的形参和返回值保持一致
+//4.被引用方法的功能需要满足当前的要求
+
+//由于下面是一个静态方法，我们以前调用的时候是：FunctionDemo1.subtraction()，其中FunctionDemo1是类名，subtraction是方法名。
+//现在在方法引用里面也是一样的
+//表示引用FunctionDemo1类里面的subtraction方法
+//把这个方法当做抽象方法的方法体
+Arrays.sort(arr, FunctionDemo1::subtraction);
+
+System.out.println(Arrays.toString(arr));
+
+//被引用的方法可以是Java已经写好的，也可以是一些第三方的工具类
+public static int subtraction(int num1, int num2) {
+    return num2 - num1;
+}
+~~~
+
+-----
+
+## 三、总结
+
+1、什么是方法引用？
+
+方法引用就是把已经有的方法拿过来用，当做函数式接口中抽象方法的方法体。
+
+2、`::` 是什么符号？
+
+`::`  该符号为引用运算符，而它所在的表达式被称为方法引用
+
+3、方法引用时要注意什么？
+
+1、应用处必须是函数式接口
+
+剩下来的三个要求是对被引用的方法有一个限制。
+
+- 被引用的方法必须是已经存在的
+
+  如果它没有存在，那么还需要自己写，非常的麻烦
+
+- 被引用方法的形参和返回值需要跟抽象方法保持一致
+
+- 被引用方法的功能要满足当前的需求
+
+  例如之前的 `Comparator接口` 中的 `compare()` 功能是返回一个作为判断的整数，那么被引用的方法的功能也应该是返回一个作为判断的整数。
 
 
+
+-----
+
+方法引用的分类如下图
+
+<img src="./assets/image-20240430193558927.png" alt="image-20240430193558927" style="zoom:80%;" />
+
+----
+
+# 44.引用静态方法
+
+## 一、概念
+
+格式：`类名::静态方法`
+
+示例：`Integer::parseInt`
+
+这个格式其实很好理解，我们以前在调用静态方法的时候也是使用类名直接调用，只不过以前是用 `.` 进行调用的，现在就是使用 `::` 进行调用。
+
+我们利用这个格式来写一个小练习。
+
+----
+
+## 二、练习
+
+```
+集合中有以下数字，要求把他们都变成int类型
+"1","2","3","4","5"
+```
+
+首先创建集合并添加元素
+
+~~~java
+ArrayList<String> list = new ArrayList<>();
+Collections.addAll(list,"1","2","3","4","5");
+~~~
+
+以前的方式也可以完成，但是这样写里面没有函数式接口，用不了方法引用。
+
+~~~java
+ArrayList<Integer> list2 = new ArrayList<>();
+for (String s : list) {
+    int i = Integer.parseInt(s);
+    list2.add(i);
+}
+~~~
+
+接下来使用方法引用来操作。
+
+~~~java
+//2.把他们都变成int类型
+list.stream().map(new Function<String, Integer>() {
+    @Override
+    public Integer apply(String s) {
+        int i = Integer.parseInt(s);
+        return i;
+    }
+}).forEach(s -> System.out.println(s));
+//1.方法需要已经存在
+//2.方法的形参和返回值需要跟抽象方法的形参和返回值保持一致
+//3.方法的功能需要把形参的字符串转换成整数
+//在Java中是存在满足以上条件的方法的，例如Integer里面的parseInt()
+list.stream()
+    // 将parseInt()直接当做是map()形参中接口的抽象方法的方法体
+    .map(Integer::parseInt)
+    .forEach(s-> System.out.println(s));
+~~~
+
+
+
+-----
+
+# 45.引用成员方法
+
+## 一、概述
+
+格式：`对象::成员方法`
+
+这个格式也很好理解，你要想：在之前我们调用成员方法的时候，都是使用对象去调用的，只不过以前是用 `.` 进行调用的，现在就是使用 `::` 进行调用。
+
+在引用成员方法的时候有三种情况需要我们知道
+
+① 其他类：`其他类对象::方法名`
+
+② 本类：`this::方法名`
+
+③ 父类：`super::方法名`
+
+----
+
+## 二、练习一
+
+集合中有一些名字，按照要求过滤数据。
+
+数据："张无忌","周芷若","赵敏","张强","张三丰"
+
+要求：只要以张开头，而且名字是3个字的
+
+~~~java
+//1.创建集合
+ArrayList<String> list = new ArrayList<>();
+//2.添加数据
+Collections.addAll(list,"张无忌","周芷若","赵敏","张强","张三丰");
+//3.过滤数据（只要以张开头，而且名字是3个字的）
+list.stream().filter(s->s.startsWith("张")).filter(s->s.length() == 3).forEach(s-> System.out.println(s));
+
+list.stream().filter(new Predicate<String>() {
+    @Override
+    public boolean test(String s) {
+        return s.startsWith("张") && s.length() == 3;
+    }
+}).forEach(s-> System.out.println(s));
+~~~
+
+接下来改为方法引用，要思考：有没有这样的方法，它的形参是字符串，返回值是 `boolean`，而且方法里面做的事情跟我现在写的代码是一样的呢？
+
+很显然，Java并没有提供这样的方法，这个时候就可以自己写一个。
+
+新建一个类 `StringOperation.java`
+
+~~~java
+public class StringOperation {
+    public boolean stringJudge(String s){
+        return s.startsWith("张") && s.length() == 3;
+    }
+}
+~~~
+
+① 其他类：`其他类对象::方法名`
+
+~~~java
+StringOperation so = new StringOperation();
+list.stream().filter(so::stringJudge)
+    .forEach(s-> System.out.println(s));
+~~~
+
+② 本类：`this::方法名`
+
+如果直接在 `main方法` 中直接用 `this` 调用下面的方法，会直接报错，因为静态方法中没有 `this`！！！
+
+<img src="./assets/image-20240430202200123.png" alt="image-20240430202200123" style="zoom:80%;" />
+
+因此如果你想要引用本类的非静态方法，那么引用处必须在非静态的方法中。
+
+但静态方法中没有 `this` 怎么办呢？这个时候你只能创建本类的对象。
+
+~~~java
+//静态方法中是没有this的
+list.stream().filter(new FunctionDemo3()::stringJudge)
+    .forEach(s-> System.out.println(s));
+~~~
+
+`this::方法名` 、`super::方法名` 会放在第二个练习中讲解，因为这两种方式引用处不能是静态方法，因为在静态方法里面是没有 `this` 也是没有 `super` 的。
+
+-----
+
+## 二、练习二
+
+GUI界面中点击事件的方法引用写法
+
+基础代码
+
+**App.java**
+
+~~~java
+public class App {
+    public static void main(String[] args) {
+        new LoginJFrame();
+    }
+}
+~~~
+
+**LoginJFrame.java**
+
+~~~java
+public class LoginJFrame extends JFrame {
+    JButton go = new JButton("Go");
+
+    public LoginJFrame() {
+        //设置图标
+        setIconImage(Toolkit.getDefaultToolkit().getImage("myfunction\\image\\logo.jpg"));
+
+        //设置界面
+        initJframe();
+
+        //添加组件
+        initView();
+
+        //界面显示出来
+        this.setVisible(true);
+
+    }
+
+    //添加组件
+    public void initView() {
+        JLabel image = new JLabel(new ImageIcon("myfunction\\image\\kit.jpg"));
+        image.setBounds(100,50,174,174);
+        this.getContentPane().add(image);
+
+        go.setFont(new Font(null,1,20));
+        go.setBounds(120,274,150,50);
+        go.setBackground(Color.WHITE);
+
+        this.getContentPane().add(go);
+
+    }
+
+    //设置界面
+    public void initJframe() {
+        //设置标题
+        this.setTitle("随机点名器");
+        //设置大小
+        this.setSize(400, 500);
+        //设置关闭模式
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //设置窗口无法进行调节
+        this.setResizable(false);
+        //界面居中
+        this.setLocationRelativeTo(null);
+        //取消内部默认居中放置
+        this.setLayout(null);
+        //设置背景颜色
+        this.getContentPane().setBackground(Color.white);
+        this.setAlwaysOnTop(true);//置顶
+    }
+}
+~~~
+
+需求：点击go之后，在控制台有数据打印
+
+<img src="./assets/image-20240430203851196.png" alt="image-20240430203851196" style="zoom:50%;" />
 
 
 
@@ -4865,7 +5211,7 @@ public class PrintableDemo {
 
 - 方法引用符
 
-  ::  该符号为引用运算符，而它所在的表达式被称为方法引用
+  
 
 - 推导与省略
 
