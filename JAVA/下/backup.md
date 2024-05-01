@@ -5959,7 +5959,7 @@ System.out.println("火鸡味锅巴");
 
 ----
 
-# 56.自己处理异常
+# 56.自己处理异常（捕获异常）
 
 `自己处理异常` 这种方式也叫作 `捕获异常`。
 
@@ -6319,7 +6319,299 @@ System.err.println(123);
 
 -----
 
-# 60.
+# 60.抛出异常
+
+## 一、概念
+
+抛出异常会涉及到两个关键字：`throws`、`throw`。
+
+1、`throws`
+
+写在方法定义处，表示声明一个异常。告诉调用者，使用本方法可能会出现哪些异常。
+
+例如以下代码，方法的后面可以加 `throws + 异常的类名` ，如果有多个异常，那么异常与异常之间应该使用逗号来进行隔开。
+
+PS：：编译时异常必须要手动写上，运行时异常可以省略不写。
+
+2、`throw`
+
+写在方法内，表示结束方法，用来手动抛出异常对象，将异常对象交给调用者处理，方法中下面的代码不会再执行了。
+
+![image-20240501155710940](./assets/image-20240501155710940.png)
+
+-----
+
+## 二、代码示例
+
+需求：定义一个方法求数组的最大值
+
+以前我们是下面这样写的
+
+~~~java
+public static void main(String[] args) {
+    int[] arr = null;
+    int max = 0;
+    max = getMax(arr);
+    System.out.println(max);
+}
+
+public static int getMax(int[] arr) {
+    System.out.println("看看我执行了吗？");
+    int max = arr[0];
+    for (int i = 1; i < arr.length; i++) {
+        if (arr[i] > max) {
+            max = arr[i];
+        }
+    }
+    return max;
+}
+~~~
+
+但是这个代码可能会有一些问题。
+
+1、假设 `arr` 是 `null` 呢？ 
+
+~~~java
+int[] arr = null;
+~~~
+
+此时下面的方法能正常运行吗？肯定是不行的
+
+2、假设传递长度为 `0` 的数组，也无法遍历
+
+虽然说这样写是没有任何意义的，但是我们不能确定被人一定不会这么写。
+
+~~~java
+int[] arr = new int[0];
+~~~
+
+因此为了提高代码的健壮性，我们需要对 `getMax()` 进行以下改进。
+
+~~~java
+public static int getMax(int[] arr){
+    if(arr == null){
+        //手动创建一个异常对象，并把这个异常交给方法的调用者处理
+        //此时方法就会结束，下面的代码不会再执行了
+        throw new NullPointerException();
+    }
+    
+    if(arr.length == 0){
+        //它的意义其实跟上面是一样的，手动创建一个异常对象，并把这个异常交给方法的调用者处理
+        //此时方法就会结束，下面的代码不会再执行了
+        throw new ArrayIndexOutOfBoundsException();
+    }
+
+    System.out.println("看看我执行了吗？"); // 未执行
+    int max = arr[0];
+    for (int i = 1; i < arr.length; i++) {
+        if(arr[i] > max){
+            max = arr[i];
+        }
+    }
+    return max;
+}
+~~~
+
+还没完，在方法的后面其实还可以再加 `throws`，也就是说告诉调用者，本方法有可能会出哪些异常
+
+~~~java
+public static int getMax(int[] arr) throws NullPointerException,ArrayIndexOutOfBoundsException {
+}
+~~~
+
+但是 `NullPointerException,ArrayIndexOutOfBoundsException` 这两个异常又是 `RuntimeException` 的子类。
+
+<img src="./assets/image-20240501160943469.png" alt="image-20240501160943469" style="zoom:80%;" />
+
+因此这两个异常都是运行时异常，运行时异常我们是不需要手动声明的，这个可以省略不写。
+
+~~~java
+public static int getMax(int[] arr)/* throws NullPointerException,ArrayIndexOutOfBoundsException*/{
+}
+~~~
+
+当代码真的出现这个异常了，我们需要将异常交给调用者处理，此时调用者是不能直接不管的，因此这样的话最终就会将异常交给虚拟机处理，虚拟机的处理方案就是：停止程序，并把异常信息打印在控制台，这种方式的弊端就是：下面的代码就执行不了了，程序会结束。
+
+所以在调用处我们最好这么干：将有可能出现异常的代码选中，<kbd>ctrl + alt + T</kbd> 选择 `try-catch` 进行捕获。
+
+在捕获的时候我们可以将空指针异常、索引越界异常进行捕获。
+
+~~~java
+int[] arr = null;
+int max = 0;
+try {
+    // 在调用处接收到下面发送过来的异常后，就会跳转到对应的catch里面执行对应的代码
+    // 这样做的好处是：就是这里的代码出异常了，但程序并没有停止，它会继续往下执行其他的代码
+    max = getMax(arr);
+} catch (NullPointerException e) {
+    System.out.println("空指针异常");
+} catch (ArrayIndexOutOfBoundsException e) {
+    System.out.println("索引越界异常");
+}
+System.out.println(max);
+
+------------------------------------------
+
+public static int getMax(int[] arr)/* throws NullPointerException,ArrayIndexOutOfBoundsException*/{
+    if(arr == null){
+        //手动创建一个异常对象，并把这个异常交给方法的调用者处理
+        //此时方法就会结束，下面的代码不会再执行了
+        throw new NullPointerException();
+    }
+
+    if(arr.length == 0){
+        //手动创建一个异常对象，并把这个异常交给方法的调用者处理
+        //此时方法就会结束，下面的代码不会再执行了
+        throw new ArrayIndexOutOfBoundsException();
+    }
+
+
+    System.out.println("看看我执行了吗？");
+    int max = arr[0];
+    for (int i = 1; i < arr.length; i++) {
+        if(arr[i] > max){
+            max = arr[i];
+        }
+    }
+    return max;
+}
+~~~
+
+---
+
+# 三种异常处理方式总结
+
+1、如果你不管，它就会采取虚拟机默认处理异常的方式：把异常的名称，异常的原因及异常出现的位置等信息输出在了控制台，而且是以红色字体打印在控制台的。
+
+2、`try-catch`(捕获异常)：一般用在调用处，它的目的是就算代码出错，也能让代码继续往下运行。
+
+3、抛出：`throw、throws`
+
+在方法中，出现异常了，方法就没有继续运行下去的意义了，此时我们采取 `抛出处理`，交给调用者进行处理。
+
+目的：让该方法结束运行，并告诉调用者方法中出现了问题。
+
+在调用处我们一般都是捕获异常，目的就是让程序能继续运行下去。
+
+
+
+-----
+
+# 61.练习：键盘录入数据
+
+~~~java
+需求：
+    键盘录入自己心仪的女朋友姓名和年龄。
+    姓名的长度在 3 - 10之间，
+    年龄的范围为 18 - 40岁,
+    超出这个范围是异常数据不能赋值，需要重新录入,一直录到正确为止。
+提示：
+    需要考虑用户在键盘录入时的所有情况。
+    比如：录入年龄时超出范围，录入年龄时录入了abc等情况
+~~~
+
+写代码前，需要知道 `抛出` 和  `捕获` 的核心思想。
+
+`抛出`：告诉调用者出错了，因此抛出更多是写在方法里面。
+
+`捕获`：捕获更多的是写在方法的调用处，它的核心是让程序不要停止，程序能继续运行下去。
+
+**测试类**
+
+~~~java
+//1.创建键盘录入的对象
+Scanner sc = new Scanner(System.in);
+//2.创建女朋友的对象
+GirlFriend gf = new GirlFriend();
+//3.接收女朋友的姓名
+System.out.println("请输入你心仪的女朋友的名字");
+String name = sc.nextLine();
+gf.setName(name);
+System.out.println("请输入你心仪的女朋友的年龄");
+String ageStr = sc.nextLine();
+int age = Integer.parseInt(ageStr);
+gf.setAge(age);
+
+//5.打印
+System.out.println(gf);
+~~~
+
+在上面代码中，如果年龄输入字符，是会报错的。
+
+因此我们需要对这种情况进行处理，还需要对题目进行处理。
+
+~~~java
+String ageStr = sc.nextLine();
+// 办法一：我们在这里写if判断是没有问题的，但是当数据量比较多的时候，这种写法太过于繁琐
+if (name.length() >= 3 && name.length() <= 10) {
+    gf.setName(name);
+}
+int age = Integer.parseInt(ageStr);
+gf.setAge(age);
+~~~
+
+那该怎么办呢？在JavaBean中，有一个 `set方法`，此时我们就可以将这些判断写在 `set方法` 里面了。
+
+
+
+**GirlFriend.java**
+
+~~~java
+public void setName(String name)  {
+    int len = name.length();
+    if(len < 3 || len > 10){
+        throw new RuntimeException();
+    }
+    this.name = name;
+}
+
+public void setAge(int age) {
+    if(age < 18 || age > 40){
+        throw new RuntimeException();
+    }
+    this.age = age;
+}
+~~~
+
+
+
+~~~java
+//1.创建键盘录入的对象
+Scanner sc = new Scanner(System.in);
+//2.创建女朋友的对象
+GirlFriend gf = new GirlFriend();
+while (true) {
+    //3.接收女朋友的姓名
+    try {
+        System.out.println("请输入你心仪的女朋友的名字");
+        String name = sc.nextLine();
+        gf.setName(name);
+        //4.接收女朋友的年龄
+        System.out.println("请输入你心仪的女朋友的年龄");
+        // 这里不用nextInt()是因为如果它输入字符就会报错
+        // 所以此时采取nextLine()，不管你录什么哪怕录的是abc，先录入到系统中，然后再来进行转换 / 判断，如果有问题，再让你重新录就行了
+        String ageStr = sc.nextLine();
+        int age = Integer.parseInt(ageStr);
+        gf.setAge(age);
+        //如果所有的数据都是正确的，那么跳出循环
+        break;
+    } catch (NumberFormatException e) {
+        System.out.println("年龄的格式有误，请输入数字");
+        //continue;
+    } catch (RuntimeException e) {
+        System.out.println("姓名的长度或者年龄的范围有误");
+        //continue;
+    }
+}
+//5.打印
+System.out.println(gf);
+~~~
+
+
+
+-----
+
+
 
 
 
