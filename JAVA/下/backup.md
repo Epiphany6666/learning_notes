@@ -5883,6 +5883,446 @@ System.out.println(name);
 
 ----
 
+## 作用二：作为方法内部的一种特殊返回值，以便通知调用者底层的执行情况
+
+**测试类**
+
+要求年龄：（同学） 18~40岁
+
+~~~java
+//1.创建学生对象
+Student s1 = new Student();
+s1.setAge(50);
+~~~
+
+**Student.java**
+
+~~~java
+/**
+* 设置
+* @param age
+*/
+public void setAge(int age) {
+    if(age < 18 || age > 40){
+        // 之前我们是直接打印在控制台，但是直接打印的效果其实是不好的
+        //因为就算赋的值超过范围，但是setAge()并没有将赋值的结果告诉给调用者，而是直接把结果打印在控制台。
+        //System.out.println("年龄超出范围");
+        //此时就可以使用异常解决，在setAge()中直接给调用者返回一个异常
+        //throw可以理解为：抛出。这里由于是因为参数出错而导致的问题，因此我们直接抛出RuntimeException即可
+        throw new RuntimeException();
+    } else{
+        this.age = age;
+    }
+}
+~~~
+
+此时它就不会在控制台中打印了，而是将信息交给调用处 `s1.setAge(50);`，此时这行代码就知道了50赋值失败。
+
+这里它就可以进行选择了，它有两种选择方式：1、自己悄悄处理；2、打印在控制台上。
+
+默认是打印在控制台的。
+
+<img src="./assets/image-20240501133810464.png" alt="image-20240501133810464" style="zoom:67%;" />
+
+
+
+-----
+
+# 异常的处理方式
+
+在Java中有三种需要我们知道
+
+1、JVM默认的处理方式
+
+如果我们在代码中没有写任何的处理方式，那么代码会将异常交给虚拟机进行处理，虚拟机会有一套默认的处理方式。
+
+2、自己处理
+
+3、也可以交给调用者处理，交给调用者就叫做：抛出异常
+
+# 55.JVM虚拟机默认处理异常的方式
+
+JVM虚拟机默认处理异常的方式：把异常的名称，异常的原因及异常出现的位置等信息输出在了控制台，而且是以红色字体打印在控制台的。
+
+程序在这个时候就会停止了，下面的代码不会再执行了。
+
+~~~java
+System.out.println("狂踹瘸子那条好腿");
+System.out.println(2/0);//算术异常 ArithmeticException
+System.out.println("是秃子终会发光");
+System.out.println("火鸡味锅巴");
+~~~
+
+<img src="./assets/image-20240501134353030.png" alt="image-20240501134353030" style="zoom:80%;" />
+
+
+
+----
+
+# 56.自己处理异常
+
+`自己处理异常` 这种方式也叫作 `捕获异常`。
+
+~~~java
+try {
+    可能出现异常的代码;
+} catch(异常类名 变量名) { //try里面会出什么异常，这里就需要写什么异常
+    异常的处理代码;
+}
+~~~
+
+目的：当代码出现异常时，可以让程序继续往下执行，不会停止虚拟机。
+
+如下代码，如果不进行任何处理，那么一定会报数组索引越界异常的。
+
+出现异常后，它会采取虚拟机默认的处理方案，将错误信息打印在控制台，并停止虚拟机的运行。
+
+~~~java
+int[] arr = {1, 2, 3, 4, 5, 6};
+System.out.println(arr[10]);
+System.out.println("看看我执行了吗？"); // 不会执行
+~~~
+
+接下来我们用 `try-catch` 的方式来处理
+
+~~~java
+int[] arr = {1, 2, 3, 4, 5, 6};
+try{
+    //可能出现异常的代码;
+    System.out.println(arr[10]);//此处出现了异常，底层程序就会在这里创建一个ArrayIndexOutOfBoundsException对象
+    //相当于 new ArrayIndexOutOfBoundsException();
+    //拿着这个对象到catch的小括号中对比，看括号中的变量是否可以接收这个对象
+    //如果能被接收，就表示该异常就被捕获（抓住），执行catch里面对应的代码
+    //当catch里面所有的代码执行完毕，继续执行try...catch体系下面的其他代码
+} catch(ArrayIndexOutOfBoundsException e){
+    //如果出现了ArrayIndexOutOfBoundsException异常，我该如何处理
+    System.out.println("索引越界了");
+}
+System.out.println("看看我执行了吗？"); // 执行
+~~~
+
+
+
+----
+
+# 57.捕获异常灵魂四问（①②）
+
+```
+
+灵魂二问：如果try中可能会遇到多个问题，怎么执行？
+```
+
+## 灵魂一问：如果try中没有遇到问题，怎么执行？
+
+如果try中没有遇到问题，会把try里面所有的代码全部执行完毕，不会执行catch里面的代码
+
+注意：只有当出现了异常才会执行catch里面的代码
+
+~~~java
+int[] arr = {1, 2, 3, 4, 5, 6};
+
+try {
+    System.out.println(arr[0]);//1
+} catch(ArrayIndexOutOfBoundsException e){
+    System.out.println("索引越界了");  // 没执行
+}
+
+System.out.println("看看我执行了吗？");// 执行了
+~~~
+
+----
+
+## 灵魂二问：如果try中可能会遇到多个问题，怎么执行？
+
+下面代码有两句话可能会出异常，但是在 `catch` 中只捕获了 `ArrayIndexOutOfBoundsException`，你觉得代码会出问题吗？
+
+```java
+int[] arr = {1, 2, 3, 4, 5, 6};
+try{
+    System.out.println(arr[10]);// 这里会报ArrayIndexOutOfBoundsException
+    System.out.println(2/0);// 这里会报ArithmeticException（算数异常）
+}catch(ArrayIndexOutOfBoundsException e){
+    System.out.println("索引越界了");
+}
+
+System.out.println("看看我执行了吗？");
+```
+
+程序运行结果如下。
+
+代码执行过程如下：先创建数组，然后执行 `try` 里面的代码，在执行到第一句话的时候就已经出问题了，因此此时在底层会创建 `ArrayIndexOutOfBoundsException` 的对象，然后直接跳转到 `catch` 里面，下面的代码就不会再走了，因此就执行 `索引越界了`，当这句话执行完毕后，整个 `try-catch` 体系就结束了，最后执行 `看看我执行了吗？`
+
+<img src="./assets/image-20240501140610339.png" alt="image-20240501140610339" style="zoom:67%;" />
+
+但是这个并不是我们最为标准的答案，最为标准的答案应该是：在 `try` 中可能会遇到多个问题，那么我们就需要写多个 `catch` 与之对应，即不同的异常我们会有不同的处理方案。
+
+~~~java
+细节：如果我们要捕获多个异常，这些异常中如果存在父子关系的话，那么父类一定要写在下面（例如Exception就是异常的父类，需要写在最下面）
+~~~
+
+如果将父类异常直接写在最下面，就会直接报错。
+
+`try-catch` 的运行规则：首先运行第 `22行` 的代码进行打印，但这行代码已经出异常了，因此Java在底层会创建一个 `ArrayIndexOutOfBoundsException` 的对象，然后拿着这个对象到下面的 `catch` 中进行匹配，它匹配的时候是从上往下一次匹配的，此时第一个 `Exception e` 就已经匹配上了，这就相当于 `Exception e = new ArrayIndexOutOfBoundsException()`，这就是继承的多态，这种方式完全可以接受，因此就会直接执行 `Exception e` 里面的代码。
+
+这样的话，所有的异常都是可以被 `Exception` 接收的，那么下面的 `catch` 永远执行不到了。
+
+<img src="./assets/image-20240501141426164.png" alt="image-20240501141426164" style="zoom:67%;" />
+
+~~~java
+int[] arr = {1, 2, 3, 4, 5, 6};
+
+try {
+    System.out.println(arr[10]);//ArrayIndexOutOfBoundsException
+    System.out.println(2 / 0);//ArithmeticException
+    String s = null;
+    System.out.println(s.equals("abc"));
+} catch (ArrayIndexOutOfBoundsException e) {
+    System.out.println("索引越界了");
+} catch (NullPointerException e) {
+    System.out.println("空指针异常");
+} catch (Exception e) {
+    System.out.println("Exception");
+}
+
+System.out.println("看看我执行了吗？");
+~~~
+
+---
+
+## 扩展
+
+在JDK7以前，异常都是需要分开书写的，一个 `catch` 里面只能处理一个异常信息。
+
+但是JDK7及JDK7以后，我们可以在catch中同时捕获多个异常，中间用 `|` 进行隔开，表示如果出现了A异常或者B异常的话，采取同一种处理方案。
+
+PS：是 `|`，不是 `||`
+
+~~~java
+try {
+    System.out.println(arr[10]);//ArrayIndexOutOfBoundsException
+    System.out.println(2 / 0);//ArithmeticException
+    String s = null;
+    System.out.println(s.equals("abc"));
+} catch (ArrayIndexOutOfBoundsException | ArithmeticException e) {
+    System.out.println("索引越界了");
+} catch (NullPointerException e) {
+    System.out.println("空指针异常");
+} catch (Exception e) {
+    System.out.println("Exception");
+}
+~~~
+
+
+
+----
+
+# 58.捕获异常灵魂四问（③④）
+
+## 灵魂三问：如果try中遇到的问题没有被捕获，怎么执行？
+
+`try` 中可能会有 `ArrayIndexOutOfBoundsException异常`，但是在 `catch` 中并没有捕获到，我捕获的是 `NullPointerException`
+
+~~~java
+try {
+    System.out.println(arr[10]);// ArrayIndexOutOfBoundsException
+} catch (NullPointerException e) {
+    System.out.println("空指针异常");
+}
+
+System.out.println("看看我执行了吗？");
+~~~
+
+运行结束后，可以发现它将异常信息以红色的字体打印在了控制台，而且下面的 `看看我执行了吗？` 并没有打印出来。
+
+这个就是虚拟机默认处理异常的方式。
+
+<img src="./assets/image-20240501143613931.png" alt="image-20240501143613931" style="zoom:67%;" />
+
+因此，如果try中遇到的问题没有被捕获，相当于try...catch的代码白写了，最终还是会交给虚拟机进行处理。
+
+接下来我们说一下它的执行过程：首先创建一个数组，然后在 `15行` 的时候出异常了，此时就会在这创建一个 `ArrayIndexOutOfBoundsException` 的对象，然后就会去看，下面有没有一个 `catch` 能接收这个对象，首先会用 `NullPointerException` 是否能接收，发现接受不了，他们两个没有父子关系。
+
+然后再往下，发现没有其他的 `catch` 来接受 `ArrayIndexOutOfBoundsException` 了，因此最终它就会将异常信息交给虚拟机进行处理。
+
+而虚拟机的处理方案就是：将异常的信息以红色的字体打印在控制台，并且停止程序的运行。
+
+---
+
+## 灵魂四问：如果try中遇到了问题，那么try下面的其他代码还会执行吗？
+
+如果try中遇到了问题，下面的代码就不会执行了，直接跳转到对应的catch当中，执行catch里面的语句体。
+
+但是如果没有对应catch与之匹配，那么还是会交给虚拟机进行处理。
+
+~~~java
+int[] arr = {1, 2, 3, 4, 5, 6};
+
+try{
+    System.out.println(arr[10]);
+    System.out.println("看看我执行了吗？... try"); // 不执行
+}catch(ArrayIndexOutOfBoundsException e){
+    System.out.println("索引越界了"); // 执行
+}
+
+System.out.println("看看我执行了吗？... 其他代码"); // 执行
+~~~
+
+执行流程
+
+<img src="./assets/image-20240501144216702.png" alt="image-20240501144216702" style="zoom:67%;" />
+
+
+
+----
+
+# 59.异常中的常见方法
+
+## 一、引入
+
+在刚刚我们已经学习了 `try-catch` 中自己捕获异常的方式。
+
+在 `catch` 中我们对异常的处理，其实就写了一个输出语句而已。
+
+<img src="./assets/image-20240501144415841.png" alt="image-20240501144415841" style="zoom:67%;" />
+
+但是这不是很专业，IDEA中默认其实是用异常对象 `e` 调用了一个方法 `printStackTrace()`
+
+<img src="./assets/image-20240501144542812.png" alt="image-20240501144542812" style="zoom:67%;" />
+
+这个方法是异常中常见方法之一。
+
+----
+
+## 二、常见方法
+
+异常中一共有三个常见方法，这些方法是定义在 `Throwable` 中的。
+
+最常用的就是第一个方法，其他两个方法了解一下即可。
+
+* `public void printStackTrace()`：把异常的错误信息输出在控制台
+
+* `public String getMessage()`：返回此 `throwable` 的详细信息字符串
+
+* `public String toString()`：返回此可抛出的简短描述
+
+----
+
+## 三、IDEA自动生成 `try-catch`
+
+选中有可能出异常的代码，<kbd>ctrl + alt + T</kbd> 就会提示 `Surround With`，让你选择你想用哪个语句块去包裹这块代码.
+
+点击第6个，可以发现它直接就自动生成了。
+
+![image-20240501145354315](./assets/image-20240501145354315.png)
+
+----
+
+## 四、`public String getMessage()`
+
+首先我们需要改一下里面的代码，在 `catch` 的形参中直接捕获的是 `Exception`，这个异常太大了，我们应该捕获实际出现的。
+
+~~~java
+int[] arr = {1, 2, 3, 4, 5, 6};
+try {
+    System.out.println(arr[10]);
+} catch (ArrayIndexOutOfBoundsException e) {
+    System.out.println(e.getMessage());
+}
+System.out.println("看看我执行了吗？");
+~~~
+
+程序运行结果如下：`Index 10 out of bounds for length 6`（10索引已经超过了长度为6的数组）
+
+<img src="./assets/image-20240501145727815.png" alt="image-20240501145727815" style="zoom:67%;" />
+
+----
+
+## 五、`public String toString()`
+
+返回此可抛出的简短描述
+
+~~~java
+int[] arr = {1, 2, 3, 4, 5, 6};
+try {
+    System.out.println(arr[10]);
+} catch (ArrayIndexOutOfBoundsException e) {
+    System.out.println(e.toString());
+}
+System.out.println("看看我执行了吗？");
+~~~
+
+可以发现它出现的是异常的名字和简短信息。
+
+<img src="./assets/image-20240501145829981.png" alt="image-20240501145829981" style="zoom:80%;" />
+
+----
+
+## 六、`public void printStackTrace()`
+
+这个方法是没有返回值的，因此我们直接调用那就行了。
+
+~~~java
+int[] arr = {1, 2, 3, 4, 5, 6};
+try {
+    System.out.println(arr[10]);
+} catch (ArrayIndexOutOfBoundsException e) {
+    e.printStackTrace();
+}
+System.out.println("看看我执行了吗？");
+~~~
+
+程序执行结果如下：以红色的字体打印在控制台，但是这行代码不会结束虚拟机，它仅仅是做了一个打印的操作。
+
+1、以红色的字体打印
+
+2、打印的信息已经包含了上面的 `getMessage()` 和 `toString()` 的结果，并且还多了一个 `异常所在的位置`
+
+因此在以后， `printStackTrace()` 是我们最长用的，因为它所包含的信息是最多的。
+
+<img src="./assets/image-20240501150011960.png" alt="image-20240501150011960" style="zoom:67%;" />
+
+----
+
+## 七、为什么 `printStackTrace()` 是以红色的字体打印的？
+
+跟进 `printStackTrace()`。
+
+在以前我们写输出语句的时候是 `System.out`，这个跟 `System.err` 有什么不一样呢？
+
+可以发现它在底层是用 `System.err.println()` 进行输出，把异常的错误信息以红色字体输出在控制台中。
+
+细节：仅仅是打印信息，不会停止程序运行。
+
+<img src="./assets/image-20240501150328176.png" alt="image-20240501150328176" style="zoom:80%;" />
+
+~~~java
+//正常的输出语句
+System.out.println(123);
+
+//错误的输出语句（但是这个错误不是说代码错误了，而是用来打印错误信息）
+System.err.println(123);
+~~~
+
+程序运行效果如下，`System.err` 会将小括号里面的内容以红色的字体进行打印。
+
+<img src="./assets/image-20240501150442061.png" alt="image-20240501150442061" style="zoom:67%;" />
+
+关于这种错误的输出语句方式我们了解一下就行了，我们一般是不会自己用的，都是Java的底层，或者第三方框架使用的。
+
+而且它里面有一个小细节：当错误的输出语句跟正常的数据语句在一起打印的时候，它打印的顺序跟代码里的顺序有可能是不一样的。
+
+多运行几次，可以发现这次跑到上面去了，要解释这个原因需要学习完多线程的知识。
+
+<img src="./assets/image-20240501150733114.png" alt="image-20240501150733114" style="zoom:67%;" />
+
+
+
+-----
+
+# 60.
+
+
+
 
 
 
@@ -5912,15 +6352,8 @@ System.out.println(name);
 
 **Throwable中的常用方法：**
 
-* `public void printStackTrace()`:打印异常的详细信息。
+* 
 
-  *包含了异常的类型,异常的原因,还包括异常出现的位置,在开发和调试阶段,都得使用printStackTrace。*
-
-* `public String getMessage()`:获取发生异常的原因。
-
-  *提示给用户的时候,就提示错误原因。*
-
-* `public String toString()`:获取异常的类型和异常描述信息(不用)。
 
 ***出现异常,不要紧张,把异常的简单类名,拷贝到API中去查。***
 
