@@ -6552,12 +6552,16 @@ gf.setAge(age);
 
 那该怎么办呢？在JavaBean中，有一个 `set方法`，此时我们就可以将这些判断写在 `set方法` 里面了。
 
+其实 `set方法` 的核心也是这样，它会对你传递过来的数据进行校验，满足要求才赋值，不满足要求直接pass不要。
 
+抛出异常时，Java没有一个类能完美表示我们现在出的问题，此时就可以写 `RuntimeException`，创建运行时异常的父类，这就可以了。
 
 **GirlFriend.java**
 
+在两个方法的后面都可以写 `throws RuntimeException`，但是这个是可以省略的，因为 `RuntimeException` 是运行时期异常，运行时异常可以省略不写。
+
 ~~~java
-public void setName(String name)  {
+public void setName(String name) {
     int len = name.length();
     if(len < 3 || len > 10){
         throw new RuntimeException();
@@ -6573,7 +6577,13 @@ public void setAge(int age) {
 }
 ~~~
 
+接下来就要在测试类中处理异常信息。
 
+如果不处理，就会交给虚拟机处理，它会将异常的信息打印在控制台，而且程序会停止。
+
+这个不是我们想要的，我们想要的是：需要重新录入，一直录到正确为止。
+
+因此这里的异常我们需要处理它。
 
 ~~~java
 //1.创建键盘录入的对象
@@ -6583,6 +6593,7 @@ GirlFriend gf = new GirlFriend();
 while (true) {
     //3.接收女朋友的姓名
     try {
+        // 输出语句放在try外面也是没问题的，但是为了保证代码的结构性，放里面也是ok的
         System.out.println("请输入你心仪的女朋友的名字");
         String name = sc.nextLine();
         gf.setName(name);
@@ -6597,6 +6608,7 @@ while (true) {
         break;
     } catch (NumberFormatException e) {
         System.out.println("年龄的格式有误，请输入数字");
+        //这里continue可写可不写，因为就算你不写，它下面也没有其他代码了
         //continue;
     } catch (RuntimeException e) {
         System.out.println("姓名的长度或者年龄的范围有误");
@@ -6611,291 +6623,257 @@ System.out.println(gf);
 
 -----
 
+# 62.自定义异常
 
+## 一、引入
 
+在刚刚的案例中，姓名 / 年龄有误，我们不知道创建什么异常的对象，因为在Java中好像没有哪个异常能表示我现在出现的问题。
 
+因此我们只能创建运行时异常共同的父类 `RuntimeException`。
 
+但是`RuntimeException`其实也不是很好，这个异常也不能表示现在出现的问题，而且在调用处，还不能将姓名的处理方案和年龄的处理方案分开，所以就有了自定义异常。
 
+<img src="./assets/image-20240501205620552.png" alt="image-20240501205620552" style="zoom: 50%;" />
 
+既然Java没有，我们就自己写一个，写一个能完美表示当前问题的异常类即可。
 
+怎么写呢？我们可以先看一下Java中的异常是怎么定义的。
 
+<kbd>ctrl + N</kbd> 搜索 `ArrayIndexOutOfBoundsException(索引越界异常)`，可以发现它只有一个继承关系，下面有一个空参，还有一个有参构造。
 
+<img src="./assets/image-20240501210236414.png" alt="image-20240501210236414" style="zoom:80%;" />
 
-## 1.1 异常概念
+再来看一个，<kbd>ctrl + N</kbd> 搜索 `ArithmeticException` ，可以发现它也是一样的，都一个继承，一个空参构造，一个带参构造。
 
-异常，就是不正常的意思。在生活中:医生说,你的身体某个部位有异常,该部位和正常相比有点不同,该部位的功能将受影响.在程序中的意思就是：
+<img src="./assets/image-20240501210354297.png" alt="image-20240501210354297" style="zoom:67%;" />
 
-* **异常** ：指的是程序在执行过程中，出现的非正常的情况，最终会导致JVM的非正常停止。
+其实Java中大多数异常都是这样的，这些异常出现的原因只有一个：就是它的名字，根据不同的情况我们可以创建不同的异常对象。
 
-在Java等面向对象的编程语言中，异常本身是一个类，产生异常就是创建异常对象并抛出了一个异常对象。Java处理异常的方式是中断处理。
+----
 
-> 异常指的并不是语法错误,语法错了,编译不通过,不会产生字节码文件,根本不能运行.
+## 二、步骤
 
-## 1.2 异常体系
+1、定义异常类，类名要见名知意
 
-异常机制其实是帮助我们**找到**程序中的问题，异常的根类是`java.lang.Throwable`，其下有两个子类：`java.lang.Error`与`java.lang.Exception`，平常所说的异常指`java.lang.Exception`。
+2、写继承关系
 
-![](./../../../课/黑马/JAVA/入门到起飞（下）/day27-IO(异常&File&综合案例）/笔记/imgs/异常体系.png)
+如果你当前定义的异常是运行时异常，需要继承 `RuntimeException`；但是如果是编译时异常，直接继承 `Exception` 即可。
 
-**Throwable体系：**
+3、空参构造
 
-* **Error**:严重错误Error，无法通过处理的错误，只能事先避免，好比绝症。
-* **Exception**:表示异常，异常产生后程序员可以通过代码的方式纠正，使程序继续运行，是必须要处理的。好比感冒、阑尾炎。
+4、带参构造
 
-**Throwable中的常用方法：**
+自定义异常的目的：就是为了让控制台的报错信息更加的见名知意，说的直白一点，就是为了自定义异常的名字。
 
-* 
+在使用自定义异常的时候跟之前一样，在合适的时候直接创建它的对象，最后再来抛出即可，然后在方法的调用处使用 `try-catch` 捕获。
 
+----
 
-***出现异常,不要紧张,把异常的简单类名,拷贝到API中去查。***
+## 三、代码示例
 
-![](./../../../课/黑马/JAVA/入门到起飞（下）/day27-IO(异常&File&综合案例）/笔记/imgs/简单的异常查看.bmp)
+目的：定义两个自定义异常来表示姓名和年龄的问题
 
-## 1.3 异常分类
+首先我们来写表示姓名问题的异常。
 
-我们平常说的异常就是指Exception，因为这类异常一旦出现，我们就要对代码进行更正，修复程序。
+~~~java
+//运行时继承：RuntimeException 核心 就表示由于参数错误而导致的问题
+//编译时继承：Exception 核心 提醒程序员检查本地信息，例如读取本地文件的时候需要检查本地文件是否存在
+//在刚刚我们写的姓名问题，是因为我们键盘录入的名字参数有问题，而导致的异常，因此我们需要继承RuntimeException更加合理
 
-**异常(Exception)的分类**:根据在编译时期还是运行时期去检查异常?
+//空参构造和带参构造不需要我们自己写，alt + insert，选择constructor，它会将父类RuntimeException的构造全部罗列出来，现在我们只需要写前两个，第一个是空参，第二个是带参数的构造，这个参数是报错的信息message，然后点击OK即可
+~~~
 
-* **编译时期异常**:checked异常。在编译时期,就会检查,如果没有处理异常,则编译失败。(如日期格式化异常)
-* **运行时期异常**:runtime异常。在运行时期,检查异常.在编译时期,运行异常不会编译器检测(不报错)。(如数学异常)
+<img src="./assets/image-20240501211735531.png" alt="image-20240501211735531" style="zoom:67%;" />
 
-​    ![](./../../../课/黑马/JAVA/入门到起飞（下）/day27-IO(异常&File&综合案例）/笔记/imgs/异常的分类.png)
+~~~java
+public class NameFormatException extends RuntimeException{
+    //技巧：
+    //NameFormat：当前异常的名字，表示姓名格式化问题
+    //Exception：它的后缀，表示当前类是一个异常类
 
-## 1.4 异常的产生过程解析
+    public NameFormatException() {
+    }
 
-先运行下面的程序，程序会产生一个数组索引越界异常ArrayIndexOfBoundsException。我们通过图解来解析下异常产生的过程。
-
- 工具类
-
-```java
-public class ArrayTools {
-    // 对给定的数组通过给定的角标获取元素。
-    public static int getElement(int[] arr, int index) {
-        int element = arr[index];
-        return element;
+    public NameFormatException(String message) {
+        super(message);
     }
 }
-```
+~~~
 
- 测试类
+另外还有一个年龄，年龄是超出范围，因此就叫做 `AgeOutOfBoundsException`。
 
-```java
-public class ExceptionDemo {
-    public static void main(String[] args) {
-        int[] arr = { 34, 12, 67 };
-        intnum = ArrayTools.getElement(arr, 4)
-        System.out.println("num=" + num);
-        System.out.println("over");
+由于年龄也是因为参数导致的问题，因此也是继承 `RuntimeException` 也更加的合理
+
+~~~java
+public class AgeOutOfBoundsException extends RuntimeException{
+
+    public AgeOutOfBoundsException() {
+    }
+
+    public AgeOutOfBoundsException(String message) {
+        super(message);
     }
 }
-```
+~~~
 
-上述程序执行过程图解：
+回到 `GirlFriend类` ，此时在抛异常的时候就不要抛 `RuntimeException` 了，而是抛出我们自定义异常。
 
- ![](./../../../课/黑马/JAVA/入门到起飞（下）/day27-IO(异常&File&综合案例）/笔记/imgs/异常产生过程.png)
+甚至在括号中还可以写我们报错的信息。
 
-## 1.5 抛出异常throw
+又由于 `NameFormatException`、`AgeOutOfBoundsException` 这两个异常都是运行时异常，因此在 `方法名` 后面可以加上 `throws`，也可以不写省略。
 
-在编写程序时，我们必须要考虑程序出现问题的情况。比如，在定义方法时，方法需要接受参数。那么，当调用方法使用接受到的参数时，首先需要先对参数数据进行合法的判断，数据若不合法，就应该告诉调用者，传递合法的数据进来。这时需要使用抛出异常的方式来告诉调用者。
-
-在java中，提供了一个**throw**关键字，它用来抛出一个指定的异常对象。那么，抛出一个异常具体如何操作呢？
-
-1. 创建一个异常对象。封装一些提示信息(信息可以自己编写)。
-
-2. 需要将这个异常对象告知给调用者。怎么告知呢？怎么将这个异常对象传递到调用者处呢？通过关键字throw就可以完成。throw 异常对象。
-
-   throw**用在方法内**，用来抛出一个异常对象，将这个异常对象传递到调用者处，并结束当前方法的执行。
-
-**使用格式：**
-
-```
-throw new 异常类名(参数);
-```
-
- 例如：
-
-```java
-throw new NullPointerException("要访问的arr数组不存在");
-
-throw new ArrayIndexOutOfBoundsException("该索引在数组中不存在，已超出范围");
-```
-
-学习完抛出异常的格式后，我们通过下面程序演示下throw的使用。
-
-```java
-public class ThrowDemo {
-    public static void main(String[] args) {
-        //创建一个数组 
-        int[] arr = {2,4,52,2};
-        //根据索引找对应的元素 
-        int index = 4;
-        int element = getElement(arr, index);
-
-        System.out.println(element);
-        System.out.println("over");
+~~~java
+public void setName(String name) {
+    int len = name.length();
+    if(len < 3 || len > 10){
+        throw new NameFormatException(name + "格式有误，长度应该为：3~10");
     }
-    /*
-     * 根据 索引找到数组中对应的元素
-     */
-    public static int getElement(int[] arr,int index){ 
-       	//判断  索引是否越界
-        if(index<0 || index>arr.length-1){
-             /*
-             判断条件如果满足，当执行完throw抛出异常对象后，方法已经无法继续运算。
-             这时就会结束当前方法的执行，并将异常告知给调用者。这时就需要通过异常来解决。 
-              */
-             throw new ArrayIndexOutOfBoundsException("哥们，角标越界了```");
-        }
-        int element = arr[index];
-        return element;
+    this.name = name;
+}
+
+public void setAge(int age) {
+    if(age < 18 || age > 40){
+        throw new AgeOutOfBoundsException(age + "超出了范围");
+    }
+    this.age = age;
+}
+~~~
+
+回到测试类中
+
+~~~java
+while (true) {
+    //3.接收女朋友的姓名
+    try {
+        System.out.println("请输入你心仪的女朋友的名字");
+        String name = sc.nextLine();
+        gf.setName(name);
+        //4.接收女朋友的年龄
+        System.out.println("请输入你心仪的女朋友的年龄");
+        String ageStr = sc.nextLine();
+        int age = Integer.parseInt(ageStr);
+        gf.setAge(age);
+        //如果所有的数据都是正确的，那么跳出循环
+        break;
+    } catch (NumberFormatException e) {
+        // 这里面就不用在控制台打印了，而是直接调用方法printStackTrace()
+        // System.out.println("年龄的格式有误，请输入数字");
+        e.printStackTrace();
+    } catch (NameFormatException e) {
+        e.printStackTrace();
+    }catch (AgeOutOfBoundsException e) {
+        e.printStackTrace();
     }
 }
-```
+~~~
 
-> 注意：如果产生了问题，我们就会throw将问题描述类即异常进行抛出，也就是将问题返回给该方法的调用者。
->
-> 那么对于调用者来说，该怎么处理呢？一种是进行捕获处理，另一种就是继续讲问题声明出去，使用throws声明处理。
+可以发现，当输入错误的时候，就会报我们自己写的异常
 
-## 1.6 声明异常throws
-
-**声明异常**：将问题标识出来，报告给调用者。如果方法内通过throw抛出了编译时异常，而没有捕获处理（稍后讲解该方式），那么必须通过throws进行声明，让调用者去处理。
-
-关键字**throws**运用于方法声明之上,用于表示当前方法不处理异常,而是提醒该方法的调用者来处理异常(抛出异常).
-
-**声明异常格式：**
-
-```
-修饰符 返回值类型 方法名(参数) throws 异常类名1,异常类名2…{   }	
-```
-
-声明异常的代码演示：
-
-```java
-public class ThrowsDemo {
-    public static void main(String[] args) throws FileNotFoundException {
-        read("a.txt");
-    }
-
-    // 如果定义功能时有问题发生需要报告给调用者。可以通过在方法上使用throws关键字进行声明
-    public static void read(String path) throws FileNotFoundException {
-        if (!path.equals("a.txt")) {//如果不是 a.txt这个文件 
-            // 我假设  如果不是 a.txt 认为 该文件不存在 是一个错误 也就是异常  throw
-            throw new FileNotFoundException("文件不存在");
-        }
-    }
-}
-```
-
-throws用于进行异常类的声明，若该方法可能有多种异常情况产生，那么在throws后面可以写多个异常类，用逗号隔开。
-
-```java
-public class ThrowsDemo2 {
-    public static void main(String[] args) throws IOException {
-        read("a.txt");
-    }
-
-    public static void read(String path)throws FileNotFoundException, IOException {
-        if (!path.equals("a.txt")) {//如果不是 a.txt这个文件 
-            // 我假设  如果不是 a.txt 认为 该文件不存在 是一个错误 也就是异常  throw
-            throw new FileNotFoundException("文件不存在");
-        }
-        if (!path.equals("b.txt")) {
-            throw new IOException();
-        }
-    }
-}
-```
-
-## 1.7 捕获异常try…catch
-
-如果异常出现的话,会立刻终止程序,所以我们得处理异常:
-
-1. 该方法不处理,而是声明抛出,由该方法的调用者来处理(throws)。
-2. 在方法中使用try-catch的语句块来处理异常。
-
-**try-catch**的方式就是捕获异常。
-
-* **捕获异常**：Java中对异常有针对性的语句进行捕获，可以对出现的异常进行指定方式的处理。
-
-捕获异常语法如下：
-
-```java
-try{
-     编写可能会出现异常的代码
-}catch(异常类型  e){
-     处理异常的代码
-     //记录日志/打印异常信息/继续抛出异常
-}
-```
-
-**try：**该代码块中编写可能产生异常的代码。
-
-**catch：**用来进行某种异常的捕获，实现对捕获到的异常进行处理。
-
-> 注意:try和catch都不能单独使用,必须连用。
-
-演示如下：
-
-```java
-public class TryCatchDemo {
-    public static void main(String[] args) {
-        try {// 当产生异常时，必须有处理方式。要么捕获，要么声明。
-            read("b.txt");
-        } catch (FileNotFoundException e) {// 括号中需要定义什么呢？
-          	//try中抛出的是什么异常，在括号中就定义什么异常类型
-            System.out.println(e);
-        }
-        System.out.println("over");
-    }
-    /*
-     *
-     * 我们 当前的这个方法中 有异常  有编译期异常
-     */
-    public static void read(String path) throws FileNotFoundException {
-        if (!path.equals("a.txt")) {//如果不是 a.txt这个文件 
-            // 我假设  如果不是 a.txt 认为 该文件不存在 是一个错误 也就是异常  throw
-            throw new FileNotFoundException("文件不存在");
-        }
-    }
-}
-```
-
-如何获取异常信息：
-
-Throwable类中定义了一些查看方法:
-
-* `public String getMessage()`:获取异常的描述信息,原因(提示给用户的时候,就提示错误原因。
+<img src="./assets/image-20240501212738419.png" alt="image-20240501212738419" style="zoom:77%;" />
 
 
-* `public String toString()`:获取异常的类型和异常描述信息(不用)。
-* `public void printStackTrace()`:打印异常的跟踪栈信息并输出到控制台。
 
-​            *包含了异常的类型,异常的原因,还包括异常出现的位置,在开发和调试阶段,都得使用printStackTrace。*
+---
 
-在开发中呢也可以在catch将编译期异常转换成运行期异常处理。
+# 63.File的概述和构造方法
 
-多个异常使用捕获又该如何处理呢？
+## 一、引入
 
-1. 多个异常分别处理。
-2. 多个异常一次捕获，多次处理。
-3. 多个异常一次捕获一次处理。
+假设我们现在在玩拼图小游戏，假设游戏有一个保存拼图进度的功能到txt文件中，那该多好，这样下次在玩的时候就不需要重头开始玩了。
 
-一般我们是使用一次捕获多次处理方式，格式如下：
+想要实现这个功能，我们需要学习两个知识：1、txt文本文件保存在哪里；2、数据如何进行传输，也就是如何保存到文件中。
 
-```java
-try{
-     编写可能会出现异常的代码
-}catch(异常类型A  e){  当try中出现A类型异常,就用该catch来捕获.
-     处理异常的代码
-     //记录日志/打印异常信息/继续抛出异常
-}catch(异常类型B  e){  当try中出现B类型异常,就用该catch来捕获.
-     处理异常的代码
-     //记录日志/打印异常信息/继续抛出异常
-}
-```
+<img src="./assets/image-20240501213426496.png" alt="image-20240501213426496" style="zoom:40%;" />
 
-> 注意:这种异常处理方式，要求多个catch中的异常不能相同，并且若catch中的多个异常之间有子父类异常的关系，那么子类异常要求在上面的catch处理，父类异常在下面的catch处理。
+在计算机中，文件保存的位置，也叫作 `路径`，在Java中会用 `File类` 进行表示。
+
+而数据的传输就需要用到 `IO流`。
+
+----
+
+## 二、路径
+
+路径分为两种：相对路径和绝对路径。
+
+相对路径是不带盘符的，它是相对于当前项目而言的。
+
+绝对路径是带盘符的。
+
+----
+
+## 三、File类
+
+`File对象` 就表示一个路径，这个路径可以是文件的路径、也可以是文件夹的路径。
+
+这个路径可以是存在的，也可以是不存在的。
+
+学习一个类，我们需要知道如何创建它的对象，File类常见的方法有三个。
+
+-  `public File(String pathname) `：根据文件路径创建文件对象
+
+- `public File(String parent, String child) ` ：根据父路径名字符串和子路径名字符串创建文件对象
+
+- `public File(File parent, String child)` ：根据父路径对应文件对象和子路径名字符串创建文件对象
+
+---
+
+## 四、`public File(String pathname) `
+
+根据文件路径创建文件对象：说白了就是：根据字符串表示的路径，变成` File对象`
+
+~~~java
+String str = "C:\\Users\\alienware\\Desktop\\a.txt";
+File f1 = new File(str);
+System.out.println(f1); // C:\Users\alienware\Desktop\a.txt
+~~~
+
+**那么为什么要将一个字符串表示的路径变成 `File对象`？**
+
+其实很简单，变成 `File对象` 就是为了使用里面的方法，例如 `delete()`，可以将这个文件删除。
+
+如果你仅仅只是一个字符串表示的，在Java的眼中，它仅仅是一个字符串而已，它不能跟本地的文件产生关联。
+
+但一旦创建了 `File对象`，在Java眼中就不是一个字符串了，而是一个真实的路径，这个路径就表示桌面上的 `a.txt`。
+
+----
+
+## 五、`public File(String parent, String child)`
+
+根据`父路径名字符串`和`子路径名字符串`创建文件对象。
+
+父路径：全称叫 `父级路径`
+
+子路径：全称叫 `子级路径`
+
+以 `C:\Users\alienware\Desktop\a.txt` 路径为例，父路径：去掉自己，剩下来的所有，即 `C:\Users\alienware\Desktop`。
+
+剩下来的 `a.txt` 就是子级路径。
+
+第二个构造的**目的就是将 `父级路径` 与 `子级路径` 进行拼接。**
+
+~~~java
+String parent = "C:\\Users\\alienware\\Desktop";
+String child = "a.txt";
+File f2 = new File(parent,child);
+System.out.println(f2); // C:\Users\alienware\Desktop\a.txt
+~~~
+
+如果你不想用这种方式，你也可以自己去拼接。
+
+PS：在Java中 `\` 叫做转义字符，因此如果想让它变成路径分隔符，需要将它变成两个 `\`，即 `\\`
+
+~~~java
+File f3 = new File(parent + "\\" + child);
+System.out.println(f3);// C:\Users\alienware\Desktop\a.txt
+~~~
+
+但是在以后我们一般不会自己拼接，而是使用Java里面的构造方法来帮我们拼接。
+
+因为在以后我们写完的代码是不一定运行在 `Windows操作系统` 里面的，在 `Windows操作系统` 中，它的路径分隔符是 `\`，但是在以后还会学习 `Linux操作系统`，
+
+
+
+
 
 ## 1.8 finally 代码块
 
@@ -7035,9 +7013,7 @@ public class Demo {
 
 ## 2.2 构造方法
 
-- `public File(String pathname) ` ：通过将给定的**路径名字符串**转换为抽象路径名来创建新的 File实例。  
-- `public File(String parent, String child) ` ：从**父路径名字符串和子路径名字符串**创建新的 File实例。
-- `public File(File parent, String child)` ：从**父抽象路径名和子路径名字符串**创建新的 File实例。  
+- 
 - 构造举例，代码如下：
 
 ```java
