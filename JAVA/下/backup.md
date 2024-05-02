@@ -8888,19 +8888,25 @@ try (FileInputStream fis = new FileInputStream("D:\\itheima\\movie.mp4");
 
 JDK9的写法
 
-~~~java
-FileInputStream fis = new FileInputStream("D:\\itheima\\movie.mp4");
-FileOutputStream fos = new FileOutputStream("myio\\copy.mp4");
+如果外面还有异常，直接进行抛出即可
 
-try (fis;fos) {
-    //2.拷贝
-    int len;
-    byte[] bytes = new byte[1024 * 1024 * 5];
-    while ((len = fis.read(bytes)) != -1) {
-        fos.write(bytes, 0, len);
+<img src="./assets/image-20240502220203887.png" alt="image-20240502220203887" style="zoom:80%;" />
+
+~~~java
+public static void main(String[] args) throws FileNotFoundException {
+    FileInputStream fis = new FileInputStream("D:\\itheima\\movie.mp4");
+    FileOutputStream fos = new FileOutputStream("myio\\copy.mp4");
+
+    try (fis;fos) {
+        //2.拷贝
+        int len;
+        byte[] bytes = new byte[1024 * 1024 * 5];
+        while ((len = fis.read(bytes)) != -1) {
+            fos.write(bytes, 0, len);
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
     }
-} catch (IOException e) {
-    e.printStackTrace();
 }
 ~~~
 
