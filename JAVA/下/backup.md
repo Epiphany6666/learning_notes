@@ -6773,54 +6773,6 @@ while (true) {
 
 
 
-----
-
-# finally 代码块
-
-**finally**：有一些特定的代码无论异常是否发生，都需要执行。另外，因为异常会引发程序跳转，导致有些语句执行不到。而finally就是解决这个问题的，在finally代码块中存放的代码都是一定会被执行的。
-
-什么时候的代码必须最终执行？
-
-当我们在try语句块中打开了一些物理资源(磁盘文件/网络连接/数据库连接等),我们都得在使用完之后,最终关闭打开的资源。
-
-finally的语法:
-
- try...catch....finally:自身需要处理异常,最终还得关闭资源。
-
-> 注意:finally不能单独使用。
-
-比如在我们之后学习的IO流中，当打开了一个关联文件的资源，最后程序不管结果如何，都需要把这个资源关闭掉。
-
-finally代码参考如下：
-
-```java
-public class TryCatchDemo4 {
-    public static void main(String[] args) {
-        try {
-            read("a.txt");
-        } catch (FileNotFoundException e) {
-            //抓取到的是编译期异常  抛出去的是运行期 
-            throw new RuntimeException(e);
-        } finally {
-            System.out.println("不管程序怎样，这里都将会被执行。");
-        }
-        System.out.println("over");
-    }
-    /*
-     *
-     * 我们 当前的这个方法中 有异常  有编译期异常
-     */
-    public static void read(String path) throws FileNotFoundException {
-        if (!path.equals("a.txt")) {//如果不是 a.txt这个文件 
-            // 我假设  如果不是 a.txt 认为 该文件不存在 是一个错误 也就是异常  throw
-            throw new FileNotFoundException("文件不存在");
-        }
-    }
-}
-```
-
-> 当只有在try或者catch中调用退出JVM的相关方法,此时finally才不会执行,否则finally永远会执行。
-
 ---
 
 # 63.File的概述和构造方法
@@ -8144,79 +8096,865 @@ while(true){}
 
 ----
 
-二、
+## 二、`write(int b)`
 
+1. 虽然参数为int类型四个字节，但是只会保留一个字节的信息写出。
+2. 流操作完毕后，必须释放系统资源，调用close方法，千万记得。
 
+~~~java
+//1.创建对象
+FileOutputStream fos = new FileOutputStream("myio\\a.txt");
+//2.写出数据
+fos.write(97); // 真正写到文件上的是97在ASCII码表中所对应的字符a
+fos.write(98); // b
+//3.释放资源
+fos.close();
+~~~
 
-### 写出字节数据
+----
 
-1. **写出字节**：`write(int b)` 方法，每次可以写出一个字节数据，代码使用演示：
+## 三、`write(byte[] b)`
 
-```java
-public class FOSWrite {
-    public static void main(String[] args) throws IOException {
-        // 使用文件名称创建流对象
-        FileOutputStream fos = new FileOutputStream("fos.txt");     
-      	// 写出数据
-      	fos.write(97); // 写出第1个字节
-      	fos.write(98); // 写出第2个字节
-      	fos.write(99); // 写出第3个字节
-      	// 关闭资源
-        fos.close();
-    }
-}
-输出结果：
-abc
-```
+在创建对象的时候，这个代码有个规则：
 
-> 小贴士：
->
-> 1. 虽然参数为int类型四个字节，但是只会保留一个字节的信息写出。
-> 2. 流操作完毕后，必须释放系统资源，调用close方法，千万记得。
+- 如果文件不存在会创建一个新的文件，但是要保证父级路径是存在的。
 
-2. **写出字节数组**：`write(byte[] b)`，每次可以写出数组中的数据，代码使用演示：
+- 如果文件已经存在，则会清空文件。
+
+因此我们这次写数据时，只剩下 `abcde`
 
 ```java
-public class FOSWrite {
-    public static void main(String[] args) throws IOException {
-        // 使用文件名称创建流对象
-        FileOutputStream fos = new FileOutputStream("fos.txt");     
-      	// 字符串转换为字节数组
-      	byte[] b = "黑马程序员".getBytes();
-      	// 写出字节数组数据
-      	fos.write(b);
-      	// 关闭资源
-        fos.close();
-    }
-}
-输出结果：
-黑马程序员
+//1.创建对象
+FileOutputStream fos = new FileOutputStream("myio\\a.txt");
+//2.写出数据
+byte[] bytes = {97, 98, 99, 100, 101};
+fos.write(bytes);
+
+fos.write(bytes);
+//3.释放资源
+fos.close();
 ```
 
-3. **写出指定长度字节数组**：`write(byte[] b, int off, int len)` ,每次写出从off索引开始，len个字节，代码使用演示：
+----
+
+## 四、`write(byte[] b, int off, int len)`
 
 ```java
-public class FOSWrite {
-    public static void main(String[] args) throws IOException {
-        // 使用文件名称创建流对象
-        FileOutputStream fos = new FileOutputStream("fos.txt");     
-      	// 字符串转换为字节数组
-      	byte[] b = "abcde".getBytes();
-		// 写出从索引2开始，2个字节。索引2是c，两个字节，也就是cd。
-        fos.write(b,2,2);
-      	// 关闭资源
-        fos.close();
-    }
-}
-输出结果：
-cd
+参数一 b：
+     数组
+参数二 off：
+     起始索引  
+参数三 len：
+     个数      
 ```
 
+~~~java
+//1.创建对象
+FileOutputStream fos = new FileOutputStream("myio\\a.txt");
+byte[] bytes = {97, 98, 99, 100, 101};
+fos.write(bytes);
+
+fos.write(bytes,1,2);// b c，从1索引开始写，一共写2个
+//3.释放资源
+fos.close();
+~~~
 
 
 
+----
+
+# 78.换行和续写
+
+## 一、换行
+
+```java
+//1.创建对象
+FileOutputStream fos = new FileOutputStream("myio\\a.txt",true);
+```
+
+写出数据的时候，如果使用 `write('')` 这种方式写，就需要一个字母一个字母的写，太麻烦了，因此可以使用其他的方法。
+
+使用字符串 `str` 调用 `getBytes()`，这个方法的返回值就是一个 `byte数组`，因此这个方法就可以将字符串变成字节数组。
+
+<img src="./assets/image-20240502190128879.png" alt="image-20240502190128879" style="zoom:77%;" />
+
+~~~java
+String str = "abc";
+byte[] arr = str.getBytes();
+System.out.println(Arrays.toString(arr)); // [97, 98, 99]
+~~~
+
+----
+
+接下来就可以开始来写换行代码了。
+
+如果是 `Windows操作系统`，换行符是 `\r(回车)\n(换行)`，它叫做 `回车换行`。
+
+因为在早期cmd中，它有这样的一个规则，如果我们需要将光标放到下一行，它其实是两步操作
+
+- 回车：将光标放到一行的开头
+- 换行：将光标移动到下一行
+
+这是早期的一个习惯，`Windows` 将这个习惯延续下来了。
+
+在 `Linux操作系统` 中，它认为回车换行太麻烦了，因此它的换行符只有一个 `\n`。
+
+~~~java
+换行写：再次写出一个换行符就可以了
+    windows： \r\n
+    Linux:    \n
+    Mac:      \r
+细节：
+    在windows操作系统当中，java对回车换行进行了优化。
+    虽然完整的是\r\n，但是我们写其中一个\r或者\n，
+    java也可以实现换行，因为java在底层会补全。
+建议：
+    不要省略，还是写全了最好。
+~~~
+
+~~~java
+//2.写出数据
+String str = "kankelaoyezuishuai";
+byte[] bytes1 = str.getBytes();
+fos.write(bytes1);
+
+//再次写出一个换行符就可以了
+String wrap = "\r\n";
+byte[] bytes2 = wrap.getBytes();
+fos.write(bytes2);
+
+String str2 = "666";
+byte[] bytes3 = str2.getBytes();
+fos.write(bytes3);
+
+//3.释放资源
+fos.close();
+~~~
+
+---
+
+## 二、续写
+
+续写其实很简单，我们在创建对象的时候，它后面还有第二个参数：续写开关。
+
+我们先来看最简单的构造：这个方法的底层它会把字符串表示的路径先变成 `File对象`，第二个参数的默认值是  `false`，所以它相当于就是将 `路径和false` 传递给了另外一个构造方法。
+
+<img src="./assets/image-20240502191343837.png" alt="image-20240502191343837" style="zoom:80%;" />
+
+选中 `this` 跟进，这个构造方法才是我们真正的核心代码，它里面有两个参数：`路径` 和 `续写开关`。
+
+如果为 `false`，就表示关闭续写，因此在创建对象的时候会将文件清空。
+
+但是如果手动给它传递 `true`，那就表示 `打开续写`，续写功能一旦打开，文件就不会清空了。
+
+<img src="./assets/image-20240502191435207.png" alt="image-20240502191435207" style="zoom:67%;" />
+
+~~~java
+续写：
+    如果想要续写，打开续写开关即可
+    开关位置：创建对象的第二个参数
+    默认false：表示关闭续写，此时创建对象会清空文件
+    手动传递true：表示打开续写，此时创建对象不会清空文件
+~~~
+
+~~~java
+//1.创建对象
+FileOutputStream fos = new FileOutputStream("myio\\a.txt", true);
+//2.写出数据
+String str = "kankelaoyezuishuai";
+byte[] bytes1 = str.getBytes();
+fos.write(bytes1);
+
+//再次写出一个换行符就可以了
+String wrap = "\r\n";
+byte[] bytes2 = wrap.getBytes();
+fos.write(bytes2);
+
+String str2 = "666";
+byte[] bytes3 = str2.getBytes();
+fos.write(bytes3);
+
+//3.释放资源
+fos.close();
+~~~
+
+----
+
+## 三、总结
+
+1、FileOutputStream的作用
+
+可以把程序中的数据写到本地文件上，是字节流中最基本最简单的基本流。
+
+2、书写步骤
+
+创建对象，写出数据，释放资源
+
+3、三步操作的细节
+
+创建对象：
+
+- 如果关联的文件是存在的，默认会清空文件
+- 如果关联的文件是不存在的，会将文件创建出来，但是要保证它的父级路径是存在的，否则会报错
+- 如果想续写，在第二个参数传 `true`，表示打开续写开关，这个也叫作：追加写入
+
+写出数据：
+
+- 如果我们写的是整数，那么实际写到文件中的是整数在ASCII码表中所对应的字符
+- 除此之外我们还可以写出一个字节数组，它相当于就是将字节数组的全部 / 一部分数据写到本地文件中
+- 如果在写的时候要换行，写换行符即可
+
+~~~java
+windows： \r\n
+Linux:    \n
+Mac:      \r
+~~~
+
+释放资源
+
+- 我们所使用的绝大IO流都需要释放资源
+
+-----
+
+# 79.字节输入流的基本用法
+
+## 一、介绍
+
+<img src="./assets/image-20240502164027484.png" alt="image-20240502164027484" style="zoom:67%;" />
+
+字节输入流（`FileInputStream`）：操作本地文件的字节输入流，可以把本地文件中的数据读取到程序中来。
+
+书写步骤：
+
+1、创建字节输入流对象
+
+对象一旦创建完，程序跟本地文件之间，就好比是有了一条传输数据的通道
+
+2、读数据
+
+利用通道可以把文件中的数据读取到程序中来
+
+3、释放资源
+
+相当于就是将这个通道给砸了
+
+-----
+
+## 二、代码示例
+
+假设在模块底下有一个 `a.txt`，并且里面存储了 `abcde`
+
+现在我们是使用字节流去读，那么就是 `InputStream`，从文件中读，在它前面拼接一个 `File` 就行了，因此我们创建的是 `FileInputStream类` 的对象。
+
+~~~java
+//1.创建对象
+FileInputStream fis = new FileInputStream("myio\\a.txt");
+~~~
+
+读数据是 `read()`，`read()` 是空参，但是有一个返回值，返回值是 `int类型` 的。
+
+由于下面代码只调用了一次 `read()`，因此在文件中它读取的是第一个数据 `a`，但是到程序中不是 `a`，而是 `a` 在ASCII码表中所对应的数字 `97`，即相当于将 `97` 赋值给了 `b1`。
+
+~~~java
+//2.读取数据
+int b1 = fis.read();
+System.out.println(b1); // 97
+//3.释放资源
+fis.close();
+~~~
+
+如果想要读取多个数据，反复调用即可。
+
+如果我们想看见原来的 `abcde`，在打印的时候强转为 `char` 即可。
+
+~~~java
+//2.读取数据
+int b1 = fis.read();
+System.out.println((char)b1);
+int b2 = fis.read();
+System.out.println((char)b2);
+int b3 = fis.read();
+System.out.println((char)b3);
+int b4 = fis.read();
+System.out.println((char)b4);
+int b5 = fis.read();
+System.out.println((char)b5);
+// read()会一个一个去读，如果读不到了返回-1
+int b6 = fis.read();
+System.out.println(b6);//-1
+//3.释放资源
+fis.close();
+~~~
 
 
+
+-----
+
+# 80.字节输入流读取数据的细节
+
+## 一、创建字节输入流对象
+
+### 细节1：如果文件不存在，就直接报错
+
+注意模块下是没有 `b.txt` 的，如果运行下面代码，就会直接报错
+
+<img src="./assets/image-20240502194641494.png" alt="image-20240502194641494" style="zoom:80%;" />
+
+~~~java
+//1.创建对象
+FileInputStream fis = new FileInputStream("myio\\b.txt");
+//2.读取数据
+int b1 = fis.read();
+System.out.println((char)b1);
+//3.释放资源
+fis.close();
+~~~
+
+**Java为什么这么设计呢？**
+
+输出流有一个特点：不存在会创建，但是需要保证父级路径是存在的。
+
+但是输入流为什么不会创建，而是报错呢？
+
+在输出流的时候，我们要做的是把数据写到文件中，在这个过程中，最重要的是数据，因此它在本地创建一个文件，将数据写到文件中是完全没有任何问题的。
+
+但是输入流，在读取的时候，数据在文件中。如果Java创建输入流对象的时候，文件不存在也创建一个新的，那么此时创建出来的就是一个空文件夹，这是没有意义的。
+
+结论：因为创建出来的文件是没有数据的，没有任何意义。因此Java就没有设计这种无意义的逻辑，文件不存在直接报错。
+
+通过这个问题我们也知道了，程序中最重要的其实是数据。
+
+-----
+
+## 二、读取数据
+
+### 细节1：一次读一个字节，读出来的是数据在ASCII上对应的数字
+
+### 细节2：读到文件末尾了，read方法返回-1
+
+在读取数据的时候，相当于有一个指针，在一开始的时候默认指向第一个数据，当我们调用一次 `read()` 后它就会读取 `a` 并移动一次指针，不断往后，读一次移动一次。
+
+<img src="./assets/image-20240502195521082.png" alt="image-20240502195521082" style="zoom:47%;" />
+
+等读到末尾后，再次调用 `read()` 就读不到数据了，既然读不到，那就表示到了文件末尾了，方法会返回 `-1`。
+
+<img src="./assets/image-20240502195548059.png" alt="image-20240502195548059" style="zoom:50%;" />
+
+因此在以后就可以根据 `read()` 的返回值判断我们是否读取到了末尾。
+
+但如果文件中有空格，空格也是数据，那么读取到程序中的就是空格在ASCII中所对应的数字。
+
+如果文件中是 `-1`，那么在读取的时候会将它分开，先读 `-`，再读 `1`。
+
+----
+
+## 三、释放资源
+
+每次使用完流后必须要释放资源。
+
+
+
+-----
+
+# 81.字节输入流循环读取
+
+在刚刚数据量不多的时候，可以一次只读取一个数据，这是完全没有任何问题的。
+
+<img src="./assets/image-20240502200107145.png" alt="image-20240502200107145" style="zoom:50%;" />
+
+但是如果本地文件中有很多很多的数据，那该怎么办呢？
+
+此时我们就需要来学习循环读取。
+
+~~~java
+//1.创建对象
+FileInputStream fis = new FileInputStream("myio\\a.txt");
+//2.循环读取
+int b;
+// 读取数据并赋值给变量b
+while ((b = fis.read()) != -1) {
+    System.out.println((char) b);
+}
+//3.释放资源
+fis.close();
+~~~
+
+不可以不定义 `变量b`，因为 `read()` 表示读取数据，而且是读取一个数据就移动一次指针
+
+~~~java
+FileInputStream fis = new FileInputStream("myio\\a.txt"); // 文件中的数据为：abcde
+//2.循环读取
+while ((fis.read()) != -1) {
+    System.out.println(fis.read()); //98  100  -1，通过打印结果也可以发现这样写是错误的
+}
+//3.释放资源
+fis.close();
+~~~
+
+
+
+----
+
+# 82.文件拷贝的基本代码
+
+注意：选择一个比较小的文件，不要太大。大文件拷贝我们下一个视频会说。
+
+拷贝的核心思想：边读边写，将从 `movie.mp4` 里面读取的数据直接写到 `copy.mp4` 中即可
+
+~~~java
+//1.创建对象
+FileInputStream fis = new FileInputStream("D:\\itheima\\movie.mp4");
+FileOutputStream fos = new FileOutputStream("myio\\copy.mp4");
+//2.拷贝
+int b;
+while((b = fis.read()) != -1){
+    fos.write(b);
+}
+//3.释放资源
+//规则：先开的流最后关闭
+fos.close();
+fis.close();
+~~~
+
+
+
+----
+
+# 83.文件拷贝的弊端和解决办法
+
+## 一、引出问题
+
+如果拷贝的文件过大，速度非常慢，因为在拷贝的时候，一次只读写一个字节。
+
+但如果我们可以一次读取多个，那么速度肯定就能提升了。
+
+因此我们需要来学习一次读取多个的方法。
+
+方法是 `read()` 的重载方法，该方法可以传递一个字节数组。
+
+在读取的时候就不是一个一个去读了，而是一次读取多个数据。
+
+一次读一个字节数组的数据，每次读取会尽可能把数据装满。
+
+例如数组长度是 `2`，那么它一次读取两个字节；如果数组长度是 `100`，那么一次读取两个字节。
+
+<img src="./assets/image-20240502202857249.png" alt="image-20240502202857249" style="zoom:67%;" />
+
+数组越大，拷贝的速度越快，但是数组本身也是会占用内存空间的，如果创建了一个长度为 `10个亿` 的数组，内存可能会直接崩。
+
+因此我们在创建数组的时候长度一般会用 `1024的整数倍`，个人一般喜欢创建一个 `5M-10M(1024*1024*5)` 之间的数组进行文件拷贝，一次能拷贝5M的数据，这个速度已经相当不错了。
+
+~~~java
+//1.创建对象
+FileInputStream fis = new FileInputStream("myio\\a.txt");
+//2.读取数据，数组长度为2，表示一次读取两个字节的数据
+byte[] bytes = new byte[2];
+//一次读取多个字节数据，具体读多少，跟数组的长度有关
+//返回值：表示本次读取到了多少个字节数据
+int len1 = fis.read(bytes);
+System.out.println(len1);//2
+String str1 = new String(bytes);
+System.out.println(str1); //ab
+
+int len2 = fis.read(bytes);
+System.out.println(len2);//2
+String str2 = new String(bytes);
+System.out.println(str2); // cd
+
+//此时a.txt中只剩下e，但是为什么读取到的是ed呢？
+int len3 = fis.read(bytes);
+System.out.println(len3);// 1
+String str3 = new String(bytes);
+System.out.println(str3);// ed
+
+//此时文件中已经没有数据读取了，len4为-1可以理解，但是为什么打印出来的数据还是ed呢？
+int len4 = fis.read(bytes);
+System.out.println(len4);// -1
+String str2 = new String(bytes);
+System.out.println(str4); // ed
+
+//3.释放资源
+fis.close();
+~~~
+
+---
+
+## 二、分析问题
+
+在代码中，我们是要将数据源中的数据读取到内存中。
+
+当我们创建输入流对象的时候，就好比内存跟数据源之间有了这么一个传输数据的通道。
+
+接下来就使用下面的这段代码去读取数据，读取的过程是怎么样的呢？
+
+<img src="./assets/image-20240502204255547.png" alt="image-20240502204255547" style="zoom:50%;" />
+
+首先定义了一个 `变量len`，这个变量是用来记录读了多少个数据，跟之前变量 `b` 表示的含义是不一样的。
+
+然后又创建了一个长度为 `2` 的数组，数组里面装的才是读取到的数据。
+
+假设数据源中有 `abcde` 这样的五个数据。
+
+第一次读取的时候使用 `fis` 调用 `read()` ，参数是一个数组，表示现在将读取的数据装到数组中，每次读的时候尽可能将数组装满。
+
+因此第一次在读取的时候，会读取两个，然后将读取到的数据 `ab` 放到数组中，由于读到了两个，此时 `len` 记录的就是 `2`。
+
+往下 `System.out.println(new String(bytes))` ，将数组中的数据变成字符串并进行打印，怎么变呢？
+
+其实很简单，就是获取字符串里面所有的元素，把它变成字符串并进行打印，因此打印出来的结果就是 `ab`。
+
+<img src="./assets/image-20240502204900739.png" alt="image-20240502204900739" style="zoom:47%;" />
+
+往下，第二次读取数据，在读取的时候，每次读取尽可能将数组装满，因此这次还是读取两个，并将读取到的数据存储到数组中。
+
+此时数组里原来的 `ab` 就被覆盖了。
+
+由于此时读到的还是两个，因此 `len` 中记录的是 `2`。
+
+继续往下，将数组中的数据变成字符串再次打印，跟刚刚一样，还是将数组中所有的内容拿出来变成字符串，因此会打印 `cd`。
+
+<img src="./assets/image-20240502205338608.png" alt="image-20240502205338608" style="zoom:50%;" />
+
+接着，第三次读取，这次读取就跟前面不一样了。
+
+在读取的时候，它还是尽可能的会将数组装满，但是现在数据源中只剩下一个数据了，所以第三次它只能读到一个，将 `e` 读取并存储到数组中。
+
+更重要的是原来的 `c` 被覆盖了，但是由于只读了一个数据，所以 `d` 没有覆盖，这个时候 `len` 为 `1`，因为第三次只读了一个数据。
+
+接着就是将数组中的数据变成字符串并进行打印，打印出来的就是 `ed`。
+
+<img src="./assets/image-20240502205609736.png" alt="image-20240502205609736" style="zoom:50%;" />
+
+如果说，下面还读取到第四次，此时就读取不到数据了。
+
+在Java中有一个规定，不管是原来空参的 `read()` 还是现在带有数组的方法，只要你读不到数据，方法就会返回 `-1`。
+
+因此第四次读取的时候，`len` 的值就为 `-1` 了。
+
+并且如果第四次还要打印数组里面的数据，还是原来的 `ed`。
+
+----
+
+## 三、解决办法
+
+在 `String` 的构造方法中，除了能将 `byte数组` 变成字符串以外，它还可以将字节数组的一部分变成字符串。因此我们在变化的时候带上参数就行了。
+
+~~~java
+String str1 = new String(bytes,0,len1);//表示这个数组中，从0开始，将len个元素变成字符串
+~~~
+
+修改我们之前的代码
+
+~~~java
+//1.创建对象
+FileInputStream fis = new FileInputStream("myio\\a.txt");
+//2.读取数据
+byte[] bytes = new byte[2];
+//一次读取多个字节数据，具体读多少，跟数组的长度有关
+//返回值：本次读取到了多少个字节数据
+int len1 = fis.read(bytes);
+System.out.println(len1);//2
+String str1 = new String(bytes,0,len1);
+System.out.println(str1);
+
+int len2 = fis.read(bytes);
+System.out.println(len2);//2
+String str2 = new String(bytes,0,len2);
+System.out.println(str2);
+
+int len3 = fis.read(bytes);
+System.out.println(len3);// 1
+String str3 = new String(bytes,0,len3);
+System.out.println(str3);// ed
+
+//3.释放资源
+fis.close();
+~~~
+
+
+
+---
+
+# 84.文件拷贝改写
+
+需求：把`D:\itheima\movie.mp4 (16.8 MB)` 拷贝到当前模块下。
+
+下面这种方法速度是非常快的。
+
+~~~java
+//1.创建对象
+FileInputStream fis = new FileInputStream("D:\\itheima\\movie.mp4");
+FileOutputStream fos = new FileOutputStream("myio\\copy.mp4");
+//2.拷贝
+int len;
+byte[] bytes = new byte[1024 * 1024 * 5];
+while((len = fis.read(bytes)) != -1){
+    fos.write(bytes,0,len); // 上面读多少，这里就写多少
+}
+//3.释放资源
+fos.close();
+fis.close();
+~~~
+
+双击已经拷贝好的MP4文件，此时IDEA会问你，这个MP4文件用什么方式打开呢？
+
+默认是 `txt记事本`，但肯定是不能用记事本，我们就需要找打开方式，可以发现没有一个电影播放器。
+
+此时就可以点击下面的 `Open matching files in associated application`，表示用操作系统中默认方式进行打开。
+
+<img src="./assets/image-20240502211141596.png" alt="image-20240502211141596" style="zoom:70%;" />
+
+
+
+----
+
+# 85.`IO流` 中不同JDK版本捕获异常的方式
+
+## 一、引入
+
+在之前我们书写 `IO流` 代码的时候，所有的异常都是采取抛出处理，但如果我们想用 `try-catch` 去捕获异常，该怎么写呢？
+
+是将所有的代码放到 `try` 中吗？
+
+不是的，如果我们这么去写，代码会有问题。
+
+上面的这三行代码其实都是有可能会出异常的，当代码执行到第二行时 `fos.write()` 从本地文件中读取数据出异常了，一旦出异常 `try` 下面的代码就有可能执行不到了，直接跳转到对应的 `catch` 语句块中，这样就会导致一个问题：释放资源的代码有可能执行不到。
+
+<img src="./assets/image-20240502211743472.png" alt="image-20240502211743472" style="zoom:50%;" />
+
+那怎么办呢？我想要的是释放资源的代码不管有没有出异常，一定要让它执行。
+
+所以为了解决这个问题，我们来学习一下捕获异常的完整形态。
+
+在 `try-catch` 的下面其实还有第三部分：`finally`。
+
+----
+
+## 二、finally
+
+**特点：`finally` 里面的代码一定会被执行，除非虚拟机停止。**
+
+### 1）`finally` 里面的代码一定会被执行
+
+`try` 中不管你有没有遇到异常，当上面所有的代码执行完毕后，一定会执行 `finally` 里面的代码。
+
+- 如果 `try` 中是没有异常的，那么先执行 `try` 里面所有的代码，再执行 `finally` 里面的代码。
+- 但是如果 `try` 里面遇到了异常，那么会跳转到对应的 `catch` 中，当 `catch` 中所有的代码执行完毕后，再来执行 `finally` 里面的代码，`finally` 在最后一定会被执行到的。
+
+因此我们就非常适合将 `释放资源` 这样的扫尾代码放到 `fiannly` 中。
+
+----
+
+### 2）除非虚拟机停止
+
+例如在 `try` 中写了一个 `System.exit(0)`，或者其他原因导致虚拟机都停止了，那么 `finally` 里面的代码是执行不到的。
+
+----
+
+## 三、代码示例
+
+异常一般都是采取抛出处理的，因为以后我们会学习 `Spring框架`，框架的底层会将我们抛出的异常统一处理。
+
+因此这个知识点只需要将 `try-catch-finally` 这个结构能掌握就行了，下面的代码了解一下就行了。
+
+选择可能出现异常的代码，<Kbd>ctrl + alt + T</kbd> ，选择 `try/catch/finally`，此时就会将所有的代码全部放在 `try` 中。
+
+![image-20240502213820243](./assets/image-20240502213820243.png)
+
+注意需要将创建对象的代码放到 `try` 外面去，否则局部变量只在所属的大括号中有效。
+
+并且一定要赋值为 `null`，否则 `finally` 中的代码就会报错：`变量fis` 可能没有被初始化。
+
+<img src="./assets/image-20240502214050808.png" alt="image-20240502214050808" style="zoom:67%;" />
+
+因此为了解决这个问题，在上面就应该给 `fis` 和 `fos` 初始化，但我们又不知道给它们赋值什么，因此直接赋值 `null` 即可。
+
+写完后发现，`close()` 也是有异常的，因此在 `finally` 中还要对 `close()` 进行异常处理。
+
+<img src="./assets/image-20240502214308853.png" alt="image-20240502214308853" style="zoom:67%;" />
+
+处理方案就是再嵌套一个 `try-catch`。
+
+但此时代码还没完，在最上面我们将 `fis、fos` 都赋值为了 `null`，但假如在try的第一行就出现了异常：`fis = new FileInputStream("D:\\itheima\\b.mp4")`，此时就会报空指针异常，因为在 `itheima` 的目录下并没有 `b.mp4` 文件。
+
+此时就会报空指针异常。
+
+![image-20240502214803486](./assets/image-20240502214803486.png)
+
+这是因为在创建对象的时候，程序跟文件之间的连接通道没有建立，那么 `fis` 中记录的值还是 `null`，那么在 `fis.close()` 的时候就会报空指针异常了！
+
+因此在下面还需要对 `fis、fos` 进行非空判断。
+
+~~~java
+//1.创建对象
+FileInputStream fis = null;
+FileOutputStream fos = null;
+try {
+    fis = new FileInputStream("D:\\itheima\\movie.mp4");
+    fos = new FileOutputStream("myio\\copy.mp4");
+    //2.拷贝
+    int len;
+    byte[] bytes = new byte[1024 * 1024 * 5];
+    while((len = fis.read(bytes)) != -1){
+        fos.write(bytes,0,len);
+    }
+} catch (IOException e) {
+    //e.printStackTrace();
+} finally {
+    //3.释放资源
+    if(fos != null){
+        try {
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    if(fis != null){
+        try {
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+~~~
+
+写完代码后，肯定会觉得这个代码太麻烦了。那有没有简化的方案呢？必须有。
+
+思考：代码麻烦的原因其实是在下面释放资源。
+
+那如果释放资源的代码不需要我们自己写了，那就很简单了。
+
+PS：简化方案也是了解性的内容。
+
+----
+
+## 四、简化方案
+
+在JDK7的时候，Java推出了一个接口 `AutoCloseable`，它的作用看名字就能看出。
+
+特点：凡是实现这个接口的，在特定的情况下都可以自动释放资源。
+
+但是并不是所有的情况都是自动的！只有在特定情况下才能自动释放资源！
+
+什么特定情况呢？此时我们就需要来看一下JDK7和JDK9的两种书写方式。
+
+JDK7：在 `try` 的后面加一个小括号，小括号中就可以创建流的对象，如果有多个流，中间以分号隔开，最后一个流的后面是不需要加分号的。
+
+但是不能将所有创建对象的代码都写在小括号中，只有实现了接口 `AutoCloseable` 的类才能在小括号中创建对象。
+
+它表示：当整个 `try-catch` 执行完毕后，小括号中的流就会自动释放资源。
+
+但是JDK7的这种写法，会让小括号中的代码难以阅读，阅读性非常的低。
+
+因此在JDK9的时候，就可以将创建对象的代码放到外面去，在小括号中只需要写变量名就行了。
+
+执行逻辑也是一样的，当整个 `try-catch` 全部执行完毕后，小括号中的流会自动释放资源。
+
+![image-20240502215345779](./assets/image-20240502215345779.png)
+
+跟进 `FileInputStream`，发现它的父类是 `InputStream`
+
+<img src="./assets/image-20240502215746101.png" alt="image-20240502215746101" style="zoom:67%;" />
+
+继续跟进 `InputStream`，可以发现 `InputStream` 实现了 `Closeable接口`
+
+<img src="./assets/image-20240502215824470.png" alt="image-20240502215824470" style="zoom:80%;" />
+
+还没完，继续跟进 `Closeable接口`，可以发现 `Closeable` 继承了 `AutoCloaseable`
+
+<img src="./assets/image-20240502215909669.png" alt="image-20240502215909669" style="zoom:80%;" />
+
+选中 `AutoCloseable` 跟进，可以发现它是一个接口，并且在JDK7的时候才出现的。
+
+<img src="./assets/image-20240502215956258.png" alt="image-20240502215956258" style="zoom:80%;" />
+
+JDK7的写法
+
+~~~java
+//由于代码写在一行，非常的难以阅读，因此我们可以这行，一行写一个对象就行了
+try (FileInputStream fis = new FileInputStream("D:\\itheima\\movie.mp4");
+     FileOutputStream fos = new FileOutputStream("myio\\copy.mp4")) {
+    //2.拷贝
+    int len;
+    byte[] bytes = new byte[1024 * 1024 * 5];
+    while ((len = fis.read(bytes)) != -1) {
+        fos.write(bytes, 0, len);
+    }
+} catch (IOException e) {
+    e.printStackTrace();
+}
+~~~
+
+JDK9的写法
+
+~~~java
+FileInputStream fis = new FileInputStream("D:\\itheima\\movie.mp4");
+FileOutputStream fos = new FileOutputStream("myio\\copy.mp4");
+
+try (fis;fos) {
+    //2.拷贝
+    int len;
+    byte[] bytes = new byte[1024 * 1024 * 5];
+    while ((len = fis.read(bytes)) != -1) {
+        fos.write(bytes, 0, len);
+    }
+} catch (IOException e) {
+    e.printStackTrace();
+}
+~~~
+
+
+
+----
+
+
+
+# finally 代码块
+
+**finally**：有一些特定的代码无论异常是否发生，都需要执行。另外，因为异常会引发程序跳转，导致有些语句执行不到。而finally就是解决这个问题的，在finally代码块中存放的代码都是一定会被执行的。
+
+什么时候的代码必须最终执行？
+
+当我们在try语句块中打开了一些物理资源(磁盘文件/网络连接/数据库连接等),我们都得在使用完之后,最终关闭打开的资源。
+
+finally的语法:
+
+ try...catch....finally:自身需要处理异常,最终还得关闭资源。
+
+> 注意:finally不能单独使用。
+
+比如在我们之后学习的IO流中，当打开了一个关联文件的资源，最后程序不管结果如何，都需要把这个资源关闭掉。
+
+finally代码参考如下：
+
+```java
+public class TryCatchDemo4 {
+    public static void main(String[] args) {
+        try {
+            read("a.txt");
+        } catch (FileNotFoundException e) {
+            //抓取到的是编译期异常  抛出去的是运行期 
+            throw new RuntimeException(e);
+        } finally {
+            System.out.println("不管程序怎样，这里都将会被执行。");
+        }
+        System.out.println("over");
+    }
+    /*
+     *
+     * 我们 当前的这个方法中 有异常  有编译期异常
+     */
+    public static void read(String path) throws FileNotFoundException {
+        if (!path.equals("a.txt")) {//如果不是 a.txt这个文件 
+            // 我假设  如果不是 a.txt 认为 该文件不存在 是一个错误 也就是异常  throw
+            throw new FileNotFoundException("文件不存在");
+        }
+    }
+}
+```
+
+> 当只有在try或者catch中调用退出JVM的相关方法,此时finally才不会执行,否则finally永远会执行。
 
 
 
