@@ -6773,6 +6773,54 @@ while (true) {
 
 
 
+----
+
+# finally 代码块
+
+**finally**：有一些特定的代码无论异常是否发生，都需要执行。另外，因为异常会引发程序跳转，导致有些语句执行不到。而finally就是解决这个问题的，在finally代码块中存放的代码都是一定会被执行的。
+
+什么时候的代码必须最终执行？
+
+当我们在try语句块中打开了一些物理资源(磁盘文件/网络连接/数据库连接等),我们都得在使用完之后,最终关闭打开的资源。
+
+finally的语法:
+
+ try...catch....finally:自身需要处理异常,最终还得关闭资源。
+
+> 注意:finally不能单独使用。
+
+比如在我们之后学习的IO流中，当打开了一个关联文件的资源，最后程序不管结果如何，都需要把这个资源关闭掉。
+
+finally代码参考如下：
+
+```java
+public class TryCatchDemo4 {
+    public static void main(String[] args) {
+        try {
+            read("a.txt");
+        } catch (FileNotFoundException e) {
+            //抓取到的是编译期异常  抛出去的是运行期 
+            throw new RuntimeException(e);
+        } finally {
+            System.out.println("不管程序怎样，这里都将会被执行。");
+        }
+        System.out.println("over");
+    }
+    /*
+     *
+     * 我们 当前的这个方法中 有异常  有编译期异常
+     */
+    public static void read(String path) throws FileNotFoundException {
+        if (!path.equals("a.txt")) {//如果不是 a.txt这个文件 
+            // 我假设  如果不是 a.txt 认为 该文件不存在 是一个错误 也就是异常  throw
+            throw new FileNotFoundException("文件不存在");
+        }
+    }
+}
+```
+
+> 当只有在try或者catch中调用退出JVM的相关方法,此时finally才不会执行,否则finally永远会执行。
+
 ---
 
 # 63.File的概述和构造方法
@@ -6803,7 +6851,7 @@ while (true) {
 
 ## 三、File类
 
-`File对象` 就表示一个路径，这个路径可以是文件的路径、也可以是文件夹的路径。
+**`File对象` 就表示一个路径，这个路径可以是文件的路径、也可以是文件夹的路径。**
 
 这个路径可以是存在的，也可以是不存在的。
 
@@ -6811,15 +6859,17 @@ while (true) {
 
 -  `public File(String pathname) `：根据文件路径创建文件对象
 
-- `public File(String parent, String child) ` ：根据父路径名字符串和子路径名字符串创建文件对象
+- `public File(String parent, String child) ` ：根据父路径名字符串和子路径名字符串创建文件对象（拼接）
 
-- `public File(File parent, String child)` ：根据父路径对应文件对象和子路径名字符串创建文件对象
+- `public File(File parent, String child)` ：根据父路径对应文件对象和子路径名字符串创建文件对象（拼接）
 
 ---
 
 ## 四、`public File(String pathname) `
 
-根据文件路径创建文件对象：说白了就是：根据字符串表示的路径，变成` File对象`
+根据文件路径创建文件对象：说白了就是：根据字符串表示的路径，变成` File对象`。
+
+其中路径可以写绝对路径，也可以写相对路径，相对路径是相对于当前项目而言的，需要加上模块名。
 
 ~~~java
 String str = "C:\\Users\\alienware\\Desktop\\a.txt";
@@ -6869,658 +6919,2259 @@ System.out.println(f3);// C:\Users\alienware\Desktop\a.txt
 
 但是在以后我们一般不会自己拼接，而是使用Java里面的构造方法来帮我们拼接。
 
-因为在以后我们写完的代码是不一定运行在 `Windows操作系统` 里面的，在 `Windows操作系统` 中，它的路径分隔符是 `\`，但是在以后还会学习 `Linux操作系统`，
+因为在以后我们写完的代码是不一定运行在 `Windows操作系统` 里面的，在 `Windows操作系统` 中，它的路径分隔符是 `\(反斜线)`，但是在以后还会学习 `Linux操作系统`，在这个操作系统里面路径分隔符是 `/(正斜线)`。
+
+因此如果你是自己拼接的话，这个代码是死的。而Java底层会先获取你的操作系统，根据不同的操作系统它会用不同的路径分隔符。
+
+因此如果以后涉及到路径的拼接，还是建议使用构造方法稳妥一些。
+
+----
+
+## 六、`public File(File parent, String child)`
+
+第三个其实是跟第二个一样的，只不过它里面的类型不一样：父级路径是 `File`，子级路径是 `String`。
+
+~~~java
+File parent2 = new File("C:\\Users\\alienware\\Desktop");
+String child2 = "a.txt";
+File f4 = new File(parent2,child2);
+System.out.println(f4); // C:\Users\alienware\Desktop\a.txt
+~~~
+
+---
+
+## 七、总结
+
+**1、`File` 表示什么？**
+
+`File对象` 表示路径，可以是文件的路径、也可以是文件夹的路径。
+
+这个路径可以是存在的，也可以是不存在的。
+
+**2、绝对路径和相对路径是什么意思？**
+
+绝对路径是带盘符的。
+
+相对路径是不带盘符的，默认到当前项目下找。
+
+**3、File三种构造方法的作用？**
+
+变成 `File对象` 的目的就是为了使用里面的方法
+
+-  `public File(String pathname) `：根据文件路径创建文件对象
+
+-  `public File(String parent, String child) ` ：根据父路径名字符串和子路径名字符串创建文件对象（拼接）
+
+-  `public File(File parent, String child)` ：根据父路径对应文件对象和子路径名字符串创建文件对象（拼接）
+
+**那么为什么要将一个字符串表示的路径变成 `File对象`？**
+
+其实很简单，变成 `File对象` 就是为了使用里面的方法，例如 `delete()`，可以将这个文件删除。
+
+如果你仅仅只是一个字符串表示的，在Java的眼中，它仅仅是一个字符串而已，它不能跟本地的文件产生关联。
+
+但一旦创建了 `File对象`，在Java眼中就不是一个字符串了，而是一个真实的路径，这个路径就表示桌面上的 `a.txt`。
 
 
 
+-----
 
+# 64.File的成员方法
 
-## 1.8 finally 代码块
+## 一、总述
 
-**finally**：有一些特定的代码无论异常是否发生，都需要执行。另外，因为异常会引发程序跳转，导致有些语句执行不到。而finally就是解决这个问题的，在finally代码块中存放的代码都是一定会被执行的。
+`File` 的成员方法非常的多
 
-什么时候的代码必须最终执行？
+有跟判断获取相关的
 
-当我们在try语句块中打开了一些物理资源(磁盘文件/网络连接/数据库连接等),我们都得在使用完之后,最终关闭打开的资源。
+<img src="./assets/image-20240502124100282.png" alt="image-20240502124100282" style="zoom:70%;" />
 
-finally的语法:
+还有跟创建、删除相关的
 
- try...catch....finally:自身需要处理异常,最终还得关闭资源。
+<img src="./assets/image-20240502131201617.png" alt="image-20240502131201617" style="zoom:67%;" />
 
-> 注意:finally不能单独使用。
+还有跟遍历文件夹相关的
 
-比如在我们之后学习的IO流中，当打开了一个关联文件的资源，最后程序不管结果如何，都需要把这个资源关闭掉。
+当然遍历文件夹有很多的方法，其中需要我们掌握的只有一个就可以了。
 
-finally代码参考如下：
+![image-20240502135227760](./assets/image-20240502135227760.png)
+
+方法有点多，但是不要慌，已经帮大家分好类了，而且方法很简单，不要背，通过IDEA的自动提示功能能想起来就行了。
+
+先来看第一类：判断和获取相关的方法，其实这些方法你猜也能猜到，我们之前曾经说过，`File对象` 表示的路径可以是存在的，也可以是不存在的，因此肯定会有一个方法去判断是否存在，因此就有 `exists()`。
+
+如果存在，它是文件还是文件夹呢？肯定也会有方法进行判断：`isDirectory()`、`isFile()`，这就是三个判断的方法。
+
+再来看获取的方法，文件、文件夹有什么东西值得你去获取呢？大小、路径、文件名、修改时间。
+
+---
+
+## 二、判断方法
+
+获取文件路径的两种方式。
+
+![image-20240502124917074](./assets/image-20240502124917074.png)
+
+<img src="./assets/image-20240502140617877.png" alt="image-20240502140617877" style="zoom:67%;" />
+
+~~~java
+//1.对一个文件的路径进行判断
+File f1 = new File("D:\\aaa\\a.txt");
+System.out.println(f1.isDirectory());//false。是不是文件夹，如果是文件夹返回true，如果是文件返回false
+System.out.println(f1.isFile());//true。是不是文件
+System.out.println(f1.exists());//true。判断文件夹 / 文件是否存在
+System.out.println("--------------------------------------");
+//2.对一个文件夹的路径进行判断
+File f2 = new File("D:\\aaa\\bbb");
+System.out.println(f2.isDirectory());//true
+System.out.println(f2.isFile());//false
+System.out.println(f2.exists());//true
+System.out.println("--------------------------------------");
+//3.对一个不存在的路径进行判断
+File f3 = new File("D:\\aaa\\c.txt");
+System.out.println(f3.isDirectory());//false
+System.out.println(f3.isFile());//false
+System.out.println(f3.exists());//false
+~~~
+
+---
+
+## 三、获取方法
+
+### 1）`public long length()`
+
+返回文件的大小，单位是 `字节数量`。
+
+查看多个文件的大小
+
+<img src="./assets/image-20240502154244583.png" alt="image-20240502154244583" style="zoom:67%;" />
+
+查看单个文件的大小
+
+<img src="./assets/image-20240502125032978.png" alt="image-20240502125032978" style="zoom:70%;" />
+
+~~~java
+File f1 = new File("D:\\aaa\\a.txt");
+long len = f1.length();
+System.out.println(len);//12
+~~~
+
+但如果调用者不是文件，而是文件夹呢？
+
+**细节1：这个方法只能获取文件的大小，单位是字节。**
+
+如果单位我们要是`M、G`，可以不断的除以`1024`。例如除以一次 `1024` 那就是 `kb`，除以两次 `1024` 那就是 `M`......
+
+**细节2：这个方法无法获取文件夹的大小。**
+
+因为调用 `length()` 的时候，不同的操作系统可能是不一样的，我的操作系统返回的是0，有的人的操作系统返回的是4096，不管是返回什么，这个结果都是不对的，这个方法是无法获取文件夹的大小的。
+
+如果我们要获取一个文件夹的大小，需要把这个文件夹里面所有的文件大小都累加在一起。
+
+~~~java
+File f2 = new File("D:\\aaa\\bbb"); //注意bbb文件夹里是有东西的
+long len2 = f2.length();
+System.out.println(len2);//0
+~~~
+
+----
+
+### 2）`public String getAbsolutePath()`
+
+返回文件的绝对路径
+
+~~~java
+File f3 = new File("D:\\aaa\\a.txt");
+String path1 = f3.getAbsolutePath();
+System.out.println(path1); // D:\aaa\a.txt
+~~~
+
+有的同学会说：你将参数返回给我有什么意义。
+
+别急，在当前模块下再新建 `a.txt`，在创建 `File对象` 的时候写相对路径，相对路径是相对于当前项目而言的。
+
+例如以下代码，它会先在当前项目下先找 `myFile`，再去找 `a.txt`。
+
+但如果你没有写 `myFile`，那么这个 `a.txt` 就是直接在项目下的，而不是在模块里面的了。
+
+~~~java
+File f4 = new File("myFile\\a.txt");
+String path2 = f4.getAbsolutePath();
+System.out.println(path2); // C:\Users\alienware\IdeaProjects\basic-code\myFile\a.txt
+~~~
+
+-----
+
+### 3）`public String getPath()`
+
+返回定义文件时使用的路径，即当你在创建 `File对象` 的时候，括号里面写的是什么，那么返回的就是什么。
+
+~~~java
+File f5 = new File("D:\\aaa\\a.txt");
+String path3 = f5.getPath();
+System.out.println(path3);//D:\aaa\a.txt
+
+File f6 = new File("myFile\\a.txt");
+String path4 = f6.getPath();
+System.out.println(path4);//myFile\a.txt
+~~~
+
+----
+
+### 4）`public String getName()`
+
+返回文件的名称，带后缀
+
+~~~java
+File f7 = new File("D:\\aaa\\a.txt");
+String name1 = f7.getName();
+//a.txt:
+//      a 文件名
+//      txt 后缀名、扩展名
+System.out.println(name1); // a.txt
+~~~
+
+下面将路径改为 `bbb文件夹`
+
+~~~java
+File f8 = new File("D:\\aaa\\bbb");
+String name2 = f8.getName();
+// 文件夹：返回的就是文件夹的名字
+System.out.println(name2);//bbb
+~~~
+
+---
+
+### 5）`public long lastModified()`
+
+返回文件的最后修改时间，返回时间的毫秒值，类型为 `long`
+
+~~~java
+File f9 = new File("D:\\aaa\\a.txt");
+long time = f9.lastModified();
+System.out.println(time); // 1667380952425
+~~~
+
+课堂练习
+
+~~~java
+//如何把时间的毫秒值变成字符串表示的时间呢？
+//格式为：yyyy年MM月dd日 HH：mm：ss
+~~~
+
+----
+
+## 四、创建方法
+
+计算机里面要么是文件，要么是文件夹，没有其他的了。
+
+因此创建无非是两种：创建文件、创建文件夹。
+
+### 1）`public boolean createNewFile()`
+
+返回值表示：当前文件是否创建成功。
+
+~~~java
+File f1 = new File("D:\\aaa\\c.txt"); // 要注意，此时在aaa文件夹中是没有c.txt文件的
+boolean b = f1.createNewFile(); // 调用createNewFile()将文件创建出来
+System.out.println(b);//true
+~~~
+
+代码写完后发现，它有一个红色波浪线
+
+<img src="./assets/image-20240502131926814.png" alt="image-20240502131926814" style="zoom:80%;" />
+
+<kbd>alt + 回车</kbd>，在IDEA中给出了两种异常的解决方案
+
+1、抛出
+
+2、用 `try-catch` 包裹
+
+<img src="./assets/image-20240502132005253.png" alt="image-20240502132005253" style="zoom:80%;" />
+
+----
+
+扩展：如果这个路径是存在它，它会报错吗？
+
+~~~java
+File f1 = new File("D:\\aaa\\a.txt"); // a.txt已存在
+boolean b = f1.createNewFile();
+System.out.println(b);//false
+~~~
+
+程序运行结束，并没有报错
 
 ```java
-public class TryCatchDemo4 {
-    public static void main(String[] args) {
-        try {
-            read("a.txt");
-        } catch (FileNotFoundException e) {
-            //抓取到的是编译期异常  抛出去的是运行期 
-            throw new RuntimeException(e);
-        } finally {
-            System.out.println("不管程序怎样，这里都将会被执行。");
-        }
-        System.out.println("over");
-    }
-    /*
-     *
-     * 我们 当前的这个方法中 有异常  有编译期异常
-     */
-    public static void read(String path) throws FileNotFoundException {
-        if (!path.equals("a.txt")) {//如果不是 a.txt这个文件 
-            // 我假设  如果不是 a.txt 认为 该文件不存在 是一个错误 也就是异常  throw
-            throw new FileNotFoundException("文件不存在");
-        }
-    }
-}
+细节1：如果当前路径表示的文件是不存在的，则创建成功，方法返回true
+      如果当前路径表示的文件是存在的，则创建失败，方法返回false
 ```
 
-> 当只有在try或者catch中调用退出JVM的相关方法,此时finally才不会执行,否则finally永远会执行。
+----
 
-## 1.9 异常注意事项
+~~~java
+细节2：如果父级路径是不存在的，那么方法会有IOException异常
+~~~
 
-* 运行时异常被抛出可以不处理。即不捕获也不声明抛出。
-* 如果父类抛出了多个异常,子类覆盖父类方法时,只能抛出相同的异常或者是他的子集。
-* 父类方法没有抛出异常，子类覆盖父类该方法时也不可抛出异常。此时子类产生该异常，只能捕获处理，不能声明抛出
-* 当多异常处理时，捕获处理，前边的类不能是后边类的父类
-* 在try/catch后可以追加finally代码块，其中的代码一定会被执行，通常用于资源回收。
+~~~java
+File f1 = new File("D:\\aaa\\ddd\\a.txt"); // aaa文件夹是存在的，ddd文件夹是不存在的
+boolean b = f1.createNewFile();
+System.out.println(b);
+~~~
 
-## 1.10 概述
+程序运行完毕，会发现直接报错。
 
-**为什么需要自定义异常类:**
+<img src="./assets/image-20240502132809931.png" alt="image-20240502132809931" style="zoom:67%;" />
 
-我们说了Java中不同的异常类,分别表示着某一种具体的异常情况,那么在开发中总是有些异常情况是SUN没有定义好的,此时我们根据自己业务的异常情况来定义异常类。,例如年龄负数问题,考试成绩负数问题。
+----
 
-在上述代码中，发现这些异常都是JDK内部定义好的，但是实际开发中也会出现很多异常,这些异常很可能在JDK中没有定义过,例如年龄负数问题,考试成绩负数问题.那么能不能自己定义异常呢？
+~~~java
+细节3：createNewFile方法创建的一定是文件，如果路径中不包含后缀名，则创建一个没有后缀的文件
+    由此可见，文件是可以没有后缀名的。
+~~~
 
-**什么是自定义异常类:**
+~~~java
+File f1 = new File("D:\\aaa\\ddd");
+boolean b = f1.createNewFile();
+System.out.println(b);//true
+~~~
 
-在开发中根据自己业务的异常情况来定义异常类.
+如下图，这个文件也是可以使用记事本打开的。
 
-自定义一个业务逻辑异常: **LoginException**。一个登陆异常类。
+<img src="./assets/image-20240502132942804.png" alt="image-20240502132942804" style="zoom:67%;" />
 
-**异常类如何定义:**
+-----
 
-1. 自定义一个编译期异常: 自定义类 并继承于`java.lang.Exception`。
-2. 自定义一个运行时期的异常类:自定义类 并继承于`java.lang.RuntimeException`。
+### 2）`public boolean mkdir()`
 
-## 1.11 自定义异常的练习
+`mk：make；dir：directory`，文件夹还有一个称呼：`目录`，因此以后我们说 `创建一个目录`，其实就表示创建一个文件夹的意思。
 
-要求：我们模拟登陆操作，如果用户名已存在，则抛出异常并提示：亲，该用户名已经被注册。
+返回值表示：当前文件夹是否创建成功。
 
-首先定义一个登陆异常类LoginException：
+**在 `Windows操作系统` 中，路径一定是唯一的**，不能重复的，在之前我们已经创建了一个没有后缀的文件 `ddd`，因此已经不能创建 `ddd` 文件夹了。
 
-```java
-// 业务逻辑异常
-public class LoginException extends Exception {
-    /**
-     * 空参构造
-     */
-    public LoginException() {
-    }
+<img src="./assets/image-20240502133502591.png" alt="image-20240502133502591" style="zoom:80%;" />
 
-    /**
-     *
-     * @param message 表示异常提示
-     */
-    public LoginException(String message) {
-        super(message);
-    }
-}
+```
+细节1：windows当中路径是唯一的，如果当前路径已经存在，则创建失败，返回false
 ```
 
-模拟登陆操作，使用数组模拟数据库中存储的数据，并提供当前注册账号是否存在方法用于判断。
+~~~java
+File f2 = new File("D:\\aaa\\ddd");
+boolean b = f2.mkdir();
+System.out.println(b); // false
+~~~
 
-```java
-public class Demo {
-    // 模拟数据库中已存在账号
-    private static String[] names = {"bill","hill","jill"};
-   
-    public static void main(String[] args) {     
-        //调用方法
-        try{
-            // 可能出现异常的代码
-            checkUsername("nill");
-            System.out.println("注册成功");//如果没有异常就是注册成功
-        } catch(LoginException e) {
-            //处理异常
-            e.printStackTrace();
+接下来换个目录创建
+
+~~~java
+File f2 = new File("D:\\aaa\\eee");
+boolean b = f2.mkdir();
+System.out.println(b); // true
+~~~
+
+但如果后面有多个文件夹都不存在呢？例如下面代码，只有aaa文件夹存在会发生什么？
+
+```
+细节2：mkdir方法只能创建单级文件夹，无法创建多级文件夹。
+```
+
+~~~java
+File f2 = new File("D:\\aaa\\aaa\\bbb\\ccc");
+boolean b = f2.mkdir();
+System.out.println(b); // false
+~~~
+
+---
+
+### 3）`public boolean mkdirs()`
+
+创建多级文件夹，其中包含单级文件夹。
+
+~~~java
+File f3 = new File("D:\\aaa\\ggg");
+boolean b = f3.mkdirs();
+System.out.println(b);//true
+~~~
+
+既然 `mkdirs()` 既能创建单级的，又能创建多级文件夹，那么 `mkdir()` 岂不是没有用了。
+
+是的，你说的没有错以后它确实没有用了。那为什么我们还要去学习它呢？
+
+因为在 `mkdirs()` 的底层它会用到 `mkdir()`。
+
+源码：如果我们要创建多级文件夹，首先它会先去判断这个路径是否存在，然后用 `mkdir()` 创建单级文件夹试一下，如果创建成功了，直接 `return true`，如果没有创建成功，才会执行自己的逻辑。
+
+<img src="./assets/image-20240502134125006.png" alt="image-20240502134125006" style="zoom:67%;" />
+
+因此以后创建文件夹，可以一律使用 `mkdirs()`。
+
+----
+
+## 五、删除方法
+
+`delete()` 默认只能删除文件和空文件夹，`delete()` 直接删除不走回收站。
+
+~~~java
+public boolean delete() // 删除文件、空文件夹
+~~~
+
+```
+细节：
+    如果删除的是文件，则直接删除，不走回收站，返回true
+    如果删除的是空文件夹，则直接删除，不走回收站，返回true
+    如果删除的是有内容的文件夹，则删除失败，返回false
+```
+
+~~~java
+//1.创建File对象
+File f1 = new File("D:\\aaa\\eee");
+//2.删除
+boolean b = f1.delete();
+System.out.println(b);
+~~~
+
+----
+
+## 六、获取并遍历
+
+`获取并遍历` 的方法有很多，但是这些方法中只需要重点掌握刚刚学习的空参的 `listFiles()` 即可，其他的了解一下即可。
+
+### 1）`public File[] listFiles()`
+
+接下来学习 `File类` 中最重要的一个方法：获取并遍历。
+
+获取到当前路径下所有的内容，并将它们放到一个数组中进行返回。
+
+代码示例
+
+~~~java
+//1.创建File对象
+File f = new File("D:\\aaa");
+//2.listFiles方法
+//作用：获取aaa文件夹里面的所有内容，包括文件，包括文件夹，哪怕你是隐藏的，它都能获取。然后把所有的内容放到数组中返回
+File[] files = f.listFiles();
+for (File file : files) {
+    //file依次表示aaa文件夹里面的每一个文件或者文件夹
+    System.out.println(file);
+}
+~~~
+
+细节
+
+1、当调用者 `File` 表示的路径不存在时，返回 `null`
+
+2、当调用者 `File` 表示的路径是文件时，返回 `null`
+
+3、当调用者 `File` 表示的路径是一个空文件时，回一个长度为`0`的数组
+
+4、当调用者 `File` 表示的路径是一个有内容的文件夹时，它会将里面所有的文件和文件夹的路径放在 `File数组` 中返回
+
+5、当调用者 `File` 表示的路径是一个有隐藏文件的文件夹时，将里面所有文件和文件夹的路径放在 `File数组` 中返回，包含隐藏文件
+
+6、当调用者 `File` 表示的路径是需要权限才能访问的文件夹时，返回 `null`
+
+有很多同学的电脑权限比较高，特别是 `C盘`，没有权限是进不去的。Java也是一样的，遇到这样的文件夹，用 `listFiles()` 也无法获取到里面的东西，也会返回一个 `null`。
+
+例如 `C:\$Recycle.Bin\S-1-5-18` 是一个隐藏的文件夹，表示回收站，这个文件夹我们是没有权限进入的，因此返回 `null`。
+
+----
+
+### 2）`public static File[] listRoots()`
+
+作用：获取系统中所有的盘符
+
+注意，这个方法是 `static静态` 的，因此需要直接使用 `File类名` 调用。
+
+这个方法在以后我们会偶尔使用，例如遍历整个硬盘的时候，搜索所有硬盘里面的电影名。
+
+~~~java
+File[] arr = File.listRoots();
+System.out.println(Arrays.toString(arr)); // [C:\, D:\, E:\, F:\, G:\]
+~~~
+
+---
+
+### 3）`public String[] list()`
+
+获取当前该路径下所有内容。
+
+但是它仅仅只能获取名字，如果是文件：文件名+后缀名；文件夹：获取的时文件夹的名字。
+
+这个方法返回的类型不是 `File` ，而是 `String`
+
+~~~java
+File f1 = new File("D:\\aaa");
+String[] arr2 = f1.list();
+for (String s : arr2) {
+    System.out.println(s);
+}
+~~~
+
+----
+
+### 4）`public String[] list(FilenameFilter filter)`
+
+利用文件名过滤器获取当前该路径下所有内容。
+
+选中 `list方法` 往下拉
+
+<img src="./assets/image-20240502140058500.png" alt="image-20240502140058500" style="zoom:80%;" />
+
+继续跟进 `FilenameFilter`，可以发现它是一个接口，而且还是一个函数式接口，因此我们可以写成匿名内部类，也可以写成 `Lambda表达式`，如果有合适的方法，我们甚至可以用方法引用。
+
+方法返回的同样是 `String`，里面存储的就是每个文件的绝对路径。
+
+需求：我现在要获取`D:\aaa` 文件夹里面所有的 `txt文件`。
+
+~~~java
+//accept方法的形参，依次表示aaa文件夹里面每一个文件或者文件夹的路径
+//参数一：父级路径
+//参数二：子级路径
+//返回值：如果返回值为true，就表示当前路径保留，返回到数组中
+//        如果返回值为false，就表示当前路径舍弃不要，不会返回到数组中
+String[] arr3 = f2.list(new FilenameFilter() {
+    @Override
+    public boolean accept(File dir, String name) {
+        File src = new File(dir,name);
+        return src.isFile() && name.endsWith(".txt");
+    }
+});
+~~~
+
+就算我们不会这个方法也没关系，使用 `listFiles()` 也可以实现。
+
+因此在以后我们重点掌握 `listFiles()` 即可，其他方法了解一下即可。
+
+~~~java
+//1.创建File对象
+File f = new File("D:\\aaa");
+//2.需求：打印里面所有的txt文件
+File[] arr = f.listFiles();
+for (File file : arr) {
+    //file依次表示aaa文件夹里面每一个文件或者文件夹的路径
+    if(file.isFile() && file.getName().endsWith(".txt")){
+        System.out.println(file);
+    }
+}
+~~~
+
+---
+
+### 5）`public File[] listFiles(FileFilter filter)`
+
+利用文件名过滤器获取当前该路径下所有内容。
+
+只不过它的返回值不是 `String[]` 而是 `File[]`
+
+~~~java
+//创建File对象
+File f = new File("D:\\aaa");
+//调用listFiles(FileFilter filter)
+File[] arr1 = f.listFiles(new FileFilter() {
+    @Override
+    // 参数pathname依次表示文件夹里面的每一个文件或者文件夹
+    //返回值：如果返回值为true，就表示当前路径保留，返回到数组中
+	//		如果返回值为false，就表示当前路径舍弃不要，不会返回到数组中
+    public boolean accept(File pathname) {
+        return pathname.isFile() && pathname.getName().endsWith(".txt");
+    }
+});
+~~~
+
+
+
+----
+
+### 6）`public File[] listFiles(FilenameFilter filter)`
+
+利用文件名过滤器获取当前该路径下所有内容。
+
+和 `public File[] listFiles(FileFilter filter)` 的区别是：
+
+- `public File[] listFiles(FileFilter filter)` 中接口的形参 `pathname` 是一个完整的路径
+- `public File[] listFiles(FilenameFilter filter)` 是将一个大的路径拆开为 `父级路径` 和 `子级路径`
+
+~~~java
+//调用listFiles(FilenameFilter filter)
+File[] arr2 = f.listFiles(new FilenameFilter() {
+    @Override                  
+    public boolean accept(File dir, String name) {
+        File src = new File(dir, name);
+        return src.isFile() && name.endsWith(".txt");
+    }
+});
+System.out.println(Arrays.toString(arr2));
+~~~
+
+
+
+---
+
+# 68.File综合练习1
+
+```
+需求：在当前模块下的aaa文件夹中创建一个a.txt文件
+```
+
+~~~java
+//1.创建a.txt的父级路径
+File file = new File("myfile\\aaa");
+//2.创建父级路径，不需要判断该路径是否存在
+//如果aaa是存在的，那么此时创建失败的。
+//如果aaa是不存在的，那么此时创建成功的。
+file.mkdirs();
+//3.拼接父级路径和子级路径
+File src = new File(file,"a.txt");
+boolean b = src.createNewFile();
+if (b) {
+    System.out.println("创建成功");
+} else {
+    System.out.println("创建失败");
+}
+~~~
+
+
+
+----
+
+# 69.File综合练习2
+
+~~~java
+需求：
+   定义一个方法找某一个文件夹中，是否有以avi结尾的电影。
+  （暂时不需要考虑子文件夹）
+~~~
+
+~~~java
+/*
+* 作用：用来找某一个文件夹中，是否有以avi结尾的电影
+* 形参：要查找的文件夹
+* 返回值：查找的结果  存在true  不存在false
+* */
+public static boolean haveAVI(File file){
+    //1.进入aaa文件夹，而且要获取里面所有的内容
+    File[] files = file.listFiles();
+    //2.遍历数组获取里面的每一个元素
+    for (File f : files) {
+        //f：依次表示aaa文件夹里面每一个文件或者文件夹的路径
+        if(f.isFile() && f.getName().endsWith(".avi")){
+            return true;
         }
     }
+    //3.如果循环结束之后还没有找到，直接返回false
+    return false;
+}
+~~~
 
-    //判断当前注册账号是否存在
-    //因为是编译期异常，又想调用者去处理 所以声明该异常
-    public static boolean checkUsername(String uname) throws LoginException {
-        for (String name : names) {
-            if(name.equals(uname)){//如果名字在这里面 就抛出登陆异常
-                throw new LoginException("亲"+name+"已经被注册了！");
+----
+
+# 70.File综合练习3
+
+```
+需求：找到电脑中所有以avi结尾的电影。（需要考虑子文件夹）
+```
+
+注意：当调用者 `File` 表示的路径是需要权限才能访问的文件夹时，返回 `null`
+
+例如 `C:\$Recycle.Bin\S-1-5-18` 是一个隐藏的文件夹，表示回收站，这个文件夹我们是没有权限进入的，因此返回 `null`。
+
+~~~java
+public static void main(String[] args) {
+    findAVI();
+}
+
+public static void findAVI(){
+    //获取本地所有的盘符
+    File[] arr = File.listRoots();
+    for (File f : arr) {
+        findAVI(f);
+    }
+}
+
+public static void findAVI(File src){
+    //1.进入文件夹src，要注意listFiles()可能会返回空
+    File[] files = src.listFiles();
+    //2.遍历数组,依次得到src里面每一个文件或者文件夹
+    if(files != null){
+        for (File file : files) {
+            if(file.isFile()){
+                //3，判断，如果是文件，就可以执行题目的业务逻辑
+                String name = file.getName();
+                if(name.endsWith(".avi")){
+                    System.out.println(file);
+                }
+            }else{
+                //4，判断，如果是文件夹，就可以递归
+                //细节：再次调用本方法的时候，参数一定要是src的次一级路径
+                findAVI(file);
             }
         }
-        return true;
+    }
+}
+~~~
+
+----
+
+# 71.File综合练习4
+
+```
+删除一个多级文件夹
+如果我们要删除一个有内容的文件夹，分为以下两步
+1.先删除文件夹里面所有的内容
+2.再删除自己
+```
+
+~~~java
+public static void main(String[] args) {
+    File file = new File("D:\\aaa\\src");
+    delete(file);
+
+}
+
+/*
+* 作用：删除src文件夹
+* 参数：要删除的文件夹
+* */
+public static void delete(File src){
+    //1.先删除文件夹里面所有的内容
+    //进入src
+    File[] files = src.listFiles();
+    //遍历
+    for (File file : files) {
+        //判断,如果是文件，删除
+        if (file.isFile()) {
+            file.delete();
+        } else {
+            //判断,如果是文件夹，就递归
+            delete(file);
+        }
+    }
+    //2.再删除自己！！！
+    src.delete();
+}
+~~~
+
+----
+
+# 72..File综合练习5
+
+```
+需求：统计一个文件夹的总大小
+```
+
+~~~java
+public static void main(String[] args) {
+    File file = new File("D:\\aaa\\src");
+
+    long len = getLen(file);
+    System.out.println(len);//4919189
+}
+
+/*
+* 作用：
+*       统计一个文件夹的总大小
+* 参数：
+*       表示要统计的那个文件夹
+* 返回值：
+*       统计之后的结果
+*
+* 文件夹的总大小：
+*       说白了，文件夹里面所有文件的大小
+* */
+public static long getLen(File src){
+    //1.定义变量进行累加
+    long len = 0;
+    //2.进入src文件夹
+    File[] files = src.listFiles();
+    //3.遍历数组
+    for (File file : files) {
+        //4.判断
+        if(file.isFile()){
+            //我们就把当前文件的大小累加到len当中
+            len = len + file.length();
+        }else{
+            //判断，如果是文件夹就递归
+            len = len + getLen(file);
+        }
+    }
+    return len;
+}
+~~~
+
+----
+
+# 73.File综合练习6
+
+```
+需求：统计一个文件夹中每种文件的个数并打印。（考虑子文件夹）
+打印格式如下：
+txt:3个
+doc:4个
+jpg:6个
+```
+
+~~~java
+public static void main(String[] args) throws IOException {
+    File file = new File("D:\\aaa\\src");
+    HashMap<String, Integer> hm = getCount(file);
+    System.out.println(hm);
+}
+
+/*
+* 作用：
+*       统计一个文件夹中每种文件的个数
+* 参数：
+*       要统计的那个文件夹
+* 返回值：
+*       用来统计map集合
+*       键：后缀名 值：次数
+*	对于以下三种特殊的情况我们都需要考虑到
+*       a.txt
+*       a.a.txt
+*       aaa（这种没有后缀名的是不需要统计的）
+* */
+public static HashMap<String,Integer> getCount(File src){
+    //1.定义集合用来统计
+    HashMap<String,Integer> hm = new HashMap<>();
+    //2.进入src文件夹
+    File[] files = src.listFiles();
+    //3.遍历数组
+    for (File file : files) {
+        //4.判断，如果是文件，统计
+        if (file.isFile()) {
+            //a.txt
+            String name = file.getName();
+            String[] arr = name.split("\\.");
+            if(arr.length >= 2){
+                String endName = arr[arr.length - 1];
+                if(hm.containsKey(endName)){
+                    //存在
+                    int count = hm.get(endName);
+                    count++;
+                    hm.put(endName,count);
+                } else {
+                    //不存在
+                    hm.put(endName,1);
+                }
+            }
+        } else {
+            //5.判断，如果是文件夹，递归
+            //sonMap里面是子文件中每一种文件的个数，然后将递归的结果同步到hm中
+            HashMap<String, Integer> sonMap = getCount(file);
+            //hm:  txt=1  jpg=2  doc=3
+            //sonMap: txt=3 jpg=1
+            //遍历sonMap把里面的值累加到hm当中
+            Set<Map.Entry<String, Integer>> entries = sonMap.entrySet();
+            for (Map.Entry<String, Integer> entry : entries) {
+                String key = entry.getKey();
+                int value = entry.getValue();
+                if(hm.containsKey(key)){
+                    //存在
+                    int count = hm.get(key);
+                    count = count + value;
+                    hm.put(key,count);
+                }else{
+                    //不存在
+                    hm.put(key,value);
+                }
+            }
+        }
+    }
+    return hm;
+}
+~~~
+
+
+
+-----
+
+# ---------------------------------------------
+
+# day28 IO（字节流&字符流）
+
+# 74.IO流的概述
+
+## 一、引入
+
+`IO流`：存储和读取数据的解决方案。
+
+假设我们现在在玩拼图小游戏，这些数据都是保存在内存中的，内存中数据的特点就是不能永久化存储，程序停止，数据就会丢失。
+
+因此我们需要添加一个存档功能，假设游戏有一个保存拼图进度的功能到txt文件中，那该多好，这样下次在玩的时候就不需要重头开始玩了。
+
+想要实现这个功能，我们需要学习两个知识：1、txt文本文件保存在哪里；2、数据如何进行传输，也就是如何保存到文件中。
+
+<img src="./assets/image-20240501213426496.png" alt="image-20240501213426496" style="zoom:40%;" />
+
+`IO流` 就是为了解决这个问题而出现的：存储和读取数据的解决方案。
+
+又因为 `IO流` 跟 `File` 是息息相关的，所以我们在学习之前需要将 `File` 简单回顾一下。
+
+----
+
+## 二、回顾 `File`
+
+`File`：表示系统中的文件或者文件夹的路径。
+
+利用 `File` 我们可以获取文件的信息、判断文件的类型、创建文件/文件夹、删除文件/文件夹。
+
+注意：`File类` 只能对文件本身进行操作，不能读写文件里面存储的数据。
+
+如果我们想要读写数据，就必须要用到 `IO流`。
+
+----
+
+## 三、`IO流` 的作用
+
+`IO流`：用于读写文件中的数据（可以读写文件，或网络中的数据.....）
+
+`IO流` 能做的事情主要是两点
+
+1、将程序中的数据保存到本地文件中，这个动作也叫做：`写出数据`，英文名字 `output`
+
+2、将本地文件中的数据加载到程序中，这个动作也叫做：`读取数据`，英文名字 `input`
+
+问题：`IO流` 中，谁在读，谁在写？以谁为参照物看读写的方向呢？
+
+答案：以程序为参照物进行读写，是程序在读取文件中你的数据，是程序在往文件中写出数据。
+
+或者答 `内存` 也是没有问题的，因为程序就是运行在内存中的。
+
+----
+
+## 四、`IO流`
+
+在Java中，`IO流` 是有很多很多种的，想要学好它，就需要先将它们进行分类，让大家有一个整体的认知，再一种一种的去学习。
+
+1、`IO流`  按照**流的方向**来分的话，可以分为两种：`输入流：把本地文件中的数据读取到程序中`、`输出流：将程序中的数据写出到本地文件中`。
+
+<img src="./assets/image-20240502161116648.png" alt="image-20240502161116648" style="zoom:50%;" />
+
+2、`IO流` 按照**操作文件的类型**，可以分为 `字节流`、`字符流`。
+
+其中 `字节流` 可以操作所有类型的文件，例如：图片文件、文本文件、视频文件、音频文件.....
+
+`字符流` 只能操作 `纯文本文件`。
+
+<img src="./assets/image-20240502161321034.png" alt="image-20240502161321034" style="zoom:57%;" />
+
+什么是纯文本文件？利用 `Windows` 自带的记事本打开并且能读的懂的就是纯文本文件。
+
+例如 `txt文件、md文件、xml文件、lrc文件` 等。`lrc`：平时下载音频文件用来存放歌词的。
+
+如下图用记事本打开了四种类型的文件。`txt和md` 是纯文本文件，而中间的 `Word、Excel` 不是纯文本文件。
+
+因此以后要是遇到了 `Word、Excel` 就不能只用 `字符流` 进行操作，只能使用 `字节流` 进行操作。
+
+![image-20240502161740333](./assets/image-20240502161740333.png)
+
+----
+
+## 五、总结
+
+**1、什么是 `IO流`？**
+
+ `IO流`：存储和读取数据的解决方案。
+
+其中的 `I` 表示 `input(输入)`，`O` 表示 `output(输出)`，`流` 是一个比喻，表示数据就像是 `水流` 一样进行传输的。
+
+**2、`IO流`的作用**
+
+用于读写数据，这个数据可以在本地文件中，也可以在网络中。
+
+**3、 `IO流` 按照 `流向` 可以分类哪两种流？**
+
+输入流：把本地文件中的数据读取到程序中。
+
+输出流：将程序中的数据写出到本地文件中。
+
+**4、`IO流` 按照 `操作文件的类型` 可以分类哪两种流？**
+
+字节流：可以操作所有类型的文件
+
+字符流：只能操作纯文本文件
+
+**5、什么是纯文本文件？**
+
+利用 `Windows` 自带的记事本打开并且能读的懂的就是纯文本文件。
+
+例如 `txt文件、md文件、xml文件、lrc文件` 等。`lrc`：平时下载音频文件用来存放歌词的。
+
+
+
+----
+
+# 75.`IO流` 的体系
+
+`IO流` 可以分为 `字节流` 和 `字符流`，每种流又有输入和输出之分。
+
+下面四个类都是抽象类，我们是不能创建它们的对象的，我们还得看它们的子类。
+
+<img src="./assets/image-20240502163148867.png" alt="image-20240502163148867" style="zoom:67%;" />
+
+以字节流为例，如果我们想要用字节流读取本地文件中的数据，如果是你来设计子类的类名，你该怎么起呢？
+
+先将父类 `InputStream` 拿出来，表示它本身是 `字节输入流`，用来读取数据。
+
+又因为我们想要从本地文件中读取数据，文件的英文是 `File`，两者一结合 `FileInputStream`，就表示：操作本地文件的字节输入流。
+
+这个名字起的多棒，第一个单词表示它的作用，第二个单词表示它的继承结构。
+
+在以后我们还会学习其他功能的字节输入流，它们的命名规则其实都是一样的，第二个单词不变，变下第一个单词就行了。
+
+![image-20240502163907095](./assets/image-20240502163907095.png)
+
+输出流也是一样的，在前面加一个 `File`，这就表示操作本地文件的字节输出流，第一个单词表示它的作用，第二个单词表示它的继承结构。
+
+<img src="./assets/image-20240502164027484.png" alt="image-20240502164027484" style="zoom:67%;" />
+
+现在我们来学习一个简单的：`FileOutputStream`
+
+-----
+
+# 字节输出流
+
+## 一、介绍
+
+`FileOutputStream`：操作本地文件的字节输出流，可以把程序中的数据写到本地文件中。
+
+书写步骤：
+
+1、创建字节输出流对象
+
+2、写数据
+
+3、释放资源
+
+-----
+
+## 二、代码示例
+
+需求：写出一段文字到本地文件中。（暂时不写中文）
+
+创建对象的时候需要思考创建谁的对象，此时我们需要思考我们的需求是什么？写出一段文字到本地文件中。
+
+既然是写出，那一定要使用到输出流：`OutputStream`。
+
+`OutputStream` 是一个抽象类，我们不能直接创建它的对象，此时就需要来看它的子类，它有一个子类是操作本地文件的，文件的单词是 `File`，因此两者一结合，创建的就是： `FileOutputStream`。
+
+调用构造方法时会有一个编译时异常，因此需要手动抛出。
+
+这个编译时异常其实就是想提示你，让你检查本地文件中是否有 `a.txt`。
+
+![image-20240502165138078](./assets/image-20240502165138078.png)
+
+~~~java
+//1.创建对象，并指定文件的路径，myio\a.txt（当前项目下的myio模块下的a.txt文件）
+FileOutputStream fos = new FileOutputStream("myio\\a.txt");
+~~~
+
+写出数据也很简单，用对象调用 `write()`，方法里面需要传递 `int类型` 的整数
+
+<img src="./assets/image-20240502165310499.png" alt="image-20240502165310499" style="zoom:80%;" />
+
+这里就随便写 `97`。
+
+下面两个方法也都是有编译时异常的，因此同样需要进行手动处理。
+
+`IOException` 是三行代码要抛出异常的父类，所以直接写一个 `IOException` 即可。
+
+![image-20240502165402184](./assets/image-20240502165402184.png)
+
+~~~java
+//2.写出数据
+fos.write(97);
+//3.释放资源
+fos.close();
+~~~
+
+代码写完后打开 `a.txt`，可以发现数据 `a` 已经写到本地文件中了。
+
+<img src="./assets/image-20240502165538635.png" alt="image-20240502165538635" style="zoom:80%;" />
+
+但是这三行代码怎么理解呢？
+
+----
+
+## 三、原理
+
+我们电脑上的文件是有很多很多的，它怎么就知道我要将数据写到哪个文件里呢？是谁做的事情呢？
+
+其实就是第一行代码创建对象时做的事情，它会根据书写的路径让程序跟文件之间产生一个数据传输的通道。
+
+<img src="./assets/image-20240502165821619.png" alt="image-20240502165821619" style="zoom:67%;" />
+
+然后再去通过 `write()` 写出数据，数据相当于就是在这个通道中进行的传输。
+
+<img src="./assets/image-20240502165846440.png" alt="image-20240502165846440" style="zoom:80%;" />
+
+最后，当我们调用 `close()` 释放资源的时候，相当于就是将这个通道给砸了。
+
+<img src="./assets/image-20240502170003993.png" alt="image-20240502170003993" style="zoom:67%;" />
+
+
+
+----
+
+# 76.字节输出流写出数据的细节
+
+## 一、创建字节输出流对象
+
+### 细节1：参数是字符串表示的路径或者是File对象都是可以的
+
+~~~java
+FileOutputStream fos = new FileOutputStream("myio\\a.txt");
+~~~
+
+选中 `FileOutputStream` 来看下源码：如果传递的是字符串表示的路径，它的底层还是会 `new` 一个 `File对象`，最终再去调用本类的其他构造。
+
+<img src="./assets/image-20240502171155588.png" alt="image-20240502171155588" style="zoom:80%;" />
+
+跟进 `this` 看一下，此时就跳到了 `216行` 的构造
+
+<img src="./assets/image-20240502171503787.png" alt="image-20240502171503787" style="zoom:80%;" />
+
+但假如此时我传递的是 `File对象`，那么它会调用哪个构造呢？
+
+~~~java
+FileOutputStream fos = new FileOutputStream(new File("myio\\a.txt"));
+~~~
+
+选中 `FileOutputStream` 跟进，可以发现方法底层还是调用了其他构造方法
+
+<img src="./assets/image-20240502172110914.png" alt="image-20240502172110914" style="zoom:80%;" />
+
+继续跟进看看，可以发现还是 `216行` 的
+
+<img src="./assets/image-20240502172149730.png" alt="image-20240502172149730" style="zoom:80%;" />
+
+---
+
+### 细节2：如果文件不存在会创建一个新的文件，但是要保证父级路径是存在的。
+
+如果父级路径不存在，就会报错。
+
+<img src="./assets/image-20240502174131329.png" alt="image-20240502174131329" style="zoom:80%;" />
+
+---
+
+### 细节3：如果文件已经存在，构造方法会清空文件
+
+----
+
+## 二、写数据
+
+细节：write方法的参数是整数，但是实际上写到本地文件中的是整数在ASCII上对应的字符
+
+例如我们在括号中写的是 `97`，实际上文件中写的却是 `a`。
+
+那如果我们真的要写一个 `97` 怎么办呢？那就将 `9` 和 `7` 分别看做是一个单独的字符，`'9'字符对应的ASCII码值是57`，`'7'字符对应的ASCII码值是55`。
+
+```java
+fos.write(57);
+fos.write(55);
+```
+
+打开文件，可以发现 `97` 成功写入
+
+<img src="./assets/image-20240502174718882.png" alt="image-20240502174718882" style="zoom:80%;" />
+
+----
+
+## 三、释放资源
+
+释放资源是IO流中每一种流都要进行的操作。
+
+每次使用完流之后都要释放资源
+
+~~~java
+fos.close();
+~~~
+
+那如果不释放资源会怎么样？
+
+~~~java
+FileOutputStream fos = new FileOutputStream("myio\\a.txt");
+fos.write(57);
+fos.write(55);
+//将释放资源注释掉
+//fos.close();
+
+// 为了让程序不停止，这里写一个无限循环
+while(true){}
+~~~
+
+运行以上代码，程序没停止，但是资源也没有释放，此时来打开一下本地文件，将它删掉，会发现，操作系统有一个提示：
+
+相当于Java正在占用着这个文件，其他人在本地中是无法操作。
+
+<img src="./assets/image-20240502175057636.png" alt="image-20240502175057636" style="zoom: 67%;" />
+
+但是如果你释放了资源，那么在程序运行的时候，再去删除文件，此时也可以删除文件。
+
+这个就是释放资源的作用，它相当于就是解除了资源的占用。
+
+-----
+
+## 四、总结
+
+```
+1.创建字节输出流对象
+      细节1：参数是字符串表示的路径或者是File对象都是可以的
+      细节2：如果文件不存在会创建一个新的文件，但是要保证父级路径是存在的。
+      细节3：如果文件已经存在，则会清空文件
+2.写数据
+      细节：write方法的参数是整数，但是实际上写到本地文件中的是整数在ASCII上对应的字符
+3.释放资源
+      每次使用完流之后都要释放资源
+```
+
+
+
+----
+
+# 77.字节输出流写出数据的三种方式
+
+## 一、总述
+
+在Java中 `FileOutputStream` 写出数据一共有三种方式。
+
+方法二：如果需要一次写多个数据，可以先将它放到一个 `byte` 类型的数组中，把整个数组中的数据写到文件中就行了。
+
+方法三：当然我们也可以写数组的一部分。
+
+<img src="./assets/image-20240502180241505.png" alt="image-20240502180241505" style="zoom:67%;" />
+
+----
+
+二、
+
+
+
+### 写出字节数据
+
+1. **写出字节**：`write(int b)` 方法，每次可以写出一个字节数据，代码使用演示：
+
+```java
+public class FOSWrite {
+    public static void main(String[] args) throws IOException {
+        // 使用文件名称创建流对象
+        FileOutputStream fos = new FileOutputStream("fos.txt");     
+      	// 写出数据
+      	fos.write(97); // 写出第1个字节
+      	fos.write(98); // 写出第2个字节
+      	fos.write(99); // 写出第3个字节
+      	// 关闭资源
+        fos.close();
+    }
+}
+输出结果：
+abc
+```
+
+> 小贴士：
+>
+> 1. 虽然参数为int类型四个字节，但是只会保留一个字节的信息写出。
+> 2. 流操作完毕后，必须释放系统资源，调用close方法，千万记得。
+
+2. **写出字节数组**：`write(byte[] b)`，每次可以写出数组中的数据，代码使用演示：
+
+```java
+public class FOSWrite {
+    public static void main(String[] args) throws IOException {
+        // 使用文件名称创建流对象
+        FileOutputStream fos = new FileOutputStream("fos.txt");     
+      	// 字符串转换为字节数组
+      	byte[] b = "黑马程序员".getBytes();
+      	// 写出字节数组数据
+      	fos.write(b);
+      	// 关闭资源
+        fos.close();
+    }
+}
+输出结果：
+黑马程序员
+```
+
+3. **写出指定长度字节数组**：`write(byte[] b, int off, int len)` ,每次写出从off索引开始，len个字节，代码使用演示：
+
+```java
+public class FOSWrite {
+    public static void main(String[] args) throws IOException {
+        // 使用文件名称创建流对象
+        FileOutputStream fos = new FileOutputStream("fos.txt");     
+      	// 字符串转换为字节数组
+      	byte[] b = "abcde".getBytes();
+		// 写出从索引2开始，2个字节。索引2是c，两个字节，也就是cd。
+        fos.write(b,2,2);
+      	// 关闭资源
+        fos.close();
+    }
+}
+输出结果：
+cd
+```
+
+
+
+
+
+
+
+
+
+
+
+## 1.4 顶级父类们
+
+|            |           **输入流**            |              输出流              |
+| :--------: | :-----------------------------: | :------------------------------: |
+| **字节流** | 字节输入流<br />**InputStream** | 字节输出流<br />**OutputStream** |
+| **字符流** |   字符输入流<br />**Reader**    |    字符输出流<br />**Writer**    |
+
+# 2. 字节流
+
+## 2.1 一切皆为字节
+
+一切文件数据(文本、图片、视频等)在存储时，都是以二进制数字的形式保存，都一个一个的字节，那么传输时一样如此。所以，字节流可以传输任意文件数据。在操作流的时候，我们要时刻明确，无论使用什么样的流对象，底层传输的始终为二进制数据。
+
+## 2.2 字节输出流【OutputStream】
+
+`java.io.OutputStream `抽象类是表示字节输出流的所有类的超类，将指定的字节信息写出到目的地。它定义了字节输出流的基本共性功能方法。
+
+* `public void close()` ：关闭此输出流并释放与此流相关联的任何系统资源。  
+* `public void flush() ` ：刷新此输出流并强制任何缓冲的输出字节被写出。  
+* `public void write(byte[] b)`：将 b.length字节从指定的字节数组写入此输出流。  
+* `public void write(byte[] b, int off, int len)` ：从指定的字节数组写入 len字节，从偏移量 off开始输出到此输出流。  
+* `public abstract void write(int b)` ：将指定的字节输出流。
+
+> 小贴士：
+>
+> close方法，当完成流的操作时，必须调用此方法，释放系统资源。
+
+## 2.3 FileOutputStream类
+
+`OutputStream`有很多子类，我们从最简单的一个子类开始。
+
+`java.io.FileOutputStream `类是文件输出流，用于将数据写出到文件。
+
+### 构造方法
+
+* `public FileOutputStream(File file)`：创建文件输出流以写入由指定的 File对象表示的文件。 
+* `public FileOutputStream(String name)`： 创建文件输出流以指定的名称写入文件。  
+
+当你创建一个流对象时，必须传入一个文件路径。该路径下，如果没有这个文件，会创建该文件。如果有这个文件，会清空这个文件的数据。
+
+* 构造举例，代码如下：
+
+```java
+public class FileOutputStreamConstructor throws IOException {
+    public static void main(String[] args) {
+   	 	// 使用File对象创建流对象
+        File file = new File("a.txt");
+        FileOutputStream fos = new FileOutputStream(file);
+      
+        // 使用文件名称创建流对象
+        FileOutputStream fos = new FileOutputStream("b.txt");
     }
 }
 ```
 
-# 2. File类
+### 数据追加续写
 
-## 2.1 概述
+经过以上的演示，每次程序运行，创建输出流对象，都会清空目标文件中的数据。如何保留目标文件中数据，还能继续添加新数据呢？
 
-`java.io.File` 类是文件和目录路径名的抽象表示，主要用于文件和目录的创建、查找和删除等操作。
+- `public FileOutputStream(File file, boolean append)`： 创建文件输出流以写入由指定的 File对象表示的文件。  
+- `public FileOutputStream(String name, boolean append)`： 创建文件输出流以指定的名称写入文件。  
 
-## 2.2 构造方法
+这两个构造方法，参数中都需要传入一个boolean类型的值，`true` 表示追加数据，`false` 表示清空原有数据。这样创建的输出流对象，就可以指定是否追加续写了，代码使用演示：
 
-- 
+```java
+public class FOSWrite {
+    public static void main(String[] args) throws IOException {
+        // 使用文件名称创建流对象
+        FileOutputStream fos = new FileOutputStream("fos.txt"，true);     
+      	// 字符串转换为字节数组
+      	byte[] b = "abcde".getBytes();
+		// 写出从索引2开始，2个字节。索引2是c，两个字节，也就是cd。
+        fos.write(b);
+      	// 关闭资源
+        fos.close();
+    }
+}
+文件操作前：cd
+文件操作后：cdabcde
+```
+
+### 写出换行
+
+Windows系统里，换行符号是`\r\n` 。把
+
+以指定是否追加续写了，代码使用演示：
+
+```java
+public class FOSWrite {
+    public static void main(String[] args) throws IOException {
+        // 使用文件名称创建流对象
+        FileOutputStream fos = new FileOutputStream("fos.txt");  
+      	// 定义字节数组
+      	byte[] words = {97,98,99,100,101};
+      	// 遍历数组
+        for (int i = 0; i < words.length; i++) {
+          	// 写出一个字节
+            fos.write(words[i]);
+          	// 写出一个换行, 换行符号转成数组写出
+            fos.write("\r\n".getBytes());
+        }
+      	// 关闭资源
+        fos.close();
+    }
+}
+
+输出结果：
+a
+b
+c
+d
+e
+```
+
+> * 回车符`\r`和换行符`\n` ：
+>   * 回车符：回到一行的开头（return）。
+>   * 换行符：下一行（newline）。
+> * 系统中的换行：
+>   * Windows系统里，每行结尾是 `回车+换行` ，即`\r\n`；
+>   * Unix系统里，每行结尾只有 `换行` ，即`\n`；
+>   * Mac系统里，每行结尾是 `回车` ，即`\r`。从 Mac OS X开始与Linux统一。
+
+## 2.4 字节输入流【InputStream】
+
+`java.io.InputStream `抽象类是表示字节输入流的所有类的超类，可以读取字节信息到内存中。它定义了字节输入流的基本共性功能方法。
+
+- `public void close()` ：关闭此输入流并释放与此流相关联的任何系统资源。    
+- `public abstract int read()`： 从输入流读取数据的下一个字节。 
+- `public int read(byte[] b)`： 从输入流中读取一些字节数，并将它们存储到字节数组 b中 。
+
+> 小贴士：
+>
+> close方法，当完成流的操作时，必须调用此方法，释放系统资源。
+
+## 2.5 FileInputStream类
+
+`java.io.FileInputStream `类是文件输入流，从文件中读取字节。
+
+### 构造方法
+
+* `FileInputStream(File file)`： 通过打开与实际文件的连接来创建一个 FileInputStream ，该文件由文件系统中的 File对象 file命名。 
+* `FileInputStream(String name)`： 通过打开与实际文件的连接来创建一个 FileInputStream ，该文件由文件系统中的路径名 name命名。  
+
+当你创建一个流对象时，必须传入一个文件路径。该路径下，如果没有该文件,会抛出`FileNotFoundException` 。
+
 - 构造举例，代码如下：
 
 ```java
-// 文件路径名
-String pathname = "D:\\aaa.txt";
-File file1 = new File(pathname); 
+public class FileInputStreamConstructor throws IOException{
+    public static void main(String[] args) {
+   	 	// 使用File对象创建流对象
+        File file = new File("a.txt");
+        FileInputStream fos = new FileInputStream(file);
+      
+        // 使用文件名称创建流对象
+        FileInputStream fos = new FileInputStream("b.txt");
+    }
+}
+```
 
-// 文件路径名
-String pathname2 = "D:\\aaa\\bbb.txt";
-File file2 = new File(pathname2); 
+### 读取字节数据
 
-// 通过父路径和子路径字符串
- String parent = "d:\\aaa";
- String child = "bbb.txt";
- File file3 = new File(parent, child);
+1. **读取字节**：`read`方法，每次可以读取一个字节的数据，提升为int类型，读取到文件末尾，返回`-1`，代码使用演示：
 
-// 通过父级File对象和子路径字符串
-File parentDir = new File("d:\\aaa");
-String child = "bbb.txt";
-File file4 = new File(parentDir, child);
+```java
+public class FISRead {
+    public static void main(String[] args) throws IOException{
+      	// 使用文件名称创建流对象
+       	FileInputStream fis = new FileInputStream("read.txt");
+      	// 读取数据，返回一个字节
+        int read = fis.read();
+        System.out.println((char) read);
+        read = fis.read();
+        System.out.println((char) read);
+        read = fis.read();
+        System.out.println((char) read);
+        read = fis.read();
+        System.out.println((char) read);
+        read = fis.read();
+        System.out.println((char) read);
+      	// 读取到末尾,返回-1
+       	read = fis.read();
+        System.out.println( read);
+		// 关闭资源
+        fis.close();
+    }
+}
+输出结果：
+a
+b
+c
+d
+e
+-1
+```
+
+循环改进读取方式，代码使用演示：
+
+```java
+public class FISRead {
+    public static void main(String[] args) throws IOException{
+      	// 使用文件名称创建流对象
+       	FileInputStream fis = new FileInputStream("read.txt");
+      	// 定义变量，保存数据
+        int b ；
+        // 循环读取
+        while ((b = fis.read())!=-1) {
+            System.out.println((char)b);
+        }
+		// 关闭资源
+        fis.close();
+    }
+}
+输出结果：
+a
+b
+c
+d
+e
 ```
 
 > 小贴士：
 >
-> 1. 一个File对象代表硬盘中实际存在的一个文件或者目录。
-> 2. 无论该路径下是否存在文件或者目录，都不影响File对象的创建。
+> 1. 虽然读取了一个字节，但是会自动提升为int类型。
+> 2. 流操作完毕后，必须释放系统资源，调用close方法，千万记得。
 
-## 2.3 常用方法
-
-### 获取功能的方法
-
-- `public String getAbsolutePath() ` ：返回此File的绝对路径名字符串。
-
-- ` public String getPath() ` ：将此File转换为路径名字符串。 
-
-- `public String getName()`  ：返回由此File表示的文件或目录的名称。  
-
-- `public long length()`  ：返回由此File表示的文件的长度。 
-
-  方法演示，代码如下：
-
-  ```java
-  public class FileGet {
-      public static void main(String[] args) {
-          File f = new File("d:/aaa/bbb.java");     
-          System.out.println("文件绝对路径:"+f.getAbsolutePath());
-          System.out.println("文件构造路径:"+f.getPath());
-          System.out.println("文件名称:"+f.getName());
-          System.out.println("文件长度:"+f.length()+"字节");
-  
-          File f2 = new File("d:/aaa");     
-          System.out.println("目录绝对路径:"+f2.getAbsolutePath());
-          System.out.println("目录构造路径:"+f2.getPath());
-          System.out.println("目录名称:"+f2.getName());
-          System.out.println("目录长度:"+f2.length());
-      }
-  }
-  输出结果：
-  文件绝对路径:d:\aaa\bbb.java
-  文件构造路径:d:\aaa\bbb.java
-  文件名称:bbb.java
-  文件长度:636字节
-  
-  目录绝对路径:d:\aaa
-  目录构造路径:d:\aaa
-  目录名称:aaa
-  目录长度:4096
-  ```
-
-> API中说明：length()，表示文件的长度。但是File对象表示目录，则返回值未指定。
-
-### 绝对路径和相对路径
-
-- **绝对路径**：从盘符开始的路径，这是一个完整的路径。
-- **相对路径**：相对于项目目录的路径，这是一个便捷的路径，开发中经常使用。
+2. **使用字节数组读取**：`read(byte[] b)`，每次读取b的长度个字节到数组中，返回读取到的有效字节个数，读取到末尾时，返回`-1` ，代码使用演示：
 
 ```java
-public class FilePath {
+public class FISRead {
+    public static void main(String[] args) throws IOException{
+      	// 使用文件名称创建流对象.
+       	FileInputStream fis = new FileInputStream("read.txt"); // 文件中为abcde
+      	// 定义变量，作为有效个数
+        int len ；
+        // 定义字节数组，作为装字节数据的容器   
+        byte[] b = new byte[2];
+        // 循环读取
+        while (( len= fis.read(b))!=-1) {
+           	// 每次读取后,把数组变成字符串打印
+            System.out.println(new String(b));
+        }
+		// 关闭资源
+        fis.close();
+    }
+}
+
+输出结果：
+ab
+cd
+ed
+```
+
+错误数据`d`，是由于最后一次读取时，只读取一个字节`e`，数组中，上次读取的数据没有被完全替换，所以要通过`len` ，获取有效的字节，代码使用演示：
+
+```java
+public class FISRead {
+    public static void main(String[] args) throws IOException{
+      	// 使用文件名称创建流对象.
+       	FileInputStream fis = new FileInputStream("read.txt"); // 文件中为abcde
+      	// 定义变量，作为有效个数
+        int len ；
+        // 定义字节数组，作为装字节数据的容器   
+        byte[] b = new byte[2];
+        // 循环读取
+        while (( len= fis.read(b))!=-1) {
+           	// 每次读取后,把数组的有效字节部分，变成字符串打印
+            System.out.println(new String(b，0，len));//  len 每次读取的有效字节个数
+        }
+		// 关闭资源
+        fis.close();
+    }
+}
+
+输出结果：
+ab
+cd
+e
+```
+
+> 小贴士：
+>
+> 使用数组读取，每次读取多个字节，减少了系统间的IO操作次数，从而提高了读写的效率，建议开发中使用。
+
+## 2.6 字节流练习：图片复制
+
+### 复制原理图解
+
+![](./assets/2_copy-1714636028757-2.jpg)
+
+### 案例实现
+
+复制图片文件，代码使用演示：
+
+```java
+public class Copy {
+    public static void main(String[] args) throws IOException {
+        // 1.创建流对象
+        // 1.1 指定数据源
+        FileInputStream fis = new FileInputStream("D:\\test.jpg");
+        // 1.2 指定目的地
+        FileOutputStream fos = new FileOutputStream("test_copy.jpg");
+
+        // 2.读写数据
+        // 2.1 定义数组
+        byte[] b = new byte[1024];
+        // 2.2 定义长度
+        int len;
+        // 2.3 循环读取
+        while ((len = fis.read(b))!=-1) {
+            // 2.4 写出数据
+            fos.write(b, 0 , len);
+        }
+
+        // 3.关闭资源
+        fos.close();
+        fis.close();
+    }
+}
+```
+
+> 小贴士：
+>
+> 流的关闭原则：先开后关，后开先关。
+
+# 3. 字符流
+
+当使用字节流读取文本文件时，可能会有一个小问题。就是遇到中文字符时，可能不会显示完整的字符，那是因为一个中文字符可能占用多个字节存储。所以Java提供一些字符流类，以字符为单位读写数据，专门用于处理文本文件。
+
+## 3.1 字符输入流【Reader】
+
+`java.io.Reader`抽象类是表示用于读取字符流的所有类的超类，可以读取字符信息到内存中。它定义了字符输入流的基本共性功能方法。
+
+- `public void close()` ：关闭此流并释放与此流相关联的任何系统资源。    
+- `public int read()`： 从输入流读取一个字符。 
+- `public int read(char[] cbuf)`： 从输入流中读取一些字符，并将它们存储到字符数组 cbuf中 。
+
+## 3.2 FileReader类  
+
+`java.io.FileReader `类是读取字符文件的便利类。构造时使用系统默认的字符编码和默认字节缓冲区。
+
+> 小贴士：
+>
+> 1. 字符编码：字节与字符的对应规则。Windows系统的中文编码默认是GBK编码表。
+>
+>    idea中UTF-8
+>
+> 2. 字节缓冲区：一个字节数组，用来临时存储字节数据。
+
+### 构造方法
+
+- `FileReader(File file)`： 创建一个新的 FileReader ，给定要读取的File对象。   
+- `FileReader(String fileName)`： 创建一个新的 FileReader ，给定要读取的文件的名称。  
+
+当你创建一个流对象时，必须传入一个文件路径。类似于FileInputStream 。
+
+- 构造举例，代码如下：
+
+```java
+public class FileReaderConstructor throws IOException{
     public static void main(String[] args) {
-      	// D盘下的bbb.java文件
-        File f = new File("D:\\bbb.java");
-        System.out.println(f.getAbsolutePath());
+   	 	// 使用File对象创建流对象
+        File file = new File("a.txt");
+        FileReader fr = new FileReader(file);
+      
+        // 使用文件名称创建流对象
+        FileReader fr = new FileReader("b.txt");
+    }
+}
+```
+
+### 读取字符数据
+
+1. **读取字符**：`read`方法，每次可以读取一个字符的数据，提升为int类型，读取到文件末尾，返回`-1`，循环读取，代码使用演示：
+
+```java
+public class FRRead {
+    public static void main(String[] args) throws IOException {
+      	// 使用文件名称创建流对象
+       	FileReader fr = new FileReader("read.txt");
+      	// 定义变量，保存数据
+        int b ；
+        // 循环读取
+        while ((b = fr.read())!=-1) {
+            System.out.println((char)b);
+        }
+		// 关闭资源
+        fr.close();
+    }
+}
+输出结果：
+黑
+马
+程
+序
+员
+```
+
+> 小贴士：虽然读取了一个字符，但是会自动提升为int类型。
+
+2. **使用字符数组读取**：`read(char[] cbuf)`，每次读取b的长度个字符到数组中，返回读取到的有效字符个数，读取到末尾时，返回`-1` ，代码使用演示：
+
+```java
+public class FRRead {
+    public static void main(String[] args) throws IOException {
+      	// 使用文件名称创建流对象
+       	FileReader fr = new FileReader("read.txt");
+      	// 定义变量，保存有效字符个数
+        int len ；
+        // 定义字符数组，作为装字符数据的容器
+         char[] cbuf = new char[2];
+        // 循环读取
+        while ((len = fr.read(cbuf))!=-1) {
+            System.out.println(new String(cbuf));
+        }
+		// 关闭资源
+        fr.close();
+    }
+}
+输出结果：
+黑马
+程序
+员序
+```
+
+获取有效的字符改进，代码使用演示：
+
+```java
+public class FISRead {
+    public static void main(String[] args) throws IOException {
+      	// 使用文件名称创建流对象
+       	FileReader fr = new FileReader("read.txt");
+      	// 定义变量，保存有效字符个数
+        int len ；
+        // 定义字符数组，作为装字符数据的容器
+        char[] cbuf = new char[2];
+        // 循环读取
+        while ((len = fr.read(cbuf))!=-1) {
+            System.out.println(new String(cbuf,0,len));
+        }
+    	// 关闭资源
+        fr.close();
+    }
+}
+
+输出结果：
+黑马
+程序
+员
+```
+
+## 3.3 字符输出流【Writer】
+
+`java.io.Writer `抽象类是表示用于写出字符流的所有类的超类，将指定的字符信息写出到目的地。它定义了字节输出流的基本共性功能方法。
+
+- `void write(int c)` 写入单个字符。
+- `void write(char[] cbuf) `写入字符数组。 
+- `abstract  void write(char[] cbuf, int off, int len) `写入字符数组的某一部分,off数组的开始索引,len写的字符个数。 
+- `void write(String str) `写入字符串。 
+- `void write(String str, int off, int len)` 写入字符串的某一部分,off字符串的开始索引,len写的字符个数。
+- `void flush() `刷新该流的缓冲。  
+- `void close()` 关闭此流，但要先刷新它。 
+
+## 3.4 FileWriter类
+
+`java.io.FileWriter `类是写出字符到文件的便利类。构造时使用系统默认的字符编码和默认字节缓冲区。
+
+### 构造方法
+
+- `FileWriter(File file)`： 创建一个新的 FileWriter，给定要读取的File对象。   
+- `FileWriter(String fileName)`： 创建一个新的 FileWriter，给定要读取的文件的名称。  
+
+当你创建一个流对象时，必须传入一个文件路径，类似于FileOutputStream。
+
+- 构造举例，代码如下：
+
+```java
+public class FileWriterConstructor {
+    public static void main(String[] args) throws IOException {
+   	 	// 使用File对象创建流对象
+        File file = new File("a.txt");
+        FileWriter fw = new FileWriter(file);
+      
+        // 使用文件名称创建流对象
+        FileWriter fw = new FileWriter("b.txt");
+    }
+}
+```
+
+### 基本写出数据
+
+**写出字符**：`write(int b)` 方法，每次可以写出一个字符数据，代码使用演示：
+
+```java
+public class FWWrite {
+    public static void main(String[] args) throws IOException {
+        // 使用文件名称创建流对象
+        FileWriter fw = new FileWriter("fw.txt");     
+      	// 写出数据
+      	fw.write(97); // 写出第1个字符
+      	fw.write('b'); // 写出第2个字符
+      	fw.write('C'); // 写出第3个字符
+      	fw.write(30000); // 写出第4个字符，中文编码表中30000对应一个汉字。
+      
+      	/*
+        【注意】关闭资源时,与FileOutputStream不同。
+      	 如果不关闭,数据只是保存到缓冲区，并未保存到文件。
+        */
+        // fw.close();
+    }
+}
+输出结果：
+abC田
+```
+
+> 小贴士：
+>
+> 1. 虽然参数为int类型四个字节，但是只会保留一个字符的信息写出。
+> 2. 未调用close方法，数据只是保存到了缓冲区，并未写出到文件中。
+
+### 关闭和刷新
+
+因为内置缓冲区的原因，如果不关闭输出流，无法写出字符到文件中。但是关闭的流对象，是无法继续写出数据的。如果我们既想写出数据，又想继续使用流，就需要`flush` 方法了。
+
+* `flush` ：刷新缓冲区，流对象可以继续使用。
+* `close `:先刷新缓冲区，然后通知系统释放资源。流对象不可以再被使用了。
+
+代码使用演示：
+
+```java
+public class FWWrite {
+    public static void main(String[] args) throws IOException {
+        // 使用文件名称创建流对象
+        FileWriter fw = new FileWriter("fw.txt");
+        // 写出数据，通过flush
+        fw.write('刷'); // 写出第1个字符
+        fw.flush();
+        fw.write('新'); // 继续写出第2个字符，写出成功
+        fw.flush();
+      
+      	// 写出数据，通过close
+        fw.write('关'); // 写出第1个字符
+        fw.close();
+        fw.write('闭'); // 继续写出第2个字符,【报错】java.io.IOException: Stream closed
+        fw.close();
+    }
+}
+```
+
+> 小贴士：即便是flush方法写出了数据，操作的最后还是要调用close方法，释放系统资源。
+
+### 写出其他数据
+
+1. **写出字符数组** ：`write(char[] cbuf)` 和 `write(char[] cbuf, int off, int len)` ，每次可以写出字符数组中的数据，用法类似FileOutputStream，代码使用演示：
+
+```java
+public class FWWrite {
+    public static void main(String[] args) throws IOException {
+        // 使用文件名称创建流对象
+        FileWriter fw = new FileWriter("fw.txt");     
+      	// 字符串转换为字节数组
+      	char[] chars = "黑马程序员".toCharArray();
+      
+      	// 写出字符数组
+      	fw.write(chars); // 黑马程序员
+        
+		// 写出从索引2开始，2个字节。索引2是'程'，两个字节，也就是'程序'。
+        fw.write(b,2,2); // 程序
+      
+      	// 关闭资源
+        fos.close();
+    }
+}
+```
+
+2. **写出字符串**：`write(String str)` 和 `write(String str, int off, int len)` ，每次可以写出字符串中的数据，更为方便，代码使用演示：
+
+```java
+public class FWWrite {
+    public static void main(String[] args) throws IOException {
+        // 使用文件名称创建流对象
+        FileWriter fw = new FileWriter("fw.txt");     
+      	// 字符串
+      	String msg = "黑马程序员";
+      
+      	// 写出字符数组
+      	fw.write(msg); //黑马程序员
+      
+		// 写出从索引2开始，2个字节。索引2是'程'，两个字节，也就是'程序'。
+        fw.write(msg,2,2);	// 程序
       	
-		// 项目下的bbb.java文件
-        File f2 = new File("bbb.java");
-        System.out.println(f2.getAbsolutePath());
+        // 关闭资源
+        fos.close();
     }
 }
-输出结果：
-D:\bbb.java
-D:\idea_project_test4\bbb.java
 ```
 
-### 判断功能的方法
-
-- `public boolean exists()` ：此File表示的文件或目录是否实际存在。
-- `public boolean isDirectory()` ：此File表示的是否为目录。
-- `public boolean isFile()` ：此File表示的是否为文件。
-
-方法演示，代码如下：
+3. **续写和换行**：操作类似于FileOutputStream。
 
 ```java
-public class FileIs {
-    public static void main(String[] args) {
-        File f = new File("d:\\aaa\\bbb.java");
-        File f2 = new File("d:\\aaa");
-      	// 判断是否存在
-        System.out.println("d:\\aaa\\bbb.java 是否存在:"+f.exists());
-        System.out.println("d:\\aaa 是否存在:"+f2.exists());
-      	// 判断是文件还是目录
-        System.out.println("d:\\aaa 文件?:"+f2.isFile());
-        System.out.println("d:\\aaa 目录?:"+f2.isDirectory());
-    }
-}
-输出结果：
-d:\aaa\bbb.java 是否存在:true
-d:\aaa 是否存在:true
-d:\aaa 文件?:false
-d:\aaa 目录?:true
-```
-
-### 创建删除功能的方法
-
-- `public boolean createNewFile()` ：当且仅当具有该名称的文件尚不存在时，创建一个新的空文件。 
-- `public boolean delete()` ：删除由此File表示的文件或目录。  
-- `public boolean mkdir()` ：创建由此File表示的目录。
-- `public boolean mkdirs()` ：创建由此File表示的目录，包括任何必需但不存在的父目录。
-
-方法演示，代码如下：
-
-```java
-public class FileCreateDelete {
+public class FWWrite {
     public static void main(String[] args) throws IOException {
-        // 文件的创建
-        File f = new File("aaa.txt");
-        System.out.println("是否存在:"+f.exists()); // false
-        System.out.println("是否创建:"+f.createNewFile()); // true
-        System.out.println("是否存在:"+f.exists()); // true
-		
-     	// 目录的创建
-      	File f2= new File("newDir");	
-        System.out.println("是否存在:"+f2.exists());// false
-        System.out.println("是否创建:"+f2.mkdir());	// true
-        System.out.println("是否存在:"+f2.exists());// true
-
-		// 创建多级目录
-      	File f3= new File("newDira\\newDirb");
-        System.out.println(f3.mkdir());// false
-        File f4= new File("newDira\\newDirb");
-        System.out.println(f4.mkdirs());// true
-      
-      	// 文件的删除
-       	System.out.println(f.delete());// true
-      
-      	// 目录的删除
-        System.out.println(f2.delete());// true
-        System.out.println(f4.delete());// false
+        // 使用文件名称创建流对象，可以续写数据
+        FileWriter fw = new FileWriter("fw.txt"，true);     
+      	// 写出字符串
+        fw.write("黑马");
+      	// 写出换行
+      	fw.write("\r\n");
+      	// 写出字符串
+  		fw.write("程序员");
+      	// 关闭资源
+        fw.close();
     }
 }
+输出结果:
+黑马
+程序员
 ```
 
-> API中说明：delete方法，如果此File表示目录，则目录必须为空才能删除。
-
-## 2.4 目录的遍历
-
-- `public String[] list()` ：返回一个String数组，表示该File目录中的所有子文件或目录。
-- `public File[] listFiles()` ：返回一个File数组，表示该File目录中的所有的子文件或目录。  
-
-```java
-public class FileFor {
-    public static void main(String[] args) {
-        File dir = new File("d:\\java_code");
-      
-      	//获取当前目录下的文件以及文件夹的名称。
-		String[] names = dir.list();
-		for(String name : names){
-			System.out.println(name);
-		}
-        //获取当前目录下的文件以及文件夹对象，只要拿到了文件对象，那么就可以获取更多信息
-        File[] files = dir.listFiles();
-        for (File file : files) {
-            System.out.println(file);
-        }
-    }
-}
-```
-
-> 小贴士：
+> 小贴士：字符流，只能操作文本文件，不能操作图片，视频等非文本文件。
 >
-> 调用listFiles方法的File对象，表示的必须是实际存在的目录，否则返回null，无法进行遍历。
+> 当我们单纯读或者写文本文件时  使用字符流 其他情况使用字节流
 
-## 2.5 综合练习
+# 4. IO异常的处理
 
-#### 练习1：创建文件夹
+### JDK7前处理
 
-​	在当前模块下的aaa文件夹中创建一个a.txt文件
+之前的入门练习，我们一直把异常抛出，而实际开发中并不能这样处理，建议使用`try...catch...finally` 代码块，处理异常部分，代码使用演示：
 
-代码实现：
-
-```java
-public class Test1 {
-    public static void main(String[] args) throws IOException {
-        //需求：在当前模块下的aaa文件夹中创建一个a.txt文件
-
-        //1.创建a.txt的父级路径
-        File file = new File("myfile\\aaa");
-        //2.创建父级路径
-        //如果aaa是存在的，那么此时创建失败的。
-        //如果aaa是不存在的，那么此时创建成功的。
-        file.mkdirs();
-        //3.拼接父级路径和子级路径
-        File src = new File(file,"a.txt");
-        boolean b = src.createNewFile();
-        if(b){
-            System.out.println("创建成功");
-        }else{
-            System.out.println("创建失败");
-        }
-    }
-}
-```
-
-#### 练习2：查找文件（不考虑子文件夹）
-
-​	定义一个方法找某一个文件夹中，是否有以avi结尾的电影（暂时不需要考虑子文件夹）
-
-代码示例：
-
-```java
-public class Test2 {
+```java  
+public class HandleException1 {
     public static void main(String[] args) {
-        /*需求：
-             定义一个方法找某一个文件夹中，是否有以avi结尾的电影。
-	        （暂时不需要考虑子文件夹）
-        */
-
-        File file = new File("D:\\aaa\\bbb");
-        boolean b = haveAVI(file);
-        System.out.println(b);
-    }
-    /*
-    * 作用：用来找某一个文件夹中，是否有以avi结尾的电影
-    * 形参：要查找的文件夹
-    * 返回值：查找的结果  存在true  不存在false
-    * */
-    public static boolean haveAVI(File file){// D:\\aaa
-        //1.进入aaa文件夹，而且要获取里面所有的内容
-        File[] files = file.listFiles();
-        //2.遍历数组获取里面的每一个元素
-        for (File f : files) {
-            //f：依次表示aaa文件夹里面每一个文件或者文件夹的路径
-            if(f.isFile() && f.getName().endsWith(".avi")){
-                return true;
-            }
-        }
-        //3.如果循环结束之后还没有找到，直接返回false
-        return false;
-    }
-}
-```
-
-### 练习3：（考虑子文件夹）
-
-​	找到电脑中所有以avi结尾的电影。（需要考虑子文件夹）
-
-代码示例：
-
-```java
-public class Test3 {
-    public static void main(String[] args) {
-        /* 需求：
-        找到电脑中所有以avi结尾的电影。（需要考虑子文件夹）
-
-
-        套路：
-            1，进入文件夹
-            2，遍历数组
-            3，判断
-            4，判断
-
-        */
-
-        findAVI();
-
-    }
-
-    public static void findAVI(){
-        //获取本地所有的盘符
-        File[] arr = File.listRoots();
-        for (File f : arr) {
-            findAVI(f);
-        }
-    }
-
-    public static void findAVI(File src){//"C:\\
-        //1.进入文件夹src
-        File[] files = src.listFiles();
-        //2.遍历数组,依次得到src里面每一个文件或者文件夹
-        if(files != null){
-            for (File file : files) {
-                if(file.isFile()){
-                    //3，判断，如果是文件，就可以执行题目的业务逻辑
-                    String name = file.getName();
-                    if(name.endsWith(".avi")){
-                        System.out.println(file);
-                    }
-                }else{
-                    //4，判断，如果是文件夹，就可以递归
-                    //细节：再次调用本方法的时候，参数一定要是src的次一级路径
-                    findAVI(file);
+      	// 声明变量
+        FileWriter fw = null;
+        try {
+            //创建流对象
+            fw = new FileWriter("fw.txt");
+            // 写出数据
+            fw.write("黑马程序员"); //黑马程序员
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fw != null) {
+                    fw.close();
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 }
 ```
 
-### 练习4：删除多级文件夹
+### JDK7的处理(扩展知识点了解内容)
 
-需求： 如果我们要删除一个有内容的文件夹
-	   1.先删除文件夹里面所有的内容
-           2.再删除自己
+还可以使用JDK7优化后的`try-with-resource` 语句，该语句确保了每个资源在语句结束时关闭。所谓的资源（resource）是指在程序完成后，必须关闭的对象。
 
-代码示例：
+格式：
 
 ```java
-public class Test4 {
-    public static void main(String[] args) {
-        /*
-           删除一个多级文件夹
-           如果我们要删除一个有内容的文件夹
-           1.先删除文件夹里面所有的内容
-           2.再删除自己
-        */
+try (创建流对象语句，如果多个,使用';'隔开) {
+	// 读写数据
+} catch (IOException e) {
+	e.printStackTrace();
+}
+```
 
-        File file = new File("D:\\aaa\\src");
-        delete(file);
+代码使用演示：
+
+```java
+public class HandleException2 {
+    public static void main(String[] args) {
+      	// 创建流对象
+        try ( FileWriter fw = new FileWriter("fw.txt"); ) {
+            // 写出数据
+            fw.write("黑马程序员"); //黑马程序员
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+### JDK9的改进(扩展知识点了解内容)
+
+JDK9中`try-with-resource` 的改进，对于**引入对象**的方式，支持的更加简洁。被引入的对象，同样可以自动关闭，无需手动close，我们来了解一下格式。
+
+改进前格式：
+
+```java
+// 被final修饰的对象
+final Resource resource1 = new Resource("resource1");
+// 普通对象
+Resource resource2 = new Resource("resource2");
+// 引入方式：创建新的变量保存
+try (Resource r1 = resource1;
+     Resource r2 = resource2) {
+     // 使用对象
+}
+```
+
+改进后格式：
+
+```java
+// 被final修饰的对象
+final Resource resource1 = new Resource("resource1");
+// 普通对象
+Resource resource2 = new Resource("resource2");
+
+// 引入方式：直接引入
+try (resource1; resource2) {
+     // 使用对象
+}
+```
+
+改进后，代码使用演示：
+
+```java
+public class TryDemo {
+    public static void main(String[] args) throws IOException {
+       	// 创建流对象
+        final  FileReader fr  = new FileReader("in.txt");
+        FileWriter fw = new FileWriter("out.txt");
+       	// 引入到try中
+        try (fr; fw) {
+          	// 定义变量
+            int b;
+          	// 读取数据
+          	while ((b = fr.read())!=-1) {
+            	// 写出数据
+            	fw.write(b);
+          	}
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+# 5. 综合练习
+
+## 练习1：拷贝文件夹
+
+```java
+public class Test01 {
+    public static void main(String[] args) throws IOException {
+        //拷贝一个文件夹，考虑子文件夹
+
+        //1.创建对象表示数据源
+        File src = new File("D:\\aaa\\src");
+        //2.创建对象表示目的地
+        File dest = new File("D:\\aaa\\dest");
+
+        //3.调用方法开始拷贝
+        copydir(src,dest);
+
+
 
     }
 
     /*
-    * 作用：删除src文件夹
-    * 参数：要删除的文件夹
+    * 作用：拷贝文件夹
+    * 参数一：数据源
+    * 参数二：目的地
+    *
     * */
-    public static void delete(File src){
-        //1.先删除文件夹里面所有的内容
-        //进入src
+    private static void copydir(File src, File dest) throws IOException {
+        dest.mkdirs();
+        //递归
+        //1.进入数据源
         File[] files = src.listFiles();
-        //遍历
+        //2.遍历数组
         for (File file : files) {
-            //判断,如果是文件，删除
             if(file.isFile()){
-                file.delete();
+                //3.判断文件，拷贝
+                FileInputStream fis = new FileInputStream(file);
+                FileOutputStream fos = new FileOutputStream(new File(dest,file.getName()));
+                byte[] bytes = new byte[1024];
+                int len;
+                while((len = fis.read(bytes)) != -1){
+                    fos.write(bytes,0,len);
+                }
+                fos.close();
+                fis.close();
             }else {
-                //判断,如果是文件夹，就递归
-                delete(file);
+                //4.判断文件夹，递归
+                copydir(file, new File(dest,file.getName()));
             }
         }
-        //2.再删除自己
-        src.delete();
     }
 }
+
 ```
 
-### 练习5：统计大小
-
-​	需求：统计一个文件夹的总大小
-
-代码示例：
+## 练习2：文件加密
 
 ```java
-public class Test5 {
-    public static void main(String[] args) {
-       /*需求：
-            统计一个文件夹的总大小
-      */
-
-
-        File file = new File("D:\\aaa\\src");
-
-        long len = getLen(file);
-        System.out.println(len);//4919189
-    }
-
-    /*
-    * 作用：
-    *       统计一个文件夹的总大小
-    * 参数：
-    *       表示要统计的那个文件夹
-    * 返回值：
-    *       统计之后的结果
-    *
-    * 文件夹的总大小：
-    *       说白了，文件夹里面所有文件的大小
-    * */
-    public static long getLen(File src){
-        //1.定义变量进行累加
-        long len = 0;
-        //2.进入src文件夹
-        File[] files = src.listFiles();
-        //3.遍历数组
-        for (File file : files) {
-            //4.判断
-            if(file.isFile()){
-                //我们就把当前文件的大小累加到len当中
-                len = len + file.length();
-            }else{
-                //判断，如果是文件夹就递归
-                len = len + getLen(file);
-            }
-        }
-        return len;
-    }
-}
-```
-
-### 练习6：统计文件个数
-
-  需求：统计一个文件夹中每种文件的个数并打印。（考虑子文件夹）
-            打印格式如下：
-            txt:3个
-            doc:4个
-            jpg:6个
-
-代码示例：
-
-```java
-public class Test6 {
+public class Test02 {
     public static void main(String[] args) throws IOException {
         /*
-            需求：统计一个文件夹中每种文件的个数并打印。（考虑子文件夹）
-            打印格式如下：
-            txt:3个
-            doc:4个
-            jpg:6个
+            为了保证文件的安全性，就需要对原始文件进行加密存储，再使用的时候再对其进行解密处理。
+            加密原理：
+                对原始文件中的每一个字节数据进行更改，然后将更改以后的数据存储到新的文件中。
+            解密原理：
+                读取加密之后的文件，按照加密的规则反向操作，变成原始文件。
+
+             ^ : 异或
+                 两边相同：false
+                 两边不同：true
+
+                 0：false
+                 1：true
+
+               100:1100100
+               10: 1010
+
+               1100100
+             ^ 0001010
+             __________
+               1101110
+             ^ 0001010
+             __________
+               1100100
+
         */
-        File file = new File("D:\\aaa\\src");
-        HashMap<String, Integer> hm = getCount(file);
-        System.out.println(hm);
     }
 
-    /*
-    * 作用：
-    *       统计一个文件夹中每种文件的个数
-    * 参数：
-    *       要统计的那个文件夹
-    * 返回值：
-    *       用来统计map集合
-    *       键：后缀名 值：次数
-    *
-    *       a.txt
-    *       a.a.txt
-    *       aaa（不需要统计的）
-    *
-    *
-    * */
-    public static HashMap<String,Integer> getCount(File src){
-        //1.定义集合用来统计
-        HashMap<String,Integer> hm = new HashMap<>();
-        //2.进入src文件夹
-        File[] files = src.listFiles();
-        //3.遍历数组
-        for (File file : files) {
-            //4.判断，如果是文件，统计
-            if(file.isFile()){
-                //a.txt
-                String name = file.getName();
-                String[] arr = name.split("\\.");
-                if(arr.length >= 2){
-                    String endName = arr[arr.length - 1];
-                    if(hm.containsKey(endName)){
-                        //存在
-                        int count = hm.get(endName);
-                        count++;
-                        hm.put(endName,count);
-                    }else{
-                        //不存在
-                        hm.put(endName,1);
-                    }
-                }
+    public static void encryptionAndReduction(File src, File dest) throws IOException {
+        FileInputStream fis = new FileInputStream(src);
+        FileOutputStream fos = new FileOutputStream(dest);
+        int b;
+        while ((b = fis.read()) != -1) {
+            fos.write(b ^ 2);
+        }
+        //4.释放资源
+        fos.close();
+        fis.close();
+    }
+
+
+}
+
+```
+
+## 练习3：数字排序
+
+文本文件中有以下的数据：
+                2-1-9-4-7-8
+ 将文件中的数据进行排序，变成以下的数据：
+                1-2-4-7-8-9
+
+实现方式一：
+
+```java
+public class Test03 {
+    public static void main(String[] args) throws IOException {
+        /*
+            文本文件中有以下的数据：
+                2-1-9-4-7-8
+            将文件中的数据进行排序，变成以下的数据：
+                1-2-4-7-8-9
+        */
+
+
+        //1.读取数据
+        FileReader fr = new FileReader("myio\\a.txt");
+        StringBuilder sb = new StringBuilder();
+        int ch;
+        while((ch = fr.read()) != -1){
+            sb.append((char)ch);
+        }
+        fr.close();
+        System.out.println(sb);
+        //2.排序
+        String str = sb.toString();
+        String[] arrStr = str.split("-");//2-1-9-4-7-8
+
+        ArrayList<Integer> list = new ArrayList<>();
+        for (String s : arrStr) {
+            int i = Integer.parseInt(s);
+            list.add(i);
+        }
+        Collections.sort(list);
+        System.out.println(list);
+        //3.写出
+        FileWriter fw = new FileWriter("myio\\a.txt");
+        for (int i = 0; i < list.size(); i++) {
+            if(i == list.size() - 1){
+                fw.write(list.get(i) + "");
             }else{
-                //5.判断，如果是文件夹，递归
-                //sonMap里面是子文件中每一种文件的个数
-                HashMap<String, Integer> sonMap = getCount(file);
-                //hm:  txt=1  jpg=2  doc=3
-                //sonMap: txt=3 jpg=1
-                //遍历sonMap把里面的值累加到hm当中
-                Set<Map.Entry<String, Integer>> entries = sonMap.entrySet();
-                for (Map.Entry<String, Integer> entry : entries) {
-                    String key = entry.getKey();
-                    int value = entry.getValue();
-                    if(hm.containsKey(key)){
-                        //存在
-                        int count = hm.get(key);
-                        count = count + value;
-                        hm.put(key,count);
-                    }else{
-                        //不存在
-                        hm.put(key,value);
-                    }
-                }
+                fw.write(list.get(i) + "-");
             }
         }
-        return hm;
+        fw.close();
     }
 }
 ```
+
+实现方式二：
+
+```java
+public class Test04 {
+    public static void main(String[] args) throws IOException {
+        /*
+            文本文件中有以下的数据：
+                2-1-9-4-7-8
+            将文件中的数据进行排序，变成以下的数据：
+                1-2-4-7-8-9
+
+           细节1：
+                文件中的数据不要换行
+
+            细节2:
+                bom头
+        */
+        //1.读取数据
+        FileReader fr = new FileReader("myio\\a.txt");
+        StringBuilder sb = new StringBuilder();
+        int ch;
+        while((ch = fr.read()) != -1){
+            sb.append((char)ch);
+        }
+        fr.close();
+        System.out.println(sb);
+        //2.排序
+        Integer[] arr = Arrays.stream(sb.toString()
+                                      .split("-"))
+            .map(Integer::parseInt)
+            .sorted()
+            .toArray(Integer[]::new);
+        //3.写出
+        FileWriter fw = new FileWriter("myio\\a.txt");
+        String s = Arrays.toString(arr).replace(", ","-");
+        String result = s.substring(1, s.length() - 1);
+        fw.write(result);
+        fw.close();
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+
 
 
 
