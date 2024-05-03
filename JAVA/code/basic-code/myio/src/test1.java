@@ -15,7 +15,7 @@ public class test1 {
             for (File file : files) {
                 if (file.isFile()) {
                     FileInputStream fis = new FileInputStream("");
-                    FileOutputStream fos = new FileOutputStream("拷贝的目的地");
+                    FileOutputStream fos = new FileOutputStream(new File("拷贝的目的地", file.getName()));
                     byte[] bytes = new byte[1024 * 1024 * 5];
                     int len;
                     while ((len = fis.read(bytes)) != -1) {
