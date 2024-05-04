@@ -34592,7 +34592,7 @@ Object u2 = u1.clone();
 
 <img src="./assets/image-20240421211436421.png" alt="image-20240421211436421" style="zoom:67%;" />
 
-由于现在帮我们克隆出来的对象是一个用户对象，因此我们还需要来做一个强转。
+由于现在帮我们克隆出来的对象是printf一个用户对象，因此我们还需要来做一个强转。
 
 ~~~java
 User u2 = (User)u1.clone();

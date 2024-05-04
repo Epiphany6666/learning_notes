@@ -11857,205 +11857,260 @@ ois.close();
 
 首先来看一下 `打印流` 在IO流体系中的位置。
 
-`打印流` 属于高级流，也是用来
+`打印流` 属于高级流，也是用来包装基本流的，但是打印流不能读，只能写，因此打印流只有输出流。
+
+<img src="./assets/image-20240504191452991.png" alt="image-20240504191452991" style="zoom:40%;" />
+
+打印流分为两种：`PrintStream(字节打印流)`、`PrintWriter(字符打印流)` 两个类。
+
+特点1：打印流只能操作文件目的地，不能操作数据源。
+
+因此打印流只有写，没有读。
+
+特点2：打印流里面有**特有的写出方法**，可以实现数据原样写出。
+
+例如 打印： 97，文件中：97。打印：true，文件中：true
+
+特点3：**特有的写出方法**，可以实现自动刷新，自动换行。
+
+所以打印流打印一次数据 = 写出 + 换行 + 刷新
+
+那打印流的代码我们该怎么写呢？首先来看字节打印流。
+
+----
+
+# 字节打印流
+
+## 一、构造方法
+
+创建对象首先要来看它的构造方法。
+
+我们可以去包装基本流，也可以直接去关联文件的目的地。
+
+但是我们要知道，就算传递的是字符串，或者是字符串所表示的路径在方法的底层它也会根据我们传递的路径去创建一个字节流的基本流 `FileOutputStream`。
+
+![image-20240504205508256](./assets/image-20240504205508256.png)
+
+在创建字节打印流的时候，我们还能指定字符编码。
+
+这种方式指定字符编码不能传递字符串，只能使用 `Charset.forName()` 指定。
+
+![image-20240504205531022](./assets/image-20240504205531022.png)
+
+第三种构造，在写出数据的时候，可以设置自动刷新。
+
+![image-20240504210359099](./assets/image-20240504210359099.png)
+
+第四种构造就是将上面的两个构造综合起来了。
+
+如果没有指定字符编码，默认使用平台默认的字符编码，IDEA默认是 `UTF-8`，因此如果你不写，默认就是 `UTF-8`。
+
+这种方式指定字符编码是可以写字符串的。
+
+![image-20240504210608522](./assets/image-20240504210608522.png)
+
+但是字节打印流的底层是没有缓冲区的，因此开不开自动刷新都是一样的，所有的数据都会直接写到文件的目的地。
+
+因此字节打印流我们真正关心的应该就是上面的两个构造。
+
+----
+
+## 二、成员方法
+
+`write方法` 不是特有的，而是常规方法，既然是常规方法，那么它在write数据的时候，规则跟之前一样的。
+
+例如小括号中写 `97`，那么真正写到文件目的地的是 `97` 在字符编码上所对应的字符 `a`，并且 `write方法` 是不能自动换行的，如果想换行还需要写 `\r\n`。
+
+![image-20240504211203010](./assets/image-20240504211203010.png)
+
+下面的三个成员方法就是特有的方法。
+
+`println` 可以打印任意类型的数据，而且这个方法是可以自动刷新，自动换行。
+
+![image-20240504211525210](./assets/image-20240504211525210.png)
+
+`print` 可以打印任意的数据，但是这个方法不换行。
+
+<img src="./assets/image-20240504211721404.png" alt="image-20240504211721404" style="zoom:67%;" />
+
+`printf` 是一个带有占位符的打印语句，这个方法也是不换行的。
+
+![image-20240504211736869](./assets/image-20240504211736869.png)
+
+但由于后面三个都是特有的方法，可以实现数据原样写出。
+
+----
+
+## 三、代码示例
+
+其中的 `csn` 其实也代表字符编码
+
+<img src="./assets/image-20240504213651116.png" alt="image-20240504213651116" style="zoom:67%;" />
+
+~~~java
+//1.创建字节打印流的对象
+PrintStream ps = new PrintStream(new FileOutputStream("myio\\a.txt"), true, Charset.forName("UTF-8"));
+//2.写出数据
+ps.println(97);//写出 + 自动刷新 + 自动换行 // 数据的原样写出
+ps.print(true);
+ps.println();
+ps.printf("%s爱上了%s","阿珍","阿强");
+//3.释放资源
+ps.close();
+~~~
+
+`%s` 是字符串的占位符，其实它还有很多很多
+
+~~~java
+PrintStream ps = new PrintStream("a.txt");
+
+//%n表示换行
+ps.printf("我叫%s %n", "阿玮");
+ps.printf("%s喜欢%s %n", "阿珍", "阿强");
+ps.printf("字母H的大写：%c %n", 'H'); // %c可以把字符变成大写
+ps.printf("8>3的结果是：%b %n", 8 > 3); // %b 是一个布尔类型的占位符，将8 > 3插在%b的地方
+ps.printf("100的一半是：%d %n", 100 / 2); //%d 是一个整数占位符
+ps.printf("100的16进制数是：%x %n", 100);
+ps.printf("100的8进制数是：%o %n", 100);
+ps.printf("50元的书打8.5折扣是：%f元%n", 50 * 0.85);
+ps.printf("计算的结果转16进制：%a %n", 50 * 0.85);
+ps.printf("计算的结果转科学计数法表示：%e %n", 50 * 0.85);
+ps.printf("计算的结果转成指数和浮点数，结果的长度较短的是：%g %n", 50 * 0.85);
+ps.printf("带有百分号的符号表示法，以百分之85为例：%d%% %n", 85);
+ps.println("---------------------");
+
+double num1 = 1.0;
+ps.printf("num: %.4g %n", num1);
+ps.printf("num: %.5g %n", num1);
+ps.printf("num: %.6g %n", num1);
+
+float num2 = 1.0F;
+ps.printf("num: %.4f %n", num2);
+ps.printf("num: %.5f %n", num2);
+ps.printf("num: %.6f %n", num2);
+ps.println("---------------------");
+
+ps.printf("数字前面带有0的表示方式：%03d %n", 7);
+ps.printf("数字前面带有0的表示方式：%04d %n", 7);
+ps.printf("数字前面带有空格的表示方式：% 8d %n", 7);
+ps.printf("整数分组的效果是：%,d %n", 9989997);
+ps.println("---------------------");
+
+//最终结果是10位，小数点后面是5位，不够在前面补空格，补满10位
+//如果实际数字小数点后面过长，但是只规定两位，会四舍五入
+//如果整数部分过长，超出规定的总长度，会以实际为准
+ps.printf("一本书的价格是：%2.5f元%n", 49.8);
+ps.printf("%(f%n", -76.04);
+
+//%f，默认小数点后面7位，
+//<，表示采取跟前面一样的内容
+ps.printf("%f和%3.2f %n", 86.04, 1.789651);
+ps.printf("%f和%<3.2f %n", 86.04, 1.789651);
+ps.println("---------------------");
+
+Date date = new Date();
+// %t 表示时间，但是不能单独出现，要指定时间的格式
+// %tc 周二 12月 06 22:08:40 CST 2022
+// %tD 斜线隔开
+// %tF 冒号隔开（12小时制）
+// %tr 冒号隔开（24小时制）
+// %tT 冒号隔开（24小时制，带时分秒）
+ps.printf("全部日期和时间信息：%tc %n", date);
+ps.printf("月/日/年格式：%tD %n", date);
+ps.printf("年-月-日格式：%tF %n", date);
+ps.printf("HH:MM:SS PM格式(12时制)：%tr %n", date);
+ps.printf("HH:MM格式(24时制)：%tR %n", date);
+ps.printf("HH:MM:SS格式(24时制)：%tT %n", date);
+
+System.out.println("---------------------");
+ps.printf("星期的简称：%ta %n", date);
+ps.printf("星期的全称：%tA %n", date);
+ps.printf("英文月份简称：%tb %n", date);
+ps.printf("英文月份全称：%tB %n", date);
+ps.printf("年的前两位数字(不足两位前面补0)：%tC %n", date);
+ps.printf("年的后两位数字(不足两位前面补0)：%ty %n", date);
+ps.printf("一年中的第几天：%tj %n", date);
+ps.printf("两位数字的月份(不足两位前面补0)：%tm %n", date);
+ps.printf("两位数字的日(不足两位前面补0)：%td %n", date);
+ps.printf("月份的日(前面不补0)：%te  %n", date);
+
+System.out.println("---------------------");
+ps.printf("两位数字24时制的小时(不足2位前面补0):%tH %n", date);
+ps.printf("两位数字12时制的小时(不足2位前面补0):%tI %n", date);
+ps.printf("两位数字24时制的小时(前面不补0):%tk %n", date);
+ps.printf("两位数字12时制的小时(前面不补0):%tl %n", date);
+ps.printf("两位数字的分钟(不足2位前面补0):%tM %n", date);
+ps.printf("两位数字的秒(不足2位前面补0):%tS %n", date);
+ps.printf("三位数字的毫秒(不足3位前面补0):%tL %n", date);
+ps.printf("九位数字的毫秒数(不足9位前面补0):%tN %n", date);
+ps.printf("小写字母的上午或下午标记(英)：%tp %n", date);
+ps.printf("小写字母的上午或下午标记(中)：%tp %n", date);
+ps.printf("相对于GMT的偏移量:%tz %n", date);
+ps.printf("时区缩写字符串:%tZ%n", date);
+ps.printf("1970-1-1 00:00:00 到现在所经过的秒数：%ts %n", date);
+ps.printf("1970-1-1 00:00:00 到现在所经过的毫秒数：%tQ %n", date);
+
+ps.close();
+~~~
+
+
+
+---
+
+# 112.字符打印流
+
+## 一、前言
+
+字符打印流和字节打印流两者是非常类似的。
+
+<img src="./assets/image-20240504215214027.png" alt="image-20240504215214027" style="zoom:30%;" />
+
+只不过字符打印流底层多了一个缓冲区，因此字符打印流效率更高一些。
+
+并且在写出数据的时候，如果想要自动刷新，那么必须要手动开启。
+
+想要学习一个类，首先还是要看它的构造方法
+
+----
+
+## 二、构造方法
+
+构造方法其实跟字节打印流是一样的。
+
+![image-20240504215427571](./assets/image-20240504215427571.png)
+
+因此关于字符打印流我们只需要记住：字符流底层有缓冲区，想要自动刷新需要手动开启。
+
+---
+
+## 三、成员方法
+
+成员方法基本上也一模一样
+
+<img src="./assets/image-20240504215534231.png" alt="image-20240504215534231" style="zoom:80%;" />
+
+----
+
+## 四、代码示例
+
+字符打印流的构造方法还是比较多的，但我们可以将这些构造方法分为三组。
+
+第一组：参数都是关联基本流的，可以关联字符输出流，也可以关联字节输入流。在第一组中是可以开启自动刷新的，因为它有 `autoFlush参数`。它还可以指定 `字符编码`。
+
+第二组：第一个参数是一个字符串类型所表示的文件路径，第二组构造中是不能开始自动刷新的，但是它可以指定字符编码。
+
+剩下来的就是第三组，在第三组中，第一个参数是 `File` 所表示的路径，而且在第三组中也无法开启自动刷新。
+
+因此在以后我们真正最常用的其实还是第一组中的两个构造。
+
+~~~java
+~~~
 
 
 
 
 
-看图理解序列化： 
 
-## 3.2 ObjectOutputStream类
-
-`java.io.ObjectOutputStream ` 类，将Java对象的原始数据类型写出到文件,实现对象的持久存储。
-
-### 构造方法
-
-* `public ObjectOutputStream(OutputStream out) `： 创建一个指定OutputStream的ObjectOutputStream。
-
-构造举例，代码如下：  
-
-```java
-FileOutputStream fileOut = new FileOutputStream("employee.txt");
-ObjectOutputStream out = new ObjectOutputStream(fileOut);
-```
-
-### 序列化操作
-
-1. 一个对象要想序列化，必须满足两个条件:
-
-* 该类必须实现`java.io.Serializable ` 接口，`Serializable` 是一个标记接口，不实现此接口的类将不会使任何状态序列化或反序列化，会抛出`NotSerializableException` 。
-* 该类的所有属性必须是可序列化的。如果有一个属性不需要可序列化的，则该属性必须注明是瞬态的，使用`transient` 关键字修饰。
-
-```java
-public class Employee implements java.io.Serializable {
-    public String name;
-    public String address;
-    public transient int age; // transient瞬态修饰成员,不会被序列化
-    public void addressCheck() {
-      	System.out.println("Address  check : " + name + " -- " + address);
-    }
-}
-```
-
-2.写出对象方法
-
-* `public final void writeObject (Object obj)` : 将指定的对象写出。
-
-```java
-public class SerializeDemo{
-   	public static void main(String [] args)   {
-    	Employee e = new Employee();
-    	e.name = "zhangsan";
-    	e.address = "beiqinglu";
-    	e.age = 20; 
-    	try {
-      		// 创建序列化流对象
-          ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("employee.txt"));
-        	// 写出对象
-        	out.writeObject(e);
-        	// 释放资源
-        	out.close();
-        	fileOut.close();
-        	System.out.println("Serialized data is saved"); // 姓名，地址被序列化，年龄没有被序列化。
-        } catch(IOException i)   {
-            i.printStackTrace();
-        }
-   	}
-}
-输出结果：
-Serialized data is saved
-```
-
-## 3.3 ObjectInputStream类
-
-ObjectInputStream反序列化流，将之前使用ObjectOutputStream序列化的原始数据恢复为对象。 
-
-### 构造方法
-
-* `public ObjectInputStream(InputStream in) `： 创建一个指定InputStream的ObjectInputStream。
-
-### 反序列化操作1
-
-如果能找到一个对象的class文件，我们可以进行反序列化操作，调用`ObjectInputStream`读取对象的方法：
-
-- `public final Object readObject ()` : 读取一个对象。
-
-```java
-public class DeserializeDemo {
-   public static void main(String [] args)   {
-        Employee e = null;
-        try {		
-             // 创建反序列化流
-             FileInputStream fileIn = new FileInputStream("employee.txt");
-             ObjectInputStream in = new ObjectInputStream(fileIn);
-             // 读取一个对象
-             e = (Employee) in.readObject();
-             // 释放资源
-             in.close();
-             fileIn.close();
-        }catch(IOException i) {
-             // 捕获其他异常
-             i.printStackTrace();
-             return;
-        }catch(ClassNotFoundException c)  {
-        	// 捕获类找不到异常
-             System.out.println("Employee class not found");
-             c.printStackTrace();
-             return;
-        }
-        // 无异常,直接打印输出
-        System.out.println("Name: " + e.name);	// zhangsan
-        System.out.println("Address: " + e.address); // beiqinglu
-        System.out.println("age: " + e.age); // 0
-    }
-}
-```
-
-**对于JVM可以反序列化对象，它必须是能够找到class文件的类。如果找不到该类的class文件，则抛出一个 `ClassNotFoundException` 异常。**  
-
-### **反序列化操作2**
-
-**另外，当JVM反序列化对象时，能找到class文件，但是class文件在序列化对象之后发生了修改，那么反序列化操作也会失败，抛出一个`InvalidClassException`异常。**发生这个异常的原因如下：
-
-* 该类的序列版本号与从流中读取的类描述符的版本号不匹配 
-* 该类包含未知数据类型 
-* 该类没有可访问的无参数构造方法 
-
-`Serializable` 接口给需要序列化的类，提供了一个序列版本号。`serialVersionUID` 该版本号的目的在于验证序列化的对象和对应类是否版本匹配。
-
-```java
-public class Employee implements java.io.Serializable {
-     // 加入序列版本号
-     private static final long serialVersionUID = 1L;
-     public String name;
-     public String address;
-     // 添加新的属性 ,重新编译, 可以反序列化,该属性赋为默认值.
-     public int eid; 
-
-     public void addressCheck() {
-         System.out.println("Address  check : " + name + " -- " + address);
-     }
-}
-```
-
-
-
-## 3.4 练习：序列化集合
-
-1. 将存有多个自定义对象的集合序列化操作，保存到`list.txt`文件中。
-2. 反序列化`list.txt` ，并遍历集合，打印对象信息。
-
-### 案例分析
-
-1. 把若干学生对象 ，保存到集合中。
-2. 把集合序列化。
-3. 反序列化读取时，只需要读取一次，转换为集合类型。
-4. 遍历集合，可以打印所有的学生信息
-
-### 案例实现
-
-```java
-public class SerTest {
-	public static void main(String[] args) throws Exception {
-		// 创建 学生对象
-		Student student = new Student("老王", "laow");
-		Student student2 = new Student("老张", "laoz");
-		Student student3 = new Student("老李", "laol");
-
-		ArrayList<Student> arrayList = new ArrayList<>();
-		arrayList.add(student);
-		arrayList.add(student2);
-		arrayList.add(student3);
-		// 序列化操作
-		// serializ(arrayList);
-		
-		// 反序列化  
-		ObjectInputStream ois  = new ObjectInputStream(new FileInputStream("list.txt"));
-		// 读取对象,强转为ArrayList类型
-		ArrayList<Student> list  = (ArrayList<Student>)ois.readObject();
-		
-      	for (int i = 0; i < list.size(); i++ ){
-          	Student s = list.get(i);
-        	System.out.println(s.getName()+"--"+ s.getPwd());
-      	}
-	}
-
-	private static void serializ(ArrayList<Student> arrayList) throws Exception {
-		// 创建 序列化流 
-		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("list.txt"));
-		// 写出对象
-		oos.writeObject(arrayList);
-		// 释放资源
-		oos.close();
-	}
-}
-```
-
-
-#  4. 打印流
-
-## 4.1 概述
 
 平时我们在控制台打印输出，是调用`print`方法和`println`方法完成的，这两个方法都来自于`java.io.PrintStream`类，该类能够方便地打印各种数据类型的值，是一种便捷的输出方式。
 
