@@ -1,3 +1,5 @@
+package mybytesstream;
+
 public class test2 {
     /**
      * 为了保证文件的安全性，就需要对原始文件进行加密存储，再使用的时候再对其进行解密处理。

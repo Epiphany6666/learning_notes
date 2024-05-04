@@ -1,3 +1,5 @@
+package mybytesstream;
+
 import java.io.*;
 
 public class test1 {

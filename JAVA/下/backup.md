@@ -1830,6 +1830,8 @@ System.out.println(list); // [qwer, 1234, bcd, qwer, abc, df, zxcv, asdf]，每�
 
 其他方法示例
 
+这里的 `sort方法` 跟 `Arrays.sort()` 排序规则是一样的。
+
 ~~~java
 System.out.println("-------------sort默认规则--------------------------");
 //默认规则，需要重写Comparable接口compareTo方法。Integer已经实现，按照从小打大的顺序排列
@@ -7883,6 +7885,8 @@ public static HashMap<String,Integer> getCount(File src){
 
 # 字节输出流
 
+一切文件数据（文本、图片、视频等）在存储时，都是以二进制数字的形式保存，都一个一个的字节，那么传输时一样如此。所以，字节流可以传输任意文件数据。在操作流的时候，我们要时刻明确，无论使用什么样的流对象，底层传输的始终为二进制数据。
+
 ## 一、介绍
 
 `FileOutputStream`：操作本地文件的字节输出流，可以把程序中的数据写到本地文件中。
@@ -8933,7 +8937,9 @@ public static void main(String[] args) throws FileNotFoundException {
 
 ----
 
-## 一、回顾
+## 一、前要知识
+
+### 1）计算机存储规则
 
 在计算机中，任意的数据都是以二进制的形式来存储的。
 
@@ -8941,11 +8947,63 @@ public static void main(String[] args) throws FileNotFoundException {
 
 其中一个 `0` 或者一个 `1` 我们会叫做一个 `bit`，中文叫做 `比特位`。
 
+一切文件数据（文本、图片、视频等）在存储时，都是以二进制数字的形式保存，都一个一个的字节，那么传输时一样如此。所以，字节流可以传输任意文件数据。在操作流的时候，我们要时刻明确，无论使用什么样的流对象，底层传输的始终为二进制数据。
+
 但是一个 `bit` 能存储的东西太少了，我们会把 `8个bit` 分为一组，这样就可以存储 `2的8次方`，一共 `256` 个数据，我们将它称之为一个 `字节`，而一个字节是我们计算机中最小的存储单元。
 
 <img src="./assets/image-20240503071133140.png" alt="image-20240503071133140" style="zoom:57%;" />
 
 计算机在存储英文的时候，只要一个字节就行了，为什么呢？这就跟今天要学习的字符集相关了。
+
+----
+
+### 2）字符编码
+
+计算机中储存的信息都是用二进制数表示的，而我们在屏幕上看到的数字、英文、标点符号、汉字等字符是二进制数转换之后的结果。按照某种规则，将字符存储到计算机中，称为**编码** 。
+
+反之，将存储在计算机中的二进制数按照某种规则解析显示出来，称为**解码** 。
+
+比如说，按照A规则存储，同样按照A规则解析，那么就能显示正确的文本符号。反之，按照A规则存储，再按照B规则解析，就会导致乱码现象。
+
+编码：字符(能看懂的) --> 字节(看不懂的)
+
+解码：字节(看不懂的) --> 字符(能看懂的)
+
+**字符编码`Character Encoding`** : 就是一套自然语言的字符与二进制数之间的对应规则。
+
+编码表:生活中文字和计算机中二进制的对应规则
+
+----
+
+### 3）字符集
+
+**字符集 `Charset`**：也叫编码表。是一个系统支持的所有字符的集合，包括各国家文字、标点符号、图形符号、数字等。
+
+计算机要准确的存储和识别各种字符集符号，需要进行字符编码，一套字符集必然至少有一套字符编码。常见字符集有ASCII字符集、GBK字符集、Unicode字符集等。![](./assets/1_charset-1714792935222-1.jpg)
+
+可见，当指定了**编码**，它所对应的**字符集**自然就指定了，所以**编码**才是我们最终要关心的。
+
+* **ASCII字符集** ：
+  * ASCII（American Standard Code for Information Interchange，美国信息交换标准代码）是基于拉丁字母的一套电脑编码系统，用于显示现代英语，主要包括控制字符（回车键、退格、换行键等）和可显示字符（英文大小写字符、阿拉伯数字和西文符号）。
+  * 基本的ASCII字符集，使用7位（bits）表示一个字符，共128字符。ASCII的扩展字符集使用8位（bits）表示一个字符，共256字符，方便支持欧洲常用字符。
+* **ISO-8859-1字符集**：
+  * 拉丁码表，别名Latin-1，用于显示欧洲使用的语言，包括荷兰、丹麦、德语、意大利语、西班牙语等。
+  * ISO-8859-1使用单字节编码，兼容ASCII编码。
+* **GBxxx字符集**：
+  * GB就是国标（国家标准）的意思，是为了显示中文而设计的一套字符集。
+  * **GB2312**：简体中文码表。一个小于127的字符的意义与原来相同。但两个大于127的字符连在一起时，就表示一个汉字，这样大约可以组合了包含7000多个简体汉字，此外数学符号、罗马希腊的字母、日文的假名们都编进去了，连在ASCII里本来就有的数字、标点、字母都统统重新编了两个字节长的编码，这就是常说的"全角"字符，而原来在127号以下的那些就叫"半角"字符了。
+  * **GBK**：最常用的中文码表。是在GB2312标准基础上的扩展规范，使用了双字节编码方案，共收录了21003个汉字，完全兼容GB2312标准，同时支持繁体汉字以及日韩汉字等。
+  * **GB18030**：最新的中文码表。收录汉字70244个，采用多字节编码，每个字可以由1个、2个或4个字节组成。支持中国国内少数民族的文字，同时支持繁体汉字以及日韩汉字等。
+* **Unicode字符集** ：
+  * Unicode编码系统为表达任意语言的任意字符而设计，是业界的一种标准，也称为统一码、标准万国码。
+  * 它最多使用4个字节的数字来表达每个字母、符号，或者文字。有三种编码方案，UTF-8、UTF-16和UTF-32。最为常用的UTF-8编码。
+  * UTF-8编码，可以用来表示Unicode标准中任何字符，它是电子邮件、网页及其他存储或传送文字的应用中，优先采用的编码。互联网工程工作小组（IETF）要求所有互联网协议都必须支持UTF-8编码。所以，我们开发Web应用，也要使用UTF-8编码。它使用一至四个字节为每个字符编码，编码规则：
+    1. 128个US-ASCII字符，只需一个字节编码。
+    2. 拉丁文等字符，需要二个字节编码。 
+    3. 大部分常用字（含中文），使用三个字节编码。
+    4. 其他极少使用的Unicode辅助字符，使用四字节编码。
+
+
 
 ----
 
@@ -10572,207 +10630,269 @@ bis.close();
 
 <img src="./assets/image-20240503220010074.png" alt="image-20240503220010074" style="zoom:57%;" />
 
-当我们
+首先我们先来看创建对象，当创建了 `字节缓冲输入流` 对象的时候，在它里面还关联了基本流，这就表示真正从文件中读取数据的还是基本流 `FileInputStream`，它会从文件中读取数据再交给缓冲输入流，准确来说，是放到缓冲输入流的缓冲区中。
+
+因为缓冲区默认大小是 `8192`，所以它会一次性读取 `8192个字节`。
+
+再来看右边的输出流，它里面其实也关联了 `基本流`，这就表示真正将数据写到文件的还是基本流 `FileOutputStream`，它会将缓冲区的数据写到本地文件中。
+
+`字节缓冲输出流` 它的缓冲区默认大小也是 `8192`，所以它会一次性把缓冲区中 `8192个字节` 写到文件目的地。
+
+细节：`缓冲输入流` 里面有个缓冲区，`缓冲输出流` 里面也有一个缓冲区，这两个缓冲区不是同一个东西。
+
+<img src="./assets/image-20240504082728069.png" alt="image-20240504082728069" style="zoom:70%;" />
+
+对象创建完毕了，然后就是利用下面这段代码进行了循环的读写。
+
+首先定义了一个变量 `b`，那么在内存中就有了一个 `b`。
+
+然后再来执行 `read方法`，这个 `read方法` 是从左边的缓冲区里面进行读取的，读取一个字节放到变量 `b` 中。
+
+然后再去调用下面的 `write方法`，将读取到的字节再写到右边的缓冲区中。
+
+所以中间的 `变量b` ，它其实就做了一个倒手，在左右两边来回的倒腾数据，将左边缓冲区中的数据一个一个放到右边的缓冲区中。
+
+当右边的缓冲区填满了，就会利用基本流自动写到目的地。
+
+但如果 `变量b` 在缓冲区中读不到数据了，此时又需要从文件中读取 `8192个字节` 放到缓冲区中，再利用变量b再次倒手，当右边的缓冲区填满后，再去写到目的地。
+
+![image-20240504083039630](./assets/image-20240504083039630.png)
+
+由于中间这段都是在内存中进行的，而内存的运算速度是非常的快的，所以这个倒手的时间可以几乎忽略不计，它真正节约的是 `读和写` 的时候跟硬盘之间打交道的时间。
+
+如果你定义的是数组，那么就是一次倒手多个数据，倒手的速度会更快而已。
+
+![image-20240504083507805](./assets/image-20240504083507805.png)
 
 
 
+---
 
+# 101.字符缓冲流
 
-# 1. 缓冲流
+## 一、前言
 
-昨天学习了基本的一些流，作为IO流的入门，今天我们要见识一些更强大的流。比如能够高效读写的缓冲流，能够转换编码的转换流，能够持久化存储对象的序列化流等等。这些功能更为强大的流，都是在基本的流对象基础之上创建而来的，就像穿上铠甲的武士一样，相当于是对基本流对象的一种增强。
+<img src="./assets/image-20240504083643121.png" alt="image-20240504083643121" style="zoom:50%;" />
 
-## 1.1 概述
+`字符缓冲流` 也是自带 `长度为8193` 的缓冲区提高读写性能。
 
-缓冲流,也叫高效流，是对4个基本的`FileXxx` 流的增强，所以也是4个流，按照数据类型分类：
+之前我们已经学习了字符流的基本流，我们知道，基本流本身已经有缓冲区了。
 
-* **字节缓冲流**：`BufferedInputStream`，`BufferedOutputStream` 
-* **字符缓冲流**：`BufferedReader`，`BufferedWriter`
+所以现在所学习的 `字符缓冲流` 它提高的效率不是很明显，但是还是得学习，因为它们里面有两个非常好用的方法，在以后我们会经常用到，因此我们还是得要学习。
 
-缓冲流的基本原理，是在创建流对象时，会创建一个内置的默认大小的缓冲区数组，通过缓冲区读写，减少系统IO次数，从而提高读写的效率。
+----
 
-## 1.2 字节缓冲流
+## 二、字符缓冲流
 
-### 构造方法
+字符缓冲流其实也是对基本流进行了包装，书写代码的思路跟之前的字节缓冲流是一样的。
 
-* `public BufferedInputStream(InputStream in)` ：创建一个 新的缓冲输入流。 
-* `public BufferedOutputStream(OutputStream out)`： 创建一个新的缓冲输出流。
+<img src="./assets/image-20240504083922323.png" alt="image-20240504083922323" style="zoom:67%;" />
 
-构造举例，代码如下：
+唯一不一样的是它里面有两个特有的方法。
+
+`字符缓冲输入流特有的方法`：可以读一整行数据，遇到 `\r\n(回车换行)` 的时候才会停止。
+
+因此如果我们使用 `readLine()` 读取，那就是一行一行的读取数据，如果读到文件末尾了，没有数据可读了，方法会返回 `null`。
+
+<img src="./assets/image-20240504084053423.png" alt="image-20240504084053423" style="zoom:67%;" />
+
+`字符缓冲输出流特有的方法`：跨平台的换行。
+
+在之前我们写回车换行的时候，我们写的是 `\r\n`，但是这是不合理的，因为同样的代码如果放到 `Mac` 或者 `Linux` 操作系统中，它的运行结果就不一样，我们还要将代码去改一改，非常的麻烦。
+
+那么有了 `newLine()` ，就非常的方便了。方法的底层会先判断你是什么操作系统，如果你是 `Windows` 的操作系统，它就写出 `\r\n`；如果你是苹果的 `Mac`，它就写出 `\r`；如果你是 `Linux`，那就写出 `\n`。
+
+<img src="./assets/image-20240504084100613.png" alt="image-20240504084100613" style="zoom:67%;" />
+
+----
+
+## 三、`字符缓冲输入流` 代码实现
+
+`a.txt` 中的内容如下
+
+<img src="./assets/image-20240504085315149.png" alt="image-20240504085315149" style="zoom:80%;" />
+
+不使用 `readLine()` 也是可以读取的，但是需要将读取的字符一个一个拼接在一起，太麻烦了。
+
+使用 `readLine()` 就可以一次读一整行了。
 
 ```java
-// 创建字节缓冲输入流
-BufferedInputStream bis = new BufferedInputStream(new FileInputStream("bis.txt"));
-// 创建字节缓冲输出流
-BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("bos.txt"));
-```
+//1.创建字符缓冲输入流的对象
+BufferedReader br = new BufferedReader(new FileReader("myio\\a.txt"));
+//2.读取数据
+//细节：
+//readLine方法在读取的时候，一次读一整行，遇到回车换行结束，但是他不会把回车换行读到内存当中
+//如果将打印的ln删掉，那么它读取到的数据都会在同一行，因此在读取数据的时候需要加上ln手动换行
+String line1 = br.readLine();
+System.out.println(line1); // 我有一张1000万兰博基尼的30元优惠券
 
-### 效率测试
+String line2 = br.readLine();
+System.out.println(line2); // 但是兰博基尼太吵了
 
-查询API，缓冲流读写方法与基本的流是一致的，我们通过复制大文件（375MB），测试它的效率。
-
-1. 基本流，代码如下：
-
-```java
-public class BufferedDemo {
-    public static void main(String[] args) throws FileNotFoundException {
-        // 记录开始时间
-      	long start = System.currentTimeMillis();
-		// 创建流对象
-        try (
-        	FileInputStream fis = new FileInputStream("jdk9.exe");
-        	FileOutputStream fos = new FileOutputStream("copy.exe")
-        ){
-        	// 读写数据
-            int b;
-            while ((b = fis.read()) != -1) {
-                fos.write(b);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-		// 记录结束时间
-        long end = System.currentTimeMillis();
-        System.out.println("普通流复制时间:"+(end - start)+" 毫秒");
-    }
+// 将文件中所有东西读取
+String line;
+while ((( line = br.readLine()) != null)){
+    System.out.println(line); 
 }
 
-十几分钟过去了...
+//3.释放资源
+//同样在关流的时候我们同样也只需要关缓冲流就行了，它里面的FileReader可以不用关闭，因为缓冲流close()的底层它会帮我们把基本流进行关闭
+br.close();
 ```
 
-2. 缓冲流，代码如下：
+---
 
-```java
-public class BufferedDemo {
-    public static void main(String[] args) throws FileNotFoundException {
-        // 记录开始时间
-      	long start = System.currentTimeMillis();
-		// 创建流对象
-        try (
-        	BufferedInputStream bis = new BufferedInputStream(new FileInputStream("jdk9.exe"));
-	     BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("copy.exe"));
-        ){
-        // 读写数据
-            int b;
-            while ((b = bis.read()) != -1) {
-                bos.write(b);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-		// 记录结束时间
-        long end = System.currentTimeMillis();
-        System.out.println("缓冲流复制时间:"+(end - start)+" 毫秒");
-    }
+## 四、`字符缓冲输出流` 代码实现
+
+~~~java
+//1.创建字符缓冲输出流的对象
+//如果b.txt不存在，那么它会创建，规则跟之前的基本流是一样的
+//如果不想清空文件，可以开启续写，但要注意续写是FileReader的功能
+BufferedWriter bw = new BufferedWriter(new FileWriter("b.txt", true));
+//2.写出数据
+bw.write("123");
+//之前如果我们想要换行，都是下面这样写，但是这种写法不能跨平台
+//br.write("\r\n");
+bw.newLine();
+bw.write("456");
+bw.newLine();
+//3.释放资源
+bw.close();
+~~~
+
+----
+
+## 五、总结
+
+**1、缓冲流有几种？**
+
+- 字节缓冲输入流：BufferedInputStream
+- 字节缓冲输出流：BufferedOutputStream
+- 字符缓冲输入流：BufferedReader
+- 字符缓冲输出流：BufferedWriter
+
+----
+
+**2、缓冲流为什么能提高性能？**
+
+这个问题在有些课程中会说：缓冲流自带8KB缓冲区。
+
+这里的缓冲区它说的其实没错，但是8KB说的不对。
+
+因为字节缓冲流中，缓冲区是 `8192` 的字节数组，字节数组是 `8KB`。
+
+但是在字节缓冲流中，它的缓冲区是 `8192` 的字符数组。
+
+以 `BufferedReader` 为例，跟进，可以发现它会将`关联的基本流` 和 `defaultCharBufferSize` 传递给另外一个构造方法。
+
+<img src="./assets/image-20240504090744785.png" alt="image-20240504090744785" style="zoom:67%;" />
+
+`defaultCharBufferSize`：默认字符缓冲区长度，选中它跟进，可以看见它的长度默认 `8192`。
+
+<img src="./assets/image-20240504090808913.png" alt="image-20240504090808913" style="zoom:80%;" />
+
+<kbd>ctrl + alt + ←</kbd>，选中 `this` 跟进，看 `106行`，可以发现它创建的是长度为8192的 `字符数组`！
+
+在Java中，一个字符是两个字节，因此`字符缓冲流`底层的缓冲区大小为 `16KB`。
+
+因此上面那句话应该改为：**缓冲流自带长度为8192的缓冲区，`字节缓冲流` 它的缓冲区是 `byte类型` 的，长度是 `8KB`；`字符缓冲流` 它的类型是 `char类型` 的，长度为 `16KB`。**
+
+通过缓冲区可以显著提高字节流的读写性能。
+
+但是对应字符流提升不明显，因为字符流的基本流中，底层已经有了缓冲区了。
+
+但是字符缓冲流也是有意义的，因为它里面有两个特都有的方法。
+
+----
+
+**3、字符缓冲流两个特有的方法是什么？**
+
+- 字符缓冲输入流BufferedReader：`readLine()`
+- 字符缓冲输出流BufferedWriter：`newLine()`
+
+
+
+-----
+
+# 102.练习：四种拷贝方式效率对比
+
+PS：每次运行程序的用时可能是不一样的，因为在电脑中不仅仅有Java在运行，还有其他的软件。
+
+还有电脑性能不一样，用时也有可能是不一样的。
+
+~~~java
+public static void main(String[] args) throws IOException {
+    long start = System.currentTimeMillis();
+    //method1();
+    //method2();          //16.253秒
+    //method3();          //95.466秒，虽然也有缓冲区，但是它需要在两个缓冲区之间进行倒手，一个字节一个字节倒。又因为这个倒手是发生在字节中的，但文件太大了，因此也要浪费一点时间的。这就导致了第三种方式的性能反而降低了，低就低在倒手的时间上。
+    //method4();            //17.686秒
+    long end = System.currentTimeMillis();
+    // 注意在除的时候需要加上.0，否则结果只能是整数
+    System.out.println((end - start) / 1000.0 + "秒");
 }
 
-缓冲流复制时间:8016 毫秒
-```
 
-如何更快呢？
-
-使用数组的方式，代码如下：
-
-```java
-public class BufferedDemo {
-    public static void main(String[] args) throws FileNotFoundException {
-      	// 记录开始时间
-        long start = System.currentTimeMillis();
-		// 创建流对象
-        try (
-			BufferedInputStream bis = new BufferedInputStream(new FileInputStream("jdk9.exe"));
-		 BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("copy.exe"));
-        ){
-          	// 读写数据
-            int len;
-            byte[] bytes = new byte[8*1024];
-            while ((len = bis.read(bytes)) != -1) {
-                bos.write(bytes, 0 , len);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-		// 记录结束时间
-        long end = System.currentTimeMillis();
-        System.out.println("缓冲流使用数组复制时间:"+(end - start)+" 毫秒");
+//字节流的基本流：一次读写一个字节4,588,568,576 字节
+public static void method1() throws IOException {
+    FileInputStream fis = new FileInputStream("E:\\aaa\\CentOS-7-x86_64-DVD-1810.iso");
+    FileOutputStream fos = new FileOutputStream("myio\\copy.iso");
+    int b;
+    while ((b = fis.read()) != -1) {
+        fos.write(b);
     }
+    fos.close();
+    fis.close();
 }
-缓冲流使用数组复制时间:666 毫秒
-```
 
-## 1.3 字符缓冲流
-
-### 构造方法
-
-* `public BufferedReader(Reader in)` ：创建一个 新的缓冲输入流。 
-* `public BufferedWriter(Writer out)`： 创建一个新的缓冲输出流。
-
-构造举例，代码如下：
-
-```java
-// 创建字符缓冲输入流
-BufferedReader br = new BufferedReader(new FileReader("br.txt"));
-// 创建字符缓冲输出流
-BufferedWriter bw = new BufferedWriter(new FileWriter("bw.txt"));
-```
-
-### 特有方法
-
-字符缓冲流的基本方法与普通字符流调用方式一致，不再阐述，我们来看它们具备的特有方法。
-
-* BufferedReader：`public String readLine()`: 读一行文字。 
-* BufferedWriter：`public void newLine()`: 写一行行分隔符,由系统属性定义符号。 
-
-`readLine`方法演示，代码如下：
-
-```java
-public class BufferedReaderDemo {
-    public static void main(String[] args) throws IOException {
-      	 // 创建流对象
-        BufferedReader br = new BufferedReader(new FileReader("in.txt"));
-		// 定义字符串,保存读取的一行文字
-        String line  = null;
-      	// 循环读取,读取到最后返回null
-        while ((line = br.readLine())!=null) {
-            System.out.print(line);
-            System.out.println("------");
-        }
-		// 释放资源
-        br.close();
+//字节流的基本流：一次读写一个字节数组
+public static void method2() throws IOException {
+    FileInputStream fis = new FileInputStream("E:\\aaa\\CentOS-7-x86_64-DVD-1810.iso");
+    FileOutputStream fos = new FileOutputStream("myio\\copy.iso");
+    byte[] bytes = new byte[8192];
+    int len;
+    while ((len = fis.read(bytes)) != -1) {
+        fos.write(bytes, 0, len);
     }
+    fos.close();
+    fis.close();
 }
-```
 
-`newLine`方法演示，代码如下：
-
-  ```java
-public class BufferedWriterDemo throws IOException {
-    public static void main(String[] args) throws IOException  {
-      	// 创建流对象
-		BufferedWriter bw = new BufferedWriter(new FileWriter("out.txt"));
-      	// 写出数据
-        bw.write("黑马");
-      	// 写出换行
-        bw.newLine();
-        bw.write("程序");
-        bw.newLine();
-        bw.write("员");
-        bw.newLine();
-		// 释放资源
-        bw.close();
+//字节流的基本流：一次读写一个字节数组
+public static void method3() throws IOException {
+    BufferedInputStream bis = new BufferedInputStream(new FileInputStream("E:\\aaa\\CentOS-7-x86_64-DVD-1810.iso"));
+    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("myio\\copy.iso"));
+    int b;
+    while ((b = bis.read()) != -1) {
+        bos.write(b);
     }
+    bos.close();
+    bis.close();
 }
-输出效果:
-黑马
-程序
-员
-  ```
 
-## 1.4 练习:文本排序
+//字节流的基本流：一次读写一个字节数组
+public static void method4() throws IOException {
+    BufferedInputStream bis = new BufferedInputStream(new FileInputStream("E:\\aaa\\CentOS-7-x86_64-DVD-1810.iso"));
+    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("myio\\copy.iso"));
+    byte[] bytes = new byte[8192];
+    int len;
+    while ((len = bis.read(bytes)) != -1) {
+        bos.write(bytes, 0, len);
+    }
+    bos.close();
+    bis.close();
+}
+~~~
 
-请将文本信息恢复顺序。
+
+
+----
+
+# 103.练习：把《出师表》的文章顺序进行恢复到一个新文件中
 
 ```
+需求：把《出师表》的文章顺序进行恢复到一个新文件中。
+
 3.侍中、侍郎郭攸之、费祎、董允等，此皆良实，志虑忠纯，是以先帝简拔以遗陛下。愚以为宫中之事，事无大小，悉以咨之，然后施行，必得裨补阙漏，有所广益。
 8.愿陛下托臣以讨贼兴复之效，不效，则治臣之罪，以告先帝之灵。若无兴德之言，则责攸之、祎、允等之慢，以彰其咎；陛下亦宜自谋，以咨诹善道，察纳雅言，深追先帝遗诏，臣不胜受恩感激。
 4.将军向宠，性行淑均，晓畅军事，试用之于昔日，先帝称之曰能，是以众议举宠为督。愚以为营中之事，悉以咨之，必能使行阵和睦，优劣得所。
@@ -10784,122 +10904,212 @@ public class BufferedWriterDemo throws IOException {
 5.亲贤臣，远小人，此先汉所以兴隆也；亲小人，远贤臣，此后汉所以倾颓也。先帝在时，每与臣论此事，未尝不叹息痛恨于桓、灵也。侍中、尚书、长史、参军，此悉贞良死节之臣，愿陛下亲之信之，则汉室之隆，可计日而待也。
 ```
 
-### 案例分析
+如果使用字符流的基本流读也行，但是需要将所有读到的字拼在一起，太麻烦了。
 
-1. 逐行读取文本信息。
-2. 把读取到的文本存储到集合中
-3. 对集合中的文本进行排序
-4. 遍历集合，按顺序，写出文本信息。
+因此这里使用 `字符缓冲流`，它里面有一个非常好用的 `readLine()`，一次可以读一整行数据。
 
-### 案例实现
+排序的时候不可以使用字符串排序，因为如果写的再多一点，可能会有序号 `11、12、13` 等，此时就不能使用字符串排了，因此尽量要考虑代码的通用性。
 
-```java
-public class Demo05Test {
-    public static void main(String[] args) throws IOException {
-        //1.创建ArrayList集合,泛型使用String
-        ArrayList<String> list = new ArrayList<>();
-        //2.创建BufferedReader对象,构造方法中传递FileReader对象
-        BufferedReader br = new BufferedReader(new FileReader("10_IO\\in.txt"));
-        //3.创建BufferedWriter对象,构造方法中传递FileWriter对象
-        BufferedWriter bw = new BufferedWriter(new FileWriter("10_IO\\out.txt"));
-        //4.使用BufferedReader对象中的方法readLine,以行的方式读取文本
-        String line;
-        while((line = br.readLine())!=null){
-            //5.把读取到的文本存储到ArrayList集合中
-            list.add(line);
-        }
-        //6.使用Collections集合工具类中的方法sort,对集合中的元素按照自定义规则排序
-        Collections.sort(list, new Comparator<String>() {
-            /*
-                o1-o2:升序
-                o2-o1:降序
-             */
-            @Override
-            public int compare(String o1, String o2) {
-                //依次比较集合中两个元素的首字母,升序排序
-                return o1.charAt(0)-o2.charAt(0);
-            }
-        });
-        //7.遍历ArrayList集合,获取每一个元素
-        for (String s : list) {
-            //8.使用BufferedWriter对象中的方法wirte,把遍历得到的元素写入到文本中(内存缓冲区中)
-            bw.write(s);
-            //9.写换行
-            bw.newLine();
-        }
-        //10.释放资源
-        bw.close();
-        br.close();
-    }
+写法一：
+
+~~~java
+//1.读取数据
+BufferedReader br = new BufferedReader(new FileReader("myio\\csb.txt"));
+String line;
+ArrayList<String> list = new ArrayList<>();
+while((line = br.readLine()) != null){
+    list.add(line);
 }
+br.close();
+
+//2.排序
+//排序规则：按照每一行前面的序号进行排列
+Collections.sort(list, new Comparator<String>() {
+    @Override
+    public int compare(String o1, String o2) {
+        //获取o1和o2的序号
+        int i1 = Integer.parseInt(o1.split("\\.")[0]);
+        int i2 = Integer.parseInt(o2.split("\\.")[0]);
+        return i1 - i2;
+    }
+});
+
+//3.写出
+BufferedWriter bw = new BufferedWriter(new FileWriter("myio\\result.txt"));
+for (String str : list) {
+    bw.write(str);
+    bw.newLine();
+}
+bw.close();
+~~~
+
+写法二：
+
+~~~java
+//1.读取数据
+BufferedReader br = new BufferedReader(new FileReader("myio\\csb.txt"));
+String line;
+TreeMap<Integer,String> tm = new TreeMap<>();
+while((line = br.readLine()) != null){
+    String[] arr = line.split("\\.");
+    //0：序号  1 ：内容，注意这里添加的是完整的数据，包括序号
+    tm.put(Integer.parseInt(arr[0]), line);
+}
+br.close();
+
+
+//2.写出数据
+BufferedWriter bw = new BufferedWriter(new FileWriter("myio\\result2.txt"));
+Set<Map.Entry<Integer, String>> entries = tm.entrySet();
+for (Map.Entry<Integer, String> entry : entries) {
+    String value = entry.getValue();
+    bw.write(value);
+    bw.newLine();
+}
+bw.close();
+~~~
+
+
+
+----
+
+# 104.软件运行四次
+
+```
+实现一个验证程序运行次数的小程序，要求如下：
+1.当程序运行超过3次时给出提示:本软件只能免费使用3次,欢迎您注册会员后继续使用~
+2.程序运行演示如下:
+    第一次运行控制台输出: 欢迎使用本软件,第1次使用免费~
+    第二次运行控制台输出: 欢迎使用本软件,第2次使用免费~
+    第三次运行控制台输出: 欢迎使用本软件,第3次使用免费~
+    第四次及之后运行控制台输出:本软件只能免费使用3次,欢迎您注册会员后继续使用~
 ```
 
+## 一、代码示例
 
+注意这里是不能通过定义变量 `int count = 0` 去统计次数，因为变量是运行在内存中的，程序结束后，变量就会消失，因此不能将变量定义在内存中。
 
-# 2. 转换流
+我们可以将它保存在本地文件中。
 
-## 2.1 字符编码和字符集
+~~~java
+//1.把文件中的数字读取到内存中
+BufferedReader br = new BufferedReader(new FileReader("myio\\count.txt"));
+String line = br.readLine(); // 由于只有一行，就没必要循环去遍历了
 
-### 字符编码
-
-计算机中储存的信息都是用二进制数表示的，而我们在屏幕上看到的数字、英文、标点符号、汉字等字符是二进制数转换之后的结果。按照某种规则，将字符存储到计算机中，称为**编码** 。反之，将存储在计算机中的二进制数按照某种规则解析显示出来，称为**解码** 。比如说，按照A规则存储，同样按照A规则解析，那么就能显示正确的文本符号。反之，按照A规则存储，再按照B规则解析，就会导致乱码现象。
-
-编码:字符(能看懂的)--字节(看不懂的)
-
-解码:字节(看不懂的)-->字符(能看懂的)
-
-* **字符编码`Character Encoding`** : 就是一套自然语言的字符与二进制数之间的对应规则。
-
-  编码表:生活中文字和计算机中二进制的对应规则
-
-### 字符集
-
-* **字符集 `Charset`**：也叫编码表。是一个系统支持的所有字符的集合，包括各国家文字、标点符号、图形符号、数字等。
-
-计算机要准确的存储和识别各种字符集符号，需要进行字符编码，一套字符集必然至少有一套字符编码。常见字符集有ASCII字符集、GBK字符集、Unicode字符集等。![](./assets/1_charset.jpg)
-
-可见，当指定了**编码**，它所对应的**字符集**自然就指定了，所以**编码**才是我们最终要关心的。
-
-* **ASCII字符集** ：
-  * ASCII（American Standard Code for Information Interchange，美国信息交换标准代码）是基于拉丁字母的一套电脑编码系统，用于显示现代英语，主要包括控制字符（回车键、退格、换行键等）和可显示字符（英文大小写字符、阿拉伯数字和西文符号）。
-  * 基本的ASCII字符集，使用7位（bits）表示一个字符，共128字符。ASCII的扩展字符集使用8位（bits）表示一个字符，共256字符，方便支持欧洲常用字符。
-* **ISO-8859-1字符集**：
-  * 拉丁码表，别名Latin-1，用于显示欧洲使用的语言，包括荷兰、丹麦、德语、意大利语、西班牙语等。
-  * ISO-8859-1使用单字节编码，兼容ASCII编码。
-* **GBxxx字符集**：
-  * GB就是国标的意思，是为了显示中文而设计的一套字符集。
-  * **GB2312**：简体中文码表。一个小于127的字符的意义与原来相同。但两个大于127的字符连在一起时，就表示一个汉字，这样大约可以组合了包含7000多个简体汉字，此外数学符号、罗马希腊的字母、日文的假名们都编进去了，连在ASCII里本来就有的数字、标点、字母都统统重新编了两个字节长的编码，这就是常说的"全角"字符，而原来在127号以下的那些就叫"半角"字符了。
-  * **GBK**：最常用的中文码表。是在GB2312标准基础上的扩展规范，使用了双字节编码方案，共收录了21003个汉字，完全兼容GB2312标准，同时支持繁体汉字以及日韩汉字等。
-  * **GB18030**：最新的中文码表。收录汉字70244个，采用多字节编码，每个字可以由1个、2个或4个字节组成。支持中国国内少数民族的文字，同时支持繁体汉字以及日韩汉字等。
-* **Unicode字符集** ：
-  * Unicode编码系统为表达任意语言的任意字符而设计，是业界的一种标准，也称为统一码、标准万国码。
-  * 它最多使用4个字节的数字来表达每个字母、符号，或者文字。有三种编码方案，UTF-8、UTF-16和UTF-32。最为常用的UTF-8编码。
-  * UTF-8编码，可以用来表示Unicode标准中任何字符，它是电子邮件、网页及其他存储或传送文字的应用中，优先采用的编码。互联网工程工作小组（IETF）要求所有互联网协议都必须支持UTF-8编码。所以，我们开发Web应用，也要使用UTF-8编码。它使用一至四个字节为每个字符编码，编码规则：
-    1. 128个US-ASCII字符，只需一个字节编码。
-    2. 拉丁文等字符，需要二个字节编码。 
-    3. 大部分常用字（含中文），使用三个字节编码。
-    4. 其他极少使用的Unicode辅助字符，使用四字节编码。
-
-## 2.2 编码引出的问题
-
-在IDEA中，使用`FileReader` 读取项目中的文本文件。由于IDEA的设置，都是默认的`UTF-8`编码，所以没有任何问题。但是，当读取Windows系统中创建的文本文件时，由于Windows系统的默认是GBK编码，就会出现乱码。
-
-```java
-public class ReaderDemo {
-    public static void main(String[] args) throws IOException {
-        FileReader fileReader = new FileReader("E:\\File_GBK.txt");
-        int read;
-        while ((read = fileReader.read()) != -1) {
-            System.out.print((char)read);
-        }
-        fileReader.close();
-    }
+int count = Integer.parseInt(line);
+//表示当前软件又运行了一次
+count++;//1
+//2.判断
+if(count <= 3){
+    System.out.println("欢迎使用本软件,第"+count+"次使用免费~");
+}else{
+    System.out.println("本软件只能免费使用3次,欢迎您注册会员后继续使用~");
 }
-输出结果：
-���
-```
+BufferedWriter bw = new BufferedWriter(new FileWriter("myio\\count.txt"));
 
-那么如何读取GBK编码的文件呢？ 
+//3.把当前自增之后的count写出到文件当中
+bw.write(count + ""); //PS：注意转为字符串，否则如果写的是数字，那么真正写到文件里的是这个数字在字符集中所对应的字符
+bw.close();
+~~~
+
+---
+
+## 二、扩展
+
+有的人之前拷贝写习惯了，喜欢将这两种流先创建出来，下面再挨个使用。
+
+~~~java
+BufferedReader br = new BufferedReader(new FileReader("myio\\count.txt"));
+BufferedWriter bw = new BufferedWriter(new FileWriter("myio\\count.txt"));
+~~~
+
+在这里绝对不行！因为 `BufferedWriter` 在创建文件的时候，如果文件存在，就会清空。
+
+一旦清空了，下面读取文件的时候就会有空指针。
+
+因此一般在创建 `IO流` 对象的时候，一般会有这样的原则：`IO流` 不是随随便便创建的，而是什么时候用什么时候创建，什么时候不用什么时候关闭。
+
+因此上面的代码一旦 `br` 读完了数据，就要将它立马关掉。
+
+~~~java
+BufferedReader br = new BufferedReader(new FileReader("myio\\count.txt"));
+String line = br.readLine(); // 由于只有一行，就没必要循环去遍历了
+br.close();
+~~~
+
+
+
+----
+
+# 105.转换流
+
+## 一、前言
+
+首先来看看转换流在 `IO体系` 中的位置。
+
+转换流属于字符流，它本身也是一种高级流，用来包装基本流的。
+
+其中输入流叫做 `InputStreamReader`，输出流叫做 `OutputStreamWriter`。
+
+<img src="./assets/image-20240504113048911.png" alt="image-20240504113048911" style="zoom:40%;" />
+
+想要知道为什么要叫这个名字，我们还需要来看看它的作用。
+
+---
+
+## 二、作用
+
+转换流：是字符流和字节流之间的桥梁。
+
+首先我们来看读取数据，读取数据首先要有一个数据源，在读取的时候就是将数据源的数据读取到内存中。
+
+当我们创建了转换流对象的时候，其实是需要包装一个 `字节输入流` 的。在包装之后这个`字节流`就变成`字符流`了，就可以拥有字符流的特性了。
+
+例如：读取数据不会乱码了、可以指定字符集一次读取多个字节。
+
+所以转换流中的输入流叫做 `InputStreamReader`，前面的 `InputStream` 就表示它的作用是将 `字节流` 转换成 `字符流`，后面的 `Reader` 表示转换流本身它是 `字符流` 的一员，它的父类是 `Reader`。
+
+---
+
+接下来看输出，输出需要有一个目的地，当我们创建了转换流对象的时候，它里面是要包装 `字节输出流` 的，它的转换方式跟左边的读是相反的：`输出流` 是将 `字符流` 转换成 `字节流`。
+
+因为在文件中，即目的地中，它真实存储的数据其实是一个又一个的字节，因此我们需要将内存中的数据转换成字节往外写出。
+
+它的名字叫做 `OutputStreamWriter`，前面的 `OutputStream` 就表示它的作用是将 `字符流` 转换成 `字节流`，后面的 `Writer` 表示转换流本身它是 `字符流` 的一员，它的父类是 `Writer`。`
+
+<img src="./assets/image-20240504114903775.png" alt="image-20240504114903775" style="zoom:50%;" />
+
+----
+
+## 三、应用场景
+
+作用1：指定字符集读写数据，但是在JDK11后，这种方式淘汰了。因此对于这种方式我们了解一下就行了，真正要我们学习的是它的替代方案。
+
+作用2：字节流想要使用字符流中的方法，因此就可以使用转换流转一下。
+
+### 1）需求1：手动创建一个GBK的文件，把文件中的中文读取到内存中，不能出现乱码
+
+
+
+---
+
+### 2）需求2：把一段中文按照GBK的方式写到本地文件
+
+
+
+----
+
+### 3）将本地文件中的GBK文件，转成UFT-8
+
+
+
+
+
+
+
+
+
+
 
 ## 2.3 InputStreamReader类  
 
