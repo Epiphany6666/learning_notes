@@ -11326,154 +11326,544 @@ br.close();
 
 ----
 
-# 107.
-
-
-
-
-
-
-
-
-
-
-
-
-
-## 2.3 InputStreamReader类  
-
-转换流`java.io.InputStreamReader`，是Reader的子类，是从字节流到字符流的桥梁。它读取字节，并使用指定的字符集将其解码为字符。它的字符集可以由名称指定，也可以接受平台的默认字符集。 
-
-### 构造方法
-
-* `InputStreamReader(InputStream in)`: 创建一个使用默认字符集的字符流。 
-* `InputStreamReader(InputStream in, String charsetName)`: 创建一个指定字符集的字符流。
-
-构造举例，代码如下： 
-
-```java
-InputStreamReader isr = new InputStreamReader(new FileInputStream("in.txt"));
-InputStreamReader isr2 = new InputStreamReader(new FileInputStream("in.txt") , "GBK");
-```
-
-### 指定编码读取
-
-```java
-public class ReaderDemo2 {
-    public static void main(String[] args) throws IOException {
-      	// 定义文件路径,文件为gbk编码
-        String FileName = "E:\\file_gbk.txt";
-      	// 创建流对象,默认UTF8编码
-        InputStreamReader isr = new InputStreamReader(new FileInputStream(FileName));
-      	// 创建流对象,指定GBK编码
-        InputStreamReader isr2 = new InputStreamReader(new FileInputStream(FileName) , "GBK");
-		// 定义变量,保存字符
-        int read;
-      	// 使用默认编码字符流读取,乱码
-        while ((read = isr.read()) != -1) {
-            System.out.print((char)read); // ��Һ�
-        }
-        isr.close();
-      
-      	// 使用指定编码字符流读取,正常解析
-        while ((read = isr2.read()) != -1) {
-            System.out.print((char)read);// 大家好
-        }
-        isr2.close();
-    }
-}
-```
-
-## 2.4 OutputStreamWriter类
-
-转换流`java.io.OutputStreamWriter` ，是Writer的子类，是从字符流到字节流的桥梁。使用指定的字符集将字符编码为字节。它的字符集可以由名称指定，也可以接受平台的默认字符集。 
-
-### 构造方法
-
-- `OutputStreamWriter(OutputStream in)`: 创建一个使用默认字符集的字符流。 
-- `OutputStreamWriter(OutputStream in, String charsetName)`: 创建一个指定字符集的字符流。
-
-构造举例，代码如下： 
-
-```java
-OutputStreamWriter isr = new OutputStreamWriter(new FileOutputStream("out.txt"));
-OutputStreamWriter isr2 = new OutputStreamWriter(new FileOutputStream("out.txt") , "GBK");
-```
-
-### 指定编码写出
-
-```java
-public class OutputDemo {
-    public static void main(String[] args) throws IOException {
-      	// 定义文件路径
-        String FileName = "E:\\out.txt";
-      	// 创建流对象,默认UTF8编码
-        OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(FileName));
-        // 写出数据
-      	osw.write("你好"); // 保存为6个字节
-        osw.close();
-      	
-		// 定义文件路径
-		String FileName2 = "E:\\out2.txt";
-     	// 创建流对象,指定GBK编码
-        OutputStreamWriter osw2 = new OutputStreamWriter(new FileOutputStream(FileName2),"GBK");
-        // 写出数据
-      	osw2.write("你好");// 保存为4个字节
-        osw2.close();
-    }
-}
-```
-
-### 转换流理解图解
-
-**转换流是字节与字符间的桥梁！**![](./assets/2_zhuanhuan.jpg)
-
-## 2.5 练习：转换文件编码
-
-将GBK编码的文本文件，转换为UTF-8编码的文本文件。
-
-### 案例分析
-
-1. 指定GBK编码的转换流，读取文本文件。
-2. 使用UTF-8编码的转换流，写出文本文件。
-
-### 案例实现
-
-```java
-public class TransDemo {
-   public static void main(String[] args) {      
-    	// 1.定义文件路径
-     	String srcFile = "file_gbk.txt";
-        String destFile = "file_utf8.txt";
-		// 2.创建流对象
-    	// 2.1 转换输入流,指定GBK编码
-        InputStreamReader isr = new InputStreamReader(new FileInputStream(srcFile) , "GBK");
-    	// 2.2 转换输出流,默认utf8编码
-        OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(destFile));
-		// 3.读写数据
-    	// 3.1 定义数组
-        char[] cbuf = new char[1024];
-    	// 3.2 定义长度
-        int len;
-    	// 3.3 循环读取
-        while ((len = isr.read(cbuf))!=-1) {
-            // 循环写出
-          	osw.write(cbuf,0,len);
-        }
-    	// 4.释放资源
-        osw.close();
-        isr.close();
-  	}
-}
-```
-
-# 3. 序列化
-
-## 3.1 概述
-
 Java 提供了一种对象**序列化**的机制。用一个字节序列可以表示一个对象，该字节序列包含该`对象的数据`、`对象的类型`和`对象中存储的属性`等信息。字节序列写出到文件之后，相当于文件中**持久保存**了一个对象的信息。 
 
-反之，该字节序列还可以从文件中读取回来，重构对象，对它进行**反序列化**。`对象的数据`、`对象的类型`和`对象中存储的数据`信息，都可以用来在内存中创建对象。看图理解序列化： ![](./assets/3_xuliehua.jpg)
+反之，该字节序列还可以从文件中读取回来，重构对象，对它进行**反序列化**。`对象的数据`、`对象的类型`和`对象中存储的数据`信息，都可以用来在内存中创建对象。
+
+# 107.序列化流
+
+## 一、引入
+
+首先我们来看看 `序列化流` 在IO流体系中的位置。序列化流是高级流，也是用来包装基本流的。
+
+而且序列化流是属于字节流的一种，负责**输出数据**。
+
+与之对应的有个输入流，我们也叫做 `反序列化流`。
+
+它们的名字也遵守了 `IO流` 的命名特点
+
+<img src="./assets/image-20240504152310552.png" alt="image-20240504152310552" style="zoom:30%;" />
+
+首先我们来学习 `序列化流`。
+
+----
+
+## 二、序列化流
+
+序列化流：可以把Java中的对象写到本地文件中。
+
+写到文件后，数据有一个特点：我们是看不懂的，但是没有关系，只要通过反序列化流将数据读取出来，读取的数据没错就行了。
+
+但是有的同学会有疑问，如果我们想要写对象，直接将对象的属性值写到对象中不就可以了吗？而且数据还看得懂，还能修改。
+
+你说的没错，但是坏就坏在：能看懂，能修改。在有的情况下，我是不想让别人看懂，修改的，例如游戏的存档，不想让用户自己修改。
+
+所以这两种方式它都是有应用场景的。
+
+----
+
+## 三、方法
+
+`序列化流` 还有一个名字：`对象操作输出流`，它的作用就是用来操作对象的，可以把Java中的对象写到本地文件中，是用来输出的，因此它的名字叫做 `ObjectOutputStream`。
+
+它本身是高级流，因此在创建对象的时候需要关联基本流。
+
+<img src="./assets/image-20240504153306643.png" alt="image-20240504153306643" style="zoom:40%;" />
+
+而且写出数据的方法也不一样了，因为现在是写出整个对象，所以方法名叫做 `writeObject()`。
+
+<img src="./assets/image-20240504153224458.png" alt="image-20240504153224458" style="zoom:40%;" />
+
+----
+
+## 四、代码实现
+
+**Student.java**
+
+~~~java
+public class Student {
+    private String name;
+    private int age;
+
+    // 标准JavaBean剩下的东西，这里为了方便观看就省略了
+}
+~~~
+
+**测试类**
+
+~~~java
+//1.创建对象
+Student stu = new Student("zhangsan", 23);
+
+//2.创建序列化流的对象/对象操作输出流
+ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("myio\\a.txt"));
+
+//3.写出数据
+oos.writeObject(stu);
+
+//4.释放资源
+oos.close();
+~~~
+
+运行代码，可以发现报错。
+
+如果直接将对象写出，它会报 `NotSerializableException` 异常：表示这个类的对象不可被序列化。
+
+<img src="./assets/image-20240504153838870.png" alt="image-20240504153838870" style="zoom:67%;" />
+
+解决方案：需要让Javabean类实现 `Serializeble接口`。
+
+~~~java
+public class Student implements Serializable {
+    private String name;
+    private int age;
+    // 标准JavaBean剩下的东西，这里为了方便观看就省略了
+}
+~~~
+
+可以跟进看看 `Serializeble接口` 里面的源码，可以发现它里面没有抽象方法。
+
+<img src="./assets/image-20240504154258269.png" alt="image-20240504154258269" style="zoom:67%;" />
+
+`Serializable接口` 里面是没有抽象方法，像这种没有抽象方法的接口有一个专业的名字：标记型接口。
+
+相当给 `Student类` 打了一个标记，一旦实现了这个接口，那么就表示当前的 `Student类` 可以被序列化。
+
+简单来说 `Student类的对象` 可以用对象操作输出流写到本地文件。
+
+如果没有实现 `Serializeble接口` ，那就表示没有这个标记，就不能使用序列化流去序列化这个类的对象。
+
+可以理解为：一个物品的合格证。有合格证这个物品就合格；没有合格证这个物品就不合格。
+
+再次运行程序，可以发现没有报错，并且对象已经写入到了本地文件中了。
+
+![image-20240504155046552](./assets/image-20240504155046552.png)
+
+
+
+---
+
+# 108.反序列化流
+
+## 一、介绍
+
+`反序列化流` 也叫作 `对象操作输出流`：可以把序列化到本地文件中的对象，读取到程序中来。
+
+名字是 `ObjectInputStream`，需要关联字节输入流。
+
+<img src="./assets/image-20240504155912353.png" alt="image-20240504155912353" style="zoom:50%;" />
+
+因为这个流它是读取文件中的对象，所以方法名叫做 `readObject`，方法的返回值就是读取到的那个对象，但是它是 `Object` 类型的，如果我们想要将它变成对象真正的类型，还需要对它做一个强转。
+
+<img src="./assets/image-20240504155922740.png" alt="image-20240504155922740" style="zoom:50%;" />
+
+----
+
+## 二、代码示例
+
+~~~java
+//1.创建反序列化流的对象
+ObjectInputStream ois = new ObjectInputStream(new FileInputStream("myio\\a.txt"));
+
+//2.读取数据
+Student o = ois.readObject();
+
+//3.打印对象
+System.out.println(o); // Student{name = zhangsan, age = 23}
+System.out.println((Student) o); // Student{name = zhangsan, age = 23}
+
+//4.释放资源
+ois.close();
+~~~
+
+
+
+-----
+
+# 109.版本号
+
+## 一、引出版本号
+
+假设我们先用 `序列化流` 将对象写到本地文件中了，但是此时我对JavaBean做了一个修改，例如现在多添加了一个 `address属性`，表示学生的家庭住址。
+
+~~~java
+private String address;
+~~~
+
+然后再利用 `反序列化流` 把对象读取到内存中，此时就会报错。
+
+![image-20240504160810683](./assets/image-20240504160810683.png)
+
+我们可以简单的阅读一下报错的信息
+
+~~~java
+Exception in thread "main" java.io.InvalidClassException: myobjectstream.Student（类名）; local class incompatible: stream classdesc serialVersionUID（在这个类中有一个叫做：serialVersionUID，是后面这段数字） = -6836389873013001547, local class serialVersionUID（但是本地文件中的serialVersionUID）是后面这串数字 = 6006265381637527298
+    两者不一样了，所以它就报错了。
+	at myobjectstream.ObjectStreamDemo2.main(ObjectStreamDemo2.java:24)
+~~~
+
+----
+
+## 二、分析
+
+如果一个类实现了 `Serializable接口`，那就表示这个类的对象是可被序列化的。
+
+Java的底层会根据这个类的成员变量、静态变量、构造方法、成员方法，简单理解，就是根据这个类里面所有的内容进行计算，计算出一个 `long类型` 的序列号，这个序列号你也可以将它理解为：版本号。
+
+假设现在计算出来的版本号是 `1`，数字短一些好理解一些。
+
+当我现在创建了一个对象的时候，在对象里面它其实就包含了 `版本号：1`，再用序列化流写到本地文件中的时候，也会把版本号写到文件中。
+
+<img src="./assets/image-20240504161941765.png" alt="image-20240504161941765" style="zoom:67%;" />
+
+但是，如果此时修改了JavaBean类中的代码，那么Java底层会重新计算出一个版本号，假设现在版本号是 `2`。
+
+此时用 `反序列化流` 将对象读取到内存后，就会发现两个版本号此时不一样了，代码直接报错。
+
+<img src="./assets/image-20240504162132878.png" alt="image-20240504162132878" style="zoom:40%;" />
+
+所以问题出现的原因就是：文件中的版本号，跟JavaBean类中的版本号不匹配。
+
+虽然我们可以不去修改JavaBean类，但是当业务需求发生变化的时候，JavaBean类不可能不改。
+
+但如果修改JavaBean的时候，不让这个版本号发生变化，也可以解决这个问题，因此我们的处理方案就是：固定版本号。
+
+----
+
+## 三、解决问题
+
+在定义JavaBean类时，手动先将这个版本号定义出来，一旦手动定义了，Java底层就不会手动计算了。
+
+<img src="./assets/image-20240504162845317.png" alt="image-20240504162845317" style="zoom:50%;" />
+
+定义版本号也是有规矩要求的
+
+- `private` ：私有。不让外界使用，也不会对版本号提供 `get / set方法`。
+
+- `static`：共享。表示这个类所有的对象都共享同一个版本号。
+
+- `final`：最终。表示版本号的值永远不会发生变化
+- `long`：版本号的数据类型。由于版本号在计算的时候比较长，`int` 的取值范围是不够的，因此需要用 `long` 进行表示
+- `serialVersionUID`：版本号的变量名，只能叫这个名字，如果写成其他的，Java就不认识了。
+
+---
+
+## 四、代码实现
+
+### 1）方法一
+
+在JavaBean中定义成员变量 `serialVersionUID`。
+
+但是这种方式太麻烦了，需要自己写，而且我们也记不住。
+
+~~~java
+private static final long serialVersionUID = 1L; // long类型需要加L为后缀
+~~~
+
+----
+
+### 2）方法二
+
+对IDEA做一个设置，设置完后，我们就可以自动生成了
+
+首先复制这里的 `Serializable` <kbd>ctrl + C</kbd>
+
+<img src="./assets/image-20240504163129803.png" alt="image-20240504163129803" style="zoom:67%;" />
+
+然后打开IDEA设置，左上角搜索 `Serializable`，根据如下图操作。
+
+![image-20240504164156451](./assets/image-20240504164156451.png)
+
+回到代码中，可以看见 `Student` 这个名字被深褐色包裹了，它其实就是给你做了一个提醒：你在这里少写了一个版本号。
+
+<img src="./assets/image-20240504165238446.png" alt="image-20240504165238446" style="zoom:67%;" />
+
+用鼠标选中 `Student`，<kbd>alt + 回车</kbd> 点击第一个
+
+<img src="./assets/image-20240504165324894.png" alt="image-20240504165324894" style="zoom:67%;" />
+
+此时它会自动根据你类里面所有的成员计算出一个版本号。
+
+要注意，一旦生成了，我们就不要去修改了。
+
+生成后上面会有一个注解，我们还没学，可以暂时删掉。
+
+<img src="./assets/image-20240504165616433.png" alt="image-20240504165616433" style="zoom:67%;" />
+
+这是第二种方式，是我比较推荐的做法。
+
+---
+
+### 3）方法三
+
+我们可以借鉴别人的，<kbd>ctrl + N</kbd> 搜索一个Java中已经定义好的类，例如 `ArrayList`
+
+<img src="./assets/image-20240504165901418.png" alt="image-20240504165901418" style="zoom:67%;" />
+
+可以发现 `ArrayList` 也实现了 `Serializable接口`，并且在下面也写好了，我们可以直接将这个 <kbd>ctrl + C</kbd>
+
+<img src="./assets/image-20240504170103523.png" alt="image-20240504170103523" style="zoom:67%;" />
+
+回到JavaBean类中，直接 <kbd>ctrl + V</kbd> 就行了
+
+<img src="./assets/image-20240504170216008.png" alt="image-20240504170216008" style="zoom:67%;" />
+
+只不过你要知道，这个版本号是属于 `ArrayList` 的，我们不能用，我们需要自己改写一下它，这里还是改成 `1`。
+
+~~~java
+private static final long serialVersionUID = 1L;
+~~~
+
+只不过这个 `1` 它显得不够专业，所以第三种方式不推荐，还是推荐使用第二种方式。
+
+----
+
+### 4）运行代码
+
+此时一旦加上版本号后，问题就已经解决了。
+
+首先重新运行 `序列化流` 的代码，然后在JavaBean类中增加 `address属性`，并重新生成JavaBean类的 `toString()`，让它打印的时候出现 `address属性`
+
+<img src="./assets/image-20240504170901487.png" alt="image-20240504170901487" style="zoom:60%;" />
+
+最后运行 `反序列化流` 的代码。
+
+可以发现代码正常运行，但是 `address` 没有值，没有值就是默认初始化值，因此它读出来的就是 `null`。
+
+<img src="./assets/image-20240504170949163.png" alt="image-20240504170949163" style="zoom:67%;" />
+
+----
+
+## 五、总结
+
+如果想要将一个JavaBean对象序列化到本地文件中，除了实现 `Serializable接口` 外，还需要加上 `serialVersionUID`版本号。
+
+
+
+---
+
+# `transient` 关键字
+
+如果JavaBean中有些成员变量的值不想序列化到本地文件，例如 `Student` 中的 `address`，需要将家庭住址进行保密。
+
+我们先将之前只有两个成员变量的时候使用 `Ptg插件` 生成的JavaBean删掉，再根据三个成员变量去生成一个标准的JavaBean类。
+
+然后再将有关 `serialVersionUID` 全部删掉
+
+<img src="./assets/image-20240504171904926.png" alt="image-20240504171904926" style="zoom:50%;" />
+
+<img src="./assets/image-20240504172111243.png" alt="image-20240504172111243" style="zoom:67%;" />
+
+如果其中有一个成员变量的值不想序列化到本地，此时需要在这个成员变量前面加上 `transient` 关键字。
+
+这个关键字也叫作 `瞬态关键字`，它的作用：不会把当前属性序列化到本地文件当中
+
+~~~java
+public class Student implements Serializable {
+    private static final long serialVersionUID = -6357601841666449654L; // long类型需要加L为后缀
+
+    private String name;
+    private int age;
+    //transient：瞬态关键字
+    //作用：不会把当前属性序列化到本地文件当中
+    private transient String address;
+    //为了方便观看，删掉了标准JavaBean类的get、set、空参构造、有参构造、toString方法
+}
+~~~
+
+重新序列化到本地
+
+~~~java
+//1.创建对象
+Student stu = new Student("zhangsan",23,"南京");
+
+//2.创建序列化流的对象/对象操作输出流
+ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("myio\\a.txt"));
+
+//3.写出数据
+oos.writeObject(stu);
+
+//4.释放资源
+oos.close();
+~~~
+
+再次反序列化
+
+~~~java
+//1.创建反序列化流的对象
+ObjectInputStream ois = new ObjectInputStream(new FileInputStream("myio\\a.txt"));
+
+//2.读取数据
+Student o = (Student) ois.readObject();
+
+//3.打印对象
+System.out.println(o);
+
+//4.释放资源
+ois.close();
+~~~
+
+程序运行结果如下，可以发现 `address` 是没有值的，就是因为在序列化的时候没有将 `address` 序列化到本地文件。
+
+<img src="./assets/image-20240504172625583.png" alt="image-20240504172625583" style="zoom:67%;" />
+
+
+
+----
+
+# 序列化流/反序列化流的细节汇总
+
+1、使用序列化流将对象写到文件时，需要让JavaBean类实现Serializable接口。否则会出现 `NotSerializableException` 异常，表示这个类对象不可被序列化。
+
+2、序列化流写到文件中的数据是不能修改的，一旦修改就无法再次读回来了。
+
+3、序列化对象后，修改了JavaBean类，再次反序列化，会不会有问题？
+
+会出现问题，会抛出 `InvalidClassException异常`
+
+解决方案：手动给JavaBean类添加 `serialVersionUID`，这个变量你可以把它理解成序列化、版本号。
+
+在添加的时候不建议字节写，也不建议抄别人的，建议在IDEA中设置一下，以后自动生成就行了。
+
+4、如果一个对象中的某个成员变量的值不想被序列化，又如何实现呢？
+
+解决方案：给该成员变量加 `transient` 关键字修饰，也叫做 `瞬态关键字`，它的作用是：该关键字标记的成员变量不参与序列化的过程。
+
+也就是说这个变量所记录的值不会保存到本地文件中，下次使用 `反序列化流` 读取出来的时候，这个变量为默认初始化值。
+
+
+
+----
+
+# 110.练习：用对象流读写多个对象
+
+由于对象的个数不确定，那么在读的时候我们该怎么操作呢？
+
+**Student.java**
+
+在写JavaBean类的时候要注意，不要一开始就生成 `serialVersionUID`，因为这个版本号是根据类里面所有的成员（成员变量、构造方法、成员方法......）计算出来的一个结果。
+
+```java
+public class Student implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 8447688314497035445L;
+    private String name;
+    private int age;
+    private String address;
+
+    //空参构造、有参构造、get、set方法、tostring方法
+}
+```
+
+## 一、引出问题
+
+**序列化**
+
+~~~java
+//1.序列化多个对象
+Student s1 = new Student("zhangsan",23,"南京");
+Student s2 = new Student("lisi",24,"重庆");
+Student s3 = new Student("wangwu",25,"北京");
+
+ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("myio\\a.txt"));
+oos.writeObject(s1);
+oos.writeObject(s2);
+oos.writeObject(s3);
+
+oos.close();
+~~~
+
+**反序列化**
+
+~~~java
+//1.创建反序列化流的对象
+ObjectInputStream ois = new ObjectInputStream(new FileInputStream("myio\\a.txt"));
+
+//2.读取数据
+//一次readObject()只能读一个对象，我们刚刚在文件中写出了三个对象，因此需要调用三次
+Student s1 = (Student) ois.readObject();
+Student s2 = (Student) ois.readObject();
+Student s3 = (Student) ois.readObject();
+
+//3.释放资源
+ois.close();
+~~~
+
+程序运行完毕，可以发现三个学生对象全部读取成功
+
+<img src="./assets/image-20240504175357995.png" alt="image-20240504175357995" style="zoom:67%;" />
+
+但是这样的代码好吗？假设序列化的代码是别人写的，它只给了你一个 `a.txt` 文件，这样对象的数目就不确定了，因此调用 `readObject()` 几次也确定不了了，那我就来想，会不会跟以前一样，如果读不到就会返回 `-1` 或者返回 `null` 呢？
+
+例如这里多读了一个对象，但是文件中只有三个对象，可以发现，如果一直读，超过了文件中对象的数目，不会返回 `-1` 也不回返回 `null` ，它会返回一个异常：EOF(`End Of File`)，表示读到了文件的末尾。
+
+<img src="./assets/image-20240504180153079.png" alt="image-20240504180153079" style="zoom:67%;" />
+
+我们不可能一直读直到读到它出异常吧？
+
+----
+
+## 二、解决问题
+
+这样是不对的，因此以后会有一个小小的规定：如果需要将多个对象序列化到本地文件中，我们一般都会将这些对象放到一个集合中，然后不要序列化对象了，而是直接序列化这个集合就行了。
+
+`ArrayList` 本身也是实现了 `Serializable接口`，而且源码中也有 `serialVersionUID`，它已经满足了我们之前所说的几个细节，因此可以被序列化。
+
+<img src="./assets/image-20240504180435689.png" alt="image-20240504180435689" style="zoom:70%;" />
+
+**序列化**
+
+~~~java
+//1.序列化多个对象
+Student s1 = new Student("zhangsan",23,"南京");
+Student s2 = new Student("lisi",24,"重庆");
+Student s3 = new Student("wangwu",25,"北京");
+
+ArrayList<Student> list = new ArrayList<>();
+list.add(s1);
+list.add(s2);
+list.add(s3);
+
+ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("myio\\a.txt"));
+oos.writeObject(list);
+
+oos.close();
+~~~
+
+**反序列化**
+
+此时在读的时候就不需要考虑循环了，直接读一次就行了。
+
+~~~java
+//1.创建反序列化流的对象
+ObjectInputStream ois = new ObjectInputStream(new FileInputStream("myio\\a.txt"));
+
+//2.读取数据
+ArrayList<Student> list = (ArrayList<Student>) ois.readObject();
+
+for (Student student : list) {
+    System.out.println(student);
+}
+
+//3.释放资源
+ois.close();
+~~~
+
+
+
+----
+
+# 打印流
+
+首先来看一下 `打印流` 在IO流体系中的位置。
+
+`打印流` 属于高级流，也是用来
+
+
+
+
+
+看图理解序列化： 
 
 ## 3.2 ObjectOutputStream类
 

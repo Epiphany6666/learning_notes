@@ -34539,7 +34539,7 @@ User u1 = new User(1, "zhangsan", "1234qwer", "girl11", data);
 
 ![image-20240421203302758](./assets/image-20240421203302758.png)
 
-由于 `Object` 是定义在 `java.lang` 包下的，我们不能把代码写在 `lang包` 下。
+由于 `Object` 是定义在 `java.lang` 包下的，我们不能把代码写在 `lang包` 下；
 
 又因为 `User类` 属于 `其他包中的子类`，但是 `User类的对象` 就不属于 `其他包中的子类` 了，调用 `clone()` 方法依旧会报错。
 
@@ -34574,7 +34574,7 @@ public class User implements Cloneable {
 
 那这个接口是什么意思呢？
 
-如果一个接口里面没有抽象方法，那就表示当前的接口是一个标记性接口。
+如果一个接口里面没有抽象方法，那就表示当前的接口是一个 `标记型接口`。
 
 现在 `Cloneable接口` 就表示：一旦实现了 `Cloneable接口`，那么当前类的对象就可被克隆；如果没有实现 `Cloneable接口`，那么当前类的对象就不能被克隆。
 
