@@ -12103,211 +12103,418 @@ ps.close();
 
 因此在以后我们真正最常用的其实还是第一组中的两个构造。
 
+那为什么不用第一组的最后一个三个参数的呢？它多出来的参数表示字符编码，而我们以后在实际开发中，默认使用字符编码都是 `UTF-8`，因此是不需要指定的。
+
+<img src="./assets/image-20240505080958445.png" alt="image-20240505080958445" style="zoom:50%;" />
+
+如下代码，就算没有关流，这句话也是立马写到本地了，就是因为在这开启了自动刷新。
+
 ~~~java
+//1.创建字符打印流的对象
+PrintWriter pw = new PrintWriter(new FileWriter("myio\\a.txt"), true);
+//2.写出数据
+pw.println("今天你终于叫我名字了，虽然叫错了，但是没关系，我马上改");
+~~~
+
+<img src="./assets/image-20240505081520638.png" alt="image-20240505081520638" style="zoom:80%;" />
+
+但是当你关闭了自动刷新，此时就不会立马写到本地了
+
+![image-20240505081557077](./assets/image-20240505081557077.png)
+
+完整代码
+
+~~~java
+//1.创建字符打印流的对象
+PrintWriter pw = new PrintWriter(new FileWriter("myio\\a.txt"), true);
+
+//2.写出数据
+pw.println("今天你终于叫我名字了，虽然叫错了，但是没关系，我马上改");
+pw.print("你好你好"); // 表示只打印不换行
+pw.printf("%s爱上了%s", "阿珍", "阿强"); // 不换行
+
+//3.释放资源
+pw.close();
+~~~
+
+---
+
+## 五、打印流的应用场景
+
+其实我们几乎每天都在用，因为之前每天都会写输出语句，这个里面其实就用到了打印流。
+
+~~~java
+System.out.println("123");
+~~~
+
+`System`：Java里面已经定义好的一个类，而且这个类是用 `final` 修饰，表示这个类是最终类，不能再有其他的子类了。
+
+<img src="./assets/image-20240505082323949.png" alt="image-20240505082323949" style="zoom:67%;" />
+
+往下找，可以发现：`out` 是 `System类` 中的一个静态变量，因此在代码中，我们就可以通过类名直接调用静态变量 `System.out`。
+
+`out` 的类型是 `PrintStream`，因此调用 `System.out` 相当于获取的就是一个打印流的对象。
+
+这个对象是不需要我们自动创建的，而是虚拟机在启动后，由虚拟机自己创建。
+
+这个打印流不是指向文件，而是默认指向控制台。
+
+因此我们可以改写 `System.out.println("123")`
+
+~~~java
+//获取打印流的对象，此打印流在虚拟机启动的时候，由虚拟机创建，默认指向控制台
+//所以这个打印流是一个特殊的打印流，它还有一个特殊的名字：系统中的标准输出流，是不能关闭，在系统中是唯一的。
+//如果关闭了就不能再次启动，除非你将虚拟机再次重启一下。
+PrintStream ps = System.out;
+
+//拿着对象ps调用打印流中的方法println
+//这个方法有三个作用：写出数据，自动换行，自动刷新
+ps.println("123");
+
+//只不过平时懒得中间再定义一个变量，因此我们是使用链式编程来书写的
+System.out.println("123");
+~~~
+
+----
+
+# 打印流总结
+
+1、打印流有几种？各有什么特点？
+
+有字节打印流和字符打印流两种
+
+打印流不操作数据源，只能操作目的地
+
+字节打印流：默认自动刷新，它有很多特有方法，其中用的最多的就是 `println`，这个方法一行抵三行：写出 + 刷新 + 换行。
+
+字符打印流：自动刷新需要手动开启，它里面也有特有的 `println`方法，这个方法也能干三件事情：写出 + 刷新 + 换行。
+
+
+
+----
+
+# 压缩流和解压缩流
+
+在开发中它们都是有自己的应用场景的。
+
+例如我们现在要传输的数据比较大，这个时候就可以先压缩，再传输。
+
+<img src="./assets/image-20240505083916867.png" alt="image-20240505083916867" style="zoom:30%;" />
+
+既然有压缩，那肯定会有解压。当接收到一个压缩包后，压缩包肯定是不能直接使用的。
+
+我们需要先进行解压，得到里面的每一个文件，这样才能用里面的数据。
+
+<img src="./assets/image-20240505084024096.png" alt="image-20240505084024096" style="zoom:30%;" />
+
+因此我们要学习的就是压缩和解压。
+
+来看下它们在 `IO流体系` 中的位置。
+
+`解压缩流` 主要就是读取压缩包里面的文件，所以它是读，属于 `输入流`。
+
+而右边的 `压缩流`，是将文件中的数据写到压缩包中，所以它是写，属于 `输出流`
+
+<img src="./assets/image-20240505084205261.png" alt="image-20240505084205261" style="zoom:30%;" />
+
+我们先来学习相对比较简单的 `解压缩流`。
+
+-----
+
+# 113.解压缩流
+
+如果想要解压，在电脑中首先要有一个压缩包，这个压缩包需要是 `zip` 作为后缀的，因为Java中只能识别这个格式的。
+
+`压缩包里面的每一个文件` 在Java中都是一个 `ZipEntry对象`。
+
+因此解压的本质：把每一个 `ZipEntry` 按照层级拷贝到本地另一个文件夹中。
+
+解压缩流的名字叫做 `ZipInputStream`，`Zip` 是它的作用，表示跟压缩包是有关系的；`InputStream` 表示它是用来读取的。
+
+~~~java
+public static void main(String[] args) throws IOException {
+    //1.创建一个File表示要解压的压缩包
+    File src = new File("D:\\aaa.zip");
+    //2.创建一个File表示解压的目的地
+    File dest = new File("D:\\");
+    //调用方法
+    unzip(src, dest);
+}
+
+//定义一个方法用来解压
+public static void unzip(File src, File dest) throws IOException {
+    ZipInputStream zip = new ZipInputStream(new FileInputStream(src));
+    ZipEntry entry = zip.getNextEntry();
+    System.out.println(entry);
+}
+~~~
+
+如果多调用几次 `getNextEntry()` 会怎么样
+
+~~~java
+ZipInputStream zip = new ZipInputStream(new FileInputStream(src));
+ZipEntry entry1 = zip.getNextEntry();
+System.out.println(entry1);
+
+ZipEntry entry2 = zip.getNextEntry();
+System.out.println(entry2);
+
+ZipEntry entry3 = zip.getNextEntry();
+System.out.println(entry3);
+~~~
+
+运行结果如下，`aaa` 有了，还有 `aaa` 里面的 `aa.txt`，以及 `bbbb文件夹`
+
+<img src="./assets/image-20240505090722122.png" alt="image-20240505090722122" style="zoom:67%;" />
+
+第一次打印出的 `ZipEntry` 是 `aaa/`
+
+<img src="./assets/image-20240505090343857.png" alt="image-20240505090343857" style="zoom:50%;" />
+
+这个 `aaa` 并不是 `aaa.zip` 本身，而是它里面的文件夹。
+
+<img src="./assets/image-20240505090212167.png" alt="image-20240505090212167" style="zoom:67%;" />
+
+---
+
+那么思考：它能一直获取吗？可以将子文件中的东西也获取到吗？
+
+如果获取不到，它会返回什么呢？`null` 还是 `-1`？
+
+没关系，我们都可以来试一下，因此这些知识点我们都可以通过不断的尝试进行总结
+
+我也不知道这个文件夹中一共有多少 `ZipEntry对象`，但我知道绝对没有100个，因此这里直接循环100次来看看。
+
+~~~java
+for (int i = 0; i < 100; i++) {
+    ZipEntry entry1 = zip.getNextEntry();
+    System.out.println(entry1);
+}
+~~~
+
+可以发现，当我们将压缩包里面的所有文件和文件夹都获取完毕了，这个时候再强行获取，就会返回 `null`，因此循环的结束条件我们已经知道了。
+
+并且，子文件夹中的文件和文件夹也都可以获取到。
+
+<img src="./assets/image-20240505091542965.png" alt="image-20240505091542965" style="zoom:50%;" />
+
+因此有了这个特性后，就不需要自己递归了，直接写一个循环就行了。
+
+`getNextEntry()` 的底层，它会把压缩包里的每一个文件，或者文件夹全都获取到。
+
+~~~java
+public static void main(String[] args) throws IOException {
+    //1.创建一个File表示要解压的压缩包
+    File src = new File("D:\\aaa.zip");
+    //2.创建一个File表示解压的目的地
+    File dest = new File("D:\\");
+
+    //调用方法
+    unzip(src,dest);
+}
+
+//定义一个方法用来解压
+public static void unzip(File src,File dest) throws IOException {
+    //解压的本质：把压缩包里面的每一个文件或者文件夹读取出来，按照层级拷贝到目的地当中
+    //创建一个解压缩流用来读取压缩包中的数据，解压缩流中关联基本流，再去关联压缩包的路径
+    ZipInputStream zip = new ZipInputStream(new FileInputStream(src));
+    //之前我们说过，`压缩包里面的每一个文件` 在Java中都是一个 `ZipEntry对象`。
+    //因此在这我们需要先获取到压缩包里面的每一个zipentry对象，调用getNextExtry()
+    //表示当前在压缩包中获取到的文件或者文件夹
+    ZipEntry entry;
+    while((entry = zip.getNextEntry()) != null){
+        System.out.println(entry);
+        if(entry.isDirectory()){ // entry没有isFile()，但是有isDirectory()，用来判断这个是不是一个文件夹
+            //文件夹：需要在目的地dest处创建一个同样的文件夹
+            File file = new File(dest,entry.toString());
+            file.mkdirs();
+        } else {
+            //文件：需要读取到压缩包中的文件，并把他存放到目的地dest文件夹中（按照层级目录进行存放）
+            //entry.toString()：将它变成字符串，即文件夹名
+            FileOutputStream fos = new FileOutputStream(new File(dest, entry.toString()));
+            int b;
+            //读取的时候是使用zip进行读取
+            while((b = zip.read()) != -1){
+                //写到目的地
+                fos.write(b);
+            }
+            fos.close();
+            //表示在压缩包中的一个文件处理完毕了，需要调用closeEntry()
+            zip.closeEntry();
+        }
+    }
+
+    zip.close();
+}
 ~~~
 
 
 
+----
 
+# 114.压缩流（压缩单个文件）
 
+压缩：将多个文件 / 文件夹变成一个压缩包。
 
+在压缩的时候需要注意：压缩包里面的每一个文件或文件夹都是一个 `ZipEntry对象`。
 
-平时我们在控制台打印输出，是调用`print`方法和`println`方法完成的，这两个方法都来自于`java.io.PrintStream`类，该类能够方便地打印各种数据类型的值，是一种便捷的输出方式。
+压缩本质：把每一个（文件/文件夹）看成 `ZipEntry对象` 放到压缩包中。
 
-## 4.2 PrintStream类
+~~~java
+需求1：把D:\\a.txt打包成一个压缩包
+~~~
 
-### 构造方法
-
-* `public PrintStream(String fileName)  `： 使用指定的文件名创建一个新的打印流。
-
-构造举例，代码如下：  
-
-```java
-PrintStream ps = new PrintStream("ps.txt")；
-```
-
-### 改变打印流向
-
-`System.out`就是`PrintStream`类型的，只不过它的流向是系统规定的，打印在控制台上。不过，既然是流对象，我们就可以玩一个"小把戏"，改变它的流向。
-
-```java
-public class PrintDemo {
-    public static void main(String[] args) throws IOException {
-		// 调用系统的打印流,控制台直接输出97
-        System.out.println(97);
-      
-		// 创建打印流,指定文件的名称
-        PrintStream ps = new PrintStream("ps.txt");
-      	
-      	// 设置系统的打印流流向,输出到ps.txt
-        System.setOut(ps);
-      	// 调用系统的打印流,ps.txt中输出97
-        System.out.println(97);
-    }
+~~~java
+public static void main(String[] args) throws IOException {
+    //1.创建File对象表示要压缩的文件
+    File src = new File("D:\\a.txt");
+    //2.创建File对象表示压缩包的位置
+    File dest = new File("D:\\");
+    //3.调用方法用来压缩
+    toZip(src, dest);
 }
-```
 
-# 5. 压缩流和解压缩流
-
-压缩流：
-
-​	负责压缩文件或者文件夹
-
-解压缩流：
-
-​	负责把压缩包中的文件和文件夹解压出来
-
-```java
 /*
-*   解压缩流
-*
-* */
-public class ZipStreamDemo1 {
-    public static void main(String[] args) throws IOException {
-
-        //1.创建一个File表示要解压的压缩包
-        File src = new File("D:\\aaa.zip");
-        //2.创建一个File表示解压的目的地
-        File dest = new File("D:\\");
-
-        //调用方法
-        unzip(src,dest);
-
+ *   作用：压缩
+ *   参数一：表示要压缩的文件
+ *   参数二：表示压缩包的位置
+ * */
+public static void toZip(File src, File dest) throws IOException {
+    //1.创建压缩流关联压缩包，这个压缩包名字一定要手动加上，压缩流中关联基本流，再去关联压缩包的路径
+    ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(new File(dest, "a.zip")));
+    //2.创建ZipEntry对象，表示压缩包里面的每一个文件和文件夹
+    //参数：压缩包里面的路径
+    ZipEntry entry = new ZipEntry("a.txt");
+    //3.把ZipEntry对象放到压缩包当中
+    zos.putNextEntry(entry);
+    //创建ZipOutputStream的时候肯定会在D盘下新建a.zip的压缩包，但是压缩包里还是空的，所以下面创建了ZipEntry对象，这个ZipEntry就表示压缩包里的a.txt，但是这个文件中还没有数据！我们还需要将原始文件中的数据再写到ZipEntry中才行。
+    //4.把src文件中的数据写到压缩包当中
+    FileInputStream fis = new FileInputStream(src); // 从src中读取数据
+    int b; // 表示读到的数据
+    while ((b = fis.read()) != -1) {
+        // 将读取到的数据写到压缩包中
+        zos.write(b);
     }
-
-    //定义一个方法用来解压
-    public static void unzip(File src,File dest) throws IOException {
-        //解压的本质：把压缩包里面的每一个文件或者文件夹读取出来，按照层级拷贝到目的地当中
-        //创建一个解压缩流用来读取压缩包中的数据
-        ZipInputStream zip = new ZipInputStream(new FileInputStream(src));
-        //要先获取到压缩包里面的每一个zipentry对象
-        //表示当前在压缩包中获取到的文件或者文件夹
-        ZipEntry entry;
-        while((entry = zip.getNextEntry()) != null){
-            System.out.println(entry);
-            if(entry.isDirectory()){
-                //文件夹：需要在目的地dest处创建一个同样的文件夹
-                File file = new File(dest,entry.toString());
-                file.mkdirs();
-            }else{
-                //文件：需要读取到压缩包中的文件，并把他存放到目的地dest文件夹中（按照层级目录进行存放）
-                FileOutputStream fos = new FileOutputStream(new File(dest,entry.toString()));
-                int b;
-                while((b = zip.read()) != -1){
-                    //写到目的地
-                    fos.write(b);
-                }
-                fos.close();
-                //表示在压缩包中的一个文件处理完毕了。
-                zip.closeEntry();
-            }
-        }
-        zip.close();
-    }
+    //closeEntry()表示当前的文件已经书写完毕
+    zos.closeEntry();
+    zos.close();
 }
-```
+~~~
+
+
+
+-----
+
+# 115.压缩流（压缩文件夹）
+
+由于上一个代码，我们只需要压缩一个文件，因此写 `a.txt` 是没有问题的，但是如果我们写 `aaa\\a.txt` 会出现什么情况呢？
+
+~~~java
+ZipEntry entry = new ZipEntry("aaa\\a.txt");
+~~~
+
+可以发现它是先有了一个 `aaa文件夹`，然后在 `aaa文件夹` 里面才有了 `a.txt`
+
+<img src="./assets/image-20240505095442624.png" alt="image-20240505095442624" style="zoom:67%;" />
+
+我们再来加一层 `bbb`
+
+~~~java
+ZipEntry entry = new ZipEntry("aaa\\bbb\\a.txt");
+~~~
+
+<img src="./assets/image-20240505095606566.png" alt="image-20240505095606566" style="zoom:67%;" />
+
+由此可知，`ZipEntry` 里面的参数其实也表示压缩包里面的路径，通过这个特点，我们就可以去压缩包中创建不同层级的子文件夹了。
+
+有的同学写路径的时候会像下面这种写法一样
+
+~~~java
+//1.创建File对象表示要压缩的文件夹
+File src = new File("D:\\aaa");
+//2.创建File对象表示压缩包放在哪里（压缩包的父级路径）
+File destParent = new File("D:\\aaa.zip");
+~~~
+
+但是如果真的这么写，代码会非常的不方便。
+
+例如以后我不想压缩 `aaa文件夹` 了，而是想压缩 `bbb文件夹`，那么下面的压缩包名字还需要跟着改，太麻烦了。
+
+我的需求是：如果我上面改了，下面也能跟着一起变动。
 
 ```java
-public class ZipStreamDemo2 {
-    public static void main(String[] args) throws IOException {
-        /*
-         *   压缩流
-         *      需求：
-         *          把D:\\a.txt打包成一个压缩包
-         * */
-        //1.创建File对象表示要压缩的文件
-        File src = new File("D:\\a.txt");
-        //2.创建File对象表示压缩包的位置
-        File dest = new File("D:\\");
-        //3.调用方法用来压缩
-        toZip(src,dest);
-    }
-
-    /*
-    *   作用：压缩
-    *   参数一：表示要压缩的文件
-    *   参数二：表示压缩包的位置
-    * */
-    public static void toZip(File src,File dest) throws IOException {
-        //1.创建压缩流关联压缩包
-        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(new File(dest,"a.zip")));
-        //2.创建ZipEntry对象，表示压缩包里面的每一个文件和文件夹
-        //参数：压缩包里面的路径
-        ZipEntry entry = new ZipEntry("aaa\\bbb\\a.txt");
-        //3.把ZipEntry对象放到压缩包当中
-        zos.putNextEntry(entry);
-        //4.把src文件中的数据写到压缩包当中
-        FileInputStream fis = new FileInputStream(src);
-        int b;
-        while((b = fis.read()) != -1){
-            zos.write(b);
-        }
-        zos.closeEntry();
-        zos.close();
-    }
+public static void main(String[] args) throws IOException {
+    //1.创建File对象表示要压缩的文件夹
+    File src = new File("D:\\aaa");
+    //2.创建File对象表示压缩包放在哪里（压缩包的父级路径）
+    //getParentFile()：获取父级路径
+    File destParent = src.getParentFile();//D:\\
+    //3.创建File对象表示压缩包的路径
+    File dest = new File(destParent, src.getName() + ".zip");
+    //4.创建压缩流关联压缩包，解压缩流中关联基本流，再去关键压缩包的路径
+    ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(dest));
+    //5.获取src里面的每一个文件，变成ZipEntry对象，放入到压缩包当中
+    //由于src是一个文件夹，如果你想要获取到里面的每一个文件，需要递归
+    toZip(src, zos, src.getName());//aaa
+    //6.释放资源
+    zos.close();
 }
-```
 
-```java
-public class ZipStreamDemo3 {
-    public static void main(String[] args) throws IOException {
-        /*
-         *   压缩流
-         *      需求：
-         *          把D:\\aaa文件夹压缩成一个压缩包
-         * */
-        //1.创建File对象表示要压缩的文件夹
-        File src = new File("D:\\aaa");
-        //2.创建File对象表示压缩包放在哪里（压缩包的父级路径）
-        File destParent = src.getParentFile();//D:\\
-        //3.创建File对象表示压缩包的路径
-        File dest = new File(destParent,src.getName() + ".zip");
-        //4.创建压缩流关联压缩包
-        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(dest));
-        //5.获取src里面的每一个文件，变成ZipEntry对象，放入到压缩包当中
-        toZip(src,zos,src.getName());//aaa
-        //6.释放资源
-        zos.close();
-    }
-
-    /*
-    *   作用：获取src里面的每一个文件，变成ZipEntry对象，放入到压缩包当中
-    *   参数一：数据源
-    *   参数二：压缩流
-    *   参数三：压缩包内部的路径
-    * */
-    public static void toZip(File src,ZipOutputStream zos,String name) throws IOException {
-        //1.进入src文件夹
-        File[] files = src.listFiles();
-        //2.遍历数组
-        for (File file : files) {
-            if(file.isFile()){
-                //3.判断-文件，变成ZipEntry对象，放入到压缩包当中
-                ZipEntry entry = new ZipEntry(name + "\\" + file.getName());//aaa\\no1\\a.txt
-                zos.putNextEntry(entry);
-                //读取文件中的数据，写到压缩包
-                FileInputStream fis = new FileInputStream(file);
-                int b;
-                while((b = fis.read()) != -1){
-                    zos.write(b);
-                }
-                fis.close();
-                zos.closeEntry();
-            }else{
-                //4.判断-文件夹，递归
-                toZip(file,zos,name + "\\" + file.getName());
-                //     no1            aaa   \\   no1
+/*
+ *   作用：获取src里面的每一个文件，变成ZipEntry对象，放入到压缩包当中
+ *   参数一：数据源
+ *   参数二：压缩流，这个压缩流已经关联好了压缩包
+ *   参数三：压缩包内部的路径
+ * */
+public static void toZip(File src, ZipOutputStream zos, String name) throws IOException {
+    //1.进入src文件夹
+    File[] files = src.listFiles();
+    //2.遍历数组
+    //file依次表示src里面的文件或者文件夹
+    for (File file : files) {
+        if (file.isFile()) {
+            //3.判断-文件，变成ZipEntry对象，放入到压缩包当中
+            ZipEntry entry = new ZipEntry(name + "\\" + file.getName());//aaa\\no1\\a.txt
+            zos.putNextEntry(entry);
+            //读取文件中的数据，写到压缩包
+            FileInputStream fis = new FileInputStream(file);
+            int b;
+            while ((b = fis.read()) != -1) {
+                zos.write(b);
             }
+            fis.close();
+            zos.closeEntry();
+        } else {
+            //4.判断-文件夹，递归
+            toZip(file, zos, name + "\\" + file.getName());
         }
     }
 }
 ```
 
-# 6. 工具包（Commons-io）
 
-介绍：
 
-​	Commons是apache开源基金组织提供的工具包，里面有很多帮助我们提高开发效率的API
+----
+
+# 116. 工具包（Commons-io）
+
+## 一、引入
+
+`Commons-io` 是 `apache开源基金组织` 提供的一组有关IO操作的开源工具包。
+
+很多课程中会将 `Commons-io` 说成 `框架`，这个说法是有问题的，因为它还达不到框架的级别，它只是一个工具包而已。
+
+`apache` 是一个专门为支持开源软件项目而办的一个非盈利性组织。
+
+这个组织成立于 `1999年`，总部设于美国马里兰州。
+
+这个组织有很多很多项目，现在在世界各地被广泛的使用，这些开源的项目为Java的快速发展提供了不可磨灭的贡献。
+
+例如有我们后面学习的 `Web应用服务器tomcat`、`项目管理工具maven`、`Java的安全框架shiro`、`分布式框架Dubbo`、`消息中间件ACTIVEMQ、RocketMQ`、`大数据的消息中间件kafka`、`分布式中做配置中心的zookeeper`、`大数据的分析平台Apache Pig`、`大数据开发的三大框架hadoop/spark/flink`、`分步搜索lucene，但是它现在已经被es所替代了`、`还有我们现在所学习的commons`。
+
+![image-20240505105024710](./assets/image-20240505105024710.png)
+
+Commons是apache开源基金组织提供的工具包，里面有很多帮助我们提高开发效率的API。
 
 比如：
 
@@ -12339,61 +12546,152 @@ public class ZipStreamDemo3 {
 
 作用：提高IO流的开发效率。
 
+----
+
+## 二、使用
+
+由于 `commons-io` 不是我们自己写的，也不是Java提供的，而是第三方组织 `apache` 提供的。
+
+第三方组织会将写好的代码打包成一个压缩包交给你，只不过在Java中压缩包的后缀是 `jar`，所以我们也把它叫做 `jar包`。
+
+在 `jar包` 中其实就是别人写好的各种各样的类，如果你想要使用这些类中的方法，是不能直接用的，而是需要先将别人的代码导入到我们自己的项目中。
+
+但是在以后我们会用到很多很多别人写好的代码，因此在正式使用的第一步是：在项目中新建一个文件夹：lib，这个文件夹以后去专门存放第三方jar包。
+
 使用方式：
 
-1，新建lib文件夹
+1，在项目中新建一个文件夹：lib
 
-2，把第三方jar包粘贴到文件夹中
+2，将jar包复制粘贴到lib文件夹
 
-3，右键点击add as a library
+3，右键点击jar包，选择Add As a Library，表示将jar包跟我们的项目关联在一起了
 
-代码示例：
+4，在类中导包使用
+
+它里面已经写好的方法有很多很多，但是有前面的的 `IO流` 做基础，这些方法很简单，看它的名字基本上也能猜出它的作用了。
+
+并且你也能猜出它底层是怎么写代码的。
+
+首先我们来说第一个相对来说比较常用的类 `FileUtils`。
+
+第一个单词 `File` 表示 `文件 / 文件夹的路径`，`Utils` 表示 `工具`，因此这个类里面的方法都是一些 `文件/文件夹相关的方法`
+
+![image-20240505105211255](./assets/image-20240505105211255.png)
+
+除了这个类外，还有 `IOUtils类`，也是比较常见的。这个类里面大多是跟流相关的方法。
+
+它也有拷贝，只不过在拷贝的时候传的就不是 `File` 了，而是 `IO流`。
+
+![image-20240505105517464](./assets/image-20240505105517464.png)
+
+在以后，`commons-io` 淘汰了，它也会出现其他的替代品，但是只要基础扎实了，这些替代品学起来也是非常简单的。
+
+----
+
+## 三、代码示例
+
+### 1）在项目中新建一个文件夹：lib
+
+新建一个文件夹，文件夹的名字就叫做 `lib`(library)，这就表示以后，我们所用的所有第三方jar包，都会拷贝到这个文件夹中，方便管理。
+
+<img src="./assets/image-20240505105927657.png" alt="image-20240505105927657" style="zoom:67%;" />
+
+来看一下资料中提供的 `jar包`。
+
+- `commons-io-2.11.0-javadoc`：`commons-io` 后面有 `javadoc`，那就表示在这个jar包中，都是一些文档
+- `commons-io-2.11.0-sources`：`sources` 即源代码，因此在这个jar包中装的就是源代码
+- `commons-io-2.11.0-tests`：`test` ，即用来做测试的
+- `commons-io-2.11.0-test-sources`：用来做测试的源代码
+
+因此上面四个都不是我想要的，我真正想要的、要导到当前项目中的，应该是第一个 `commons-io-2.11.0`（后面是它的版本号）
+
+<img src="./assets/image-20240505110120129.png" alt="image-20240505110120129" style="zoom:60%;" />
+
+因此选中第一个 <kbd>ctrl + C</kbd>，回到代码中，点击 `lib` <kbd>ctrl + V</kbd> 直接粘贴进去就行了。
+
+<img src="./assets/image-20240505110531935.png" alt="image-20240505110531935" style="zoom:67%;" />
+
+但是光粘贴过来还不行，还需要让项目跟 `jar包` 两者间产生关联。
+
+最后一步：右键点击 `commons-io-2.11.0.jar`，选择 `Add as Library...` ，然后点击 `OK` 即可
+
+<img src="./assets/image-20240505110940187.png" alt="image-20240505110940187" style="zoom:67%;" />
+
+<img src="./assets/image-20240505111000285.png" alt="image-20240505111000285" style="zoom:50%;" />
+
+一旦关联成功后，在jar包的左边会有一个这样的箭头
+
+<img src="./assets/image-20240505111045973.png" alt="image-20240505111045973" style="zoom:67%;" />
+
+双击打开，是可以将jar包展开，看见里面的内容。这就表示你的jar包导入成功。
+
+<img src="./assets/image-20240505111125904.png" alt="image-20240505111125904" style="zoom:67%;" />
+
+
+
+----
+
+### 2）将jar包复制粘贴到lib文件夹
+
+一旦导入成功之后，我就可以开始使用里面的方法了。
+
+在书写的时候要注意导入的包
+
+<img src="./assets/image-20240505111507736.png" alt="image-20240505111507736" style="zoom:67%;" />
+
+由于下面的方法都是静态的，因此可以直接使用类名调用。
 
 ```java
-public class CommonsIODemo1 {
-    public static void main(String[] args) throws IOException {
-        /*
-          FileUtils类
-                static void copyFile(File srcFile, File destFile)                   复制文件
-                static void copyDirectory(File srcDir, File destDir)                复制文件夹
-                static void copyDirectoryToDirectory(File srcDir, File destDir)     复制文件夹
-                static void deleteDirectory(File directory)                         删除文件夹
-                static void cleanDirectory(File directory)                          清空文件夹
-                static String readFileToString(File file, Charset encoding)         读取文件中的数据变成成字符串
-                static void write(File file, CharSequence data, String encoding)    写出数据
+//一定不要导错包
+import org.apache.commons.io.FileUtils;
+/*
+  FileUtils类
+        static void copyFile(File srcFile, File destFile)                   复制文件
+        static void copyDirectory(File srcDir, File destDir)                复制文件夹，直接拷贝文件夹里面的内容，拷贝后点进去，里面就是srcDir里面的东西。
+        static void copyDirectoryToDirectory(File srcDir, File destDir)     复制文件夹，将数据源文件夹原封不动的拷贝到目的地文件夹里面，点进去后，会先看到srcDir目录，然后再看到srcDir目录里面的东西。
+        static void deleteDirectory(File directory)                         删除文件夹，文件夹本身也被删掉了
+        static void cleanDirectory(File directory)                          清空文件夹，文件夹里面的东西没有了，但是文件夹本身还在
+        static String readFileToString(File file, Charset encoding)         读取文件中的数据变成成字符串
+        static void write(File file, CharSequence data, String encoding)    写出数据
 
-            IOUtils类
-                public static int copy(InputStream input, OutputStream output)      复制文件
-                public static int copyLarge(Reader input, Writer output)            复制大文件
-                public static String readLines(Reader input)                        读取数据
-                public static void write(String data, OutputStream output)          写出数据
-         */
-
-
-        /* File src = new File("myio\\a.txt");
-        File dest = new File("myio\\copy.txt");
-        FileUtils.copyFile(src,dest);*/
+    IOUtils类
+        public static int copy(InputStream input, OutputStream output)      复制文件
+        public static int copyLarge(Reader input, Writer output)            复制大文件
+        public static String readLines(Reader input)                        读取数据
+        public static void write(String data, OutputStream output)          写出数据
+ */
+File src = new File("myio\\a.txt");
+File dest = new File("myio\\copy.txt");
+FileUtils.copyFile(src, dest);
 
 
-        /*File src = new File("D:\\aaa");
-        File dest = new File("D:\\bbb");
-        FileUtils.copyDirectoryToDirectory(src,dest);*/
+File src = new File("D:\\aaa");
+File dest = new File("D:\\bbb");
+FileUtils.copyDirectoryToDirectory(src, dest);
 
-        /*File src = new File("D:\\bbb");
-        FileUtils.cleanDirectory(src);*/
-
-
-
-    }
-}
-
+File src = new File("D:\\bbb");
+FileUtils.cleanDirectory(src);
 ```
 
-# 7. 工具包（hutool）
 
-介绍：
 
-​	Commons是国人开发的开源工具包，里面有很多帮助我们提高开发效率的API
+-----
+
+# 117.工具包（hutool）
+
+## 一、介绍
+
+`hutool` 工具包在市场上用的人是越来越多了，怎么能证明它的受欢迎程度呢？
+
+有一个平台叫做 `GitHub`，它是国际性的代码托管平台，很多人，很多公司会将项目的源代码放到这个平台上面，所以是我们程序员最喜欢的一个网站，在这个网站上能找到很多很多各种各样的开源项目，因此这个网站也被我们程序员戏称为：最大的同性交友网站。
+
+`hutool` 在GitHub上就是非常受欢迎的开源项目之一。
+
+`hutool` 是国人开发的开源工具包，里面有很多帮助我们提高开发效率的API。
+
+其中 `Hu` 是汉语拼音胡，是开发作者致敬前任公司。 `tool` 表示工具，两者一结合 `hutool`，它的开发者还给它赋予了一层寓意：难得糊涂，因此这个工具包我们也叫做 `糊涂包`，稀里糊涂的就把代码写完了。
+
+在糊涂包中，有很多很多的工具类
 
 比如：
 
@@ -12417,7 +12715,152 @@ public class CommonsIODemo1 {
 
 ​	NumberUtil  数字工具类
 
-使用方式：
+但是今天我们还是来学习跟 `IO` 相关的工具类，一共有七个工具类。
+
+最后两个 `FileReader`、`FileWriter` 跟字符流中的两个类名重复了，所以在使用的一定要注意导包。
+
+<img src="./assets/image-20240505113408893.png" alt="image-20240505113408893" style="zoom:50%;" />
+
+----
+
+## 二、相关网址
+
+~~~
+官网：
+	https://hutool.cn/
+中文使用文档：
+	https://hutool.cn/docs/#/
+API文档：
+	https://apidoc.gitee.com/dromara/hutool/
+~~~
+
+### 1）官网
+
+~~~
+https://hutool.cn/
+~~~
+
+在官网上其实没有什么太多的信息，我们可以简单来看一下。
+
+一开始是它的名字，后面是它最新的版本
+
+<img src="./assets/image-20240505114406944.png" alt="image-20240505114406944" style="zoom:27%;" />
+
+往下拉，就是关于 `Hutool` 一些介绍
+
+<img src="./assets/image-20240505114547526.png" alt="image-20240505114547526" style="zoom:37%;" />
+
+再往下拉，点击就可以跳转到另外两个网址。
+
+![image-20240505114640407](./assets/image-20240505114640407.png)
+
+再往下拉可以看见维护人员
+
+<img src="./assets/image-20240505114655278.png" alt="image-20240505114655278" style="zoom:47%;" />
+
+---
+
+### 2）中文使用文档
+
+~~~
+https://hutool.cn/docs/#/
+~~~
+
+第二个才是真正有用的，在简洁中就是对 `Hutool` 做了一个介绍。
+
+![image-20240505114842454](./assets/image-20240505114842454.png)
+
+再往下看，它说了 `Hutool` 里面包含了很多很多组件，每个组件里面又有不同的功能
+
+我们主要的是来看这里的第四个：`hutool-core`，它是 `hutool` 的核心包，在这个核心包里面提供了很多很多的工具类。
+
+我们现在要学习的 `io相关` 的就是在 `core` 这个包中，因此一会我们要找的也是 `core` 里面的东西。
+
+![image-20240505114935769](./assets/image-20240505114935769.png)
+
+接下来我们就要来看一下 `io` 里面七个相关的类了。
+
+![image-20240505115202813](./assets/image-20240505115202813.png)
+
+这些类里面都有什么样的方法，方法都有什么样的作用呢？此时就需要来看第三个网址。
+
+---
+
+### 3）API文档
+
+~~~
+https://apidoc.gitee.com/dromara/hutool/
+~~~
+
+由于 `Hutool` 是中国人写的，所以它后面的解释都是中文的，我们在学习起来的时候非常的轻松。
+
+在刚开始打开的页面中，就是 `Hutool` 里面所有的包和每个包的作用。
+
+首先来找 `core包`，这个包是核心包
+
+但是在这个包里面还有很多很多的子包，每个子包又有自己的作用。
+
+例如 `core.bean` 就是跟JavaBean相关的
+
+![image-20240505115637507](./assets/image-20240505115637507.png)
+
+`core.clone`，就是跟克隆相关的。
+
+<img src="./assets/image-20240505115717282.png" alt="image-20240505115717282" style="zoom:67%;" />
+
+`core.date` ，跟时间相关的。
+
+<img src="./assets/image-20240505115801261.png" alt="image-20240505115801261" style="zoom:80%;" />
+
+再往下找，`core.io`，就是跟我们现在所学习的 `io` 所相关的，因此一会我们要找的就是  `core.io` 这个包下。
+
+![image-20240505115903374](./assets/image-20240505115903374.png)
+
+怎么找？
+
+首先看左边上面，先选择包名，找到 `core.io` 点击。
+
+然后下面就会出现在 `io包` 下所有的类。
+
+<img src="./assets/image-20240505120002200.png" alt="image-20240505120002200" style="zoom:57%;" />
+
+首先找 `IoUtil`，看左边，`IoUtil` 中所有的方法和解释都出来了。
+
+![image-20240505120113054](./assets/image-20240505120113054.png)
+
+如果你想看 `FileUtil` 也一样
+
+这些方法我们甚至都不需要自己练，看后面的解释都会了。
+
+例如第一个 `appendLines方法`：将列表写入文件，追加模式。
+
+这里的列表可以理解为单列集合，因为方法的参数类型是 `Collection`。
+
+![image-20240505120158909](./assets/image-20240505120158909.png)
+
+如果不想追加，想清空，此时就可以继续往下找，可以找到 `writeLines`，表示将集合里面的数据写到文件中，但是会覆盖。
+
+![image-20240505120355527](./assets/image-20240505120355527.png)
+
+既然有写，那肯定有读的相关方法。
+
+例如下面方法，它可以将文件里的数据读到一个集合中返回，返回值就是一个集合。
+
+![image-20240505120542265](./assets/image-20240505120542265.png)
+
+如果我现在不讲，让你用里面的方法，也只是可以使用的。这就是打基础的重要性，你可以很快上手，而且看到这个方法，你也差不多知道它的底层是怎么写的了。
+
+----
+
+## 三、代码示例
+
+因为糊涂包不是我们自己写的，也不是Java写的，而是第三方写的，因此还是需要导入它的jar包。
+
+在使用的时候要注意了，JDK版本一定要是8或者8以上的。
+
+<img src="./assets/image-20240505113846429.png" alt="image-20240505113846429" style="zoom:67%;" />
+
+还是以下步骤，这里就不截图了
 
 1，新建lib文件夹
 
@@ -12425,55 +12868,121 @@ public class CommonsIODemo1 {
 
 3，右键点击add as a library
 
-代码示例：
+下面会对 `File类` 里面一些好用的、常见方法做一个演示，由于下面的方法都是静态的，因此可以直接使用类名调用。
 
-```java
-public class Test1 {
-    public static void main(String[] args) {
-    /*
-        FileUtil类:
-                file：根据参数创建一个file对象
-                touch：根据参数创建文件
+~~~java
+//导包的时候一定不要导错包
+import cn.hutool.core.io.FileUtil;
+~~~
 
-                writeLines：把集合中的数据写出到文件中，覆盖模式。
-                appendLines：把集合中的数据写出到文件中，续写模式。
-                readLines：指定字符编码，把文件中的数据，读到集合中。
-                readUtf8Lines：按照UTF-8的形式，把文件中的数据，读到集合中
+----
 
-                copy：拷贝文件或者文件夹
-    */
+### 1）`file()`
+
+file：根据参数创建一个file对象
+
+<kbd>ctrl + p</kbd> 来看下它的参数
+
+它可以将一个字符串所表示的路径变成 `File对象`，还可以将父级路径跟子级路径做一个拼接，这两个功能跟之前所学习的 `File` 的构造方法是完全一模一样的。
+
+还没完，它的强大之处在下面两个构造方法。
+
+`String... names`：可变参数，因此我们可以在小括号中传入多个参数一起进行拼接。
+
+<img src="./assets/image-20240505121203427.png" alt="image-20240505121203427" style="zoom:67%;" />
+
+~~~java
+File file1 = FileUtil.file("D:\\", "aaa", "bbb", "a.txt");
+System.out.println(file1);//D:\aaa\bbb\a.txt
+~~~
+
+---
+
+### 2）`touch()`
+
+touch：根据参数创建文件
+
+那是不是跟我们之前所学习的 `createNewFile()` 是一样的呢？
+
+~~~java
+File f = new File("a.txt");
+f.createNewFile(); // 此时可以创建一个新的空的文件
+~~~
+
+但是 `createNewFile()` 如果父级路径是不存在的，那么方法会有IOException异常。
+
+此时这个 `touch()` 就非常的强悍了，如果父级路径不存在，它不会报错，它会帮你把父级路径一起创建出来
+
+~~~java
+File touch = FileUtil.touch(file1);
+System.out.println(touch);
+~~~
+
+----
+
+### 3）`writeLines()`
+
+writeLines：把集合中的数据写出到文件中，覆盖模式。
+
+此时会有两个效果：集合中的数据已经写到了文件中，并且文件中的东西也被覆盖。
+
+<img src="./assets/image-20240505122239684.png" alt="image-20240505122239684" style="zoom:67%;" />
+
+~~~java
+ArrayList<String> list = new ArrayList<>();
+list.add("aaa");
+list.add("aaa");
+list.add("aaa");
+
+File file2 = FileUtil.writeLines(list, "D:\\a.txt", "UTF-8");
+System.out.println(file2);
+~~~
+
+----
+
+### 4）`appendLines()`
+
+appendLines：把集合中的数据写出到文件中，续写模式。
+
+~~~java
+ArrayList<String> list = new ArrayList<>();
+list.add("aaa");
+list.add("aaa");
+list.add("aaa");
+File file3 = FileUtil.appendLines(list, "D:\\a.txt", "UTF-8");
+System.out.println(file3);
+~~~
+
+效果如下
+
+<img src="./assets/image-20240505122440121.png" alt="image-20240505122440121" style="zoom:67%;" />
+
+----
+
+### 5）`readLines()`
+
+readLines：指定字符编码，把文件中的数据，读到集合中。
+
+第三个参数其实是可以传递一个集合的，此时它会将 `a.txt` 文件里的数据进行读取，读完后放到集合中，然后再将这个集合给你返回
+
+<img src="./assets/image-20240505122631181.png" alt="image-20240505122631181" style="zoom:67%;" />
+
+但是这么写太麻烦了，干嘛要自己创建集合，直接让方法帮我们创建，因此下面我们调用两个参数的方法，这个方法底层会帮我们创建集合。
+
+在读的时候有个特点：一行数据它认为是集合中的一个元素。
+
+~~~java
+List<String> list = FileUtil.readLines("D:\\a.txt", "UTF-8");
+System.out.println(list);
+~~~
 
 
-       /* File file1 = FileUtil.file("D:\\", "aaa", "bbb", "a.txt");
-        System.out.println(file1);//D:\aaa\bbb\a.txt
 
-        File touch = FileUtil.touch(file1);
-        System.out.println(touch);
+----
 
+# -------------------------------------
 
-        ArrayList<String> list = new ArrayList<>();
-        list.add("aaa");
-        list.add("aaa");
-        list.add("aaa");
-
-        File file2 = FileUtil.writeLines(list, "D:\\a.txt", "UTF-8");
-        System.out.println(file2);*/
-
-      /*  ArrayList<String> list = new ArrayList<>();
-        list.add("aaa");
-        list.add("aaa");
-        list.add("aaa");
-        File file3 = FileUtil.appendLines(list, "D:\\a.txt", "UTF-8");
-        System.out.println(file3);*/
-        List<String> list = FileUtil.readLines("D:\\a.txt", "UTF-8");
-        System.out.println(list);
-    }
-}
-```
-
-
-
-
+# day30 阶段综合案例（带权重的随机&每日一记）
 
 
 
