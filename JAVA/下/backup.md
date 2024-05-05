@@ -12984,35 +12984,217 @@ System.out.println(list);
 
 # day30 阶段综合案例（带权重的随机&每日一记）
 
+# 制造假数据
 
+例如，如果我要随机点名，那么同学的姓名需要在记事本中提前准备好。
 
+如果这些名字让你随便写，肯定很多同学都写不出什么花样。
 
+例如：张三、李四、王五、赵六、孙七、周八..........
 
+这些就是假数据，是我们胡编乱造的虚假数据，虽然这些数据是胡编乱造的，但是在开发中，这些数据尽可能要与实际的情况相吻合。
 
+<img src="./assets/image-20240505133110343.png" alt="image-20240505133110343" style="zoom:50%;" />
 
+制造假数据的方式有很多，先来介绍第一种：网络爬取。
 
+```
+制造假数据：
+    获取姓氏：https://hanyu.baidu.com/shici/detail?pid=0b2f26d4c0ddb3ee693fdb1137ee1b0d&from=kg0
+    获取男生名字：http://www.haoming8.cn/baobao/10881.html（但是只有名，没有姓）
+    获取女生名字：http://www.haoming8.cn/baobao/7641.html（但是只有名，没有姓）
+```
 
+当数据爬取完毕后，将姓氏和名字拼起来，出来的就是我们现在想要的数据。
 
+<img src="./assets/image-20240505133427363.png" alt="image-20240505133427363" style="zoom:50%;" />
 
+<img src="./assets/image-20240505133448990.png" alt="image-20240505133448990" style="zoom:50%;" />
 
+# 118.网络爬虫（爬取姓氏）
 
+## 一、代码分析
 
+`familyName` 表示姓氏，后面加个 `Net` ，表示网址记录的是姓氏。
 
+~~~java
+public static void main(String[] args) throws IOException {
+    //1.定义变量记录网址
+    String familyNameNet = "https://hanyu.baidu.com/shici/detail?pid=0b2f26d4c0ddb3ee693fdb1137ee1b0d&from=kg0";
+    String boyNameNet = "http://www.haoming8.cn/baobao/10881.html";
+    String girlNameNet = "http://www.haoming8.cn/baobao/7641.html";
 
+    //2.爬取数据，把网址上所有的数据拼接成一个字符串
+    //由于要爬取三次，因此定义成方法，后面调用三次即可。
+    //familyName：表示里面装的是所有的姓氏。Str：并且它是以字符串的姓氏来进行表示的
+    String familyNameStr = webCrawler(familyNameNet);
+    String boyNameStr = webCrawler(boyNameNet);
+    String girlNameStr = webCrawler(girlNameNet);
 
+    System.out.println(familyNameStr);
+    // System.out.println(boyNameStr);
+    // System.out.println(girlNameStr);
 
+}
 
+/*
+* crawler：爬虫
+* 作用：
+*   从网络中爬取数据，把数据拼接成字符串返回
+* 形参：
+*   网址
+* 返回值：
+*   爬取到的所有数据
+* */
+public static String webCrawler(String net) throws IOException {
+    //1.定义StringBuilder拼接爬取到的数据
+    StringBuilder sb = new StringBuilder();
+    //2.创建一个URL对象，url就表示网址的对象
+    URL url = new URL(net);
+    //3.链接上这个网址
+    //细节：必须保证网络是畅通的，而且这个网址是可以链接上的。
+    URLConnection conn = url.openConnection();
+    //4.读取数据
+    //getInputStream()：获取到输入流，网址上所有的数据通过这个输入流就能读到了
+    //但是InputStream是一个字节流，由于在网址上有可能会有中文，这个中文就不能用字节流去读了，因为可能会乱码。因此我们需要将字节流进行转换，转换为字符流
+    InputStreamReader isr = new InputStreamReader(conn.getInputStream());
+    int ch;
+    while ((ch = isr.read()) != -1){
+        sb.append((char)ch);
+    }
+    //5.释放资源
+    isr.close();
+    //6.把读取到的数据返回
+    return sb.toString();
+}
+~~~
 
+运行代码，我们来看一看我们现在爬取到的到底是什么。
 
+因为它爬取到的数据相对来讲比较复杂，我们一个一个来看，先来看第一个：familyNameStr
 
+运行代码，可以看见浏览器上的数据都爬取出来了。
 
+在这些爬取出来的数据，里面包含了我们所有想要的姓氏。
 
+![image-20240505135553215](./assets/image-20240505135553215.png)
 
+接下来看第二个爬取到的网址
 
+~~~java
+// System.out.println(familyNameStr);
+System.out.println(boyNameStr);
+// System.out.println(girlNameStr);
+~~~
 
+可以发现运行结果也是一样的，它里面有所有的东西。
 
+但是我不是所有东西都要，我只要里面的名字。
 
+![image-20240505135749970](./assets/image-20240505135749970.png)
 
+三个网址中的数据我们都爬取出来了，接下来需要通过正则表达式，将其中符合要求的数据获取出来。
+
+并且我是想在三个网址中都进行获取，因此我们还需要来写一个方法 `getData()`，表示获取数据的意思。
+
+~~~java
+//3.通过正则表达式，把其中符合要求的数据获取出来
+//familyNameTempList里面记录的都是姓名，只不过这个集合是临时的，所以加了一个Temp，也就是说我们拿到这个临时的集合后，还需要将它再进行处理
+ArrayList<String> familyNameTempList = getData(familyNameStr,"正则表达式");
+ArrayList<String> boyNameTempList = getData(boyNameStr,"正则表达式");
+ArrayList<String> girlNameTempList = getData(girlNameStr,"正则表达式");
+
+/*
+* 作用：根据正则表达式获取字符串中的数据
+* 参数一：
+*       完整的字符串
+* 参数二：
+*       正则表达式
+* 参数三：
+*      ???? 第三个参数现在还不确定
+*
+* 返回值：
+*       真正想要的数据
+* */
+private static ArrayList<String> getData(String str, String regex, ???) {
+    //1.创建集合存放数据
+    ArrayList<String> list = new ArrayList<>();
+    //2.按照正则表达式的规则，去获取数据
+    Pattern pattern = Pattern.compile(regex);
+    //按照pattern的规则，到str当中获取数据
+    Matcher matcher = pattern.matcher(str);
+    while (matcher.find()){
+        System.out.println(m.group());
+    }
+    return list;
+}
+~~~
+
+接下来就需要先将正则表达式写出来。
+
+正则表达式该如何写呢？你要获取什么，就写谁的正则表达式。
+
+思考：我要获取的是这些姓氏，像下面的这些说明性的文字我其实是不要的，因此我需要写这些数据的正则表达式。
+
+观察发现，每一句都是任意的四个汉字，然后中间用逗号或者句话隔开。我们就可以利用这个特点去写正则表达式。
+
+<img src="./assets/image-20240505140658920.png" alt="image-20240505140658920" style="zoom:47%;" />
+
+~~~java
+ArrayList<String> familyNameTempList = getData(familyNameStr,".{4}(，|。)");
+~~~
+
+先爬取一下试试，可以发现都爬取出来了。但
+
+<img src="./assets/image-20240505143555196.png" alt="image-20240505143555196" style="zoom:67%;" />
+
+是逗号跟句号我不要怎么办？也就是说在上面这个正则表达式中，我只需要获取前面这一部分。因此可以将前面的数据括起来，将它当成第一组，后面一个括号当成第二组。
+
+因此这个方法的后面就可以加上第三个参数，第三个参数就表示正则表达式中的第几组，如果传0，表示要获取这里完整的数据；1
+
+~~~java
+ArrayList<String> familyNameTempList = getData(familyNameStr,"(.{4})(，|。)");
+~~~
+
+接下来完善 `getData()`，index写在 `group()` 中
+
+~~~java
+/*
+* 作用：根据正则表达式获取字符串中的数据
+* 参数一：
+*       完整的字符串
+* 参数二：
+*       正则表达式
+* 参数三：
+*      获取数据
+*       0：获取符合正则表达式所有的内容
+*       1：获取正则表达式中第一组数据
+*       2：获取正则表达式中第二组数据
+*       ...以此类推
+*
+* 返回值：
+*       真正想要的数据
+*
+* */
+private static ArrayList<String> getData(String str, String regex,int index) {
+    //1.创建集合存放数据
+    ArrayList<String> list = new ArrayList<>();
+    //2.按照正则表达式的规则，去获取数据
+    Pattern pattern = Pattern.compile(regex);
+    //按照pattern的规则，到str当中获取数据
+    Matcher matcher = pattern.matcher(str);
+    while (matcher.find()){
+        list.add(matcher.group(index));
+    }
+    return list;
+}
+~~~
+
+重新运行，此时所有的名字已经都获取到了
+
+<img src="./assets/image-20240505144128736.png" alt="image-20240505144128736" style="zoom:67%;" />
+
+但是此时它还是四个字连在一次，等会我们需要将它们分开，因此 `familyNameTempList` 只是一个临时的集合。
 
 
 
