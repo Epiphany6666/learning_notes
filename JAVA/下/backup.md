@@ -2107,7 +2107,17 @@ for (int i = 1; i <= 10; i++) {
 
 其实就是因为现在上网的人太多了，一台服务器扛不住了，就需要将一个大项目拆分成n个小项目，部署在n个服务器中。
 
-但是这就会有一个小问题：
+但是这就会有一个小问题：用户在上网的时候，我也不知道访问哪个服务器。
+
+所以在中间就会有一个服务网关，它会根据一些算法计算出，现在哪台服务器的压力还比较小。
+
+其中有一个算法叫做：带权重的随机，随机到哪台服务器，用户就会去访问所对应的服务器，这样的好处就是可以能让我们的项目去被更多的人访问。
+
+一开始我们可以给每台服务器都设置权重为1，那就表示每台服务器所随机到的概率是一样的。
+
+<img src="./assets/image-20240505171537016.png" alt="image-20240505171537016" style="zoom:50%;" />
+
+但是假设，现在有一台服务器访问的人数太多了，此时我们就可以将它的权重降低，如果降到0的话，就不会再随机到这台服务器了。
 
 不想打字了，以后有时间再补
 
@@ -12742,7 +12752,9 @@ https://hutool.cn/
 
 在官网上其实没有什么太多的信息，我们可以简单来看一下。
 
-一开始是它的名字，后面是它最新的版本
+一开始是它的名字，后面是它最新的版本。
+
+下面就是一些相关网址。
 
 <img src="./assets/image-20240505114406944.png" alt="image-20240505114406944" style="zoom:27%;" />
 
@@ -12934,6 +12946,7 @@ list.add("aaa");
 list.add("aaa");
 list.add("aaa");
 
+//细节：糊涂包的相对路径，不是相对于当前项目而言的，而是相对class文件而言的
 File file2 = FileUtil.writeLines(list, "D:\\a.txt", "UTF-8");
 System.out.println(file2);
 ~~~
@@ -13011,7 +13024,7 @@ System.out.println(list);
 
 <img src="./assets/image-20240505133448990.png" alt="image-20240505133448990" style="zoom:50%;" />
 
-# 118.网络爬虫（爬取姓氏）
+# 118.网络爬虫
 
 ## 一、代码分析
 
@@ -13089,11 +13102,15 @@ System.out.println(boyNameStr);
 
 可以发现运行结果也是一样的，它里面有所有的东西。
 
-但是我不是所有东西都要，我只要里面的名字。
-
 ![image-20240505135749970](./assets/image-20240505135749970.png)
 
-三个网址中的数据我们都爬取出来了，接下来需要通过正则表达式，将其中符合要求的数据获取出来。
+但是我不是所有东西都要，我只要里面的名字。
+
+----
+
+## 二、爬取姓氏
+
+接下来需要通过正则表达式，将其中符合要求的数据获取出来。
 
 并且我是想在三个网址中都进行获取，因此我们还需要来写一个方法 `getData()`，表示获取数据的意思。
 
@@ -13196,27 +13213,717 @@ private static ArrayList<String> getData(String str, String regex,int index) {
 
 但是此时它还是四个字连在一次，等会我们需要将它们分开，因此 `familyNameTempList` 只是一个临时的集合。
 
+---
+
+## 三、爬取男神名字
+
+正则表达式该怎么写呢？
+
+我们需要打开网址，来查看我们需要爬取数据的特点。
+
+可以看见名字都是两个汉字，在后面是以`中文的顿号`或者`中文的句话结尾`
+
+<img src="./assets/image-20240505153604504.png" alt="image-20240505153604504" style="zoom:57%;" />
+
+~~~java
+ArrayList<String> boyNameTempList = getData(boyNameStr, "(..)(、|。)", 1);
+~~~
+
+但是这样其实还不行，打印集合看看，可以发现，不仅名字被爬取出来了，还有一些我们不需要的东西也被爬取出来了
+
+`、日` 也是满足正则表达式要求的，因此我们需要继续修改正则。
+
+<img src="./assets/image-20240505154020392.png" alt="image-20240505154020392" style="zoom: 50%;" />
+
+此时就要来想，这里就不能获取任意的数据了，只有前面是中文才能获取。
+
+那中文在字符编码中的范围是多少呢？此时我们就可以使用之前分享过的 `any-rule` 插件。
+
+然后在插件中输入 `中文`，双击点一下即可。
+
+<img src="./assets/image-20240505154440130.png" alt="image-20240505154440130" style="zoom:50%;" />
+
+~~~java
+ArrayList<String> boyNameTempList = getData(boyNameStr,"([\\u4E00-\\u9FA5]{2})(、|。)",1);
+~~~
+
+<img src="./assets/image-20240505154623432.png" alt="image-20240505154623432" style="zoom:67%;" />
+
+----
+
+## 四、爬取女生名字
+
+打开浏览器（http://www.haoming8.cn/baobao/7641.html），查看我们需要爬取数据的规律。
+
+有的人说：可以以空格结尾，或者回车结尾。
+
+当然不能这样爬取，因为这样符合要求的太多了，凡是有空格或者回车的，都会把它收录进来！
+
+我们可以换种思路：将一整行数据看做是一个元素进行爬取。
+
+<img src="./assets/image-20240505154818917.png" alt="image-20240505154818917" style="zoom:50%;" />
+
+~~~java
+ArrayList<String> girlNameTempList = getData(girlNameStr,"(.. ){4}..", 0);
+~~~
+
+---
+
+## 五、数据处理
+
+### 1）姓
+
+在 `familyNameTempList` 集合中，是每四个姓当做是一个元素。
+
+![image-20240505160035585](./assets/image-20240505160035585.png)
+
+但是这不是我们想要的，我们想要的是将里面每一个姓都拆开放到一个新的集合中。
+
+```java
+//4.处理数据
+//familyNameTempList（姓氏）
+//处理方案：把每一个姓氏拆开并添加到一个新的集合当中
+ArrayList<String> familyNameList = new ArrayList<>();
+for (String str : familyNameTempList) {
+    //str 赵钱孙李  周吴郑王   冯陈褚卫   蒋沈韩杨
+    for (int i = 0; i < str.length(); i++) {
+        char c = str.charAt(i);
+        familyNameList.add(c + "");
+    }
+}
+```
+
+---
+
+### 2）男生的名字
+
+在 `boyNameTempList` 集合中，可以发现这些数据我们不需要做什么处理，直接就可以拿过来用。
+
+但是发现有些数据是重复的，因此我们只需要将它做一个去重就行了。
+
+<img src="./assets/image-20240505160456543.png" alt="image-20240505160456543" style="zoom:67%;" />
+
+去重我们有很多的办法，例如创建一个HashSet集合，或者创建ArrayList集合，当数据往集合中添加的时候判断一下
+
+~~~java
+//boyNameTempList（男生的名字）
+//处理方案：去除其中的重复元素
+ArrayList<String> boyNameList = new ArrayList<>();
+for (String str : boyNameTempList) {
+    if(!boyNameList.contains(str)){
+        boyNameList.add(str);
+    }
+}
+~~~
+
+---
+
+### 3）女生的名字
+
+可以发现女生的姓名是每五个为一组，名字跟名字之间用空格进行了隔开
+
+```java
+//girlNameTempList（女生的名字）
+//处理方案：把里面的每一个元素用空格进行切割，得到每一个女生的名字
+ArrayList<String> girlNameList = new ArrayList<>();
+
+for (String str : girlNameTempList) {
+    String[] arr = str.split(" ");
+    for (int i = 0; i < arr.length; i++) {
+        girlNameList.add(arr[i]);
+    }
+}
+```
+
+-----
+
+## 六、生成数据
+
+需求：姓名（唯一）-性别-年龄（随机）
+
+这里定义一个方法，在方法中完成这个需求。
+
+~~~java
+//5.生成数据
+//姓名（唯一）-性别-年龄
+ArrayList<String> list = getInfos(familyNameList, boyNameList, girlNameList, 70, 50);
+Collections.shuffle(list);
+
+/*
+* 作用：
+*      获取男生和女生的信息：张三-男-23
+*
+* 形参：
+*      参数一：装着姓氏的集合
+*      参数二：装着男生名字的集合
+*      参数三：装着女生名字的集合
+*      参数四：需要的男生的个数
+*      参数五：需要的女生的个数
+
+* 返回值：
+*	   由于我们要获取的名字有很多很多，就应该返回一个集合
+* */
+public static ArrayList<String> getInfos(ArrayList<String> familyNameList,ArrayList<String> boyNameList,ArrayList<String> girlNameList, int boyCount,int girlCount){
+    //1.生成男生不重复的名字
+    HashSet<String> boyhs = new HashSet<>();
+    while (true){
+        if(boyhs.size() == boyCount){
+            break;
+        }
+        //随机
+        Collections.shuffle(familyNameList);
+        Collections.shuffle(boyNameList);
+        boyhs.add(familyNameList.get(0) + boyNameList.get(0));
+    }
+    //2.生成女生不重复的名字
+    HashSet<String> girlhs = new HashSet<>();
+    while (true){
+        if(girlhs.size() == girlCount){
+            break;
+        }
+        //随机
+        Collections.shuffle(familyNameList);
+        Collections.shuffle(girlNameList);
+        girlhs.add(familyNameList.get(0) + girlNameList.get(0));
+    }
+    //3.生成男生的信息并添加到集合当中
+    ArrayList<String> list = new ArrayList<>();
+    Random r = new Random();
+    //【18 ~ 27】
+    for (String boyName : boyhs) {
+        //boyName依次表示每一个男生的名字
+        int age = r.nextInt(10) + 18;
+        list.add(boyName + "-男-" + age);
+    }
+    //4.生成女生的信息并添加到集合当中
+    //用来生成任意数到任意数之间的随机数 例如7 ~15
+    //1.让这个范围头尾都减去一个值，让这个范围从0开始  -7   0~8
+    //2.尾巴+1       8 + 1 = 9
+    //3.最终的结果，再加上第一步减去的值。 r.nextInt(9) + 7;// 7 ~ 15
+    //这里要生成的是【18 ~ 25】
+    for (String girlName : girlhs) {
+        //girlName依次表示每一个女生的名字
+        int age = r.nextInt(8) + 18;
+        list.add(girlName + "-女-" + age);
+    }
+    return list;
+}
+~~~
+
+----
+
+## 七、写出数据
+
+~~~java
+//6.写出数据
+BufferedWriter bw = new BufferedWriter(new FileWriter("myiotest\\names.txt"));
+for (String str : list) {
+    bw.write(str);
+    bw.newLine();
+}
+bw.close();
+~~~
+
+---
+
+## 八、完整代码
+
+~~~java
+public static void main(String[] args) throws IOException {
+    /*
+     制造假数据：
+         获取姓氏：https://hanyu.baidu.com/shici/detail?pid=0b2f26d4c0ddb3ee693fdb1137ee1b0d&from=kg0
+         获取男生名字：http://www.haoming8.cn/baobao/10881.html
+         获取女生名字：http://www.haoming8.cn/baobao/7641.html
+    */
+
+    //1.定义变量记录网址
+    String familyNameNet = "https://hanyu.baidu.com/shici/detail?pid=0b2f26d4c0ddb3ee693fdb1137ee1b0d&from=kg0";
+    String boyNameNet = "http://www.haoming8.cn/baobao/10881.html";
+    String girlNameNet = "http://www.haoming8.cn/baobao/7641.html";
+
+    //2.爬取数据,把网址上所有的数据拼接成一个字符串
+    String familyNameStr = webCrawler(familyNameNet);
+    String boyNameStr = webCrawler(boyNameNet);
+    String girlNameStr = webCrawler(girlNameNet);
+
+    //3.通过正则表达式，把其中符合要求的数据获取出来
+    ArrayList<String> familyNameTempList = getData(familyNameStr,"(.{4})(，|。)",1);
+    ArrayList<String> boyNameTempList = getData(boyNameStr,"([\\u4E00-\\u9FA5]{2})(、|。)",1);
+    ArrayList<String> girlNameTempList = getData(girlNameStr,"(.. ){4}..",0);
+
+    //4.处理数据
+    //familyNameTempList（姓氏）
+    //处理方案：把每一个姓氏拆开并添加到一个新的集合当中
+    ArrayList<String> familyNameList = new ArrayList<>();
+    for (String str : familyNameTempList) {
+        //str 赵钱孙李  周吴郑王   冯陈褚卫   蒋沈韩杨
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            familyNameList.add(c + "");
+        }
+    }
+    //boyNameTempList（男生的名字）
+    //处理方案：去除其中的重复元素
+    ArrayList<String> boyNameList = new ArrayList<>();
+    for (String str : boyNameTempList) {
+        if(!boyNameList.contains(str)){
+            boyNameList.add(str);
+        }
+    }
+    //girlNameTempList（女生的名字）
+    //处理方案：把里面的每一个元素用空格进行切割，得到每一个女生的名字
+    ArrayList<String> girlNameList = new ArrayList<>();
+
+    for (String str : girlNameTempList) {
+        String[] arr = str.split(" ");
+        for (int i = 0; i < arr.length; i++) {
+            girlNameList.add(arr[i]);
+        }
+    }
+
+    //5.生成数据
+    //姓名（唯一）-性别-年龄
+    ArrayList<String> list = getInfos(familyNameList, boyNameList, girlNameList, 70, 50);
+    Collections.shuffle(list);
+
+
+    //6.写出数据
+    BufferedWriter bw = new BufferedWriter(new FileWriter("myiotest\\names.txt"));
+    for (String str : list) {
+        bw.write(str);
+        bw.newLine();
+    }
+    bw.close();
+
+
+}
+
+/*
+* 作用：
+*      获取男生和女生的信息：张三-男-23
+*
+* 形参：
+*      参数一：装着姓氏的集合
+*      参数二：装着男生名字的集合
+*      参数三：装着女生名字的集合
+*      参数四：男生的个数
+*      参数五：女生的个数
+* */
+public static ArrayList<String> getInfos(ArrayList<String> familyNameList,ArrayList<String> boyNameList,ArrayList<String> girlNameList, int boyCount,int girlCount){
+    //1.生成男生不重复的名字
+    HashSet<String> boyhs = new HashSet<>();
+    while (true){
+        if(boyhs.size() == boyCount){
+            break;
+        }
+        //随机
+        Collections.shuffle(familyNameList);
+        Collections.shuffle(boyNameList);
+        boyhs.add(familyNameList.get(0) + boyNameList.get(0));
+    }
+    //2.生成女生不重复的名字
+    HashSet<String> girlhs = new HashSet<>();
+    while (true){
+        if(girlhs.size() == girlCount){
+            break;
+        }
+        //随机
+        Collections.shuffle(familyNameList);
+        Collections.shuffle(girlNameList);
+        girlhs.add(familyNameList.get(0) + girlNameList.get(0));
+    }
+    //3.生成男生的信息并添加到集合当中
+    ArrayList<String> list = new ArrayList<>();
+    Random r = new Random();
+    //【18 ~ 27】
+    for (String boyName : boyhs) {
+        //boyName依次表示每一个男生的名字
+        int age = r.nextInt(10) + 18;
+        list.add(boyName + "-男-" + age);
+    }
+    //4.生成女生的信息并添加到集合当中
+    //【18 ~ 25】
+    for (String girlName : girlhs) {
+        //girlName依次表示每一个女生的名字
+        int age = r.nextInt(8) + 18;
+        list.add(girlName + "-女-" + age);
+    }
+    return list;
+}
 
 
 
+/*
+* 作用：根据正则表达式获取字符串中的数据
+* 参数一：
+*       完整的字符串
+* 参数二：
+*       正则表达式
+* 参数三：
+*      获取数据
+*       0：获取符合正则表达式所有的内容
+*       1：获取正则表达式中第一组数据
+*       2：获取正则表达式中第二组数据
+*       ...以此类推
+*
+* 返回值：
+*       真正想要的数据
+*
+* */
+private static ArrayList<String> getData(String str, String regex,int index) {
+    //1.创建集合存放数据
+    ArrayList<String> list = new ArrayList<>();
+    //2.按照正则表达式的规则，去获取数据
+    Pattern pattern = Pattern.compile(regex);
+    //按照pattern的规则，到str当中获取数据
+    Matcher matcher = pattern.matcher(str);
+    while (matcher.find()){
+        list.add(matcher.group(index));
+    }
+    return list;
+
+}
+
+
+/*
+* 作用：
+*   从网络中爬取数据，把数据拼接成字符串返回
+* 形参：
+*   网址
+* 返回值：
+*   爬取到的所有数据
+* */
+public static String webCrawler(String net) throws IOException {
+    //1.定义StringBuilder拼接爬取到的数据
+    StringBuilder sb = new StringBuilder();
+    //2.创建一个URL对象
+    URL url = new URL(net);
+    //3.链接上这个网址
+    //细节：保证网络是畅通的，而且这个网址是可以链接上的。
+    URLConnection conn = url.openConnection();
+    //4.读取数据
+    InputStreamReader isr = new InputStreamReader(conn.getInputStream());
+    int ch;
+    while ((ch = isr.read()) != -1){
+        sb.append((char)ch);
+    }
+    //5.释放资源
+    isr.close();
+    //6.把读取到的数据返回
+    return sb.toString();
+}
+~~~
 
 
 
+----
+
+# 122.利用糊涂包生成假数据
+
+之前的代码我们写了很多，那第三方工具中有没有什么现成的方法呢？
+
+其实是有的，在糊涂包中有一个现成的方法帮助我们爬取数据，而且它也有现成的方法帮助我们利用正则表达式进行解析。
+
+因此向这种 `webCraler()` 和 `getData()` 两个方法，可以直接调用jar包中的方法。
+
+那我们该如何找到方法呢？
+
+例如我们要找跟爬取相关的，来看看它的代码是怎么写的。
+
+它里面有一个工具类 `HttpUtil`，里面有一个静态方法 `get()`，将网址传递过去，它就可以将网址中所有的数据都拼接成字符串给你返回了。
+
+拿到数据后，再根据正则表达式获取到里面想要的数据（参数为：正则表达式、字符串、正则表达式里面的第几组），方法返回一个集合。
+
+`ReUtil` 中的 `Re` 是 `Regex` 的前面两个字母。
+
+`findAll()` 返回的是一个 `List集合`，它是以多态的形式进行返回的，在底层它真正创建的还是一个 `ArrayList集合`
+
+<img src="./assets/image-20240505165326806.png" alt="image-20240505165326806" style="zoom:67%;" />
+
+如果一定要转为ArrayList，那么只需要强转一下就行了，或者不强转，直接使用List接收也行。
+
+两种方法都行，看你自己喜欢哪种。
+
+![image-20240505164626239](./assets/image-20240505164626239.png)
+
+接下来就可以改造代码了。
+
+细节：糊涂包的相对路径，不是相对于当前项目而言的，而是相对class文件而言的。（结合下面写出数据的代码看）
+
+<img src="./assets/image-20240505170301990.png" alt="image-20240505170301990" style="zoom:50%;" />
+
+~~~java
+public static void main(String[] args){
+    //利用糊涂包生成假数据，并写到文件当中
+
+    //1. 定义网址
+    String familyNameNet = "https://hanyu.baidu.com/shici/detail?pid=0b2f26d4c0ddb3ee693fdb1137ee1b0d&from=kg0";
+    String boyNameNet = "http://www.haoming8.cn/baobao/10881.html";
+    String girlNameNet = "http://www.haoming8.cn/baobao/7641.html";
+
+    //2.爬取数据
+    String familyNameStr = HttpUtil.get(familyNameNet);
+    String boyNameStr = HttpUtil.get(boyNameNet);
+    String girlNameStr = HttpUtil.get(girlNameNet);
+
+    //3.利用正则表达式获取数据
+    //通过正则表达式，把其中符合要求的数据获取出来
+    List<String> familyNameTempList = ReUtil.findAll("(.{4})(，|。)", familyNameStr, 1);
+    List<String> boyNameTempList = ReUtil.findAll("([\\u4E00-\\u9FA5]{2})(、|。)", boyNameStr, 1);
+    List<String> girlNameTempList = ReUtil.findAll("(.. ){4}..", girlNameStr, 0);
+
+    System.out.println(familyNameTempList);
+    System.out.println(boyNameTempList);
+    System.out.println(girlNameTempList);
+
+    //4.处理数据
+    //familyNameTempList（姓氏）
+    //处理方案：把每一个姓氏拆开并添加到一个新的集合当中
+    ArrayList<String> familyNameList = new ArrayList<>();
+    for (String str : familyNameTempList) {
+        //str 赵钱孙李  周吴郑王   冯陈褚卫   蒋沈韩杨
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            familyNameList.add(c + "");
+        }
+    }
+    //boyNameTempList（男生的名字）
+    //处理方案：去除其中的重复元素
+    ArrayList<String> boyNameList = new ArrayList<>();
+    for (String str : boyNameTempList) {
+        if(!boyNameList.contains(str)){
+            boyNameList.add(str);
+        }
+    }
+    //girlNameTempList（女生的名字）
+    //处理方案：把里面的每一个元素用空格进行切割，得到每一个女生的名字
+    ArrayList<String> girlNameList = new ArrayList<>();
+
+    for (String str : girlNameTempList) {
+        String[] arr = str.split(" ");
+        for (int i = 0; i < arr.length; i++) {
+            girlNameList.add(arr[i]);
+        }
+    }
+
+    //5.生成数据
+    //姓名（唯一）-性别-年龄
+    ArrayList<String> list = getInfos(familyNameList, boyNameList, girlNameList, 70, 50);
+    Collections.shuffle(list);
+
+    //6.写出数据
+    //细节：糊涂包的相对路径，不是相对于当前项目而言的，而是相对class文件而言的
+    FileUtil.writeLines(list, "names.txt", "UTF-8");
+
+}
+
+/*
+ * 作用：
+ *      获取男生和女生的信息：张三-男-23
+ *
+ * 形参：
+ *      参数一：装着姓氏的集合
+ *      参数二：装着男生名字的集合
+ *      参数三：装着女生名字的集合
+ *      参数四：男生的个数
+ *      参数五：女生的个数
+ * */
+public static ArrayList<String> getInfos(ArrayList<String> familyNameList,ArrayList<String> boyNameList,ArrayList<String> girlNameList, int boyCount,int girlCount){
+    //1.生成男生不重复的名字
+    HashSet<String> boyhs = new HashSet<>();
+    while (true){
+        if(boyhs.size() == boyCount){
+            break;
+        }
+        //随机
+        Collections.shuffle(familyNameList);
+        Collections.shuffle(boyNameList);
+        boyhs.add(familyNameList.get(0) + boyNameList.get(0));
+    }
+    //2.生成女生不重复的名字
+    HashSet<String> girlhs = new HashSet<>();
+    while (true){
+        if(girlhs.size() == girlCount){
+            break;
+        }
+        //随机
+        Collections.shuffle(familyNameList);
+        Collections.shuffle(girlNameList);
+        girlhs.add(familyNameList.get(0) + girlNameList.get(0));
+    }
+    //3.生成男生的信息并添加到集合当中
+    ArrayList<String> list = new ArrayList<>();
+    Random r = new Random();
+    //【18 ~ 27】
+    for (String boyName : boyhs) {
+        //boyName依次表示每一个男生的名字
+        int age = r.nextInt(10) + 18;
+        list.add(boyName + "-男-" + age);
+    }
+    //4.生成女生的信息并添加到集合当中
+    //【18 ~ 25】
+    for (String girlName : girlhs) {
+        //girlName依次表示每一个女生的名字
+        int age = r.nextInt(8) + 18;
+        list.add(girlName + "-女-" + age);
+    }
+    return list;
+}
+~~~
 
 
 
+----
+
+# 124.带权重的随机算法
+
+## 一、引入
+
+<img src="./assets/image-20240505170956670.png" alt="image-20240505170956670" style="zoom:47%;" />
+
+这种带权重的随机是非常常见的，例如现在最后的微服务架构，就用到了这种随机算法。
+
+其中这里的 `带权重随机算法` 还是很重要的：在以后，我们会学习到微服务架构，那为什么会有微服务呢？
+
+其实就是因为现在上网的人太多了，一台服务器扛不住了，就需要将一个大项目拆分成n个小项目，部署在n个服务器中。
+
+但是这就会有一个小问题：用户在上网的时候，我也不知道访问哪个服务器。
+
+所以在中间就会有一个服务网关，它会根据一些算法计算出，现在哪台服务器的压力还比较小。
+
+其中有一个算法叫做：带权重的随机，随机到哪台服务器，用户就会去访问所对应的服务器，这样的好处就是可以能让我们的项目去被更多的人访问。
+
+一开始我们可以给每台服务器都设置权重为1，那就表示每台服务器所随机到的概率是一样的。
+
+<img src="./assets/image-20240505171537016.png" alt="image-20240505171537016" style="zoom:50%;" />
+
+但是假设，现在有一台服务器访问的人数太多了，此时我们就可以将它的权重降低，如果降到0的话，就不会再随机到这台服务器了。
+
+----
+
+## 二、梳理过程
+
+在本地文件中，在准备数据的时候，需要给每个学生都设置权重，最初每个学生的权重都是1，就表示每个人被随机到的概率是一样的。
+
+这个概率我们也会称之为 `权重比`，使用 `个人权重 ÷ 总权重 = 每个人的权重占比`。
+
+现在在文件中总共有十个人，总权重就是 `10`，它里面每个人的权重占比就是 `0.1`，即 `10%` 的概率。
+
+那么这 `10%` 的概率怎么去计算呢？
+
+在之前我们曾经说了一个办法， `70%的概率随机到男生`、`30%的概率随机到女生`，此时我们可以往一个集合中添加 `7个1，和3个0`，根据 `1` 和 `0` 的占比情况来决定概率，这种方法是可以的，但是它是适合于数据量比较少的情况，一旦数据比较多，就不合适了。
+
+男生、女生只有两种，可以用 `1` 和 `0` 来表示，那如果有十种数据、一百种数据呢，就没有办法进行表示了。
+
+因此我们需要来学习一种新办法：求出每一种数据的权重占比范围。
+
+画个数轴来理解一下，既然每个学生概率都是 `10%`，此时就可以将数轴中的 `0.0` 到 `1.0` 去分成十等分，每一个学生占据其中的一份。
+
+<img src="./assets/image-20240505173006581.png" alt="image-20240505173006581" style="zoom:30%;" />
+
+因此这里的权重占比可以这么去理解：假设现在随机到 `0.0` 到 `0.1` 之间就表示是第一位同学；随机到 `0.1` 到 `0.2` 之间就表示是第一位同学..........以此类推
+
+<img src="./assets/image-20240505173038548.png" alt="image-20240505173038548" style="zoom:33%;" />
+
+---
+
+## 三、代码实现
+
+首先检查数据，注意除了姓名、性别、年龄外，还需要有权重
+
+<img src="./assets/image-20240505173156786.png" alt="image-20240505173156786" style="zoom:67%;" />
+
+由于现在学生中的属性比较多，因此我们最好新建一个JavaBean类，在JavaBean类中定义四个属性，统一管理，这样会更方便一些。
+
+`成员变量里面的属性顺序` 最好跟 `文件中的顺序`保持一致
+
+**Student.java**
+
+~~~java
+public class Student {
+    private String name;
+    private String gender;
+    private int age;
+    private double weight;
+
+    //空参构造、全参构造、set/get方法
+    
+    //改写toString的原因结合下面代码观看
+    public String toString() {
+        return name + "-" + gender + "-" + age + "-" + weight;
+    }
+}
+~~~
+
+**测试类**
+
+~~~java
+//1.把文件中所有的学生信息读取到内存中，并封装成一个Student对象，再方法集合里面，这样我们才能统一的进行管理
+ArrayList<Student> list = new ArrayList<>();
+BufferedReader br = new BufferedReader(new FileReader("myiotest\\src\\com\\itheima\\myiotest6\\names.txt"));
+String line;
+while((line = br.readLine()) != null){
+    String[] arr = line.split("-");
+    Student stu = new Student(arr[0], arr[1],Integer.parseInt(arr[2]), Double.parseDouble(arr[3]));
+    list.add(stu);
+}
+br.close();
+
+//接下来就是要将每个人的权重占比给算出来：个人权重 ÷ 总权重 = 每个人的权重占比
+//2.计算权重的总和
+double weight = 0;
+for (Student stu : list) {
+    weight = weight + stu.getWeight();
+}
+
+//3.计算每一个人的实际占比存起来，这里可以用数组也可以用集合
+//[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+double[] arr = new double[list.size()];
+int index = 0;
+for (Student stu : list) {
+    arr[index] = stu.getWeight() / weight;
+    index++;
+}
+
+//4.计算每一个人的权重占比范围
+//第一个人的范围是0 ~ 0.1，第二个人的范围是0.1~0.2，我们需要想清楚0.2是怎么来的，是不是前一个人0.1的基础上，再去加上自己本身？
+//第三个人的范围也是在前一个人的基础上（0.2）加上自己本身的范围0.1，就变成了0.3
+for (int i = 1; i < arr.length; i++) {
+    arr[i] = arr[i] + arr[i - 1];
+}
+//此时如果直接打印arr，有些小数是不精确的，但是这个不精确对结果影响的不是很大，是在我们能接受范围之内的。
+
+//5.随机抽取
+//获取一个0.0~1.0之间的随机数
+double number = Math.random();
+//判断number在arr中的位置
+//由于在arr中数据是升序排列的，因此可以使用二分查找法
+//方法回返回： - 插入点 - 1
+//插入点 = -方法回返回 - 1
+//获取number这个数据在数组当中的插入点位置
+int result = -Arrays.binarySearch(arr, number) - 1;
+//获取到插入点的位置后，我们就知道是哪个学生了
+Student stu = list.get(result);
+System.out.println(stu);
+
+//6.修改当前学生的权重
+double w = stu.getWeight() / 2;
+stu.setWeight(w);
+
+//7.把集合中的数据再次写到文件中
+BufferedWriter bw = new BufferedWriter(new FileWriter("myiotest\\src\\com\\itheima\\myiotest6\\names.txt"));
+//需要按照指定的格式进行拼接太麻烦了，此时我们可以直接改写toString方法，此时我们就不需要多次调用get方法进行拼接了。
+for (Student s : list) {
+    bw.write(s.toString());
+    bw.newLine();
+}
+bw.close();
+~~~
 
 
 
-
-
-
-
-
-
-
-
-
+----
 
 
 

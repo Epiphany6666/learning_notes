@@ -25,8 +25,36 @@ public class Test2 {
 //        System.out.println(familyNameStr);
 //        System.out.println(boyNameStr);
 //        System.out.println(girlNameStr);
-        ArrayList<String> familyNameTempList = getData(familyNameStr, "(\\u4E00-\\u9FA5{4})(，|。)", 1);
-        System.out.println(familyNameTempList);
+        ArrayList<String> familyNameTempList = getData(familyNameStr, "([\u4E00-\u9FA5]{4})(，|。)", 1);
+        ArrayList<String> boyNameTempList = getData(boyNameStr,"([\\u4E00-\\u9FA5]{2})(、|。)",1);
+        ArrayList<String> girlNameTempList = getData(girlNameStr,"(.. ){4}..",0);
+        System.out.println(girlNameTempList);
+
+        //4.处理数据
+        //familyNameTempList（姓氏）
+        //处理方案：把每一个姓氏拆开并添加到一个新的集合当中
+        ArrayList<String> familyNameList = new ArrayList<>();
+        for (String str : familyNameTempList) {
+            //str 赵钱孙李  周吴郑王   冯陈褚卫   蒋沈韩杨
+            for (int i = 0; i < str.length(); i++) {
+                char c = str.charAt(i);
+                familyNameList.add(c + "");
+            }
+        }
+        //boyNameTempList（男生的名字）
+        //处理方案：去除其中的重复元素
+        ArrayList<String> boyNameList = new ArrayList<>();
+        for (String str : boyNameTempList) {
+            if(!boyNameList.contains(str)){
+                boyNameList.add(str);
+            }
+        }
+        //girlNameTempList（女生的名字）
+        ArrayList<String> girlNameList = new ArrayList<>();
+        for (String str : girlNameTempList) {
+            Collections.addAll(girlNameList, str.split("\\s"));
+        }
+        System.out.println(girlNameList);
 
     }
 
@@ -35,7 +63,7 @@ public class Test2 {
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(str);
         while (m.find()) {
-            System.out.println(m.group(index));
+            list.add(m.group(index));
         }
         return list;
     }
