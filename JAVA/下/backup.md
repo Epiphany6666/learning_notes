@@ -16197,136 +16197,770 @@ public class MyRunnable implements Runnable {
 
 ----
 
-## 三、扩展
+## 三、StringBuffer
 
 学习完同步方法后，我们之前有很多知识点其实也就可以解释了。
 
-很多同学在
+很多同学在之前肯定听过：字符串在进行拼接的时候，除了 `StringBuilder` 外，还有一个类：`StringBuffer`。
+
+那这个 `StringBuffer` 跟我们之前学习的 `StringBuilder` 有什么区别呢？
+
+打开 `API帮助文档` 来看一下。
+
+这里打开了两个 `API帮助文档`，左边是 `StringBuilder`，右边是 `StringBuffer`
+
+![image-20240506192619700](./assets/image-20240506192619700.png)
+
+往下滑，可以惊讶的发现，方法都是一模一样的。
+
+![image-20240506192721093](./assets/image-20240506192721093.png)
+
+那为什么Java要定义两个完全一模一样的类呢？
+
+看下面，StringBuilder下面有这样一句话：将 `StringBuilder` 的实例（即对象的意思）用于多个线程是不安全的。如果需要这样的同步，则建议使用 `StringBuffer`。 
+
+![image-20240506192904651](./assets/image-20240506192904651.png)
+
+接下来看下源码，同样左边是 `StringBuilder`，右边是 `StringBuffer`。
+
+往下拉，找到成员方法。可以发现，`StringBuffer` 里面每一个成员方法都有 `synchronized`，但左边的 `StringBuilder` 所有的成员方法都没有 `synchronized`，这就表示 `StringBuffer` 是线程安全的，因为它里面所有的方法前面都有 `synchronized`，即它里面所有的方法都是同步的。
+
+![image-20240506194200650](./assets/image-20240506194200650.png)
+
+那我们以后如何选择呢？
+
+如果你的代码是单线程的，不需要考虑多线程中数据安全的情况，就用 `StringBuilder` 就行了。
+
+但如果是多线程环境下，需要考虑到 `数据安全`，这时候就可以选择右边的  `StringBuffer`。
 
 
 
 -----
 
+# 150.lock锁
+
+## 一、引入
+
+我们刚刚学习完了同步代码块和同步方法，它们里面有个细节要注意。
+
+这里以同步代码为例。我们发现，当有线程进入到同步代码块后，这里的锁是会自动关闭的。
+
+当线程执行完里面的代码后，锁又会自动打开。
+
+<img src="./assets/image-20240506194701253.png" alt="image-20240506194701253" style="zoom:33%;" />
+
+也就是说这里的锁的开关，我们是没有办法自己控制，都是自动的。
+
+但如果我想手动去加锁，或者手动释放锁，有没有办法呢？
+
+当然这必须是有的，在JavaJDK5以后提供了一个新的锁对象Lock。
+
+Lock实现提供比使用synchronized方法和语句可以获得更广泛的锁定操作。
+
+Lock中提供了获得锁、释放锁的方法，这样我们就可以去手动上锁、手动释放锁。
+
+| 方法名        | 说明   |
+| ------------- | ------ |
+| void lock()   | 获得锁 |
+| void unlock() | 释放锁 |
+
+Lock是接口不能直接实例化（创建对象），这里采用它的实现类ReentrantLock来实例化
+
+在创建对象的时候直接用它的空参构造就行了
+
+| 方法名          | 说明                        |
+| --------------- | --------------------------- |
+| ReentrantLock() | 创建一个ReentrantLock的实例 |
+
+----
+
+## 二、引出问题
+
+将之前的代码使用 `Lock` 来改写
+
+~~~java
+public class MyThread extends Thread{
+    static int ticket = 0;
+
+    //Lock是一个接口，在创建的时候需要创建它实现类的对象
+    Lock lock = new ReentrantLock();
+
+    @Override
+    public void run() {
+        //1.循环
+        while(true){
+            //由于上锁跟释放锁跟同步代码块是重复的，因此需要将同步代码块给注释掉
+            //2.同步代码块
+            //synchronized (MyThread.class){
+            lock.lock(); 
+
+            //3.判断
+            if(ticket == 100){
+                break;
+                //4.判断
+            }else{
+                try {
+                    Thread.sleep(10);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                ticket++;
+                System.out.println(getName() + "在卖第" + ticket + "张票！！！");
+            }
+            //  }
+            lock.unlock(); // 释放锁
+        }
+    }
+}
+~~~
+
+如果此时直接运行代码，票依旧是有重复的，并且也会超出范围。这是为什么呢？
+
+由于我们用的是第一种方式实现的多线程，`MyThread` 需要创建很多次
+
+<img src="./assets/image-20240506201655146.png" alt="image-20240506201655146" style="zoom:57%;" />
+
+如果 `MyThread` 创建很多次，那么势必造成这里的 `Lock锁` 有多个对象，所以我们需要在它的前面加上 `static静态关键字`，这就表示所有的对象都共享同一把锁。
+
+```java
+static Lock lock = new ReentrantLock();
+```
+
+运行后重复的票没有了，超出范围的票也没有了，但是新的问题又出现了：程序居然没停！
+
+<img src="./assets/image-20240506200005501.png" alt="image-20240506200005501" style="zoom:67%;" />
+
+假设三个线程都在 `run()` 这里抢夺CPU的执行权，一开始假设线程1抢夺到了CPU的执行权。
+
+然后执行到while循环、lock.lock()，此时相当于将锁给锁上了，线程1进来。
+
+进来后做了一个判断：`ticket == 100`，发现不等于，就会执行 `else` 中的代码块，于是就会睡觉。
+
+睡觉的时候CPU的执行权就会被抢走，给线程2或者线程3，它抢走后，它执行到了 `lock.lock()`，此时它无法获取到锁对象了，锁已经关闭了，因为线程1已经事先拿到了锁，一旦拿到了锁之后，锁就会关掉。其他的线程就算你抢到了CPU的执行权，它也会被关在外面。到这里还是跟之前是一样的。
+
+继续往下分析，当线程1醒来后，执行下面的代码，直到调用 `unlock()`，即释放锁。
+
+此时回到循环的上面，继续和线程2线程3抢夺CPU执行权。
+
+假设现在每次都是线程1抢到的，因此线程1会把所有的票都卖完。
+
+假设现在是最后一次，`ticket = 100`。假设还是线程1抢到了执行权，此时通过 `lock.lock()` 拿到了锁，然后进行 `ticket == 100` ，判断为true，执行break，直接跳到了循环的外面，此时问题就出现了，它都没有执行到这里的 `unlock()` ！
+
+这就导致了线程1虽然结束了，但是它还拿着锁对象出去的，没有把锁给打开，这就导致了线程2和线程3一直停在 `lock.lock()`，此时程序就不会停止。
+
+<img src="./assets/image-20240506200847457.png" alt="image-20240506200847457" style="zoom:50%;" />
+
+---
+
+## 三、解决问题
+
+但是这并不是我想要的，我想要的是：不管是什么样的情况，程序都能停止，即 `lock.unlock()` 都能执行到。
+
+哪怕你循环结束了，你也得把这个锁释放了。
+
+有的同学会说：在break前面再加一个 `unlock()` 不就行了吗？
+
+这确实是可以的，但是 `unlock()` 算是扫尾代码，像这种扫尾代码我干嘛要写两遍呢？
+
+有没有一种更为简单的办法？是有的，而且是最稳妥的。
+
+在Java中异常的处理体系中，有个 `finally`，特性：不管怎么样，它里面的代码一定会执行，因此我们可以利用这个特性将 `unlock()` 写在 `finally` 中。
+
+改写：将从锁开始全部的代码，全都放到 `try-catch` 中。
+
+~~~java
+public class MyThread extends Thread{
+
+    static int ticket = 0;
+
+    static Lock lock = new ReentrantLock();
+
+    @Override
+    public void run() {
+        //1.循环
+        while(true){
+            //2.同步代码块
+            //synchronized (MyThread.class){
+            lock.lock(); //2 //3
+            try {
+                //3.判断
+                if(ticket == 100){
+                    break;
+                    //4.判断
+                }else{
+                    Thread.sleep(10);
+                    ticket++;
+                    System.out.println(getName() + "在卖第" + ticket + "张票！！！");
+                }
+                //  }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            lock.unlock();
+        }
+    }
+}
+~~~
 
 
-  ```
 
-### 2.5Lock锁【应用】
+----
 
-虽然我们可以理解同步代码块和同步方法的锁对象问题，但是我们并没有直接看到在哪里加上了锁，在哪里释放了锁，为了更清晰的表达如何加锁和释放锁，JDK5以后提供了一个新的锁对象Lock
+# 151.死锁
 
-Lock是接口不能直接实例化，这里采用它的实现类ReentrantLock来实例化
+死锁说白了，就是在程序中出现了锁的嵌套。
 
-- ReentrantLock构造方法
+<img src="./assets/image-20240506202045038.png" alt="image-20240506202045038" style="zoom:33%;" />
 
-  | 方法名             | 说明                   |
-  | --------------- | -------------------- |
-  | ReentrantLock() | 创建一个ReentrantLock的实例 |
+死锁不是一个知识点，它是一个错误。
 
-- 加锁解锁方法
+现在我们学习死锁的目的就是：以后不要犯这个错误。
 
-  | 方法名           | 说明   |
-  | ------------- | ---- |
-  | void lock()   | 获得锁  |
-  | void unlock() | 释放锁  |
+A线程拿着A锁，B线程拿着B锁，它们都在等着对方释放锁，此时程序就会卡死，运行不下去。
 
-- 代码演示
+由于死锁不是一个知识点，而是一个错误，因此下面的代码是不需要你去练的，你只需要理解它的过程就行了
 
-  ```java
-  public class Ticket implements Runnable {
-      //票的数量
-      private int ticket = 100;
-      private Object obj = new Object();
-      private ReentrantLock lock = new ReentrantLock();
+**测试类**
 
-      @Override
-      public void run() {
-          while (true) {
-              //synchronized (obj){//多个线程必须使用同一把锁.
-              try {
-                  lock.lock();
-                  if (ticket <= 0) {
-                      //卖完了
-                      break;
-                  } else {
-                      Thread.sleep(100);
-                      ticket--;
-                      System.out.println(Thread.currentThread().getName() + "在卖票,还剩下" + ticket + "张票");
-                  }
-              } catch (InterruptedException e) {
-                  e.printStackTrace();
-              } finally {
-                  lock.unlock();
-              }
-              // }
-          }
-      }
-  }
+~~~java
+yThread t1 = new MyThread();
+MyThread t2 = new MyThread();
 
-  public class Demo {
-      public static void main(String[] args) {
-          Ticket ticket = new Ticket();
+t1.setName("线程A");
+t2.setName("线程B");
 
-          Thread t1 = new Thread(ticket);
-          Thread t2 = new Thread(ticket);
-          Thread t3 = new Thread(ticket);
+t1.start();
+t2.start();
+~~~
 
-          t1.setName("窗口一");
-          t2.setName("窗口二");
-          t3.setName("窗口三");
+**MyThread.java**
 
-          t1.start();
-          t2.start();
-          t3.start();
-      }
-  }
-  ```
+~~~java
+public class MyThread extends Thread {
+    //定义了两把锁，一把A锁一把B锁
+    static Object objA = new Object();
+    static Object objB = new Object();
 
-### 2.6死锁【理解】
+    @Override
+    public void run() {
+        //1.循环
+        while (true) {
+            //如果是线程A就执行这段
+            if ("线程A".equals(getName())) {
+                //先是A锁
+                synchronized (objA) {
+                    System.out.println("线程A拿到了A锁，准备拿B锁");//A
+                    //再是B锁
+                    synchronized (objB) {
+                        System.out.println("线程A拿到了B锁，顺利执行完一轮");
+                    }
+                }
+            } else if ("线程B".equals(getName())) { //如果是线程B，就执行这段
+                if ("线程B".equals(getName())) {
+                    //但是在线程B中，先是B锁
+                    synchronized (objB) {
+                        System.out.println("线程B拿到了B锁，准备拿A锁");//B
+                        //再是A锁
+                        synchronized (objA) {
+                            System.out.println("线程B拿到了A锁，顺利执行完一轮");
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+~~~
 
-+ 概述
+此时它会出现什么情况呢？运行程序发现，程序卡死了。
 
-  线程死锁是指由于两个或者多个线程互相持有对方所需要的资源，导致这些线程处于等待状态，无法前往执行
+<img src="./assets/image-20240506202805365.png" alt="image-20240506202805365" style="zoom:67%;" />
 
-+ 什么情况下会产生死锁
+那为什么会开始呢？
 
-  1. 资源有限
-  2. 同步嵌套
+首先还是线程A、线程B在抢夺CPU的执行权
 
-+ 代码演示
+~~~~java
+@Override
+public void run() { //A //B
+    ....
+}
+~~~~
 
-  ```java
-  public class Demo {
-      public static void main(String[] args) {
-          Object objA = new Object();
-          Object objB = new Object();
-  
-          new Thread(()->{
-              while(true){
-                  synchronized (objA){
-                      //线程一
-                      synchronized (objB){
-                          System.out.println("小康同学正在走路");
-                      }
-                  }
-              }
-          }).start();
-  
-          new Thread(()->{
-              while(true){
-                  synchronized (objB){
-                      //线程二
-                      synchronized (objA){
-                          System.out.println("小薇同学正在走路");
-                      }
-                  }
-              }
-          }).start();
-      }
-  }
-  ```
+假设现在是线程A抢到了，此时它就会进去，然后做一个判断，是线程A就会执行线程A里面的代码
 
-## 3.生产者消费者
+在执行的时候默认情况下锁都是打开的，所以A可以拿到 `objA`，即A锁
+
+~~~java
+@Override
+public void run() {
+    while (true) {
+        if ("线程A".equals(getName())) {
+            synchronized (objA) { //拿到A锁
+                //一旦拿到后，A锁就关闭了
+                System.out.println("线程A拿到了A锁，准备拿B锁");//然后打印这句话
+                //但是当线程A还没有拿到B锁，此时CPU的执行权被上面的线程B抢到了
+                synchronized (objB) {
+                    System.out.println("线程A拿到了B锁，顺利执行完一轮");
+                }
+            }
+        } else if ("线程B".equals(getName())) {
+            //线程B就会执行到这段代码，此时B锁是打开的，因为线程A停在了第7行，它导致了A锁关闭，但是它还没去操作B锁
+            synchronized (objB) { //因此此时线程B在执行的时候，看到B锁，是可以进来的
+                System.out.println("线程B拿到了B锁，准备拿A锁");//进来后就会打印这句话
+                //但是此时就出问题了，B如果想要继续往下执行，就必须要让A锁打开
+                //但是A锁打开不了，因为线程A还在拿着A锁
+                //那A锁什么时候才能释放呢？很简单，只有当synchronized (objA) 代码块中所有代码都执行完了，A锁才能释放。
+                //说白了线程A需要拿到B锁然后执行完里面的代码A锁才能释放
+                //但是线程A进不去，因为B锁已经被线程B拿到了
+                synchronized (objA) {
+                    System.out.println("线程B拿到了A锁，顺利执行完一轮");
+                }
+            }
+        }
+    }
+}
+~~~
+
+此时线程A正在等着线程B释放锁，而线程B又在等着线程A释放锁，此时两个线程都会卡死在对应的地方：A线程卡死在第7行，B线程卡死在16行，这个时候程序就运行不下去了，这个就是死锁
+
+**总结：以后我们在写锁的时候，千万不要让两个锁嵌套就行了。**
+
+
+
+----
+
+# 152.生产者和消费者（等待唤醒机制）
+
+## 一、思路分析
+
+### 1）引入
+
+`生产者和消费者` 也叫做 `等待唤醒机制`。
+
+`生产者消费者模式` 是一个十分经典的多线程协作的模式，学习完了 `等待唤醒机制`，会让我们对多线程的运行有更加深刻的理解。
+
+之前我们学习过，线程的执行是有随机性的，所以如果有两条线程正在执行，它的结果有可能是这样的，完全随机。
+
+![image-20240506204309069](./assets/image-20240506204309069.png)
+
+但是我们现在学习的 `等待唤醒机制`，这个机制就要打破随机的规则。
+
+它会让两个线程轮流执行，你一次我一次。这就是在 `等待唤醒机制` 中多线程的运行结果。
+
+![image-20240506204406248](./assets/image-20240506204406248.png)
+
+其中的一条线程我们会将它叫做 `生产者`，负责 `生产数据`。
+
+另一条线程我们会叫做 `消费者`，负责 `消费数据`。
+
+由于这个过程非常的复杂，我们先将一个小故事，用故事去理解复杂的代码逻辑。
+
+假设现在有两个人，一个是吃货，一个是厨师。
+
+吃货负责吃，所以它是消费者；厨师负责做，所以它是生产者。
+
+但是光有它们两个还不够，还需要有第三者桌子，因为在默认情况下，线程的执行是具有随机性的，我们需要有一个东西去控制线程的执行，现在我们就用桌子去控制。
+
+<img src="./assets/image-20240506204847961.png" alt="image-20240506204847961" style="zoom:30%;" />
+
+假设现在桌子上有一碗面条，如果有面条，就是吃货执行，负责吃。
+
+<img src="./assets/image-20240506204951698.png" alt="image-20240506204951698" style="zoom:30%;" />
+
+但是如果桌子上没有面条，那就是厨师去执行，它负责做面条。
+
+<img src="./assets/image-20240506205024343.png" alt="image-20240506205024343" style="zoom:30%;" />
+
+我们先来看看理想情况是怎么样的。
+
+理想情况下，就是一开始是厨师先抢到了CPU的执行权，此时桌子上是没有面条的，所以厨师在一开始就要做一碗面条。
+
+做完了后将买那条放在桌子上，再让吃货线程来吃，这就是理想的情况。
+
+相当于就是厨师做一个，吃货吃一个。
+
+
+
+但是程序程序没有这么听话，它不能按照我们自己想的去执行，线程的执行是具有随机性的。
+
+所以我们需要将各种各样的情况给考虑到。
+
+但是它出现的情况没有大家想的那么复杂，只有两种情况。
+
+我们先来分析第一种：消费者等待。
+
+----
+
+### 2）情况一：消费者等待
+
+假设在一开始，不是厨师先抢到CPU的执行权，而是吃货先抢到CPU的执行权，这个时候桌子上还没有东西的，总不能啃桌子吧，所以它只能先等着，代码中叫做 `wait`。
+
+一旦它等了，CPU的执行权一定会被厨师抢到，厨师就会看下桌子上有没有面条，现在没有，那就开始做，做一碗面条放在桌子上。
+
+做完后还没完，吃货还在等着，因此厨师需要含吃货去吃，这个动作我们也叫作 `唤醒`，英文：`notify`。
+
+<img src="./assets/image-20240506210208638.png" alt="image-20240506210208638" style="zoom:43%;" />
+
+吃货一旦被唤醒后就开始。
+
+<img src="./assets/image-20240506210245533.png" alt="image-20240506210245533" style="zoom:33%;" />
+
+以上就是第一种消费者等待的情况。
+
+主要核心思想其实就是看桌子，桌子上如果没有面条，消费者就会等待。
+
+消费者和生产者执行过程如下
+
+<img src="./assets/image-20240506210403572.png" alt="image-20240506210403572" style="zoom:40%;" />
+
+----
+
+### 3）情况二：生产者等待
+
+在一开始的时候是厨师抢到了CPU的执行权，此时桌子上是没有事物的，此时厨师就会执行我们刚刚分析到的三步：制作食物、把事物放在桌子上、叫醒等待的消费者开吃。
+
+但是现在没有人在等，这个其实也没有什么太大关系，就是喊一下的事情，代码是不会受到任何影响的。
+
+<img src="./assets/image-20240506210832037.png" alt="image-20240506210832037" style="zoom:33%;" />
+
+这个时候，就不能是左边的吃货去抢到CPU的执行权了，如果是吃货抢到了CPU的执行权，此时就变成理想情况了。
+
+而我们现在说的是生产者等待的情况，因此下一次还是厨师抢到CPU的执行权。
+
+此时厨师抢到CPU执行权后，她就不能做面条了，因为桌子上已经有了，所以此时厨师只能等着。
+
+因此关于生产者的三步我们就需要改进一下，加个判断即可。
+
+此时厨师已经等着了，一旦它等待，CPU的执行权就会被吃货抢走，吃货就会执行我们刚刚推导的两步，它会去判断桌子上是否有事物，没有事物就会等待。
+
+如果有就开始，吃完后还需要再次唤醒厨师继续做。
+
+说以这才是生产者和消费者完整的执行过程。
+
+<img src="./assets/image-20240506211114149.png" alt="image-20240506211114149" style="zoom:50%;" />
+
+在这个过程中涉及到三个方法
+
+| 方法名           | 说明                                                         |
+| ---------------- | ------------------------------------------------------------ |
+| void wait()      | 当前线程等待，直到另一个线程调用该对象的 notify()方法或 notifyAll()方法唤醒为止 |
+| void notify()    | 随机唤醒单个线程                                             |
+| void notifyAll() | 唤醒所有线程                                                 |
+
+----
+
+## 二、Desk的代码实现
+
+在刚刚分析的过程中，我们知道在里面至少会有三个角色，分别是 `生产者`、`消费者` 以及中间那个控制 `生产者和消费者的那个第三者`。
+
+~~~java
+public class Desk {
+
+    /*
+    * 作用：控制生产者和消费者的执行
+    *
+    * */
+
+    //那如何控制呢？在它里面就应该有一个状态，没有食物就是厨师执行，有实物就是吃货执行
+    //为了方便外界调用，这里直接使用public static就行了
+    //表示桌子上是否有面条  0：没有面条  1：有面条
+    //那为什么不使用boolean类型表示呢？因为boolean只有两个值，它只能控制两条线程轮流执行。
+    //以后我的需求变更了，需要控制三条线程、四条线程轮流执行，这个boolean就搞不定了。因此这里为了考虑到后面的通用性，这里用int类型
+    public static int foodFlag = 0;
+
+    //吃货也不可能一直吃，因此需要有一个变量来表示总个数
+    //总个数
+    public static int count = 10; // 表示吃货最多可以吃十个
+
+    //在线程中还需要用到锁，因此在这里定一个锁对象
+    //锁对象
+    public static Object lock = new Object();
+}
+~~~
+
+接下来就是补全吃货和厨师里面的代码就行了。
+
+----
+
+## 三、消费者代码实现
+
+大家以后在写多线程的时候，一定要按照之前四个套路去写，有了套路多线程的代码会变得非常简单。
+
+```
+1. 循环
+2. 同步代码块（之后可以改写为同步方法或者lock锁，都行）
+3. 判断共享数据是否到了末尾（建议先写到了末尾的情况，因为到了末尾更简单）
+4. 判断共享数据是否到了末尾（没有到末尾，执行核心逻辑）
+```
+
+~~~java
+public class Foodie extends Thread {
+
+    @Override
+    public void run() {
+        //1. 循环
+        while (true) {
+            //2. 同步代码块（之后可以改写为同步方法或者lock锁，都行）
+            //括号中写锁对象，锁对象一定要唯一，在Desk中的静态变量lock，我们将它当做是锁就行了
+            synchronized (Desk.lock) {
+                //3. 判断共享数据是否到了末尾（到了末尾）
+                //什么是共享数据？很简单，你就想线程什么时候才能停止。
+                //即当吃货把十碗面条都吃完了，线程就要停止了。因此此时共享数据就是Desk里面的count。它的初始值是10，如果你变成0了，那么循环就要停止。循环一旦停止，循环就会结束了。
+                if (Desk.count == 0) {
+                    break;
+                } else {
+                    //4. 判断共享数据是否到了末尾（没有到末尾，执行核心逻辑）
+                    //先判断桌子上是否有面条
+                    if (Desk.foodFlag == 0) {
+                        //如果没有，就等待
+                        try {
+                            //等待的时候不能直接调用wait()，而是需要使用锁对象去调用wait()
+                            //为什么是这样呢？其实是有原因的，这行代码会有一个逻辑：让当前线程跟锁进行绑定
+                            //一旦绑定后，在下面我们进行notifyAll()唤醒的时候就可以操作了。
+                            //因为我们在唤醒的时候肯定不能唤醒操作系统中所有的线程，那我该唤醒哪些线程呢？其实就跟这个锁是有关系的。
+                            //我们下面在调用notifyAll()的时候也是通过锁进行调用的，这个时候Dest.lock.notyfyAll()就表示现在要唤醒这把锁绑定的所有线程。
+                            //因此我们不管调用wait()还是调用下面notyfyAll()，都是需要用锁对象调用的。
+                            //wait()有异常，我们需要对它进行处理，并且它只能try不能抛出
+                            Desk.lock.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    } else { // 这里的else就表示footFlag不是0，即桌子上是有面条的
+                        //把吃的总数-1
+                        Desk.count--;
+                        //如果有，就开吃
+                        System.out.println("吃货在吃面条，还能再吃" + Desk.count + "碗！！！");
+                        //吃完之后，唤醒厨师继续做
+                        Desk.lock.notifyAll();//表示要去唤醒绑定在这把锁上的所有线程
+                        //修改桌子的状态
+                        Desk.foodFlag = 0;
+                    }
+                }
+            }
+        }
+    }
+}
+~~~
+
+----
+
+## 四、生产者代码实现
+
+首先生产者也是个多线程，多线程中的四个套路千万别忘了。
+
+~~~java
+1. 循环
+2. 同步代码块（之后可以改写为同步方法或者lock锁，都行）
+3. 判断共享数据是否到了末尾（建议先写到了末尾的情况，因为到了末尾更简单）
+4. 判断共享数据是否到了末尾（没有到末尾，执行核心逻辑）
+~~~
+
+
+
+~~~java
+public class Cook extends Thread {
+    @Override
+    public void run() {
+        //1. 循环
+        while (true) {
+            //2. 同步代码块（之后可以改写为同步方法或者lock锁，都行）
+            synchronized (Desk.lock) {
+                //3. 判断共享数据是否到了末尾
+                if (Desk.count == 0) {
+                    //到末尾了
+                    break;
+                } else {
+                    //没有到末尾
+                    //判断桌子上是否有食物
+                    if (Desk.foodFlag == 1) {
+                        //如果有，就等待吃货将已有的吃掉
+                        try {
+                            Desk.lock.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        //如果没有，就制作食物
+                        System.out.println("厨师做了一碗面条");
+                        //修改桌子上的食物状态
+                        Desk.foodFlag = 1;
+                        //叫醒等待的消费者开吃
+                        Desk.lock.notifyAll();
+                    }
+                }
+            }
+        }
+    }
+}
+~~~
+
+----
+
+## 五、测试
+
+~~~java
+public static void main(String[] args) {
+    //创建线程的对象
+    Cook c = new Cook();
+    Foodie f = new Foodie();
+
+    //给线程设置名字
+    c.setName("厨师");
+    f.setName("吃货");
+
+    //开启线程
+    c.start();
+    f.start();
+}
+~~~
+
+程序运行完毕，可以发现就是跟我们想象中是一样的，厨师做一碗，吃货吃一碗.........
+
+并且程序也已经停止。如果你写完代码，这里的红灯没有灭，那么你的代码就是有bug的。
+
+<img src="./assets/image-20240506213927365.png" alt="image-20240506213927365" style="zoom:50%;" />
+
+
+
+-----
+
+# 155.阻塞队列实现等待唤醒机制
+
+## 一、引入
+
+我们刚刚已经学习完了 `等待唤醒机制` 最基本的写法，其实它还有第二种方式：利用阻塞队列实现。
+
+那什么是阻塞队列呢？其实就好比是连接生产者和消费者之间的管道。
+
+以刚刚的故事为例，厨师做好面条后，就可以将面条放在管道中，而且左边的消费者就可以从管道中获取面条去吃。
+
+而且更重要的是，我们去规定管道中最多能放多少碗面条。
+
+<img src="./assets/g6r6t-ftk7d.gif" alt="g6r6t-ftk7d" style="zoom:40%;" />
+
+如果我们规定管道中只能放一碗面条，那么运行结果就是和我们上面写的代码是一样的，做一碗吃一碗，做一碗吃一碗。
+
+中间的这个管道其实就是阻塞队列。
+
+阻塞队列可以分成两个单词去理解：
+
+- 队列：数据在管道中就好比是排队一样，先放进去的这碗面，是最先被拿出来的，所以就叫做队列。
+
+- 阻塞：当厨师put数据时，如果中间的管道已经放满了，此时厨师就会等着，因此将等着，什么也干不了的这个动作叫做 `阻塞`
+
+  吃货其实也会阻塞的，当吃货从管道中获取不到数据了，此时它也只能等着，什么也干不了，这个动作也叫作阻塞。
+
+知道了什么是阻塞队列，接下来看看阻塞队列的体系结构。
+
+----
+
+## 二、阻塞队列的继承结构
+
+阻塞队列一共实现了四个接口
+
+- 最顶层的接口是 `Iterable`，也就表示，阻塞队列是可以利用迭代器/增强for进行遍历的。
+
+- 阻塞队列本身还实现了 `Collection接口`，由此可见，阻塞队列其实就是一个单列集合。
+
+- `Queue`：它表示队列
+- `BlockingQueue`：表示是阻塞队列
+
+上面四个都是接口，不能直接创建它们的对象，我们要创建的是两个实现类的对象。
+
+`ArrayBlockingQueue`、`LinkedBlockingQueue`，它们有什么区别呢？
+
+`ArrayBlockingQueue`：底层是数组实现的，有界（即有长度的界限）。我们在创建 `ArrayBlockingQueue` 对象的时候，必须要去指定队列的长度。
+
+`LinkedBlockingQueue`：底层是链表实现的，无界（指没有长度的界限），创建它的对象的时候我们不需要去指定队列的长度。但是它又并不是真正的无界，它其实也是有最大值的，只不过这个最大值非常的大，是int的最大值，有21个亿那么多。
+
+----
+
+## 三、用阻塞队列完成 `唤醒机制` 代码实现
+
+用阻塞队列完成 `唤醒机制`，代码非常的简单。
+
+只不过在这里我们有个小细节一定要注意：生产者和消费者必须使用同一个阻塞队列才行。
+
+因此`阻塞队列的对象`的代码最好写在测试类中，有了这个对象后，我们再通过创建对象的方式将队列传递给 `Cook`、`foodie`，这样就可以实现两者用的是同一个阻塞队列。
+
+~~~java
+public class ThreadDemo {
+    public static void main(String[] args) {创建阻塞队列的对象，泛型表示的是队列中数据的类型
+        //通过刚刚的学习我们知道，ArrayBlockingQueue是一个有界的阻塞队列，因此在创建它对象的时候必须指定上线
+        //这里假设它最多只能放1个
+        ArrayBlockingQueue<String> queue = new ArrayBlockingQueue<>(1);
+
+        //2.创建线程的对象，并把阻塞队列传递过去
+        Cook c = new Cook(queue);
+        Foodie f = new Foodie(queue);
+
+        //3.开启线程
+        c.start();
+        f.start();
+    }
+}
+~~~
+
+细节：这里是不需要写锁的，看一下源码就知道了。
+
+~~~java
+public class Cook extends Thread{
+    //定义一个成员变量，表示阻塞队列，只不过此时只是只定义不给值。创建对象的时候才赋值。
+    ArrayBlockingQueue<String> queue;
+
+    public Cook(ArrayBlockingQueue<String> queue) {
+        this.queue = queue;
+    }
+
+    @Override
+    public void run() {
+        while(true){
+            //不断的把面条放到阻塞队列当中
+            try {
+                //异常直接try即可
+                queue.put("面条");
+                System.out.println("厨师放了一碗面条");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
+----------------------------------
+
+public class Foodie extends Thread{
+
+    ArrayBlockingQueue<String> queue;
+
+    public Foodie(ArrayBlockingQueue<String> queue) {
+        this.queue = queue;
+    }
+
+    @Override
+    public void run() {
+        while(true){
+            //不断从阻塞队列中获取面条
+            try {
+                String food = queue.take();
+                System.out.println(food);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+~~~
+
+
+
+
+
+
+
+
 
 ### 3.1生产者和消费者模式概述【应用】
 
@@ -16348,11 +16982,6 @@ Lock是接口不能直接实例化，这里采用它的实现类ReentrantLock来
 
 - Object类的等待和唤醒方法
 
-  | 方法名           | 说明                                                         |
-  | ---------------- | ------------------------------------------------------------ |
-  | void wait()      | 导致当前线程等待，直到另一个线程调用该对象的 notify()方法或 notifyAll()方法 |
-  | void notify()    | 唤醒正在等待对象监视器的单个线程                             |
-  | void notifyAll() | 唤醒正在等待对象监视器的所有线程                             |
 
 ### 3.2生产者和消费者案例【应用】
 
