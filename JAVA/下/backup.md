@@ -12936,10 +12936,6 @@ System.out.println(touch);
 
 writeLines：把集合中的数据写出到文件中，覆盖模式。
 
-此时会有两个效果：集合中的数据已经写到了文件中，并且文件中的东西也被覆盖。
-
-<img src="./assets/image-20240505122239684.png" alt="image-20240505122239684" style="zoom:67%;" />
-
 ~~~java
 ArrayList<String> list = new ArrayList<>();
 list.add("aaa");
@@ -12950,6 +12946,12 @@ list.add("aaa");
 File file2 = FileUtil.writeLines(list, "D:\\a.txt", "UTF-8");
 System.out.println(file2);
 ~~~
+
+此时会有两个效果：集合中的数据已经写到了文件中，并且文件中的东西也被覆盖。
+
+<img src="./assets/image-20240505122239684.png" alt="image-20240505122239684" style="zoom:67%;" />
+
+PS：如果是自定义对象，它会去调用对象的 `toString()` 写入文件中，因此我们往往需要改写 `toString()`，改成我们想要的格式。
 
 ----
 
@@ -13924,6 +13926,741 @@ bw.close();
 
 
 ----
+
+# 125.综合练习：登录注册1
+
+```
+需求：写一个登陆小案例。
+步骤：
+    将正确的用户名和密码手动保存在本地的userinfo.txt文件中。
+    保存格式为:username=zhangsan&password=123
+    让用户键盘录入用户名和密码
+            比较用户录入的和正确的用户名密码是否一致
+    如果一致则打印登陆成功
+            如果不一致则打印登陆失败
+```
+
+文件路径直接拷贝就好，不需要自己手动写
+
+<img src="./assets/image-20240506075613705.png" alt="image-20240506075613705" style="zoom:50%;" />
+
+~~~java
+//1.读取正确的用户名和密码
+BufferedReader br = new BufferedReader(new FileReader("myiotest\\src\\com\\itheima\\myiotest7\\userinfo.txt"));
+String line = br.readLine();//username=zhangsan&password=123
+br.close();
+String[] userInfo = line.split("&");
+String[] arr1 = userInfo[0].split("=");
+String[] arr2 = userInfo[1].split("=");
+
+String rightUsername = arr1[1];
+String rightPassword = arr2[1];
+
+//2.用户键盘录入用户名和密码
+Scanner sc = new Scanner(System.in);
+System.out.println("请输入用户名");
+String username = sc.nextLine();
+System.out.println("请输入密码");
+String password = sc.nextLine();
+
+//3.比较
+if(rightUsername.equals(username) && rightPassword.equals(password)){
+    System.out.println("登陆成功");
+}else{
+    System.out.println("登陆失败");
+}
+~~~
+
+# 登录注册2
+
+```
+需求：写一个登陆小案例（添加锁定账号功能）
+步骤：
+    将正确的用户名和密码手动保存在本地的userinfo.txt文件中。
+    保存格式为:username=zhangsan&password=123&count=0
+    让用户键盘录入用户名和密码
+    比较用户录入的和正确的用户名密码是否一致
+    如果一致则打印登陆成功
+    如果不一致则打印登陆失败，连续输错三次被锁定
+```
+
+细节：如果第三次输对了，次数就需要归0
+
+```java
+public static void main(String[] args) throws IOException {
+   /*
+    需求：写一个登陆小案例（添加锁定账号功能）
+    步骤：
+        将正确的用户名和密码手动保存在本地的userinfo.txt文件中。
+        保存格式为:username=zhangsan&password=123&count=0
+        让用户键盘录入用户名和密码
+        比较用户录入的和正确的用户名密码是否一致
+        如果一致则打印登陆成功
+        如果不一致则打印登陆失败，连续输错三次被锁定
+    */
+    //1.读取正确的用户名和密码
+    BufferedReader br = new BufferedReader(new FileReader("myiotest\\src\\com\\itheima\\myiotest8\\userinfo.txt"));
+    String line = br.readLine();//username=zhangsan&password=123&count=0
+    br.close();
+    String[] userInfo = line.split("&");
+    String[] arr1 = userInfo[0].split("=");
+    String[] arr2 = userInfo[1].split("=");
+    String[] arr3 = userInfo[2].split("=");
+    String rightUsername = arr1[1];
+    String rightPassword = arr2[1];
+    //count:表示用户连续输错的次数
+    int count = Integer.parseInt(arr3[1]);
+    //2.用户键盘录入用户名和密码
+    Scanner sc = new Scanner(System.in);
+    System.out.println("请输入用户名");
+    String username = sc.nextLine();
+    System.out.println("请输入密码");
+    String password = sc.nextLine();
+    //3.比较
+    if (rightUsername.equals(username) && rightPassword.equals(password) && count < 3) {
+        System.out.println("登陆成功");
+        writeInfo("username=" + rightUsername + "&password=" + rightPassword + "&count=0");
+    } else {
+        count++;
+        if (count < 3) {
+            System.out.println("登陆失败,还剩下" + (3 - count) + "次机会");
+        } else {
+            System.out.println("用户账户被锁定");
+        }
+        writeInfo("username=" + rightUsername + "&password=" + rightPassword + "&count=" + count);
+    }
+}
+/*
+* 作用：
+*       写出一个字符串到本地文件中
+* 参数：
+*       要写出的字符串
+* */
+public static void writeInfo(String content) throws IOException {
+    BufferedWriter bw = new BufferedWriter(new FileWriter("myiotest\\src\\com\\itheima\\myiotest8\\userinfo.txt"));
+    bw.write(content);
+    bw.close();
+}
+```
+
+
+
+----
+
+# 126.导入项目
+
+在导入比人的项目的时候有很多同学是这样操作的
+
+![image-20240506081123724](./assets/image-20240506081123724.png)
+
+这么导入是可以的，但是如果涉及到一些路径的话，它有可能路径的表示方式跟你想的不太一样，因此不建议直接这么导入，而是建议在前面多一步。
+
+首先找到当前要导入的模块
+
+<img src="./assets/image-20240506081249085.png" alt="image-20240506081249085" style="zoom:67%;" />
+
+然后打开当前项目，直接将上面找到的模块拷贝到当前项目下
+
+<img src="./assets/image-20240506081745217.png" alt="image-20240506081745217" style="zoom:50%;" />
+
+拷贝成功后，当前项目下就已经有 `puzzlegame` 了，再来导入模块
+
+<img src="./assets/image-20240506081908431.png" alt="image-20240506081908431" style="zoom:67%;" />
+
+找到刚刚拷贝进来的模块，然后选择它的 `iml文件`，然后点击ok即可。
+
+<img src="./assets/image-20240506081952744.png" alt="image-20240506081952744" style="zoom:60%;" />
+
+此时再看项目目录，可以发现 `puzzlegame` 已经出来了，这样导入代码才不会有路径的问题。
+
+<img src="./assets/image-20240506082120425.png" alt="image-20240506082120425" style="zoom:50%;" />
+
+
+
+----
+
+# 127.拼图游戏（登录界面）
+
+## 一、思路分析
+
+由于是具体的项目，此时就需要考虑多个用户的情况。
+
+之前我们还没有学过IO，所有正确的数据只能保存在集合中，这样的操作它是有一个弊端的：程序一旦停止，所有的数据全部丢失，下次运行的时候还得重新注册，因此直接存集合是不行的，我们需要将用户信息保存在本地文件中，永久化存储。
+
+在登录的时候其实就是跟文件中的数据进行比较；在注册的时候就是将用户的信息写到文件中。
+
+<img src="./assets/image-20240506082720070.png" alt="image-20240506082720070" style="zoom:67%;" />
+
+登录的细节：我们肯定要将正确的用户信息读取到内存中，那么什么时候去读呢？是打开登录页面就直接读取，还是点击登录按钮的时候再读取呢？
+
+正确答案：应该在打开界面的时候就读取，因为只要登录界面中没有关闭，我们是不会去修改文件里面的数据的，因此不管你读多少次，什么时候去读，读到的数据都是一样的，既然是这样，那为什么不是一开始就读取进来呢？
+
+思考：读取的代码写在哪呢？静态代码块还是构造方法
+
+想要知道这两个，就要区分静态代码块和构造方法的执行时机。
+
+静态代码块：类第一次加载时执行，而且只执行一次。
+
+构造方法：每次创建对象的时候都会执行，说白了，就是每次打开登录界面的时候，都会先去读一下文件。
+
+我们这里肯定是写在构造方法中，因为我们还有可能会注册，文件中的数据就有可能发生变化，每次打开登录页面的时候，就必须重新读取文件中的内容，否则新注册的用户是看不到的。
+
+----
+
+## 二、代码实现
+
+由于需要跟本地文件发生关系，因此建议先导入一个 `糊涂包`，这样我们写代码会更加的简洁。
+
+<img src="./assets/image-20240506083612675.png" alt="image-20240506083612675" style="zoom:67%;" />
+
+
+
+~~~java
+ArrayList<User> allUsers = new ArrayList<>();
+
+//读取本地文件中的用户信息
+private void readUserInfo() {
+    //1.读取数据，readUtf8Lines()会一行一行的去读取数据，每一行都会放到集合中当做是一个元素
+    List<String> userInfoStrList = FileUtil.readUtf8Lines("C:\\Users\\alienware\\IdeaProjects\\basic-code\\puzzlegame\\userinfo.txt");
+    //2.遍历集合获取用户信息并创建User对象
+    for (String str : userInfoStrList) {
+        //username=zhangsan&password=123
+        String[] userInfoArr = str.split("&");
+        //0  username=zhangsan   1   password=123
+        String[] arr1 = userInfoArr[0].split("=");
+        String[] arr2 = userInfoArr[1].split("=");
+        User u = new User(arr1[1],arr2[1]);
+        allUsers.add(u);
+    }
+
+    System.out.println(allUsers);
+}
+~~~
+
+
+
+----
+
+# 128.注册界面
+
+组件名如下
+
+<img src="./assets/image-20240506084352337.png" alt="image-20240506084352337" style="zoom:40%;" />
+
+步骤如下
+
+<img src="./assets/image-20240506084419153.png" alt="image-20240506084419153" style="zoom:33%;" />
+
+在登录界面中修改如果是注册按钮
+
+~~~java
+else if (e.getSource() == register) {
+    System.out.println("点击了注册按钮");
+    //关闭当前的登录界面
+    this.setVisible(false);
+    //打开注册界面，建议将读取到的用户信息传递给注册页面，这样在注册页面就不需要重新读了
+    new RegisterJFrame(allUsers);
+} 
+~~~
+
+由于登录界面使用的是 `if-else` 结构，因此不需要 `return`，因为 `if-else` 只会进入一个代码块。
+
+![image-20240506085908052](./assets/image-20240506085908052.png)
+
+但是这里是需要 `return` 的。
+
+```java
+public class RegisterJFrame extends JFrame implements MouseListener {
+
+    ArrayList<User> allUsers;
+
+    //提升三个输入框的变量的作用范围，让这三个变量可以在本类中所有方法里面可以使用。
+    JTextField username = new JTextField();
+    JTextField password = new JTextField();
+    JTextField rePassword = new JTextField();
+
+    //提升两个按钮变量的作用范围，让这两个变量可以在本类中所有方法里面可以使用。
+    JButton submit = new JButton();
+    JButton reset = new JButton();
+
+    public RegisterJFrame(ArrayList<User> allUsers) {
+        this.allUsers = allUsers;
+        initFrame();
+        initView();
+        setVisible(true);
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if(e.getSource() == submit){
+            //点击了注册按钮
+            //1.用户名，密码不能为空
+            if(username.getText().length() == 0 || password.getText().length() == 0 || rePassword.getText().length() == 0){
+                showDialog("用户名和密码不能为空");
+                return;
+            }
+            //2.判断两次密码输入是否一致
+            if(!password.getText().equals(rePassword.getText())){
+                showDialog("两次密码输入不一致");
+                return;
+            }
+            //3.判断用户名和密码的格式是否正确
+            //正则表达式可以使用any-rule生成，但生成的太严格了，我们可以自行修改
+            if(!username.getText().matches("[a-zA-Z0-9]{4,16}")){
+                showDialog("用户名不符合规则");
+                return;
+            }
+            if(!password.getText().matches("\\S*(?=\\S{6,})(?=\\S*\\d)(?=\\S*[a-z])\\S*")){
+                showDialog("密码不符合规则，至少包含1个小写字母，1个数字，长度至少6位");
+                return;
+            }
+            //4.判断用户名是否已经重复
+            if(containsUsername(username.getText())){
+                showDialog("用户名已经存在，请重新输入");
+                return;
+            }
+            //5.添加用户
+            allUsers.add(new User(username.getText(), password.getText()));
+            //6.写入文件，writeLines()如果我们写入对象，它会调用toString()将结果写到文件中，因此我们需要改写toString
+            FileUtil.writeLines(allUsers,"C:\\Users\\alienware\\IdeaProjects\\basic-code\\puzzlegame\\userinfo.txt","UTF-8");
+            //7.提示注册成功
+            showDialog("注册成功");
+            //关闭注册界面，打开登录界面
+            this.setVisible(false);
+            new LoginJFrame();
+        }else if(e.getSource() == reset){
+            //点击了重置按钮
+            //清空三个输入框
+            username.setText("");
+            password.setText("");
+            rePassword.setText("");
+        }
+    }
+
+
+    /*
+    * 作用：
+    *       判断username在集合中是否存在
+    * 参数：
+    *       用户名
+    * 返回值：
+    *       true：存在
+    *       false：不存在
+    *
+    * */
+    public boolean containsUsername(String username){
+        for (User u : allUsers) {
+            if(u.getUsername().equals(username)){
+                return true;
+            }
+        }
+        return false;
+    }
+}
+```
+
+
+
+----
+
+# 129.拼图游戏（存档读档）
+
+## 一、引入
+
+不管是哪个游戏，一个存档记录就是一个单独的文件，但是这个文件的名字建议从0开始，这样跟计算机计数的习惯是一样的，也会让我们的代码简单很多。
+
+<img src="./assets/image-20240506090653789.png" alt="image-20240506090653789" style="zoom:50%;" />
+
+在拼图小游戏中，我们会将存档独挡的功能写在菜单中。
+
+它里面会有存档的位置
+
+<img src="./assets/image-20240506090825484.png" alt="image-20240506090825484" style="zoom:50%;" />
+
+下次再玩的时候点击读档，游戏的进度就会恢复。
+
+<img src="./assets/image-20240506090924576.png" alt="image-20240506090924576" style="zoom:50%;" />
+
+步骤如下
+
+<img src="./assets/image-20240506091004758.png" alt="image-20240506091004758" style="zoom:50%;" />
+
+认识名字
+
+<img src="./assets/image-20240506091125241.png" alt="image-20240506091125241" style="zoom:50%;" />
+
+----
+
+## 二、代码示例
+
+首先需要思考，我们该什么样的形式将数据写到本地，难道还是和之前一样，每种数据写一行吗？
+
+<img src="./assets/image-20240506091648334.png" alt="image-20240506091648334" style="zoom:67%;" />
+
+这是不对的，这么写太麻烦了，而且后面读也不好读，更重要的是，如果用户找到了这个文件，就可以随意篡改游戏的进度了。
+
+思考：之前有一个IO流，它可以将一个对象的整体写到本地文件，更重要的是，用户不能改。即之前讲的 `序列化流/对象操作流`。
+
+想要使用 `对象操作流` 进行写出，就需要定义一个JavaBean类
+
+~~~java
+public class GameInfo implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 5544981119935263973L;
+
+    private int[][] data;
+    private int x = 0;
+    private int y = 0;
+    private String path;
+    private int step;
+
+    //空参构造、全参构造、get/set方法
+
+    public String toString() {
+        return "GameInfo{data = " + data + ", x = " + x + ", y = " + y + ", path = " + path + ", step = " + step + "}";
+    }
+}
+~~~
+
+一般在游戏中，会创建一个文件夹单独放游戏的进度，这里文件夹的名字就叫做 `save`。
+
+<img src="./assets/image-20240506092449094.png" alt="image-20240506092449094" style="zoom:67%;" />
+
+`save文件夹` 中文件的名字该如何定义呢？一般文件名都会这么起：`save + 序号`、`data + 序号`，这里就直接 `save + 序号` 了。
+
+后缀名可以随便写，这里写 `.data`，表示是数据的意思。
+
+有异常要注意，它是抛不了异常的，直接 `try`，因为父类中 `actionPerformed()` 没有抛出异常，因此子类中也不能抛出异常，只能自己 `try`
+
+![image-20240506093103621](./assets/image-20240506093103621.png)
+
+这样就可以了
+
+<img src="./assets/image-20240506093230642.png" alt="image-20240506093230642" style="zoom:67%;" />
+
+但如果你觉得这个代码有点麻烦，还可以使用糊涂包里面的方法。
+
+糊涂包中有一个 `IOUtils类`，里面有一个 `writeObj`，方法里面有三个形参（流、是否关流、写哪个对象）
+
+这样我们就省的自己关流了，这个方法的底层会帮我们自动搞定。
+
+~~~java
+IoUtil.writeObj(oos, true, gi);
+~~~
+
+完整代码
+
+~~~java
+//存档
+else if (obj == saveItem0 || obj == saveItem1 || obj == saveItem2 || obj == saveItem3 || obj == saveItem4) {
+    //获取当前是哪个存档被点击了，获取其中的序号
+    JMenuItem item = (JMenuItem) obj;
+    String str = item.getText(); // 存档2（空）
+    int index = str.charAt(2) - '0';
+
+    //直接把游戏的数据写到本地文件中
+    try {
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("puzzlegame\\save\\save" + index + ".data"));
+        GameInfo gi = new GameInfo(data, x, y, path, step);
+        IoUtil.writeObj(oos, true, gi);
+    } catch (IOException ioException) {
+        ioException.printStackTrace();
+    }
+    //修改一下存档item上的展示信息
+    //格式：存档0(XX步)
+    item.setText("存档" + index + "(" + step + "步)");
+    //修改一下读档item上的展示信息，这里的index就很好用了
+    loadJMenu.getItem(index).setText("存档" + index + "(" + step + "步)");
+} else if (obj == loadItem0 || obj == loadItem1 || obj == loadItem2 || obj == loadItem3 || obj == loadItem4) {
+    //获取当前是哪个读档被点击了，获取其中的序号
+    JMenuItem item = (JMenuItem) obj;
+    String str = item.getText();
+    int index = str.charAt(2) - '0';
+
+    GameInfo gi = null;
+    try {
+        //可以到本地文件中读取数据
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream("puzzlegame\\save\\save" + index + ".data"));
+        gi = (GameInfo)ois.readObject();
+        ois.close();
+    } catch (IOException ioException) {
+        ioException.printStackTrace();
+    } catch (ClassNotFoundException classNotFoundException) {
+        classNotFoundException.printStackTrace();
+    }
+
+    data = gi.getData();
+    path = gi.getPath();
+    step = gi.getStep();
+    x = gi.getX();
+    y = gi.getY();
+
+    //重新刷新界面加载游戏
+    initImage();
+}
+~~~
+
+
+
+----
+
+# 131.拼图游戏（数据同步）
+
+其实刚刚的代码还有一个小Bug，当我们重新运行程序后，独挡存档还是空的。
+
+<img src="./assets/image-20240506094757368.png" alt="image-20240506094757368" style="zoom:67%;" />
+
+Bug出现原因：我们在游戏加载的时候，并没有去获取里面的存档信息，没有将存档信息加载到菜单中。
+
+找到 `initJMenuBar()`，在这个方法里面，我们要读取存档信息，并将步数加载到菜单上。
+
+这里定义一个方法单独书写。
+
+~~~java
+public void getGameInfo(){
+    //1.创建File对象表示所有存档所在的文件夹
+    File file = new File("puzzlegame\\save");
+    //2.进入文件夹获取到里面所有的存档文件
+    File[] files = file.listFiles();
+    //3.遍历数组，得到每一个存档
+    for (File f : files) {
+        //f ：依次表示每一个存档文件
+        //获取每一个存档文件中的步数
+        GameInfo gi = null;
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
+            gi = (GameInfo)ois.readObject();
+            ois.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        //获取到了步数
+        int step = gi.getStep();
+
+        //把存档的步数同步到菜单当中
+        //save0 ---> 0Item中
+        //save1 ---> 1Item中
+        //...
+
+        //获取存档的文件名 save0.data
+        String name = f.getName();
+        //获取当存档的序号（索引）
+        int index = name.charAt(4) - '0';
+        //修改菜单上所表示的文字信息
+        saveJMenu.getItem(index).setText("存档" + index + "(" + step + ")步");
+        loadJMenu.getItem(index).setText("存档" + index + "(" + step + ")步");
+    }
+}
+~~~
+
+
+
+----
+
+# 132.`properties` 的基本使用
+
+## 一、配置文件
+
+配置几乎所有的软件都会有，通俗易懂来讲，其实就是软件的设置，例如IDEA可以设置背景图片、字体大小、字体颜色等等，这些设置我们会将它保存到一个文件夹中永久化存储，这个保存设置的文件，我们就会将它叫做 `配置文件`。
+
+而我们的游戏也可以有配置文件，我们可以将游戏界面的宽高、默认图片、广告图片都放到配置文件中。
+
+有了配置文件后，至少会有两大好处
+
+1、可以把软件的设置永久化存储
+
+2、如果我们要修改参数，不需要改动代码，直接修改配置文件就可以了
+
+----
+
+在代码中，常见的配置文件有很多种，例如：XML、properties、ini、YAML........
+
+我们先来学习第一个：properties配置文件。
+
+----
+
+## 二、properties配置文件
+
+`properties配置文件` 有两个特点
+
+1、文件的后缀名就是 `.properties`
+
+2、文件中所有的数据，都是按照键值对的形式进行存储的，左边是键，右边是值
+
+看见键值，就想到了Map集合，Java为了方便我们从properties配置文件中读取数据和写出数据，它专门设计了一个类，就叫做 `properties`，这个 `properties类` 是归属于 `Map集合` 的，它具有 `Map集合` 所有的特性。
+
+<img src="./assets/image-20240506100244066.png" alt="image-20240506100244066" style="zoom:50%;" />
+
+更重要的是，它里面还会有一些特有的方法，可以把集合中的数据，按照键值对的形式写到配置文件中。
+
+也可以把配置文件中的数据读取到集合中来。
+
+----
+
+## 三、`Properies` 作为双列集合的使用
+
+Java在定义Properties的时候后面没有写泛型
+
+它既然不是一个泛型类，那么在创建对象的时候根本就不需要指定泛型。
+
+<img src="./assets/image-20240506100545367.png" alt="image-20240506100545367" style="zoom:67%;" />
+
+既然没有泛型，我们在添加的时候就可以添加任意的数据类型。可以发现方法参数的类型都是 `Object类型` 的。
+
+<img src="./assets/image-20240506100659099.png" alt="image-20240506100659099" style="zoom:67%;" />
+
+```java
+//1.创建集合的对象
+Properties prop = new Properties();
+
+//2.添加数据
+//细节：虽然我们可以往Properties当中添加任意的数据类型，但是一般只会往里面添加字符串类型的数据
+prop.put("aaa","111");
+prop.put("aaa","222");//这里会覆盖，要注意Map集合的键是唯一的，值是可以重复的。
+prop.put("bbb","222");
+prop.put("ccc","333");
+prop.put("ddd","444");
+
+//3.遍历集合
+//方法一
+Set<Object> keys = prop.keySet();
+for (Object key : keys) {
+    Object value = prop.get(key);
+    System.out.println(key + "=" + value);
+}
+
+//方法二
+Set<Map.Entry<Object, Object>> entries = prop.entrySet();
+for (Map.Entry<Object, Object> entry : entries) {
+    Object key = entry.getKey();
+    Object value = entry.getValue();
+    System.out.println(key + "=" + value);
+}
+```
+
+----
+
+## 四、Properties跟IO流结合的操作
+
+### 1）保存（`store()`）
+
+把集合中的数据以键值对的形式写到本地文件当中：如果我们没有学习Properties中特有的方法，这个我们其实也能做。
+
+但是非常的麻烦，需要我们自己遍历，需要我们自己写出。
+
+~~~java
+BufferedWriter bw = new BufferedWriter(new FileWriter("myiotest\\a.properties"));
+Set<Map.Entry<Object, Object>> entries = prop.entrySet();
+for (Map.Entry<Object, Object> entry : entries) {
+    Object key = entry.getKey();
+    Object value = entry.getValue();
+    bw.write(key + "=" + value);
+    bw.newLine();
+}
+bw.close();
+~~~
+
+接下来看看它的特有方法有多简单
+
+`store()`：保存，将集合中的数据保存到本地文件中。
+
+方法参数有两个
+
+输出流我们可以关联字节输出流也可以关联字符输出流。
+
+第二个参数表示文件里面的注释信息，要注意的是，在文件中我们一般是不写中文的。
+
+<img src="./assets/image-20240506102034324.png" alt="image-20240506102034324" style="zoom:50%;" />
+
+~~~java
+//1.创建集合
+Properties prop = new Properties();
+
+//2.添加数据
+prop.put("aaa","bbb");
+prop.put("bbb","ccc");
+prop.put("ddd","eee");
+prop.put("fff","iii");
+
+//3.把集合中的数据以键值对的形式写到本地文件当中
+FileOutputStream fos = new FileOutputStream("myiotest\\a.properties");
+prop.store(fos, "test");
+fos.close();
+~~~
+
+上面的test就是我们自己写的属实信息
+
+<img src="./assets/image-20240506102141341.png" alt="image-20240506102141341" style="zoom:60%;" />
+
+----
+
+### 2）读取（`store()`）
+
+- `load()`：加载，将 `properties` 中的数据读取到集合中。
+
+这个方法可以传入字符输入流，也可以传入字节输入流
+
+<img src="./assets/image-20240506102017076.png" alt="image-20240506102017076" style="zoom:50%;" />
+
+~~~java
+//1.创建集合
+Properties prop = new Properties();
+//2.读取本地Properties文件里面的数据
+FileInputStream fis = new FileInputStream("myiotest\\a.properties");
+prop.load(fis);
+fis.close();
+
+//3.打印集合
+System.out.println(prop);
+~~~
+
+
+
+-----
+
+# 133.拼图游戏（配置文件）
+
+需求：把点击 `关于我们` 要展示的广告图片放到配置文件中。
+
+这样做我们以后如果要更改图片，就不需要我们自己去写代码了。
+
+我们先来新建一个文件，文件名可以随便取，但是后缀名一定要叫做 `properties`。
+
+![image-20240506102831394](./assets/image-20240506102831394.png)
+
+在配置文件中书写键值对的时候，`=` 前后不要加空格，值的后面也不要加 `;(分号)`，就写一个最基本最简单的 `键=值` 即可
+
+因为如果习惯性在后面写一个分号，那么值就不是这个路径了，而是 `值 + ;`
+
+<img src="./assets/image-20240506103133159.png" alt="image-20240506103133159" style="zoom:70%;" />
+
+正确的写法如下
+
+![image-20240506103203849](./assets/image-20240506103203849.png)
+
+并且在代码中，用到的路径我们一律采用拷贝，因为自己写有可能会写错。
+
+<img src="./assets/image-20240506103428466.png" alt="image-20240506103428466" style="zoom:67%;" />
+
+
+
+----
+
+# 144.综合练习：每日一记
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
