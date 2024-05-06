@@ -14822,6 +14822,24 @@ CPU不会切换到其他代码去运行，所以它的效率会比较低。
 
 3、利用Callable接口和Future接口方式实现
 
+我们需要在合适的时候去选择对应的实现方式，那该如何选择呢？
+
+首先需要将这三种方式分为两类，第一类是前面两个，这两种方式是无法获取到多线程的结果的。
+
+第二类就是下面的第三种，这种方式是可以获取到多线程运行的结果，因此如果你想要获取结果，那就使用第三种。
+
+如果不想获取，就使用第一种跟第二种。第一种跟第二种也是有区别的。
+
+第一种：代码相对来将会比较简单，而且因为是继承了 `Thread类`，因此在子类中可以直接使用 `Thread类` 中的方法。
+
+但是它也有自己的缺陷：可扩展性差，在Java中是单继承，如果你已经继承了 `Thread`，那你就无法再去继承其他类了，因此为了解决这个问题，才有了下面第二种实现方式。
+
+<img src="./assets/image-20240506145337910.png" alt="image-20240506145337910" style="zoom:57%;" />
+
+
+
+----
+
 # 137.多线程的第一种实现方式（继承Thread类的方式进行实现）
 
 ## 一、查询API帮助文档
@@ -14863,6 +14881,13 @@ CPU不会切换到其他代码去运行，所以它的效率会比较低。
  2. 重写run方法
  3. 创建子类的对象，并启动线程
 ```
+
+方法介绍
+
+| 方法名       | 说明                                        |
+| ------------ | ------------------------------------------- |
+| void run()   | 在线程开启后，此方法将被调用执行            |
+| void start() | 使此线程开始执行，Java虚拟机会调用run方法() |
 
 自己定义一个类继承Thread，并重写run方法
 
@@ -14909,655 +14934,1280 @@ t2.start();
 
 # 138.多线程的第二种实现方式（实现Runnable接口的方式进行实现）
 
+## 一、查询API帮助文档
 
+打开一下 `API帮助文档`，我们来看一下Java是怎么写的，同样也是搜索 `Thread类`。
 
-### 1.2并发和并行【理解】
+创建线程的另一种方法是声明实现 `Runnable` 接口的类，让这个类去实现 `run()`。
 
-+ 并行：在同一时刻，有多个指令在多个CPU上同时执行。
+在测试类中，然后再去创建一个 `Thread`，也就是创建一个线程，将自己这个类的对象传递过去，再去调用 `start()`。
 
-  ![02_并行](./assets/02_并行.png)
+![image-20240506141826077](./assets/image-20240506141826077.png)
 
-+ 并发：在同一时刻，有多个指令在单个CPU上交替执行。
+---
 
-  ![03_并发](./assets/03_并发.png)
+## 二、代码示例
 
-### 1.3进程和线程【理解】
+```
+多线程的第二种启动方式：
+  1.自己定义一个类实现Runnable接口
+  2.重写里面的run方法
+  3.创建自己的类的对象
+  4.创建一个Thread类的对象，并开启线程
+```
 
-- 进程：是正在运行的程序
+Thread构造方法
 
-  独立性：进程是一个能独立运行的基本单位，同时也是系统分配资源和调度的独立单位
-  动态性：进程的实质是程序的一次执行过程，进程是动态产生，动态消亡的
-  并发性：任何进程都可以同其他进程一起并发执行
+| 方法名                               | 说明                   |
+| ------------------------------------ | ---------------------- |
+| Thread(Runnable target)              | 分配一个新的Thread对象 |
+| Thread(Runnable target, String name) | 分配一个新的Thread对象 |
 
-- 线程：是进程中的单个顺序控制流，是一条执行路径
+自己定义一个类实现Runnable接口，并重写里面的run方法
 
-  ​	单线程：一个进程如果只有一条执行路径，则称为单线程程序
+~~~java
+public class MyRun implements Runnable{
+    @Override
+    public void run() {
+        //书写线程要执行的代码
+        for (int i = 0; i < 100; i++) {
+            System.out.println("HelloWorld!");
+        }
+    }
+}
+~~~
 
-  ​	多线程：一个进程如果有多条执行路径，则称为多线程程序
+创建自己的类的对象；创建一个Thread类的对象，并开启线程
 
+~~~java
+//创建MyRun的对象
+//这个对象就表示多线程要执行的任务，因此这个对象可以理解为：任务对象
+MyRun mr = new MyRun();
 
-### 1.4实现多线程方式一：继承Thread类【应用】
+//创建线程对象，这个线程对象不需要我们写子类继承了，直接使用Java中现成的Thread类即可
+Thread t1 = new Thread(mr); //将任务传递给线程
+Thread t2 = new Thread(mr);
 
-- 方法介绍
+//给线程设置名字
+t1.setName("线程1");
+t2.setName("线程2");
 
-  | 方法名       | 说明                                        |
-  | ------------ | ------------------------------------------- |
-  | void run()   | 在线程开启后，此方法将被调用执行            |
-  | void start() | 使此线程开始执行，Java虚拟机会调用run方法() |
+//开启线程
+t1.start();
+t2.start();
+~~~
 
-- 实现步骤
+为了区分，给线程加上了名字。
 
-  - 定义一个类MyThread继承Thread类
-  - 在MyThread类中重写run()方法
-  - 创建MyThread类的对象
-  - 启动线程
+这里不能直接调用 `getName()` 了，因为 `getName()` 是在 `Thread类中的`，之前的实现方式是继承了 `Thread接口`，是在子类中调用了父类的 `getName()`，是完全没有任何问题的。
 
-- 代码演示
+但是这种实现关系 `Thread` 跟我自己写的 `MyRun类` 是没有任何关系的，因此是不能使用 `getName()` 的。
 
-  ```java
-  public class MyThread extends Thread {
-      @Override
-      public void run() {
-          for(int i=0; i<100; i++) {
-              System.out.println(i);
-          }
-      }
-  }
-  public class MyThreadDemo {
-      public static void main(String[] args) {
-          MyThread my1 = new MyThread();
-          MyThread my2 = new MyThread();
-  
-  //        my1.run();
-  //        my2.run();
-  
-          //void start() 导致此线程开始执行; Java虚拟机调用此线程的run方法
-          my1.start();
-          my2.start();
-      }
-  }
-  ```
-
-- 两个小问题
-
-  - 为什么要重写run()方法？
-
-    因为run()是用来封装被线程执行的代码
-
-  - run()方法和start()方法的区别？
-
-    run()：封装线程执行的代码，直接调用，相当于普通方法的调用
-
-    start()：启动线程；然后由JVM调用此线程的run()方法
-
-### 1.5实现多线程方式二：实现Runnable接口【应用】
-
-- Thread构造方法
-
-  | 方法名                               | 说明                   |
-  | ------------------------------------ | ---------------------- |
-  | Thread(Runnable target)              | 分配一个新的Thread对象 |
-  | Thread(Runnable target, String name) | 分配一个新的Thread对象 |
-
-- 实现步骤
-
-  - 定义一个类MyRunnable实现Runnable接口
-  - 在MyRunnable类中重写run()方法
-  - 创建MyRunnable类的对象
-  - 创建Thread类的对象，把MyRunnable对象作为构造方法的参数
-  - 启动线程
-
-- 代码演示
-
-  ```java
-  public class MyRunnable implements Runnable {
-      @Override
-      public void run() {
-          for(int i=0; i<100; i++) {
-              System.out.println(Thread.currentThread().getName()+":"+i);
-          }
-      }
-  }
-  public class MyRunnableDemo {
-      public static void main(String[] args) {
-          //创建MyRunnable类的对象
-          MyRunnable my = new MyRunnable();
-  
-          //创建Thread类的对象，把MyRunnable对象作为构造方法的参数
-          //Thread(Runnable target)
-  //        Thread t1 = new Thread(my);
-  //        Thread t2 = new Thread(my);
-          //Thread(Runnable target, String name)
-          Thread t1 = new Thread(my,"坦克");
-          Thread t2 = new Thread(my,"飞机");
-  
-          //启动线程
-          t1.start();
-          t2.start();
-      }
-  }
-  ```
-
-### 1.6实现多线程方式三: 实现Callable接口【应用】
-
-+ 方法介绍
-
-  | 方法名                           | 说明                                               |
-  | -------------------------------- | -------------------------------------------------- |
-  | V call()                         | 计算结果，如果无法计算结果，则抛出一个异常         |
-  | FutureTask(Callable<V> callable) | 创建一个 FutureTask，一旦运行就执行给定的 Callable |
-  | V get()                          | 如有必要，等待计算完成，然后获取其结果             |
-
-+ 实现步骤
-
-  + 定义一个类MyCallable实现Callable接口
-  + 在MyCallable类中重写call()方法
-  + 创建MyCallable类的对象
-  + 创建Future的实现类FutureTask对象，把MyCallable对象作为构造方法的参数
-  + 创建Thread类的对象，把FutureTask对象作为构造方法的参数
-  + 启动线程
-  + 再调用get方法，就可以获取线程结束之后的结果。
-
-+ 代码演示
-
-  ```java
-  public class MyCallable implements Callable<String> {
-      @Override
-      public String call() throws Exception {
-          for (int i = 0; i < 100; i++) {
-              System.out.println("跟女孩表白" + i);
-          }
-          //返回值就表示线程运行完毕之后的结果
-          return "答应";
-      }
-  }
-  public class Demo {
-      public static void main(String[] args) throws ExecutionException, InterruptedException {
-          //线程开启之后需要执行里面的call方法
-          MyCallable mc = new MyCallable();
-  
-          //Thread t1 = new Thread(mc);
-  
-          //可以获取线程执行完毕之后的结果.也可以作为参数传递给Thread对象
-          FutureTask<String> ft = new FutureTask<>(mc);
-  
-          //创建线程对象
-          Thread t1 = new Thread(ft);
-  
-          String s = ft.get();
-          //开启线程
-          t1.start();
-  
-          //String s = ft.get();
-          System.out.println(s);
-      }
-  }
-  ```
-
-+ 三种实现方式的对比
-
-  + 实现Runnable、Callable接口
-    + 好处: 扩展性强，实现该接口的同时还可以继承其他的类
-    + 缺点: 编程相对复杂，不能直接使用Thread类中的方法
-  + 继承Thread类
-    + 好处: 编程比较简单，可以直接使用Thread类中的方法
-    + 缺点: 可以扩展性较差，不能再继承其他的类
-
-### 1.7设置和获取线程名称【应用】
-
-- 方法介绍
-
-  | 方法名                     | 说明                               |
-  | -------------------------- | ---------------------------------- |
-  | void  setName(String name) | 将此线程的名称更改为等于参数name   |
-  | String  getName()          | 返回此线程的名称                   |
-  | Thread  currentThread()    | 返回对当前正在执行的线程对象的引用 |
-
-- 代码演示
-
-  ```java
-  public class MyThread extends Thread {
-      public MyThread() {}
-      public MyThread(String name) {
-          super(name);
-      }
-  
-      @Override
-      public void run() {
-          for (int i = 0; i < 100; i++) {
-              System.out.println(getName()+":"+i);
-          }
-      }
-  }
-  public class MyThreadDemo {
-      public static void main(String[] args) {
-          MyThread my1 = new MyThread();
-          MyThread my2 = new MyThread();
-  
-          //void setName(String name)：将此线程的名称更改为等于参数 name
-          my1.setName("高铁");
-          my2.setName("飞机");
-  
-          //Thread(String name)
-          MyThread my1 = new MyThread("高铁");
-          MyThread my2 = new MyThread("飞机");
-  
-          my1.start();
-          my2.start();
-  
-          //static Thread currentThread() 返回对当前正在执行的线程对象的引用
-          System.out.println(Thread.currentThread().getName());
-      }
-  }
-  ```
-
-### 1.8线程休眠【应用】
-
-+ 相关方法
-
-  | 方法名                         | 说明                                             |
-  | ------------------------------ | ------------------------------------------------ |
-  | static void sleep(long millis) | 使当前正在执行的线程停留（暂停执行）指定的毫秒数 |
-
-+ 代码演示
-
-  ```java
-  public class MyRunnable implements Runnable {
-      @Override
-      public void run() {
-          for (int i = 0; i < 100; i++) {
-              try {
-                  Thread.sleep(100);
-              } catch (InterruptedException e) {
-                  e.printStackTrace();
-              }
-  
-              System.out.println(Thread.currentThread().getName() + "---" + i);
-          }
-      }
-  }
-  public class Demo {
-      public static void main(String[] args) throws InterruptedException {
-          /*System.out.println("睡觉前");
-          Thread.sleep(3000);
-          System.out.println("睡醒了");*/
-  
-          MyRunnable mr = new MyRunnable();
-  
-          Thread t1 = new Thread(mr);
-          Thread t2 = new Thread(mr);
-  
-          t1.start();
-          t2.start();
-      }
-  }
-  ```
-
-### 1.9线程优先级【应用】
-
-- 线程调度
-
-  - 两种调度方式
-
-    - 分时调度模型：所有线程轮流使用 CPU 的使用权，平均分配每个线程占用 CPU 的时间片
-    - 抢占式调度模型：优先让优先级高的线程使用 CPU，如果线程的优先级相同，那么会随机选择一个，优先级高的线程获取的 CPU 时间片相对多一些
-
-  - Java使用的是抢占式调度模型
-
-  - 随机性
-
-    假如计算机只有一个 CPU，那么 CPU 在某一个时刻只能执行一条指令，线程只有得到CPU时间片，也就是使用权，才可以执行指令。所以说多线程程序的执行是有随机性，因为谁抢到CPU的使用权是不一定的
-
-    ![05_多线程示例图](./assets/05_多线程示例图.png)
-
-- 优先级相关方法
-
-  | 方法名                                  | 说明                                                         |
-  | --------------------------------------- | ------------------------------------------------------------ |
-  | final int getPriority()                 | 返回此线程的优先级                                           |
-  | final void setPriority(int newPriority) | 更改此线程的优先级线程默认优先级是5；线程优先级的范围是：1-10 |
-
-- 代码演示
-
-  ```java
-  public class MyCallable implements Callable<String> {
-      @Override
-      public String call() throws Exception {
-          for (int i = 0; i < 100; i++) {
-              System.out.println(Thread.currentThread().getName() + "---" + i);
-          }
-          return "线程执行完毕了";
-      }
-  }
-  public class Demo {
-      public static void main(String[] args) {
-          //优先级: 1 - 10 默认值:5
-          MyCallable mc = new MyCallable();
-  
-          FutureTask<String> ft = new FutureTask<>(mc);
-  
-          Thread t1 = new Thread(ft);
-          t1.setName("飞机");
-          t1.setPriority(10);
-          //System.out.println(t1.getPriority());//5
-          t1.start();
-  
-          MyCallable mc2 = new MyCallable();
-  
-          FutureTask<String> ft2 = new FutureTask<>(mc2);
-  
-          Thread t2 = new Thread(ft2);
-          t2.setName("坦克");
-          t2.setPriority(1);
-          //System.out.println(t2.getPriority());//5
-          t2.start();
-      }
-  }
-  ```
-
-### 1.10守护线程【应用】
-
-- 相关方法
-
-  | 方法名                     | 说明                                                         |
-  | -------------------------- | ------------------------------------------------------------ |
-  | void setDaemon(boolean on) | 将此线程标记为守护线程，当运行的线程都是守护线程时，Java虚拟机将退出 |
-
-- 代码演示
-
-  ```java
-  public class MyThread1 extends Thread {
-      @Override
-      public void run() {
-          for (int i = 0; i < 10; i++) {
-              System.out.println(getName() + "---" + i);
-          }
-      }
-  }
-  public class MyThread2 extends Thread {
-      @Override
-      public void run() {
-          for (int i = 0; i < 100; i++) {
-              System.out.println(getName() + "---" + i);
-          }
-      }
-  }
-  public class Demo {
-      public static void main(String[] args) {
-          MyThread1 t1 = new MyThread1();
-          MyThread2 t2 = new MyThread2();
-  
-          t1.setName("女神");
-          t2.setName("备胎");
-  
-          //把第二个线程设置为守护线程
-          //当普通线程执行完之后,那么守护线程也没有继续运行下去的必要了.
-          t2.setDaemon(true);
-  
-          t1.start();
-          t2.start();
-      }
-  }
-  ```
-
-## 2.线程同步
-
-### 2.1卖票【应用】
-
-- 案例需求
-
-  某电影院目前正在上映国产大片，共有100张票，而它有3个窗口卖票，请设计一个程序模拟该电影院卖票
-
-- 实现步骤
-
-  - 定义一个类SellTicket实现Runnable接口，里面定义一个成员变量：private int tickets = 100;
-
-  - 在SellTicket类中重写run()方法实现卖票，代码步骤如下
-
-  - 判断票数大于0，就卖票，并告知是哪个窗口卖的
-  - 卖了票之后，总票数要减1
-  - 票卖没了，线程停止
-  - 定义一个测试类SellTicketDemo，里面有main方法，代码步骤如下
-  - 创建SellTicket类的对象
-  - 创建三个Thread类的对象，把SellTicket对象作为构造方法的参数，并给出对应的窗口名称
-  - 启动线程
-
-- 代码实现
-
-  ```java
-  public class SellTicket implements Runnable {
-      private int tickets = 100;
-      //在SellTicket类中重写run()方法实现卖票，代码步骤如下
-      @Override
-      public void run() {
-          while (true) {
-              if(ticket <= 0){
-                      //卖完了
-                      break;
-                  }else{
-                      try {
-                          Thread.sleep(100);
-                      } catch (InterruptedException e) {
-                          e.printStackTrace();
-                      }
-                      ticket--;
-                      System.out.println(Thread.currentThread().getName() + "在卖票,还剩下" + ticket + "张票");
-                  }
-          }
-      }
-  }
-  public class SellTicketDemo {
-      public static void main(String[] args) {
-          //创建SellTicket类的对象
-          SellTicket st = new SellTicket();
-  
-          //创建三个Thread类的对象，把SellTicket对象作为构造方法的参数，并给出对应的窗口名称
-          Thread t1 = new Thread(st,"窗口1");
-          Thread t2 = new Thread(st,"窗口2");
-          Thread t3 = new Thread(st,"窗口3");
-  
-          //启动线程
-          t1.start();
-          t2.start();
-          t3.start();
-      }
-  }
-  ```
-
-
-### 2.2卖票案例的问题【理解】
-
-- 卖票出现了问题
-
-  - 相同的票出现了多次
-
-  - 出现了负数的票
-
-- 问题产生原因
-
-  线程执行的随机性导致的,可能在卖票过程中丢失cpu的执行权,导致出现问题
-
-
-### 2.3同步代码块解决数据安全问题【应用】
-
-- 安全问题出现的条件
-
-  - 是多线程环境
-
-  - 有共享数据
-
-  - 有多条语句操作共享数据
-
-- 如何解决多线程安全问题呢?
-
-  - 基本思想：让程序没有安全问题的环境
-
-- 怎么实现呢?
-
-  - 把多条语句操作共享数据的代码给锁起来，让任意时刻只能有一个线程执行即可
-
-  - Java提供了同步代码块的方式来解决
-
-- 同步代码块格式：
-
-  ```java
-  synchronized(任意对象) { 
-  	多条语句操作共享数据的代码 
-  }
-  ```
-
-  synchronized(任意对象)：就相当于给代码加锁了，任意对象就可以看成是一把锁
-
-- 同步的好处和弊端  
-
-  - 好处：解决了多线程的数据安全问题
-
-  - 弊端：当线程很多时，因为每个线程都会去判断同步上的锁，这是很耗费资源的，无形中会降低程序的运行效率
-
-- 代码演示
-
-  ```java
-  public class SellTicket implements Runnable {
-      private int tickets = 100;
-      private Object obj = new Object();
-  
-      @Override
-      public void run() {
-          while (true) {
-              synchronized (obj) { // 对可能有安全问题的代码加锁,多个线程必须使用同一把锁
-                  //t1进来后，就会把这段代码给锁起来
-                  if (tickets > 0) {
-                      try {
-                          Thread.sleep(100);
-                          //t1休息100毫秒
-                      } catch (InterruptedException e) {
-                          e.printStackTrace();
-                      }
-                      //窗口1正在出售第100张票
-                      System.out.println(Thread.currentThread().getName() + "正在出售第" + tickets + "张票");
-                      tickets--; //tickets = 99;
-                  }
-              }
-              //t1出来了，这段代码的锁就被释放了
-          }
-      }
-  }
-  
-  public class SellTicketDemo {
-      public static void main(String[] args) {
-          SellTicket st = new SellTicket();
-  
-          Thread t1 = new Thread(st, "窗口1");
-          Thread t2 = new Thread(st, "窗口2");
-          Thread t3 = new Thread(st, "窗口3");
-  
-          t1.start();
-          t2.start();
-          t3.start();
-      }
-  }
-  ```
-
-### 2.4同步方法解决数据安全问题【应用】
-
-- 同步方法的格式
-
-  同步方法：就是把synchronized关键字加到方法上
-
-  ```java
-  修饰符 synchronized 返回值类型 方法名(方法参数) { 
-  	方法体；
-  }
-  ```
-
-  同步方法的锁对象是什么呢?
-
-  ​	this
-
-- 静态同步方法
-
-  同步静态方法：就是把synchronized关键字加到静态方法上
-
-  ```java
-  修饰符 static synchronized 返回值类型 方法名(方法参数) { 
-  	方法体；
-  }
-  ```
-
-  同步静态方法的锁对象是什么呢?
-
-  ​	类名.class
-
-- 代码演示
-
-  ```java
-  public class MyRunnable implements Runnable {
-      private static int ticketCount = 100;
-  
-      @Override
-      public void run() {
-          while(true){
-              if("窗口一".equals(Thread.currentThread().getName())){
-                  //同步方法
-                  boolean result = synchronizedMthod();
-                  if(result){
-                      break;
-                  }
-              }
-  
-              if("窗口二".equals(Thread.currentThread().getName())){
-                  //同步代码块
-                  synchronized (MyRunnable.class){
-                      if(ticketCount == 0){
-                         break;
-                      }else{
-                          try {
-                              Thread.sleep(10);
-                          } catch (InterruptedException e) {
-                              e.printStackTrace();
-                          }
-                          ticketCount--;
-                          System.out.println(Thread.currentThread().getName() + "在卖票,还剩下" + ticketCount + "张票");
-                      }
-                  }
-              }
-  
-          }
-      }
-  
-      private static synchronized boolean synchronizedMthod() {
-          if(ticketCount == 0){
-              return true;
-          }else{
-              try {
-                  Thread.sleep(10);
-              } catch (InterruptedException e) {
-                  e.printStackTrace();
-              }
-              ticketCount--;
-              System.out.println(Thread.currentThread().getName() + "在卖票,还剩下" + ticketCount + "张票");
-              return false;
-          }
-      }
-  }
-  ```
-
-
-  public class Demo {
-      public static void main(String[] args) {
-          MyRunnable mr = new MyRunnable();
-
-          Thread t1 = new Thread(mr);
-          Thread t2 = new Thread(mr);
-    
-          t1.setName("窗口一");
-          t2.setName("窗口二");
-    
-          t1.start();
-          t2.start();
-      }
-
-  }
+解决办法：在打印之前，先**获取到当前线程对象**，在 `Thread` 中有一个 `currentThread()` 方法
+
+~~~java
+Thread t = Thread.currentThread(); // 哪条线程执行到这个方法，这个方法就会返回谁的对象
+~~~
+
+然后用对象去调用里面的方法就行了。
+
+~~~java
+public class MyRun implements Runnable{
+    @Override
+    public void run() {
+        //书写线程要执行的代码
+        for (int i = 0; i < 100; i++) {
+            System.out.println(Thread.currentThread().getName() + "HelloWorld!");
+        }
+    }
+}
+~~~
+
+执行程序，同样也可以看见交织的效果。
+
+![image-20240506143326126](./assets/image-20240506143326126.png)
+
+
+
+-----
+
+# 139.138.多线程的第三种实现方式（利用Callable接口和Future接口方式实现）
+
+## 一、介绍
+
+为什么要有第三种实现方式呢？其实是它对前面两种方式进行了一个补充，我们先来回顾一下前两种。
+
+1、继承Thread类的方式进行实现
+
+2、实现Runnable接口的方式进行实现
+
+可以发现两个 `run()` 都是没有返回值的，因此我就不能获得多线程运行的结果。
+
+![image-20240506143733642](./assets/image-20240506143733642.png)
+
+但如果我现在想要获取到多线程运行的结果该怎么办呢？
+
+此时我们就需要用到多线程的第三种实现方式：利用Callable接口和Future接口方式实现
+
+特点：可以获取到多线程的运行结果
+
+```
+多线程的第三种实现方式：
+    特点：可以获取到多线程运行的结果
+    1. 创建一个类MyCallable实现Callable接口
+    2. 重写call() （是有返回值的，表示多线程运行的结果）
+    3. 创建MyCallable的对象（表示多线程要执行的任务）
+    4. 创建Future的对象（作用管理多线程运行的结果），但是Future是一个接口，我们不能直接创建它的对象，因此我们创建的应该是Future实现类FutureTask的对象
+    5. 创建Thread类的对象，并启动（表示线程）
+```
+
+方法介绍
+
+| 方法名                           | 说明                                               |
+| -------------------------------- | -------------------------------------------------- |
+| V call()                         | 计算结果，如果无法计算结果，则抛出一个异常         |
+| FutureTask(Callable<V> callable) | 创建一个 FutureTask，一旦运行就执行给定的 Callable |
+| V get()                          | 如有必要，等待计算完成，然后获取其结果             |
+
+---
+
+## 二、代码示例
+
+这个接口它是有一个泛型的，那这个泛型是什么意思呢？
+
+第三种方式可以获取到多线程运行的结果，这里的泛型就表示结果的类型。
+
+<img src="./assets/image-20240506144352569.png" alt="image-20240506144352569" style="zoom:67%;" />
+
+例如：我想要开启一个线程，让它去求 `1-100` 的整数和，结果肯定是一个整数，因此泛型就可以写 `Integer`。
+
+方法的返回值跟泛型保持一致，就表示多线程运行的结果。
+
+<img src="./assets/image-20240506144613198.png" alt="image-20240506144613198" style="zoom:60%;" />
+
+~~~java
+public class MyCallable implements Callable<Integer> {
+    @Override
+    public Integer call() throws Exception {
+        // 求1~100之间的和
+        int sum = 0;
+        for (int i = 1; i <= 100; i++) {
+            sum = sum + i;
+        }
+        return sum;
+    }
+}
+~~~
+
+测试类
+
+~~~java
+//创建MyCallable的对象（表示多线程要执行的任务）
+MyCallable mc = new MyCallable();
+//创建FutureTask的对象（作用管理多线程运行的结果），其中泛型就表示多线程运行的结果
+FutureTask<Integer> ft = new FutureTask<>(mc); //表示现在是用FutureTask对象去管理它的结果
+//创建线程的对象
+Thread t1 = new Thread(ft);
+//启动线程
+t1.start();
+
+//获取多线程运行的结果
+Integer result = ft.get();//FutureTask就是用来去管理它的结果的，因此可以直接使用ft去调用get()
+System.out.println(result);
+~~~
+
+
+
+---
+
+# 多线程中的常用成员方法
+
+<img src="./assets/image-20240506145545516.png" alt="image-20240506145545516" style="zoom:50%;" />
+
+----
+
+# 140.简单的成员方法
+
+## 一、`setName、getName` 方法
+
+### 1）细节一
+
+| 方法名                     | 说明                             |
+| -------------------------- | -------------------------------- |
+| void  setName(String name) | 将此线程的名称更改为等于参数name |
+| String  getName()          | 返回此线程的名称                 |
+
+这个方法我们之前已经使用过了，但是如果我们没有给它设置名字，它会有默认的吗？
+
+~~~java
+public class MyThread extends Thread{
+    @Override
+    public void run() {
+        for (int i = 0; i < 100; i++) {
+            System.out.println(getName() + "@" + i);
+        }
+    }
+}
+~~~
+
+测试类
+
+~~~java
+//1.创建线程的对象
+MyThread t1 = new MyThread();
+MyThread t2 = new MyThread();
+
+//2.开启线程
+t1.start();
+t2.start();
+~~~
+
+程序运行完毕，`@` 前面就是线程默认的名字，格式为：`Thread-X（X是序号，从0开始的）`
+
+<img src="./assets/image-20240506150407113.png" alt="image-20240506150407113" style="zoom:60%;" />
+
+我们来看下源码，<kbd>ctrl + N</kbd> 搜索一下 `java.lang` 包下的 `Thread`。
+
+<kbd>ctrl + F12</kbd> 找到空参构造。
+
+<img src="./assets/image-20240506150830988.png" alt="image-20240506150830988" style="zoom:50%;" />
+
+在空参构造中，它是用 `this关键字` 再去调用其他的构造，但是在调用的时候，它的第三个参数 `"Thread-" + nextThreadNum()` 其实就是给线程设置名字。前面的 `Thread-` 是定死了的，后面再加一个 `nextThreadNum()`。
+
+<img src="./assets/image-20240506150907929.png" alt="image-20240506150907929" style="zoom:67%;" />
+
+选中 `nextThreadNum()` <kbd>ctrl + b</kbd>，这下就很明了了，它就是一个变量，然后不断的自增，一开始默认初始化值是 `0`，所以第一个线程默认的序号就是 `0`，当这个方法被调用完一次后，这个变量就要 `++自增`，变成 `1`。
+
+<img src="./assets/image-20240506151157572.png" alt="image-20240506151157572" style="zoom:67%;" />
+
+这就是它默认名字的由来。
+
+-----
+
+### 2）细节二
+
+在给线程起名字的时候，我们不单单可以使用 `setName()`，`Thread` 的构造方法也是可以设置名字的。
+
+我们可以来看一下 `API帮助文档`。
+
+找到第三个，可以发现，在创建Thread对象的时候，可以给它去设置一个名字。
+
+除此之外看第二个构造，是两个参数的，第一个参数是 `Runnable`，即我们可以给它传递线程的任务对象，后面还有第二个参数，就是线程的名字。
+
+![image-20240506151545322](./assets/image-20240506151545322.png)
+
+~~~java
+//1.创建线程的对象
+MyThread t1 = new MyThread("飞机");
+MyThread t2 = new MyThread("坦克");
+~~~
+
+但此时会报错
+
+<img src="./assets/image-20240506152255408.png" alt="image-20240506152255408" style="zoom:60%;" />
+
+别忘了，我们现在创建的是 `MyThread`，但是我们刚刚看的是 `Thread` ，即它的父类的构造。
+
+之前我们学习面向对象的时候说过，构造方法是不能继承的，子类如果想要使用父类的构造，需要直接写一个利用 `super关键字` 去调用父类的构造。
+
+<kbd>alt + insert</kbd> ，选择第一个
+
+<img src="./assets/image-20240506152818487.png" alt="image-20240506152818487" style="zoom:67%;" />
+
+IDEA就会问你：你要继承父类的哪些构造？
+
+我们不用全选，只需要选择我们需要的两个即可。
+
+<img src="./assets/image-20240506152919387.png" alt="image-20240506152919387" style="zoom:57%;" />
+
+一旦生成完毕，就不会报错了，可以发现运行成功。
+
+<img src="./assets/image-20240506152958321.png" alt="image-20240506152958321" style="zoom:60%;" />
+
+----
+
+## 二、`currentThread` 方法
+
+| 方法名                  | 说明               |
+| ----------------------- | ------------------ |
+| Thread  currentThread() | 获取当前线程的对象 |
+
+这个方法我们之前也使用过了，因此此时我们来玩一个好玩的
+
+~~~java
+public static void main(String[] args) {
+    //在main方法中不开启线程，直接用Thread.currentThread()，此时获取到的t表示什么呢？
+    //如果你不知道，来看看这个方法的作用：获取当前线程的对象
+    //简单理解：哪条线程执行到这个方法，此时获取的就是哪条线程的对象
+    //因此t表示的是执行main方法的那条线程的对象
+    Thread t = Thread.currentThread();
+    String name = t.getName();
+    System.out.println(name);
+}
+~~~
+
+程序运行完毕，可以看见它的名字也叫做 `main`
+
+<img src="./assets/image-20240506153426868.png" alt="image-20240506153426868" style="zoom:67%;" />
+
+```
+细节：
+    当JVM虚拟机启动之后，会自动的启动多条线程
+    其中有一条线程就叫做main线程
+    他的作用就是去调用main方法，并执行里面的代码
+    在以前，我们写的所有的代码，其实都是运行在main线程当中
+```
+
+---
+
+## 三、`sleep` 方法
+
+| 方法名                         | 说明                           |
+| ------------------------------ | ------------------------------ |
+| static void sleep(long millis) | 让线程休眠指定时间，单位为毫秒 |
+
+```
+细节：
+    1、哪条线程执行到这个方法，那么哪条线程就会在这里停留对应的时间
+    2、方法的参数：就表示睡眠的时间，单位毫秒
+        1秒 = 1000毫秒
+    3、当时间到了之后，线程会自动的醒来，继续执行下面的其他代码
+```
+
+下面代码的效果就是：先打印 `11111111111`，等五秒后才打印 `22222222222`。
+
+效果出现的原因就是因为：main线程执行到这个地方后停留了五秒钟，时间到了之后再继续执行下面的代码。
+
+~~~java
+System.out.println("11111111111");
+Thread.sleep(5000);
+System.out.println("22222222222");
+~~~
+
+同理，将睡眠写在 `MyThread类` 中，每打印一次就睡眠一下。
+
+此时方法有异常不能抛出，只能 `try`，因为父类 `Thread类` 中，`run()` 是没有抛出异常的，父类没有抛出异常，子类也就不能抛，子类只能自己 `try`。
+
+<img src="./assets/image-20240506170337411.png" alt="image-20240506170337411" style="zoom:67%;" />
+
+<img src="./assets/image-20240506154219653.png" alt="image-20240506154219653" style="zoom:60%;" />
+
+```java
+@Override
+public void run() {
+    for (int i = 0; i < 100; i++) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(getName() + "@" + i);
+    }
+}
+```
+
+
+
+-----
+
+# 141.线程的优先级
+
+说到优先级，我们就需要先来学习一下 `线程的调度`。
+
+## 一、线程的调度
+
+在计算机中，线程的调度有两种：抢占式调度、非抢占式调度。
+
+抢占式调度：多个线程在抢夺CPU的执行权。
+
+CPU在什么时候执行哪条线程是不确定的，执行多少时间也是不确定的，所以 `抢占式调度` 体现了一种随机性。
+
+<img src="./assets/ovznb-m7jfl.gif" alt="ovznb-m7jfl" style="zoom:50%;" />
+
+非抢占式调度：所有的线程轮流的执行，你一次我一次，执行的时间也是差不多的。
+
+<img src="./assets/eko84-g69n9.gif" alt="eko84-g69n9" style="zoom:40%;" />
+
+在Java中采取了第一种：抢占式调度。
+
+抢占式调度重点掌握两个字：随机性，这里的优先级跟随机是有关系的。
+
+----
+
+## 二、优先级
+
+优先级越大，这条线程抢到CPU的概率就是最大的。
+
+在Java中线程的优先级分为十档，最小的是 `1`，最大的是 `10`，如果没有设置，默认就是 `5`。
+
+优先级相关方法
+
+| 方法名                                  | 说明                                                         |
+| --------------------------------------- | ------------------------------------------------------------ |
+| final int getPriority()                 | 返回此线程的优先级                                           |
+| final void setPriority(int newPriority) | 更改此线程的优先级。线程默认优先级是5；线程优先级的范围是：1-10 |
+
+~~~java
+public class MyRunnable implements Runnable{
+    @Override
+    public void run() {
+        for (int i = 1; i <= 100; i++) {
+            System.out.println(Thread.currentThread().getName() + "---" + i);
+        }
+    }
+}
+~~~
+
+测试类
+
+~~~java
+//创建线程要执行的参数对象
+MyRunnable mr = new MyRunnable();
+//创建线程对象，并指定名字
+Thread t1 = new Thread(mr, "飞机");
+Thread t2 = new Thread(mr, "坦克");
+
+System.out.println(t1.getPriority()); //5
+System.out.println(t2.getPriority()); //5，由此可得，默认优先级就是5
+
+// 好奇一下，当前main线程的优先级是多少？
+System.out.println(Thread.currentThread().getPriority());//打印结束，可以发现也是5
+~~~
+
+我们可以来看看 `Thread` 的源码。
+
+<kbd>ctrl + F12</kbd> 找到 `MIN_PRIORITY` 和 `MAX_PRIORITY`，可以发现最小为1，最大是10，默认的是中间的 `NORM_PRIORITY`，即 `5`
+
+<img src="./assets/image-20240506160041429.png" alt="image-20240506160041429" style="zoom:50%;" />
+
+优先级越高，抢到CPU的概率就越高，但是并不能保证它 `100%` 能抢到CPU的执行权。
+
+~~~java
+t1.setPriority(1);
+t2.setPriority(10);
+
+t1.start();
+t2.start();
+~~~
+
+由于坦克的优先级高，因此它先执行完毕没有问题
+
+<img src="./assets/image-20240506160402819.png" alt="image-20240506160402819" style="zoom:50%;" />
+
+但是这只是概率问题，飞机也有可能先执行完毕。
+
+因此优先级并不是绝对的，只是一个概率问题。
+
+
+
+----
+
+# 142.守护线程
+
+## 一、代码示例
+
+| 方法名                     | 说明                                                         |
+| -------------------------- | ------------------------------------------------------------ |
+| void setDaemon(boolean on) | 将此线程标记为守护线程，当运行的线程都是守护线程时，Java虚拟机将退出 |
+
+先来看看三个准备好的代码
+
+**MyThread1.java**
+
+~~~java
+public class MyThread1 extends Thread{
+    @Override
+    public void run() {
+        for (int i = 1; i <= 10; i++) {
+            System.out.println(getName() + "@" + i);
+        }
+    }
+}
+~~~
+
+**MyThread2.java**
+
+~~~java
+public class MyThread2 extends Thread{
+    @Override
+    public void run() {
+        for (int i = 1; i <= 100; i++) {
+            System.out.println(getName() + "@" + i);
+        }
+    }
+}
+~~~
+
+**main方法**
+
+~~~java
+public static void main(String[] args) {
+    MyThread1 t1 = new MyThread1();
+    MyThread2 t2 = new MyThread2();
+
+    t1.setName("女神");
+    t2.setName("备胎");
+
+    //把第二个线程设置为守护线程（守护线程说的比较难听一点就是：备胎线程）
+    t2.setDaemon(true);
+
+    t1.start();
+    t2.start();
+}
+~~~
+
+```
+细节：
+    当其他的非守护线程执行完毕之后，守护线程会陆续结束
+通俗易懂：
+    当女神线程结束了，那么备胎也没有存在的必要了
+```
+
+程序运行结束，当女神线程执行完毕后，备胎线程就没有必要往下了，它也会陆陆续续的结束。
+
+在备胎线程中，我循环了100次，但是备胎线程执行到16就结束了。
+
+因此要注意的是：备胎不是里面就结束了，当女神线程结束后，系统会告诉备胎：备胎，你没存在的必要了，你结束吧。告诉它的过程中，备胎又瞬间往下执行了一波，因此备胎线程是陆续结束的。
+
+控制台打印结果如下
+
+~~~java
+D:\develop\Java\JDK17\bin\java.exe -javaagent:D:\software\JetBrains\IDEA\lib\idea_rt.jar=55403:D:\software\JetBrains\IDEA\bin -Dfile.encoding=UTF-8 -classpath
+备胎@1
+女神@1
+备胎@2
+女神@2
+备胎@3
+女神@3
+备胎@4
+女神@4
+备胎@5
+女神@5
+备胎@6
+女神@6
+备胎@7
+女神@7
+备胎@8
+女神@8
+备胎@9
+女神@9
+备胎@10
+女神@10
+备胎@11
+备胎@12
+备胎@13
+备胎@14
+备胎@15
+备胎@16
+
+Process finished with exit code 0
+~~~
+
+----
+
+## 二、应用场景
+
+假设现在又两个人在用QQ进行聊天，此时左边的人要给右边的人发一个文件。
+
+此时聊天可以看做一个线程，发送文件也可以看做一个线程，因此此时至少会有两个线程。
+
+但此时如果我们将聊天窗口关闭，也就是 `线程1` 结束了，此时 `线程2` 就没有执行下去的必要了，此时就可以将 `线程2` 设置为 `守护线程（备胎线程）`。
+
+<img src="./assets/image-20240506161656076.png" alt="image-20240506161656076" style="zoom:50%;" />
+
+
+
+----
+
+# 143.礼让线程
+
+这个方法用的不多，了解一下即可。
+
+方法是静态的，直接用类名调即可。
+
+| 方法名                     | 说明              |
+| -------------------------- | ----------------- |
+| public static void yield() | 出让线程/礼让线程 |
+
+**MyThread.java**
+
+```java
+public class MyThread extends Thread{
+    @Override
+    public void run() {//"飞机"  "坦克"
+        for (int i = 1; i <= 100; i++) {
+            System.out.println(getName() + "@" + i);
+        }
+    }
+}
+```
+
+**main方法**
+
+~~~java
+public class ThreadDemo {
+    public static void main(String[] args) {
+        MyThread t1 = new MyThread();
+        MyThread t2 = new MyThread();
+
+        t1.setName("飞机");
+        t2.setName("坦克");
+
+        t1.start();
+        t2.start();
+    }
+}
+~~~
+
+运行上面代码，我们可以发现，线程的执行是随机性的，有可能是：你一次我一次，也有可能刷一下执行很多很多的飞机，然后再刷一下执行很多很多的坦克。
+
+我觉得这样不太好，那能不能让线程的执行尽可能均匀一些呢？
+
+因此就可以用到 `yield()`，出让线程方法。
+
+例如：现在是 "飞机线程" 抢到了CPU的执行权，此时就会打印飞机，打印完后，如果没有 `yield()`，那么CPU的执行权还在飞机线程上，因此就有可能导致飞机一直打印，直到CPU的执行权被坦克抢走。
+
+但现在我们加了一个 `yield()`，表示当飞机这个线程打印完后，此时它就会出让CPU的执行权，那么下一次在运行的时候，飞机跟坦克就会重新再去抢夺CPU的执行权，此时是有可能让这个结果尽可能均匀一点。
+
+但是它只是尽可能的均匀一点，虽然飞机出让了CPU的执行权，但是在上面再次抢夺的时候，飞机有可能再抢到CPU，因此不是绝对的。
+
+因此这个方法在以后用的非常少，了解一下即可。
+
+~~~java
+public class MyThread extends Thread{
+    @Override
+    public void run() 
+        for (int i = 1; i <= 100; i++) {
+            System.out.println(getName() + "@" + i);
+            //表示出让当前CPU的执行权
+            Thread.yield();
+        }
+    }
+}
+~~~
+
+运行结果如下
+
+<img src="./assets/image-20240506162739174.png" alt="image-20240506162739174" style="zoom:67%;" />
+
+
+
+----
+
+# 144.插入线程
+
+| 方法名                   | 说明              |
+| ------------------------ | ----------------- |
+| public final void join() | 插入线程/插队线程 |
+
+**MyThread.java**
+
+```java
+public class MyThread extends Thread{
+    @Override
+    public void run() {
+        for (int i = 1; i <= 100; i++) {
+            System.out.println(getName() + "@" + i);
+        }
+    }
+}
+```
+
+**main方法**
+
+~~~java
+public class ThreadDemo {
+    public static void main(String[] args) {
+        MyThread t = new MyThread();
+        t.setName("土豆");
+        t.start();
+        
+        //执行在main线程当中的
+        for (int i = 0; i < 10; i++) {
+            System.out.println("main线程" + i);
+        }
+    }
+}
+~~~
+
+运行以上代码，那就应该是 `土豆线程` 和 `main线程` 正在抢夺CPU的执行权，谁抢到了谁就执行。
+
+现在有一个需求：将 `土豆线程` 插入到 `main线程` 之前，即等 `土豆线程` 执行完后，`main线程` 再继续执行。
+
+此时就可以用到 `join()` 方法。
+
+~~~java
+public class ThreadDemo {
+    MyThread t = new MyThread();
+    t.setName("土豆");
+    t.start();
+
+    //表示把t这个线程，插入到当前线程之前。
+    //t形参:土豆
+    //当前线程: 看这段代码是运行在哪个线程上的，这里是main线程
+    t.join(); //理解：将土豆线程插入到main线程之前，等土豆线程中所有的代码都执行完了，才会轮到main线程执行
+
+    //执行在main线程当中的
+    for (int i = 0; i < 10; i++) {
+        System.out.println("main线程" + i);
+    }
+}
+~~~
+
+程序运行结果：等土豆线程运行完后，才轮到 `main线程`
+
+<img src="./assets/image-20240506163420821.png" alt="image-20240506163420821" style="zoom:50%;" />
+
+同样的，这个方法我们以后用到的也不多，因此了解一下即可。
+
+
+
+-----
+
+# 145.线程的生命周期
+
+生命周期：从生到死的过程中经历了哪些状态。
+
+当创建线程对象的时候，它是新建状态，新建完后，调用 `start()` 去运行线程，此时就变成了 `就绪状态`。
+
+注意是 `调用完start()` 之后才变成 `就绪状态`。
+
+在 `就绪状态` 下，线程开始抢夺CPU的执行权，PS：它是正在抢，但是还没抢到。没有抢到就没办法执行代码，所以 `就绪状态` 是：有执行资格，但是没有执行权。
+
+- 有执行资格：你有资格去抢CPU的执行权
+- 没有执行权：你现在还没有抢到，不能去执行代码
+
+因此在 `就绪状态` 下，线程干的事情说白了就是不停的去抢CPU。
+
+如果抢到了CPU的执行权，此时就会变成 `运行状态`，运行状态下线程就会运行代码，因此此时它是有执行资格，也是有执行权的。
+
+在运行的过程中，CPU的执行权是有可能被其他线程抢走的，一旦被抢走，此时又会回到 `就绪状态`。
+
+但如果当前的线程将 `run()` 中所有的代码全都运行完了，此时线程就会死亡变成垃圾，此时就是 `死亡状态`。
+
+最后还有一种情况：如果在运行的时候遇到了 `sleep()`，此时线程就会阻塞，即等着，此时什么也干不了，它不能去抢CPU的执行权，也不能执行代码，因此它是没有执行资格，也没有执行权的，如果此时代码还没执行完，CPU的执行权也一定会被其他线程抢走。
+
+当睡眠的时间到了之后，它就会变成 `就绪状态`，开始重新抢夺CPU的执行权。
+
+![image-20240506164941529](./assets/image-20240506164941529.png)
+
+为了考验大家是否看懂了，这里问个问题：sleep方法会让线程睡眠，睡眠时间到了之后，立马就会执行下面的代码吗？
+
+它是不会立马执行的，因为sleep时间到了之后，它是变成了 `就绪状态`，此时它是先去抢夺CPU的执行权，抢到了才会去执行代码。
+
+
+
+----
+
+# 146.线程的安全问题（同步代码块）
+
+多线程可以帮我们提高效率，但是提高效率的同时它会有一个弊端：不安全。
+
+在学习之前，我们先来看一个小练习。
+
+## 一、引出问题
+
+~~~java
+需求：某电影院目前正在上映国产大片，共有100张票，而它有3个窗口卖票，请设计一个程序模拟该电影院卖票
+~~~
+
+这三个窗口在程序中应该是互相独立的，因此三个窗口就可以看做三个线程
+
+**MyThread.java**
+
+~~~java
+public class MyThread extends Thread {
+    int ticket = 0;//0 ~ 99
+
+    @Override
+    public void run() {
+        while (true) {
+            //同步代码块
+            if (ticket < 100) {
+                try {
+                    //方法执行的太快了，这里让它睡眠10毫秒
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                ticket++;
+                System.out.println(getName() + "正在卖第" + ticket + "张票！！！");
+            } else {
+                break;
+            }
+        }
+    }
+}
+~~~
+
+**测试类**
+
+~~~java
+public static void main(String[] args) {
+    //创建线程对象
+    MyThread t1 = new MyThread();
+    MyThread t2 = new MyThread();
+    MyThread t3 = new MyThread();
+
+    //起名字
+    t1.setName("窗口1");
+    t2.setName("窗口2");
+    t3.setName("窗口3");
+
+    //开启线程
+    t1.start();
+    t2.start();
+    t3.start();
+}
+~~~
+
+运行上面代码，可以发现三个窗口卖的票好像是互相独立的，即三个窗口总共卖了300张票。
+
+![image-20240506170659266](./assets/image-20240506170659266.png)
+
+但这不是我想要的，我想要的是总共只有100张票
+
+此时需要在 `ticket变量` 前面加一个 `static` 静态关键字。
+
+~~~java
+//表示这个类所有的对象，都共享ticket数据
+static int ticket = 0;//0 ~ 99
+~~~
+
+但是改完后还有问题，运行代码，可以发现它还有重复的票
+
+<img src="./assets/image-20240506170950878.png" alt="image-20240506170950878" style="zoom:70%;" />
+
+并且将控制台划到最后，发现它还会超出范围。
+
+<img src="./assets/image-20240506171217039.png" alt="image-20240506171217039" style="zoom:67%;" />
+
+----
+
+## 二、分析问题
+
+### 1）为什么票会重复
+
+假设现在有三条线程，三条线程要操作的数据刚开始为0。
+
+线程开启后，三条线程会子在这里抢夺CPU的执行权，谁抢到了，就会继续往下执行。
+
+<img src="./assets/image-20240506171541231.png" alt="image-20240506171541231" style="zoom:43%;" />
+
+假设线程1在一开始抢到了CPU的执行权，线程1就会继续往下执行，此时是满足这里的判断条件的，所以线程1就会进入到if中，进来后立马睡10毫秒。
+
+睡觉的时候是不会去抢夺CPU的执行权的，CPU的执行权一定会被其他线程抢走。
+
+假设是线程2抢到了，线程2就会继续往下执行，此时也是满足这里的判断条件的，所以线程2也会进入if中，进来后，同样去睡10毫秒。
+
+此时CPU的执行权就会被线程3抢走，线程3也会进来睡10毫秒。
+
+<img src="./assets/image-20240506172047011.png" alt="image-20240506172047011" style="zoom:43%;" />
+
+时间到了后这三条线程就会陆陆续续的醒来，继续执行下面的代码。
+
+假设线程1醒来了，它抢夺到了CPU的执行权，线程1就会继续往下执行：`ticket++`，由 `0` 变成了 `1`，但是自增后，它还没来得及去打印，CPU的执行权就被线程2抢走了。
+
+<img src="./assets/image-20240506172533061.png" alt="image-20240506172533061" style="zoom:40%;" />
+
+线程2在这里也对 `ticket` 做了一次自增，`ticket` 就会从 `1` 变成了 `2`。
+
+<img src="./assets/image-20240506172841281.png" alt="image-20240506172841281" style="zoom:40%;" />
+
+因此，我们需要知道一句话：线程在执行代码的时候，CPU的执行权随时有可能会被其他线程抢走。
+
+假设现在又被线程3抢走了，线程3也做了一次自增，`ticket` 就变成了 `3`。
+
+那么在这个时候，不管是 `线程1` 还是 `线程2` 还是 `线程3`，继续往下打印票号的时候，它在打印的都是 `3号票`。
+
+<img src="./assets/image-20240506172935383.png" alt="image-20240506172935383" style="zoom:50%;" />
+
+这就是重复票的由来，其根本原因是：线程执行时有随机性，CPU的执行权随时有可能会被其他的线程抢走。
+
+----
+
+### 2）为什么票会超出范围？
+
+假设 `ticket` 现在已经到 `99` 了，此时三条线程在抢夺CPU的执行权。
+
+<img src="./assets/image-20240506173255831.png" alt="image-20240506173255831" style="zoom:40%;" />
+
+假设线程1抢夺到了CPU的执行权，睡10毫秒。
+
+睡10毫秒的时候CPU的执行权被线程2抢到了，线程2也会进来睡10毫秒。
+
+睡10毫秒的时候CPU的执行权被线程3抢到了，线程3也会进来睡10毫秒。
+
+睡眠完后还是会陆陆续续的醒来，继续执行下面的代码。
+
+假设现在线程1醒来了，抢到了CPU的执行权，执行 `ticket自增`，由 `99` 变成了 `100`。
+
+<img src="./assets/image-20240506173539157.png" alt="image-20240506173539157" style="zoom:40%;" />
+
+自增完成后还是一样，还没来得及打印，CPU的执行权被线程2抢走了，线程2也做了一次自增，`ticket` 变成了 `101`。
+
+<img src="./assets/image-20240506173641189.png" alt="image-20240506173641189" style="zoom:40%;" />
+
+同样的，这个时候它也还没有打印，`ticket` 执行权又被线程3抢走了，线程3也做了一次自增，`ticket` 变成了 `102`。
+
+那么这个时候不管是线程1，还是线程2，还是线程3，它们打印的都是 `102号票`。
+
+这就是超出范围的由来。
+
+<img src="./assets/image-20240506173846189.png" alt="image-20240506173846189" style="zoom:40%;">
+
+其根本原因跟刚刚是一样的：线程执行的时候是具有随机性的，CPU的执行权随时都有可能会被其他线程抢走，这个就是买票所产生的原因。
+
+那我们该如何纠正呢？
+
+如果我们能将操作数据的这段代码给锁起来，当有线程进来后，其他的线程就算抢夺到了CPU的执行权，也得在外面等着，它进不来。
+
+只有当线程1出来了，其他的线程才能进去。
+
+----
+
+## 三、同步代码块
+
+把操作共享数据的代码锁起来
+
+此时会用到一个关键字 `synchronized`，在它的后面写 `锁对象` 就行了
+
+~~~java
+synchronized (锁){
+    操作共享数据的代码
+}
+~~~
+
+细节1：在最初锁的状态是默认打开的，如果有一个线程进去了，此时锁就会自动关闭。
+
+细节2：当锁里面所有的代码都执行完毕了，线程出来了，这时候锁才会自动打开。
+
+----
+
+## 四、修改代码
+
+小括号中需要写锁对象，这个锁对象是任意的，任意到我在上面创建一个Object的对象都可以，只不过我们一定要切记，这是一个锁对象，一定要是唯一的，即在对象前面加一个静态关键字就可以保证唯一了，即：MyThread这个类不管创建多少对象，这里的obj都是共享的，都是同一个。
+
+~~~java
+public class MyThread extends Thread {
+    //表示这个类所有的对象，都共享ticket数据
+    static int ticket = 0;//0 ~ 99
+
+    static Object obj = new Object();
+
+    @Override
+    public void run() {
+        //此时我们就可以将obj放在小括号中，当做锁对象
+        //这样就能解决线程安全的问题，这种解决方式我们会叫做：同步代码块
+        //利用同步代码块将操作共享数据的代码给锁起来，让同步代码块里的代码轮流进行的
+        while (obj) {
+            synchronized (MyThread.class) {//相当于将共享数据的代码锁起来了，此时不管你有多少条线程，这个里面的代码都是轮流执行的。
+                //同步代码块
+                if (ticket < 100) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    ticket++;
+                    System.out.println(getName() + "正在卖第" + ticket + "张票！！！");
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+}
+~~~
+
+----
+
+## 五、同步代码块的两个小细节
+
+### 1）synchronized同步代码块不能写在循环的外面
+
+如果你写在循环的外面就会有一个小问题：
+
+~~~java
+@Override
+public void run() {
+    synchronized (obj) {
+        while (true) {
+            //同步代码块
+            if (ticket < 100) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                ticket++;
+                System.out.println(getName() + "正在卖第" + ticket + "张票！！！");
+            } else {
+                break;
+            }
+        }
+    }
+}
+~~~
+
+运行上面代码，你会发现窗口1将所有的代码都卖完了，压根就没有窗口2，窗口3什么事。
+
+<img src="./assets/image-20240506175243124.png" alt="image-20240506175243124" style="zoom:60%;" />
+
+程序刚开始运行的时候，窗口1、窗口2、窗口3它会去抢夺CPU的执行权。
+
+如果说窗口1抢到了，此时它就会进来，进来后，这里的锁就关闭了。
+
+就算窗口2、窗口3抢到CPU的执行权，它也得在synchronized的外面等着，一直等到synchronized里面所有的代码全都执行完毕后，线程1出来了，2跟3才有可能进去。
+
+由于synchronized里面是循环，窗口1只有将100张票全部卖完了，线程1才会出来，此时就会导致一个线程会将所有的票卖完。
+
+~~~java
+@Override
+public void run() {
+    synchronized (obj) {
+        ///----------------------------------------------------
+        while (true) {
+            ............
+        }
+    }
+}
+~~~
+
+---
+
+### 2）synchronized里面的锁对象一定要是唯一的
+
+那如果不是唯一的，会出现什么效果呢？
+
+如果现在有两条线程，两条线程看的是不同的锁，那么这把锁还有意义吗？
+
+<img src="./assets/image-20240506180139784.png" alt="image-20240506180139784" style="zoom:35%;" />
+
+就没意义了，如果每条线程对应的锁不一样，那这个synchronized代码块就等于没有写。
+
+下面代码将之前的obj改成this，当线程1进来后，这里的this表示的就是线程1本身，线程2进来后，this表示的就是线程2本身，此时这里的锁对象就是不一样，我们可以来运行一下。
+
+~~~java
+@Override
+public void run() {
+    while (true) {
+        synchronized (this) {
+            //同步代码块
+            if (ticket < 100) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                ticket++;
+                System.out.println(getName() + "正在卖第" + ticket + "张票！！！");
+            } else {
+                break;
+            }
+        }
+    }
+}
+~~~
+
+程序运行完毕，可以发现卖重复票的情况和超票的情况依旧存在。
+
+<img src="./assets/image-20240506180454350.png" alt="image-20240506180454350" style="zoom:67%;" />
+
+所以 **synchronized里面的锁对象一定要是唯一的**。
+
+但一般我们会怎么写呢？一般我们会在这写当前类的字节码文件对象。
+
+其实说的就是那个class的对象，这个对象其实是唯一的，因为在同一个文件夹里面只能有一个 `MyThread.class`，因此字节码文件对象一定是唯一，那么既然你是唯一的，那我就把你拿过来当做是锁对象就行了。
+
+~~~java
+@Override
+public void run() {
+    while (true) {
+        synchronized (this) {
+            //同步代码块
+            if (ticket < 100) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                ticket++;
+                System.out.println(getName() + "正在卖第" + ticket + "张票！！！");
+            } else {
+                break;
+            }
+        }
+    }
+}
+~~~
+
+
+
+----
+
+# 149.同步方法
+
+## 一、总述
+
+刚刚我们已经学习完了同步代码块，就是将一段代码锁起来，这样就可以解决多线程操作共享数据时带来的数据安全问题。
+
+但是如果我们想要将一个方法里面所有的代码全部锁起来，此时就没有必要去用同步代码块了，我们可以直接将 `synchronized` 加在方法上，此时这个方法就叫做同步方法。
+
+~~~java
+修饰符 synchronized 返回值类型 方法名(方法参数) { 
+	方法体；
+}
+~~~
+
+特点1：同步方法是锁住方法里面所有的代码
+
+特点2：同步方法的锁对象，我们是不能自己指定的，是Java已经规定好的。
+
+- 如果你当前的方法是非静态的，它的锁对象就是 `this`，即当前方法的调用者。
+- 如果你当前的方法是静态的，它的锁对象就是 `当前类的字节码文件对象`。
+
+----
+
+## 二、练习
+
+题目还是刚刚的题目，只不过要求用同步方法完成。
+
+很多同学在写同步方法的时候都会有一个小疑问：不知道把哪些方法写在同步方法中。
+
+技巧：你首先不要写同步方法，而是先写同步代码块，然后再把同步代码块里面的代码去抽取成方法就行了。
+
+```
+需求：
+     某电影院目前正在上映国产大片，共有100张票，而它有3个窗口卖票，请设计一个程序模拟该电影院卖票
+     利用同步方法完成
+     技巧：同步代码块
+```
+
+我们先用同步代码块写，再去改成同步方法。
+
+由于在之前我们用的都是多线程的第一种实现方式，这里就使用第二种实现方式。
+
+由于现在使用的是第二种实现方式，此时 `ticket` 的前面就没必要去加 `static` 了。
+
+我们之前一直使用第一种实现方式（继承Thread类），此时它是有可能创建多个对象的，所以如果我想让所有的对象都共享一个 ticket成员变量的值，在前面就需要加static。
+
+<img src="./assets/image-20240506182109806.png" alt="image-20240506182109806" style="zoom:60%;" />
+
+但是我们现在使用的是第二种实现方式（实现Runnable接口），在这种方式下，MyRunnable（我们自己写的类）只有可能会创建一次，它是作为一个参数让线程去执行的，所以只会创建一次它的对象。
+
+那么既然只会创建一次，ticket就没有必要再去加static了。
+
+~~~java
+public class MyRunnable implements Runnable {
+    int ticket = 0;
+    @Override
+    public void run() {
+    }
+}
+~~~
+
+接下来完善 `run()`，写 `run()` 的时候也是有套路的
+
+```java
+public class MyRunnable implements Runnable {
+
+    int ticket = 0;
+
+    @Override
+    public void run() {
+        //1.循环
+        while (true) {
+            //2.同步代码块（同步方法）
+            //3.判断共享数据是否到了末尾，如果到了末尾
+            if (ticket == 100) {
+                break;
+            } else {
+                //4.判断共享数据是否到了末尾，如果没有到末尾
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                ticket++;
+                System.out.println(Thread.currentThread().getName() + "在卖第" + ticket + "张票！！！");
+            }
+        }
+    }
+}
+```
+
+**测试类**
+
+~~~java
+MyRunnable mr = new MyRunnable();
+
+Thread t1 = new Thread(mr);
+Thread t2 = new Thread(mr);
+Thread t3 = new Thread(mr);
+
+t1.setName("窗口1");
+t2.setName("窗口2");
+t3.setName("窗口3");
+
+t1.start();
+t2.start();
+t3.start();
+~~~
+
+接下来改成同步方法。
+
+改写很简单：将synchronized里面所有的代码全都放到方法中即可。
+
+选中synchronized里面所有的代码，<kbd>ctrl + alt + M</kbd> ，此时就可以抽取成一个方法了。
+
+```java
+public class MyRunnable implements Runnable {
+
+    int ticket = 0;
+
+    @Override
+    public void run() {
+        //1.循环
+        while (true) {
+            //2.同步代码块（同步方法）
+            if (method()) break;
+        }
+    }
+
+    //this
+    private synchronized boolean method() {
+        //3.判断共享数据是否到了末尾，如果到了末尾
+        if (ticket == 100) {
+            return true;
+        } else {
+            //4.判断共享数据是否到了末尾，如果没有到末尾
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            ticket++;
+            System.out.println(Thread.currentThread().getName() + "在卖第" + ticket + "张票！！！");
+        }
+        return false;
+    }
+}
+```
+
+----
+
+## 三、扩展
+
+学习完同步方法后，我们之前有很多知识点其实也就可以解释了。
+
+很多同学在
+
+
+
+-----
+
+
 
   ```
 
