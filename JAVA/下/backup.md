@@ -16691,7 +16691,7 @@ public class Desk {
 ```
 1. 循环
 2. 同步代码块（之后可以改写为同步方法或者lock锁，都行）
-3. 判断共享数据是否到了末尾（建议先写到了末尾的情况，因为到了末尾更简单）
+3. 判断共享数据是否到了末尾（到了末尾）,建议先写到了末尾的情况，因为到了末尾更简单
 4. 判断共享数据是否到了末尾（没有到末尾，执行核心逻辑）
 ```
 
@@ -16875,6 +16875,8 @@ public static void main(String[] args) {
 
 `LinkedBlockingQueue`：底层是链表实现的，无界（指没有长度的界限），创建它的对象的时候我们不需要去指定队列的长度。但是它又并不是真正的无界，它其实也是有最大值的，只不过这个最大值非常的大，是int的最大值，有21个亿那么多。
 
+![06_阻塞队列继承结构](./assets/06_阻塞队列继承结构.png)
+
 ----
 
 ## 三、用阻塞队列完成 `唤醒机制` 代码实现
@@ -16891,19 +16893,58 @@ public class ThreadDemo {
         //通过刚刚的学习我们知道，ArrayBlockingQueue是一个有界的阻塞队列，因此在创建它对象的时候必须指定上线
         //这里假设它最多只能放1个
         ArrayBlockingQueue<String> queue = new ArrayBlockingQueue<>(1);
-
-        //2.创建线程的对象，并把阻塞队列传递过去
-        Cook c = new Cook(queue);
-        Foodie f = new Foodie(queue);
-
-        //3.开启线程
-        c.start();
-        f.start();
     }
 }
 ~~~
 
-细节：这里是不需要写锁的，看一下源码就知道了。
+细节：这里是不需要写锁的，看一下源码就知道了，`put()` 底层已经有锁了。
+
+选择 `ArrayBlockingQueue` 的 `put()` 跟进，可以发现在方法中，它首先会用 `lock锁` 的方式将代码锁起来。
+
+~~~java
+public void put(E e) throws InterruptedException {
+    Objects.requireNonNull(e);
+    //获取到锁对象
+    final ReentrantLock lock = this.lock;
+    //然后用锁对象去调用一个方法，这个方法就可以来获取锁。
+    lock.lockInterruptibly();
+    try {
+        //然后进行循环判断，数据的个数 跟 队列的长度是否相等。
+        while (count == items.length)
+            //如果相等，说明队列装满了，等待
+            notFull.await();
+        //没有装满就往队列中放数据就行了
+        enqueue(e);
+    } finally {
+        //当这些逻辑执行完毕后，再调用unlock()释放锁
+        lock.unlock();
+    }
+}
+~~~
+
+并且take()的底层也是有锁的，我们在写代码的时候也不需要去加锁了，否则就会有锁的嵌套，锁的嵌套容易导致死锁。
+
+~~~java
+public E take() throws InterruptedException {
+    //先获取到锁对象
+    final ReentrantLock lock = this.lock;
+    //然后再去调用lock方法获取到锁
+    lock.lockInterruptibly();
+    try {
+        //在下面它又写了一个循环，来判断队列中数据是不是0
+        while (count == 0)
+            //如果是0表示没数据，拿不出来只能等着
+            notEmpty.await();
+        //如果有数据就获取
+        return dequeue();
+    } finally {
+        //当上面所有代码执行完毕后，再调用unlock()释放锁
+        lock.unlock();
+    }
+}
+~~~
+
+代码示例
 
 ~~~java
 public class Cook extends Thread{
@@ -16944,6 +16985,8 @@ public class Foodie extends Thread{
         while(true){
             //不断从阻塞队列中获取面条
             try {
+                //获取面条，获取的方法叫take()
+                //并且take()的底层也是有锁的，我们在写代码的时候也不需要去加锁了
                 String food = queue.take();
                 System.out.println(food);
             } catch (InterruptedException e) {
@@ -16952,515 +16995,546 @@ public class Foodie extends Thread{
         }
     }
 }
+
+-----------------------------------------------
+
+public class ThreadDemo {
+    public static void main(String[] args) {创建阻塞队列的对象，泛型表示的是队列中数据的类型
+        //通过刚刚的学习我们知道，ArrayBlockingQueue是一个有界的阻塞队列，因此在创建它对象的时候必须指定上线
+        //这里假设它最多只能放1个
+        ArrayBlockingQueue<String> queue = new ArrayBlockingQueue<>(1);
+
+        //2.创建线程的对象，并把阻塞队列传递过去
+        Cook c = new Cook(queue);
+        Foodie f = new Foodie(queue);
+
+        //3.开启线程
+        c.start();
+        f.start();
+    }
+}
+~~~
+
+程序运行完毕，发现结果怎么跟想象的不太一样，这里怎么会有连续的？
+
+<img src="./assets/image-20240507072826227.png" alt="image-20240507072826227" style="zoom:50%;" />
+
+我们刚刚控制台看到的运行结果是这两条打印语句导致的。
+
+但打印语句其实是定义在锁的外面，定义在锁的外面其实就是会导致这个现象。
+
+![image-20240507073000313](./assets/image-20240507073000313.png)
+
+当我们将之前写的等待唤醒机制的代码进行改写，将打印语句放到锁的外面，发现也会这样的情况
+
+<img src="./assets/image-20240507073408049.png" alt="image-20240507073408049" style="zoom:50%;" />
+
+因此连续的原因就是因为我们将打印语句写在了锁的外面，导致看上去数据错乱的情况。
+
+但是写在锁的外面并不会对数据的安全造成影响，它没有对共享数据造成任何的修改/改编，它只是对我们看运行的结果造成了一点点不方便而已。
+
+
+
+----
+
+# 156.多线程的6中状态
+
+在之前我们简单的分析过，线程有 `新建、就绪、运行、死亡、阻塞` 这几种状态。
+
+<img src="./assets/image-20240506164941529.png" alt="image-20240506164941529" style="zoom:30%;" />
+
+但是还不够完整，除此之外还有几种状态需要我们知道。
+
+在代码运行的过程中，如果你遇到了 `wait()`，此时就会进入到 `等待` 状态，直到被人唤醒它为止。
+
+如果需要了 `sleep()`，这个状态，标准是叫做 `计时等待` 状态，当时间到了之后它会自动醒来。
+
+这个才是我们理解的线程七大状态。
+
+但是在这里会有一个小细节：Java的虚拟机中，它是没有定义运行状态的。
+
+这里的运行状态是为了方便大家理解，我自己加上的。
+
+![image-20240507074518282](./assets/image-20240507074518282.png)
+
+我们可以通过 `API帮助文档` 来查阅一下，搜索 `Thread.State`。
+
+可以看见，线程的六个状态都定义在这里。
+
+- NEW：新建
+- RUNNABLE：就绪
+- BLOCKED：阻塞
+- WAITING：无限等待
+- TIMED WAITING：计时等待
+- TERMINGATED：结束、死亡状态
+
+<img src="./assets/image-20240507074648923.png" alt="image-20240507074648923" style="zoom:50%;" />
+
+那为什么Java没有定义运行状态呢？是有原因的。
+
+当线程抢夺到CPU执行权的时候，此时虚拟机就会把当前的线程交给操作系统去管理，虚拟机就不管了。
+
+既然此时虚拟机已经不管了，因此它就没有定义运行状态。
+
+<img src="./assets/image-20240507075017080.png" alt="image-20240507075017080" style="zoom:30%;" />
+
+
+
+-----
+
+
+
+# 158.综合练习：抢红包
+
+~~~java
+需求：
+	抢红包也用到了多线程。
+	假设：100块，分成了3个包，现在有5个人去抢。
+	其中，红包是共享数据。
+	5个人是5条线程。
+	打印结果如下：
+		  XXX抢到了XXX元
+		  XXX抢到了XXX元
+~~~
+
+四个套路，但又由于这里抢红包每个人只能抢一次，因此第一步循环就不用写了
+
+~~~java
+1. 循环
+2. 同步代码块（之后可以改写为同步方法或者lock锁，都行）
+3. 判断共享数据是否到了末尾（到了末尾）,建议先写到了末尾的情况，因为到了末尾更简单
+4. 判断共享数据是否到了末尾（没有到末尾，执行核心逻辑）
+~~~
+
+PS：需要随机带小数，可以使用 `Random类` 的 `nextDouble(double bound)`，如果你传递 100，它就会在100中随机，随机的时候是带小数的，只不过这个方法在JDK17的时候才能用，低版本用不了。
+
+~~~java
+public class MyThread extends Thread {
+    //共享数据
+    //100块，分成了3个包
+    static double money = 100;
+    static int count = 3;
+
+    //最小的中奖金额，能是0吗？不能，最小也是最小的中奖金额
+    //又由于最小的中奖金额是不会发生变化的，因此用final修饰
+    //用final修饰后，它就变成常量了，常量的名字要大写
+    static final double MIN = 0.01;
+
+    @Override
+    public void run() {
+        //同步代码块
+        synchronized (MyThread.class) {
+            if (count == 0) {
+                //判断，共享数据是否到了末尾（已经到末尾）
+                System.out.println(getName() + "没有抢到红包！");
+            } else {
+                //判断，共享数据是否到了末尾（没有到末尾），就抽奖
+                //但是抽奖的时候不能直接随机，因为随机到最后一次，就不要再随机了，第三次就是剩余的钱，因此随机前应该对count进行判断
+                //定义一个变量，表示中奖的金额
+                double prize = 0;
+                if (count == 1) {
+                    //表示此时是最后一个红包
+                    //就无需随机，剩余所有的钱都是中奖金额
+                    prize = money;
+                } else {
+                    //表示第一次，第二次（随机）
+                    Random r = new Random();
+                    //nextDouble()中随机的范围不能直接写money，下面举个例子你就懂了
+                    //假设现在是100 元 分成了 3个包
+                    //第一个红包的最大金额应该为：99.98
+                    //计算方式：100 - (3-1) * 0.01（最小值），这样计算出来的才是随机的范围
+                    double bounds = money - (count - 1) * MIN;
+                    prize = r.nextDouble(bounds);
+                    if (prize < MIN) {
+                        //如果小于最小的金额，此时就将你强制变成最小的金额。
+                        prize = MIN;
+                    }
+                }
+                //从money当中，去掉当前中奖的金额
+                money = money - prize;
+                //红包的个数-1
+                count--;
+                //本次红包的信息进行打印
+                System.out.println(getName() + "抢到了" + prize + "元");
+            }
+        }
+    }
+}
+~~~
+
+在写测试类的时候教你一招
+
+<img src="./assets/kfmyb-35gxy.gif" alt="kfmyb-35gxy" style="zoom:50%;" />
+
+~~~java
+public static void main(String[] args) {
+    //创建线程的对象
+    MyThread t1 = new MyThread();
+    MyThread t2 = new MyThread();
+    MyThread t3 = new MyThread();
+    MyThread t4 = new MyThread();
+    MyThread t5 = new MyThread();
+
+    //给线程设置名字
+    t1.setName("小A");
+    t2.setName("小QQ");
+    t3.setName("小哈哈");
+    t4.setName("小诗诗");
+    t5.setName("小丹丹");
+
+    //启动线程
+    t1.start();
+    t2.start();
+    t3.start();
+    t4.start();
+    t5.start();
+}
+~~~
+
+运行程序，这就是我们想要的结果，三个人抢到了，两个人没有抢到，而且三个人的总金额是100元。
+
+<img src="./assets/image-20240507084737529.png" alt="image-20240507084737529" style="zoom:50%;" />
+
+写完后发现，虽然逻辑对了，数据好像也没有什么太大问题，但是跟实际生活好像有一点不一样，在实际生活中，应该保留小数点后面两位，我要进行精确计算怎么办？
+
+因此我们还需要将这个代码去改一改，改成精确运算就行了，即使用 `BigDecimal`。
+
+只不过 `BigDecimal` 在用起来的时候非常难受，非常不方便，它里面加减乘除所有的全部都是使用方法来实现的。
+
+在操作完后，还需要对抽奖结果进行一个四舍五入的设置，并且小数点保留两位。
+
+~~~java
+//设置抽中红包，小数点保留两位，四舍五入
+prize = prize.setScale(2,RoundingMode.HALF_UP);
+~~~
+
+完整代码
+
+~~~java
+public class MyThread extends Thread {
+    //总金额
+    static BigDecimal money = BigDecimal.valueOf(100.0);
+    //个数
+    static int count = 3;
+    //最小抽奖金额
+    static final BigDecimal MIN = BigDecimal.valueOf(0.01);
+
+    @Override
+    public void run() {
+        synchronized (MyThread.class) {
+            if (count == 0) {
+                System.out.println(getName() + "没有抢到红包！");
+            } else {
+                //中奖金额
+                BigDecimal prize;
+                if (count == 1) {
+                    prize = money;
+                } else {
+                    //获取抽奖范围
+                    double bounds = money.subtract(BigDecimal.valueOf(count - 1).multiply(MIN)).doubleValue();
+                    Random r = new Random();
+                    //抽奖金额
+                    prize = BigDecimal.valueOf(r.nextDouble(bounds));
+                }
+                //设置抽中红包，小数点保留两位，四舍五入
+                prize = prize.setScale(2, RoundingMode.HALF_UP);
+                //在总金额中去掉对应的钱
+                money = money.subtract(prize);
+                //红包少了一个
+                count--;
+                //输出红包信息
+                System.out.println(getName() + "抽中了" + prize + "元");
+            }
+        }
+    }
+}
 ~~~
 
 
 
+-----
+
+# 159.综合练习：抽奖箱抽奖
+
+~~~java
+有一个抽奖池,该抽奖池中存放了奖励的金额,该抽奖池中的奖项为 {10,5,20,50,100,200,500,800,2,80,300,700};
+创建两个抽奖箱(线程)设置线程名称分别为“抽奖箱1”，“抽奖箱2”
+随机从抽奖池中获取奖项元素并打印在控制台上,格式如下:
+                 每次抽出一个奖项就打印一个(随机)
+	抽奖箱1 又产生了一个 10 元大奖
+	抽奖箱1 又产生了一个 100 元大奖
+	抽奖箱1 又产生了一个 200 元大奖
+	抽奖箱1 又产生了一个 800 元大奖
+	抽奖箱2 又产生了一个 700 元大奖
+	.....
+~~~
+
+首先思考，这些奖项 `10, 5, 20, 50, 100, 200, 500, 800, 2, 80, 300, 700` 我们该放到数组中还是集合中呢？
+
+两个其实都是可以的，但由于集合操作更方便，因此这里定义在集合中。
+
+~~~java
+public class Test {
+    public static void main(String[] args) {
+        //创建奖池
+        ArrayList<Integer> list = new ArrayList<>();
+        Collections.addAll(list, 10, 5, 20, 50, 100, 200, 500, 800, 2, 80, 300, 700);
+
+        //创建线程
+        MyThread t1 = new MyThread(list);
+        MyThread t2 = new MyThread(list);
+
+        //设置名字
+        t1.setName("抽奖箱1");
+        t2.setName("抽奖箱2");
+
+        //启动线程
+        t1.start();
+        t2.start();
+    }
+}
+
+------------------------------
+
+public class MyThread extends Thread {
+    ArrayList<Integer> list;
+
+    public MyThread(ArrayList<Integer> list) {
+        this.list = list;
+    }
+
+    @Override
+    public void run() {
+        //1.循环
+        //2.同步代码块
+        //3.判断
+        //4.判断
+        while (true) {
+            synchronized (MyThread.class) {
+                if (list.size() == 0) {
+                    break;
+                } else {
+                    //继续抽奖
+                    Collections.shuffle(list);
+                    int prize = list.remove(0);
+                    System.out.println(getName() + "又产生了一个" + prize + "元大奖");
+                }
+            }
+            //由于这里奖项太少了，一个线程有可能短时间内会将所有奖项全部打印完
+            //如果想让结果平均一些，那就在锁的外面让线程睡10毫秒
+            //有的人会将sleep()写在synchronized里面，但是写在这效果不明显，因为线程1在synchronized里面睡觉，线程2依旧是进不来的，因此写在外面是最好的。
+            try {
+                Thread.sleep(10); //假设线程1在这里睡着了，此时CPU的执行权就没有了，一定会被线程2抢走，此时线程2就会进入到锁中进行抽奖
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+}
+~~~
+
+
+
+----
+
+# 160.综合练习：抽奖箱抽奖
+
+```
+有一个抽奖池,该抽奖池中存放了奖励的金额,该抽奖池中的奖项为 {10,5,20,50,100,200,500,800,2,80,300,700};
+创建两个抽奖箱(线程)设置线程名称分别为“抽奖箱1”，“抽奖箱2”
+随机从抽奖池中获取奖项元素并打印在控制台上,格式如下:
+每次抽的过程中，不打印，抽完时一次性打印(随机)    在此次抽奖过程中，抽奖箱1总共产生了6个奖项。
+    分别为：10,20,100,500,2,300最高奖项为300元，总计额为932元
+在此次抽奖过程中，抽奖箱2总共产生了6个奖项。
+    分别为：5,50,200,800,80,700最高奖项为800元，总计额为1835元
+```
+
+## 实现方式一
+
+~~~java
+public class Test {
+    public static void main(String[] args) {
+        //创建奖池
+        ArrayList<Integer> list = new ArrayList<>();
+        Collections.addAll(list, 10, 5, 20, 50, 100, 200, 500, 800, 2, 80, 300, 700);
+
+        //创建线程
+        MyThread t1 = new MyThread(list);
+        MyThread t2 = new MyThread(list);
+
+        //设置名字
+        t1.setName("抽奖箱1");
+        t2.setName("抽奖箱2");
+
+        //启动线程
+        t1.start();
+        t2.start();
+    }
+}
+
+-------------------------------------
+    
+public class MyThread extends Thread {
+
+    ArrayList<Integer> list;
+
+    public MyThread(ArrayList<Integer> list) {
+        this.list = list;
+    }
+
+    //线程一
+    static ArrayList<Integer> list1 = new ArrayList<>();
+    //线程二
+    static ArrayList<Integer> list2 = new ArrayList<>();
+
+    @Override
+    public void run() {
+        while (true) {
+            synchronized (MyThread.class) {
+                if (list.size() == 0) {
+                    if ("抽奖箱1".equals(getName())) {
+                        System.out.println("抽奖箱1" + list1);
+                    } else { // 这里可以用else-if，但由于这里只有两条线程，因此使用else更简单一些
+                        System.out.println("抽奖箱2" + list2);
+                    }
+                    break;
+                } else {
+                    //继续抽奖
+                    Collections.shuffle(list);
+                    int prize = list.remove(0);
+                    if ("抽奖箱1".equals(getName())) {
+                        list1.add(prize);
+                    } else {
+                        list2.add(prize);
+                    }
+                }
+            }
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+}
+~~~
 
+写完方式一时，有没有感觉代码有点不太合适呢？
 
+我们现在仅仅只有两个线程，因此在成员变量中创建2个集合就行了。
 
+但是如果有100个线程呢？每一个线程对应着一个集合，就需要创建100个集合，还有下面的判断 `if ("抽奖箱1".equals(getName()))`，需要写100个 `if-else`，太麻烦了！
 
+因此刚刚的写法不行，虽然它能解决问题，但是不好。
 
+----
 
-### 3.1生产者和消费者模式概述【应用】
+## 实现方式二（推荐）
 
-- 概述
-
-  生产者消费者模式是一个十分经典的多线程协作的模式，弄懂生产者消费者问题能够让我们对多线程编程的理解更加深刻。
-
-  所谓生产者消费者问题，实际上主要是包含了两类线程：
-
-  ​	一类是生产者线程用于生产数据
-
-  ​	一类是消费者线程用于消费数据
-
-  为了解耦生产者和消费者的关系，通常会采用共享的数据区域，就像是一个仓库
-
-  生产者生产数据之后直接放置在共享数据区中，并不需要关心消费者的行为
-
-  消费者只需要从共享数据区中去获取数据，并不需要关心生产者的行为
-
-- Object类的等待和唤醒方法
-
-
-### 3.2生产者和消费者案例【应用】
-
-- 案例需求
-
-  + 桌子类(Desk)：定义表示包子数量的变量,定义锁对象变量,定义标记桌子上有无包子的变量
-
-  + 生产者类(Cooker)：实现Runnable接口，重写run()方法，设置线程任务
-
-    1.判断是否有包子,决定当前线程是否执行
-
-    2.如果有包子,就进入等待状态,如果没有包子,继续执行,生产包子
-
-    3.生产包子之后,更新桌子上包子状态,唤醒消费者消费包子
-
-  + 消费者类(Foodie)：实现Runnable接口，重写run()方法，设置线程任务
-
-    1.判断是否有包子,决定当前线程是否执行
-
-    2.如果没有包子,就进入等待状态,如果有包子,就消费包子
-
-    3.消费包子后,更新桌子上包子状态,唤醒生产者生产包子
-
-  + 测试类(Demo)：里面有main方法，main方法中的代码步骤如下
-
-    创建生产者线程和消费者线程对象
-
-    分别开启两个线程
-
-- 代码实现
-
-  ```java
-  public class Desk {
-  
-      //定义一个标记
-      //true 就表示桌子上有汉堡包的,此时允许吃货执行
-      //false 就表示桌子上没有汉堡包的,此时允许厨师执行
-      public static boolean flag = false;
-  
-      //汉堡包的总数量
-      public static int count = 10;
-  
-      //锁对象
-      public static final Object lock = new Object();
-  }
-  
-  public class Cooker extends Thread {
-  //    生产者步骤：
-  //            1，判断桌子上是否有汉堡包
-  //    如果有就等待，如果没有才生产。
-  //            2，把汉堡包放在桌子上。
-  //            3，叫醒等待的消费者开吃。
-      @Override
-      public void run() {
-          while(true){
-              synchronized (Desk.lock){
-                  if(Desk.count == 0){
-                      break;
-                  }else{
-                      if(!Desk.flag){
-                          //生产
-                          System.out.println("厨师正在生产汉堡包");
-                          Desk.flag = true;
-                          Desk.lock.notifyAll();
-                      }else{
-                          try {
-                              Desk.lock.wait();
-                          } catch (InterruptedException e) {
-                              e.printStackTrace();
-                          }
-                      }
-                  }
-              }
-          }
-      }
-  }
-  
-  public class Foodie extends Thread {
-      @Override
-      public void run() {
-  //        1，判断桌子上是否有汉堡包。
-  //        2，如果没有就等待。
-  //        3，如果有就开吃
-  //        4，吃完之后，桌子上的汉堡包就没有了
-  //                叫醒等待的生产者继续生产
-  //        汉堡包的总数量减一
-  
-          //套路:
-              //1. while(true)死循环
-              //2. synchronized 锁,锁对象要唯一
-              //3. 判断,共享数据是否结束. 结束
-              //4. 判断,共享数据是否结束. 没有结束
-          while(true){
-              synchronized (Desk.lock){
-                  if(Desk.count == 0){
-                      break;
-                  }else{
-                      if(Desk.flag){
-                          //有
-                          System.out.println("吃货在吃汉堡包");
-                          Desk.flag = false;
-                          Desk.lock.notifyAll();
-                          Desk.count--;
-                      }else{
-                          //没有就等待
-                          //使用什么对象当做锁,那么就必须用这个对象去调用等待和唤醒的方法.
-                          try {
-                              Desk.lock.wait();
-                          } catch (InterruptedException e) {
-                              e.printStackTrace();
-                          }
-                      }
-                  }
-              }
-          }
-  
-      }
-  }
-  
-  public class Demo {
-      public static void main(String[] args) {
-          /*消费者步骤：
-          1，判断桌子上是否有汉堡包。
-          2，如果没有就等待。
-          3，如果有就开吃
-          4，吃完之后，桌子上的汉堡包就没有了
-                  叫醒等待的生产者继续生产
-          汉堡包的总数量减一*/
-  
-          /*生产者步骤：
-          1，判断桌子上是否有汉堡包
-          如果有就等待，如果没有才生产。
-          2，把汉堡包放在桌子上。
-          3，叫醒等待的消费者开吃。*/
-  
-          Foodie f = new Foodie();
-          Cooker c = new Cooker();
-  
-          f.start();
-          c.start();
-  
-      }
-  }
-  ```
-
-### 3.3生产者和消费者案例优化【应用】
-
-+ 需求
-
-  + 将Desk类中的变量,采用面向对象的方式封装起来
-  + 生产者和消费者类中构造方法接收Desk类对象,之后在run方法中进行使用
-  + 创建生产者和消费者线程对象,构造方法中传入Desk类对象
-  + 开启两个线程
-
-+ 代码实现
-
-  ```java
-  public class Desk {
-  
-      //定义一个标记
-      //true 就表示桌子上有汉堡包的,此时允许吃货执行
-      //false 就表示桌子上没有汉堡包的,此时允许厨师执行
-      //public static boolean flag = false;
-      private boolean flag;
-  
-      //汉堡包的总数量
-      //public static int count = 10;
-      //以后我们在使用这种必须有默认值的变量
-     // private int count = 10;
-      private int count;
-  
-      //锁对象
-      //public static final Object lock = new Object();
-      private final Object lock = new Object();
-  
-      public Desk() {
-          this(false,10); // 在空参内部调用带参,对成员变量进行赋值,之后就可以直接使用成员变量了
-      }
-  
-      public Desk(boolean flag, int count) {
-          this.flag = flag;
-          this.count = count;
-      }
-  
-      public boolean isFlag() {
-          return flag;
-      }
-  
-      public void setFlag(boolean flag) {
-          this.flag = flag;
-      }
-  
-      public int getCount() {
-          return count;
-      }
-  
-      public void setCount(int count) {
-          this.count = count;
-      }
-  
-      public Object getLock() {
-          return lock;
-      }
-  
-      @Override
-      public String toString() {
-          return "Desk{" +
-                  "flag=" + flag +
-                  ", count=" + count +
-                  ", lock=" + lock +
-                  '}';
-      }
-  }
-  
-  public class Cooker extends Thread {
-  
-      private Desk desk;
-  
-      public Cooker(Desk desk) {
-          this.desk = desk;
-      }
-  //    生产者步骤：
-  //            1，判断桌子上是否有汉堡包
-  //    如果有就等待，如果没有才生产。
-  //            2，把汉堡包放在桌子上。
-  //            3，叫醒等待的消费者开吃。
-  
-      @Override
-      public void run() {
-          while(true){
-              synchronized (desk.getLock()){
-                  if(desk.getCount() == 0){
-                      break;
-                  }else{
-                      //System.out.println("验证一下是否执行了");
-                      if(!desk.isFlag()){
-                          //生产
-                          System.out.println("厨师正在生产汉堡包");
-                          desk.setFlag(true);
-                          desk.getLock().notifyAll();
-                      }else{
-                          try {
-                              desk.getLock().wait();
-                          } catch (InterruptedException e) {
-                              e.printStackTrace();
-                          }
-                      }
-                  }
-              }
-          }
-      }
-  }
-  
-  public class Foodie extends Thread {
-      private Desk desk;
-  
-      public Foodie(Desk desk) {
-          this.desk = desk;
-      }
-  
-      @Override
-      public void run() {
-  //        1，判断桌子上是否有汉堡包。
-  //        2，如果没有就等待。
-  //        3，如果有就开吃
-  //        4，吃完之后，桌子上的汉堡包就没有了
-  //                叫醒等待的生产者继续生产
-  //        汉堡包的总数量减一
-  
-          //套路:
-              //1. while(true)死循环
-              //2. synchronized 锁,锁对象要唯一
-              //3. 判断,共享数据是否结束. 结束
-              //4. 判断,共享数据是否结束. 没有结束
-          while(true){
-              synchronized (desk.getLock()){
-                  if(desk.getCount() == 0){
-                      break;
-                  }else{
-                      //System.out.println("验证一下是否执行了");
-                      if(desk.isFlag()){
-                          //有
-                          System.out.println("吃货在吃汉堡包");
-                          desk.setFlag(false);
-                          desk.getLock().notifyAll();
-                          desk.setCount(desk.getCount() - 1);
-                      }else{
-                          //没有就等待
-                          //使用什么对象当做锁,那么就必须用这个对象去调用等待和唤醒的方法.
-                          try {
-                              desk.getLock().wait();
-                          } catch (InterruptedException e) {
-                              e.printStackTrace();
-                          }
-                      }
-                  }
-              }
-          }
-  
-      }
-  }
-  
-  public class Demo {
-      public static void main(String[] args) {
-          /*消费者步骤：
-          1，判断桌子上是否有汉堡包。
-          2，如果没有就等待。
-          3，如果有就开吃
-          4，吃完之后，桌子上的汉堡包就没有了
-                  叫醒等待的生产者继续生产
-          汉堡包的总数量减一*/
-  
-          /*生产者步骤：
-          1，判断桌子上是否有汉堡包
-          如果有就等待，如果没有才生产。
-          2，把汉堡包放在桌子上。
-          3，叫醒等待的消费者开吃。*/
-  
-          Desk desk = new Desk();
-  
-          Foodie f = new Foodie(desk);
-          Cooker c = new Cooker(desk);
-  
-          f.start();
-          c.start();
-  
-      }
-  }
-  ```
-
-### 3.4阻塞队列基本使用【理解】
-
-+ 阻塞队列继承结构
-
-  ![06_阻塞队列继承结构](./assets/06_阻塞队列继承结构.png)
-
-
-+ 常见BlockingQueue:
-
-  ArrayBlockingQueue: 底层是数组,有界
-
-  LinkedBlockingQueue: 底层是链表,无界.但不是真正的无界,最大为int的最大值
-
-+ BlockingQueue的核心方法:
-
-  put(anObject): 将参数放入队列,如果放不进去会阻塞
-
-  take(): 取出第一个数据,取不到会阻塞
-
-+ 代码示例
-
-  ```java
-  public class Demo02 {
-      public static void main(String[] args) throws Exception {
-          // 创建阻塞队列的对象,容量为 1
-          ArrayBlockingQueue<String> arrayBlockingQueue = new ArrayBlockingQueue<>(1);
-  
-          // 存储元素
-          arrayBlockingQueue.put("汉堡包");
-  
-          // 取元素
-          System.out.println(arrayBlockingQueue.take());
-          System.out.println(arrayBlockingQueue.take()); // 取不到会阻塞
-  
-          System.out.println("程序结束了");
-      }
-  }
-  ```
-
-### 3.5阻塞队列实现等待唤醒机制【理解】
-
-+ 案例需求
-
-  + 生产者类(Cooker)：实现Runnable接口，重写run()方法，设置线程任务
-
-    1.构造方法中接收一个阻塞队列对象
-
-    2.在run方法中循环向阻塞队列中添加包子
-
-    3.打印添加结果
-
-  + 消费者类(Foodie)：实现Runnable接口，重写run()方法，设置线程任务
-
-    1.构造方法中接收一个阻塞队列对象
-
-    2.在run方法中循环获取阻塞队列中的包子
-
-    3.打印获取结果
-
-  + 测试类(Demo)：里面有main方法，main方法中的代码步骤如下
-
-    创建阻塞队列对象
-
-    创建生产者线程和消费者线程对象,构造方法中传入阻塞队列对象
-
-    分别开启两个线程
-
-+ 代码实现
-
-  ```java
-  public class Cooker extends Thread {
-  
-      private ArrayBlockingQueue<String> bd;
-  
-      public Cooker(ArrayBlockingQueue<String> bd) {
-          this.bd = bd;
-      }
-  //    生产者步骤：
-  //            1，判断桌子上是否有汉堡包
-  //    如果有就等待，如果没有才生产。
-  //            2，把汉堡包放在桌子上。
-  //            3，叫醒等待的消费者开吃。
-  
-      @Override
-      public void run() {
-          while (true) {
-              try {
-                  bd.put("汉堡包");
-                  System.out.println("厨师放入一个汉堡包");
-              } catch (InterruptedException e) {
-                  e.printStackTrace();
-              }
-          }
-      }
-  }
-  
-  public class Foodie extends Thread {
-      private ArrayBlockingQueue<String> bd;
-  
-      public Foodie(ArrayBlockingQueue<String> bd) {
-          this.bd = bd;
-      }
-  
-      @Override
-      public void run() {
-  //        1，判断桌子上是否有汉堡包。
-  //        2，如果没有就等待。
-  //        3，如果有就开吃
-  //        4，吃完之后，桌子上的汉堡包就没有了
-  //                叫醒等待的生产者继续生产
-  //        汉堡包的总数量减一
-  
-          //套路:
-          //1. while(true)死循环
-          //2. synchronized 锁,锁对象要唯一
-          //3. 判断,共享数据是否结束. 结束
-          //4. 判断,共享数据是否结束. 没有结束
-          while (true) {
-              try {
-                  String take = bd.take();
-                  System.out.println("吃货将" + take + "拿出来吃了");
-              } catch (InterruptedException e) {
-                  e.printStackTrace();
-              }
-          }
-  
-      }
-  }
-  
-  public class Demo {
-      public static void main(String[] args) {
-          ArrayBlockingQueue<String> bd = new ArrayBlockingQueue<>(1);
-  
-          Foodie f = new Foodie(bd);
-          Cooker c = new Cooker(bd);
-  
-          f.start();
-          c.start();
-      }
-  }
-  ```
-
-
-
-
-
-
-
-
+### 1）代码实现
+
+直接将定义集合的代码写在 `run()` 中，然后在下面也不需要进行判断了 `if ("抽奖箱1".equals(getName()))`，直接使用即可。
+
+那为什么可以搞定呢？
+
+以两条线程为例。当线程启动完毕后，线程1、线程2是在 `run方法` 这里抢夺CPU的执行权的，不管是谁抢到了CPU的执行权，它都会去执行 `run()` 中的代码。
+
+假设线程1抢到了CPU的执行权，此时它会去创建一个集合挂在线程1上面；而线程2抢到了CPU的执行权，此时它同样也会去创建一个集合挂在线程2上面，这就形成了每一个线程都有自己的集合。
+
+~~~java
+public static void main(String[] args) {
+    //创建奖池
+    ArrayList<Integer> list = new ArrayList<>();
+    Collections.addAll(list, 10, 5, 20, 50, 100, 200, 500, 800, 2, 80, 300, 700);
+
+    //创建线程
+    MyThread t1 = new MyThread(list);
+    MyThread t2 = new MyThread(list);
+
+
+    //设置名字
+    t1.setName("抽奖箱1");
+    t2.setName("抽奖箱2");
+
+
+    //启动线程
+    t1.start();
+    t2.start();
+}
+
+------------------------------
+
+public class MyThread extends Thread {
+    ArrayList<Integer> list;
+
+    public MyThread(ArrayList<Integer> list) {
+        this.list = list;
+    }
+
+    @Override
+    public void run() {
+        ArrayList<Integer> boxList = new ArrayList<>();//1 //2
+        while (true) {
+            synchronized (MyThread.class) {
+                if (list.size() == 0) {
+                    System.out.println(getName() + boxList);
+                    break;
+                } else {
+                    //继续抽奖
+                    Collections.shuffle(list);
+                    int prize = list.remove(0);
+                    boxList.add(prize);
+                }
+            }
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+}
+~~~
+
+代码实现了，那它的本质到底是什么呢？来画个内存图，你就恍然大悟了。
+
+----
+
+### 2）内存图
+
+内存图我们知道，它里面有栈有堆。
+
+在方法里面首先开启了两条线程，在线程的类中，代码比较简单，成员位置有一个变量，`run()` 里面还有一个局部变量，接下来看看它们在内存中到底是怎么回事吧。
+
+<img src="./assets/image-20240507095231260.png" alt="image-20240507095231260" style="zoom:40%;" />
+
+在正式画内存图之前，我们在大脑中需要有一个思维：当程序启动后，它是有一个main线程的，而main方法就是运行在main线程中。
+
+在main方法中我是先创建了线程对象，再开启了两条自己的线程，此时在右边的图中就有三条线程了。
+
+<img src="./assets/image-20240507095527786.png" alt="image-20240507095527786" style="zoom:33%;" />
+
+
+
+-----
+
+# 161.
+
+```
+有一个抽奖池,该抽奖池中存放了奖励的金额,该抽奖池中的奖项为 {10,5,20,50,100,200,500,800,2,80,300,700};
+创建两个抽奖箱(线程)设置线程名称分别为    "抽奖箱1", "抽奖箱2"
+随机从抽奖池中获取奖项元素并打印在控制台上,格式如下:
+在此次抽奖过程中，抽奖箱1总共产生了6个奖项，分别为：10,20,100,500,2,300
+    最高奖项为300元，总计额为932元
+在此次抽奖过程中，抽奖箱2总共产生了6个奖项，分别为：5,50,200,800,80,700
+    最高奖项为800元，总计额为1835元
+在此次抽奖过程中,抽奖箱2中产生了最大奖项,该奖项金额为800元
+核心逻辑：获取线程抽奖的最大值（看成是线程运行的结果）
+以上打印效果只是数据模拟,实际代码运行的效果会有差异
+```
 
 
 
