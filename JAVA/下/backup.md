@@ -17789,6 +17789,8 @@ static ExecutorService newCachedThreadPool()   创建一个默认的线程池
 
 ## 二、代码实现
 
+### 1）创建没有上线的线程池
+
 ~~~java
 //1.获取线程池对象，newCachedThreadPool()可以获取一个没有上限的线程池对象
 ExecutorService pool1 = Executors.newCachedThreadPool();
@@ -17815,10 +17817,25 @@ public class MyRunnable implements Runnable{
 
 测试类完整代码
 
-~~~
+~~~java
 //1.获取线程池对象
 ExecutorService pool1 = Executors.newCachedThreadPool();
 
+//2.提交任务
+pool1.submit(new MyRunnable());
+
+//3.销毁线程池，一旦池子被摧毁后，它里面所有的线程也会消失
+pool1.shutdown();
+~~~
+
+运行代码，可以看见线程是有自己的名字 `pool-thread-1`，后面就是我们在 `run()` 中打印的序号。
+
+<img src="./assets/image-20240507123643553.png" alt="image-20240507123643553" style="zoom:50%;" />
+
+在刚刚我们说了，线程池一般是不会销毁的，因此需要将第三步注释掉，再给第二步多提交几个任务。
+
+~~~java
+ExecutorService pool1 = Executors.newCachedThreadPool();
 //2.提交任务
 pool1.submit(new MyRunnable());
 pool1.submit(new MyRunnable());
@@ -17827,9 +17844,307 @@ pool1.submit(new MyRunnable());
 pool1.submit(new MyRunnable());
 pool1.submit(new MyRunnable());
 
-//3.销毁线程池，一旦池子被摧毁后，它里面所有的线程也会消失
-pool1.shutdown();
+
+//3.销毁线程池
+//pool1.shutdown();
 ~~~
+
+运行程序，可以看见编号为 `1-5` ，由此可见线程池开启了五个线程去执行我们的任务。
+
+<img src="./assets/image-20240507123835335.png" alt="image-20240507123835335" style="zoom:70%;" />
+
+-----
+
+### 2）展示复用的效果
+
+我们可以将任务写的简单一些，不要循环打印那么多次了，直接打印一句话就行了
+
+~~~java
+public class MyRunnable implements Runnable{
+    @Override
+    public void run() {
+            System.out.println(Thread.currentThread().getName() + "---");
+    }
+}
+~~~
+
+回到测试类中多提交几个任务，并且每次提交任务之前，都让 `main线程` 先睡个1秒钟，目的就是为了让上一个任务赶紧执行完毕，把线程还回去。
+
+~~~java
+public static void main(String[] args) throws InterruptedException {
+    ExecutorService pool1 = Executors.newCachedThreadPool();
+    //2.提交任务
+    pool1.submit(new MyRunnable());
+    Thread.sleep(1000);
+    pool1.submit(new MyRunnable());
+    Thread.sleep(1000);
+    pool1.submit(new MyRunnable());
+    Thread.sleep(1000);
+    pool1.submit(new MyRunnable());
+    Thread.sleep(1000);
+    pool1.submit(new MyRunnable());
+    Thread.sleep(1000);
+    pool1.submit(new MyRunnable());
+
+    //3.销毁线程池
+    //pool1.shutdown();
+}
+~~~
+
+任务执行完毕，可以发现每次都是线程1
+
+<img src="./assets/image-20240507124536220.png" alt="image-20240507124536220" style="zoom:60%;" />
+
+----
+
+### 3）创建有上限的线程池
+
+~~~java
+static newFixedThreadPool(int nThreads)	    创建一个指定最多线程数量的线程池
+~~~
+
+测试代码
+
+~~~java
+public class MyRunnable implements Runnable{
+    @Override
+    public void run() {
+        for (int i = 1; i <= 100; i++) {
+            System.out.println(Thread.currentThread().getName() + "---" + i);
+        }
+    }
+}
+
+-----------------------------
+    
+public static void main(String[] args) throws InterruptedException {
+    //1.获取线程池对象
+    ExecutorService pool1 = Executors.newFixedThreadPool(3);
+    //2.提交任务
+    pool1.submit(new MyRunnable());
+    pool1.submit(new MyRunnable());
+    pool1.submit(new MyRunnable());
+    pool1.submit(new MyRunnable());
+    pool1.submit(new MyRunnable());
+    pool1.submit(new MyRunnable());
+
+    //3.销毁线程池
+    //pool1.shutdown();
+}
+~~~
+
+运行完毕，不管怎么看，都只有 `123`，这就表示了线程池中最多只能有三个线程。
+
+<img src="./assets/image-20240507124657817.png" alt="image-20240507124657817" style="zoom:67%;" />
+
+以上是我们通过代码的运行结果进行的验证，还有一种验证方式：利用Debug进行验证
+
+注意关注一下变量
+
+- `pool size`：目前线程池中有多少线程，现在是0，那就表示线程池刚开始创建的时候它里面是空的，什么也没有。
+- `workQueue`：记录了你当前有多少任务在排序等待，目前 `size` 是0，因此一开始的时候是没有认为在等的。
+
+![image-20240507125107772](./assets/image-20240507125107772.png)
+
+点击下一步，当我们将第一个任务提交上去后， `poll size` 变成 `1` 了，表示线程池中已经有一个线程了。
+
+<img src="./assets/image-20240507125206171.png" alt="image-20240507125206171" style="zoom:50%;" />
+
+再点击两次下一步，线程池中里面就有三个了，此时看好了，池子里面有3个线程，后面的队伍还是0，还没有任务在排队。
+
+![image-20240507125302088](./assets/image-20240507125302088.png)
+
+接下来再下一步，池子的长度还是 `3`，但是在外面已经有一个任务在排队等待了。
+
+![image-20240507125342919](./assets/image-20240507125342919.png)
+
+再点击下一个，可以看见有两个任务在排队了。
+
+![image-20240507125412645](./assets/image-20240507125412645.png)
+
+
+
+-----
+
+# 164.自定义线程池超详细解析
+
+## 一、引入
+
+我们刚刚已经学习了创建线程池的两个静态方法，这两个静态方法是通过Java的工具类进行获取的，方便是方便了，但是不够灵活。
+
+例如当我们的任务提交的比较多，这个任务就会排队等待，如果想修改队伍的长度，此时就修改不了。
+
+那我们能不能不用工具类，自己创建线程池的对象呢？这样我就可以对我想要的参数进行设置了。
+
+当然这必须是可以的，我们可以来看一下 `newFixedThreadPool()` 方法的源码。
+
+可以发现在底层它其实是创建了 `ThreadPoolExecutor` 这个类的对象，在创建对象的时候，传递了很多很多的参数。
+
+<img src="./assets/image-20240507130050734.png" alt="image-20240507130050734" style="zoom:55%;" />
+
+那我就在想了：这是一个什么样的类呢？不着急，选中 `ThreadPoolExecutor` <kbd>ctrl + C</kbd> 打开一下 `API帮助文档` 搜索一下它。
+
+这个类其实就是线程池的类，如果我们创建了它的对象，相当于就是已经有了一个线程池，因此我们需要去看它的构造方法。
+
+不看还好，一看吓一跳，它最长的方法有7个参数。
+
+![image-20240507130335044](./assets/image-20240507130335044.png)
+
+但是不要害怕，为了让大家更深刻去理解这7个参数，这里用一个小故事来帮你理解。
+
+小A同学开了一个饭馆，这个饭馆实施的是一对一服务，其实就是一个服务员就服务一个顾客。
+
+当这个顾客走了，这个服务员才能去服务别人。
+
+但是小A同学比较抠，它也不知道自己这家饭馆能经营多久，所以上面的服务员没有立马招聘，而是等客户来了，来一个招一个。
+
+<img src="./assets/image-20240507130929038.png" alt="image-20240507130929038" style="zoom:33%;" />
+
+那如果这三个客户一直没走，此时又来了三位顾客，此时在饭馆中就没有空闲的服务员了，因此就需要再招聘三个。
+
+因为饭馆不大，所以只能服务六名顾客，与之对应的，就是：最多只能招聘6名服务员。
+
+<img src="./assets/image-20240507131314827.png" alt="image-20240507131314827" style="zoom:50%;" />
+
+其中三名是正式员工，还有三名是临时员工。那这两类员工有什么不同呢？
+
+<img src="./assets/image-20240507131643975.png" alt="image-20240507131643975" style="zoom:40%;" />
+
+假设另外三位顾客已经走了，那么临时员工就会空闲下来。
+
+如果一段时间内，还没有其他的顾客来，为了节约成本，就要把临时工辞掉。
+
+但是正式员工就不一样了，即使没有顾客，正式员工也不能辞退，除非饭馆倒闭。
+
+以上是生意不好的情况，但是如果生意特别好呢？
+
+饭馆的外面肯定要排队，排队不要紧，但是排队肯定会有隐患，如果队伍过长，可能会导致队伍等待时间过长，顾客心里就会非常的暴躁。
+
+<img src="./assets/image-20240507131931444.png" alt="image-20240507131931444" style="zoom:23%;" />
+
+小A同学作为老板，它就指定了一个规则：最多只允许十名顾客进行排队，后面排队的顾客，只能拒绝服务了。
+
+<img src="./assets/image-20240507132047317.png" alt="image-20240507132047317" style="zoom:33%;" />
+
+故事讲完，我们来梳理一下故事中的核心元素。
+
+第三个和第四个并不一样，假设临时员工它是空闲60秒就被辞退了，那么第三个数值就是 `60`，下面的第四个数值就是 `秒`，所以第三个是值，第四个是单位。
+
+我们自己定义的线程池也会用到类似的七个参数。
+
+在线程池中除了核心线程外，还会有一些临时的线程，而临时的线程是有可能随时随地会被销毁的，那么多长时间被销毁呢？就是由第三个和第四个数据决定的。
+
+最后一个参数：线程池中的数目如果比较多，也会去拒绝服务。
+
+![image-20240507132137521](./assets/image-20240507132137521.png)
+
+接下来通过画图，让你明白这7个参数各自的作用。
+
+----
+
+## 二、画图演示
+
+### 1）情况一
+
+在刚开始线程池是空的，里面什么线程都没有。
+
+现在我设置：核心线程3，临时线程也是3。这就表示线程池中最多只有6条线程。
+
+其中核心线程，跟刚刚故事中饭点里的核心员工是一样的，永远不会被销毁，除非你去销毁整个线程池。
+
+而临时线程就跟饭点里的临时员工是一样的，如果一段时间不工作，就要把它进行销毁。
+
+接下来我们要往线程池中提交任务了。
+
+假设在刚开始我们提交了三个任务，线程池就会创建三条线程去处理这三个任务
+
+<img src="./assets/image-20240507134822406.png" alt="image-20240507134822406" style="zoom:33%;" />
+
+但是如果我们提交了五个任务呢？是跟刚刚一样创建五个线程去执行五个任务吗？
+
+---
+
+### 2）情况2
+
+其实不是这样的，正确的应该是这样的：当我们创建了五个任务后，它会创建三个线程来处理，因为核心线程最多只能有三个。
+
+剩余的两个任务就会来后面排队等待，等有了空闲的线程，后面的两个任务才会被执行。
+
+<img src="./assets/image-20240507135022438.png" alt="image-20240507135022438" style="zoom:33%;" />
+
+继续让下，将提交的任务增加，假设我们现在提交了八个任务，跟刚刚一样，因为设置了核心线程最多是3个，因此它会创建三条线程来处理前面的三个任务，剩余的任务就会在后面排队。
+
+假设我们定义了队伍的长度最长为 3。此时任务4/5/6就会在队伍中排队等待。
+
+这个时候线程池才会创建临时线程去处理任务。
+
+因此在这里有两个小细节要去注意
+
+- 核心线程都在忙，而且队伍中已经排满了，这个时候才会去创建临时线程。
+- 先提交的任务不一定先执行。例如刚刚的案例，任务4/5/6还在队伍中排队，而后提交的 7/8 已经正在执行了。
+
+<img src="./assets/image-20240507135403225.png" alt="image-20240507135403225" style="zoom:33%;" />
+
+还没完，还有最后一种情况需要我们知道。如果我们提交的任务再多，例如有10个。
+
+---
+
+### 3）情况三
+
+此时它已经超过了核心线程的数量+临时线程的数量+队伍的长度。
+
+第一步，还是会创建三个核心线程去处理任务；
+
+第二步将4/5/6放到队伍中排队等待；
+
+第三步，创建临时线程去执行7/8/9；
+
+现在线程池已经在满负荷工作了，核心线程在工作，队伍排满了，临时线程也在工作。
+
+因此如果还有其他任务，就会触发任务的拒绝策略。
+
+什么策略呢？默认就是舍弃不要。
+
+<img src="./assets/image-20240507135744721.png" alt="image-20240507135744721" style="zoom:50%;" />
+
+在Java中的任务策略一共会有四种，默认就是第一种：`AbortPolicy`。其他的几个了解一下即可
+
+~~~java
+ThreadPoolExecutor.AbortPolicy: 		   丢弃任务并抛出RejectedExecutionException异常。是默认的策略。
+ThreadPoolExecutor.DiscardPolicy： 		  丢弃任务，但是不抛出异常 这是不推荐的做法。
+ThreadPoolExecutor.DiscardOldestPolicy：    抛弃队列中等待最久的任务 然后把当前任务加入队列中。（即将队伍中排在第一个的给抛弃）
+ThreadPoolExecutor.CallerRunsPolicy:        调用任务的run()方法绕过线程池直接执行。（这种方式不会直接提交给线程池了，而是直接调用任务的run()绕过线程池直接执行）
+~~~
+
+以上就是线程池完整的过程，重点还是这七个参数，这七个参数有一些小细节，我们一会在写代码的时候要注意。
+
+![image-20240507140056365](./assets/image-20240507140056365.png)
+
+----
+
+## 三、代码实现
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
