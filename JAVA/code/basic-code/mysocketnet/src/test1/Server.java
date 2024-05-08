@@ -14,7 +14,7 @@ public class Server {
         while (true) {
             int b;
             while ((b = br.read()) != -1) {
-                System.out.println((char) b);
+                System.out.print((char) b);
             }
         }
     }

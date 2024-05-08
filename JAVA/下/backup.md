@@ -18136,7 +18136,7 @@ ThreadPoolExecutor pool = new ThreadPoolExecutor(
     6,  //最大线程数，不能小于0，最大数量 >= 核心线程数量，由此就可以计算出临时线程数量为3
     60,//空闲线程最大存活时间
     TimeUnit.SECONDS,//时间单位，不能写字符串，而是使用TimeUnit指定，一般我们都会写秒
-    new ArrayBlockingQueue<>(3),//任务队列，即我们之前学习的阻塞队列，我们可以new ArrayBlockingQueue，还能new LinkedBlockingQueue，如果想要指定队伍的长度，那就new ArrayBlockingQueue
+    new ArrayBlockingQueue<>(3),//任务队列，即我们之前学习的阻塞队列，我们可以new ArrayBlockingQueue，还能new LinkedBlockingQueue，如果想要指定队伍的长度，那就new ArrayBlockingQueue()
     Executors.defaultThreadFactory(),//创建线程工厂，说白了就是：线程池如何去获取到一个线程。这里不能直接new Thread，而是需要调用工具类Executors，里面有个defaultThreadFactory()，这个方法在底层其实也是new，我们可以来看下源码
 ~~~
 
@@ -18146,7 +18146,7 @@ ThreadPoolExecutor pool = new ThreadPoolExecutor(
 
 选中 `DefaultThreadFactory` 继续跟进，可以发现它其实也是new了一个Thread，只不过给这个线程做了一系列设置而已
 
-<img src="./assets/image-20240507145126904.png" alt="image-20240507145126904" style="zoom:70%;" />
+<img src="./assets/image-20240508192928219.png" alt="image-20240508192928219" style="zoom:50%;" />
 
 接着最后一个参数
 
@@ -19829,7 +19829,7 @@ BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("mysock
 
 -----
 
-# 187.综合练习5：多线程版的服务端
+# 187.综合练习5：上传任务（多线程版的服务端）
 
 ```
 客户端：将本地文件上传到服务器。接收服务器的反馈。
@@ -19848,6 +19848,119 @@ BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("mysock
 这是我们用循环去改进的代码，其实这也是单线程程序的弊端，单线程程序只能一个一个的来，第一个用户传完了，第二个用户才能上传。
 
 但是这不是我们想要的，我们想要的是服务器能同时被多个用户上传，此时只能用多线程的形式。
+
+**MyRunnable.java**
+
+~~~java
+public class MyRunnable implements Runnable {
+
+    Socket socket;
+
+    public MyRunnable(Socket socket) {
+        this.socket = socket;
+    }
+
+    @Override
+    public void run() {
+        try {
+            //3.读取数据并保存到本地文件中
+            BufferedInputStream bis = new BufferedInputStream(socket.getInputStream());
+            String name = UUID.randomUUID().toString().replace("-", "");
+            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("mysocketnet\\serverdir\\" + name + ".jpg"));
+            int len;
+            byte[] bytes = new byte[1024];
+            while ((len = bis.read(bytes)) != -1) {
+                bos.write(bytes, 0, len);
+            }
+            bos.close();
+            //4.回写数据
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            bw.write("上传成功");
+            bw.newLine();
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            //5.释放资源
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+~~~
+
+**Client.java**
+
+~~~java
+public static void main(String[] args) throws IOException {
+        //客户端：将本地文件上传到服务器。接收服务器的反馈。
+        //服务器：接收客户端上传的文件，上传完毕之后给出反馈。
+
+
+        //1. 创建Socket对象，并连接服务器
+        Socket socket = new Socket("127.0.0.1", 10000);
+
+        //2.读取本地文件中的数据，并写到服务器当中
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream("mysocketnet\\clientdir\\a.jpg"));
+        BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
+        byte[] bytes = new byte[1024];
+        int len;
+        while ((len = bis.read(bytes)) != -1) {
+            bos.write(bytes, 0, len);
+        }
+
+        //往服务器写出结束标记
+        socket.shutdownOutput();
+
+
+        //3.接收服务器的回写数据
+        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        String line = br.readLine();
+        System.out.println(line);
+
+
+        //4.释放资源
+        socket.close();
+
+    }
+~~~
+
+**Server.java**
+
+~~~java
+public class Server {
+    public static void main(String[] args) throws IOException {
+        //1.创建对象并绑定端口
+        ServerSocket ss = new ServerSocket(10000);
+
+        while (true) {
+            //2.等待客户端来连接
+            Socket socket = ss.accept();
+
+            //开启一条线程
+            //一个用户就对应服务端的一条线程
+            new Thread(new MyRunnable(socket)).start();
+        }
+    }
+}
+~~~
+
+
+
+-----
+
+# 188.综合练习6：删除文件（线程池优化）
+
+```
+客户端：将本地文件上传到服务器。接收服务器的反馈。
+服务器：接收客户端上传的文件，上传完毕之后给出反馈。
+频繁的创建线程并销毁线程非常的浪费系统资源，那能不能用线程池优化呢？
+```
 
 **MyRunnable.java**
 
@@ -19969,26 +20082,24 @@ public class Server {
 
 
 
------
-
-# 188.综合练习6：
-
-```
-客户端：将本地文件上传到服务器。接收服务器的反馈。
-服务器：接收客户端上传的文件，上传完毕之后给出反馈。
-频繁的创建线程并销毁线程非常的浪费系统资源，那能不能用线程池优化呢？
-```
-
-
-
-
-
 ----
 
-# 189.综合练习7：
+# 189.综合练习7：BS（接受浏览器的消息并打印）
 
 ~~~java
 客户端：不需要我们自己写，客户端直接用浏览器
 服务器：接收浏览器请求的数据并打印
 ~~~
+
+服务端代码我们都不需要重新写，直接运行之前的代码。
+
+然后打开一个浏览器，访问 `127.0.0.1:10010`。
+
+看右边，就是浏览器给服务器发过来的所有的数据。
+
+![image-20240508193255115](./assets/image-20240508193255115.png)
+
+将这个练习的目的就是为了大家在大脑中有一个BS的概念，在BS架构中，客户端其实就是浏览器，而服务端就是接收浏览器传输过来的数据，当我们要回显的时候，也是把数据回显给浏览器。
+
+
 

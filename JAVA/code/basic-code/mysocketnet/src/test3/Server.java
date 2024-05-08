@@ -15,6 +15,7 @@ public class Server {
         while ((b = bis.read(bytes)) != -1) {
             bos.write(bytes, 0, b);
         }
+        bos.close();
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         bw.write("上传成功");
         bw.newLine();
