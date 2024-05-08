@@ -19433,7 +19433,7 @@ public static void main(String[] args) throws IOException {
     }
 
     //4.释放资源
-    socket.close(); //相当于端口和客户端连接
+    socket.close(); //相当于端口和客户端连接，流可以不用关，因为流是在连接通道里面的，通道关闭了，流自然也就关闭了
     ss.close(); // 相当于关闭了服务器
 }
 ~~~
@@ -19493,29 +19493,502 @@ while ((b = br.read()) != -1){
 
 # 181.TCP协议（代码细节）
 
+我们在启动程序的时候，是先运行服务端。
+
+服务端启动后，运行到 `Socket socket = ss.accept();` 的时候，它会在这死等，直到等到有客户端来连为止。
+
+此时必须要去启动客户端，客户端第一行代码就是跟 `127.0.0.1` 的 `10000端口` 进行连接，此时连接就已经建立了，客户端与服务端直接就有了这么个数据传输的通道。
+
+- 对于左边客户端创建对象的代码而言，它负责连接。
+
+- 对于右边的服务端而言，`accept()` 方法终于等到有人来连我了。
+
+  既然有人来连我了，`accept()` 就会返回客户端的连接对象。
+
+在客户端连接方法的底层方法有个协议，它会去利用一个 `三次握手协议` 去保证连接建立。
+
+<img src="./assets/image-20240508151325606.png" alt="image-20240508151325606" style="zoom:67%;" />
+
+下面就是客户端不断的去写出数据，服务端不断的去读取数据，此时不管是写还是读，它都是通过IO流的形式进行操作的。
+
+这个流不是我们自己创建的，左边是通过 `socket.get`，即通过连接通道获取出来的；右边也是一样的，也是从连接通道获取出来的。
+
+因此这个流其实是在连接通道里面的，流的方向针对左边的客户端而言，它是往外写的，所以它是输出流。
+
+针对于右边的服务器而言，它是要读取的，所以是输入流。
+
+除此之外还有一点要知道，这个流它是在连接通道里面的，所以在下面我们在释放资源的时候，流是不需要关的，我们只需要将连接通道 `socket` 关闭即可，它里面的流自然也断开了。
+
+因此在下面释放资源的时候，流可以关也可以不关。
+
+![image-20240508151744650](./assets/image-20240508151744650.png)
+
+但是在关闭的时候，它里面还有一个小协议。
+
+我们来说一个场景来体现这个协议的重要性：当左边的客户端将 `"aaa"`，通过中的连接通道写到服务器的时候，此时数据还在通道里面，右边的服务器还没来得及读，假设此时直接 `socket.close()`，就可以将通道给断了，这样肯定不合理。
+
+所以在断开连接前，需要保证服务器将通道里面的数据全都处理完毕了，才能断开。
+
+因此这里的断开还有一个协议：`四次挥手协议`，此时是利用这个协议去断开连接，而且要保证连接通道里面的数据已经处理完毕了。
+
+
+
+-----
+
+# 182.三次握手和四次挥手
+
+## 一、三次握手
+
+它的作用是为了保证连接的建立。
+
+它的过程是这样的：客户端一开始会往服务器发送接连的请求，它需要等待服务端去确认。
+
+由此可见，这个连接不是你说连就连的，而是需要先发请求再进行确认。
+
+此时服务器就需要去响应一个确认消息，相当于就是服务器告诉客户端：我已经接收到了你的请求，现在我允许你来连接。
+
+现在压力就给到了客户端，客户端此时已经接收到了这个确认请求，此时它会再次发出确认消息，这个时候连接才是真正的建立。
+
+因此三次握手为什么是三次，其实就是有一个反复确认的过程。
+
+<img src="./assets/image-20240508152727750.png" alt="image-20240508152727750" style="zoom:50%;" />
+
+----
+
+## 二、四次挥手
+
+四次挥手的作用：确保连接断开，且连接通道中的数据处理完毕。
+
+它的过程是这样的：首先客户端发送请求，这个请求就是取消连接的请求，将这个请求发送给服务端。
+
+服务端就需要响应，告诉客户端：我已经收到了你的这个请求，但是你别忙，连接通道里面还有数据我还没处理呢。
+
+所以这个时候客户端还需要等待，等待服务器将最后的数据处理完毕，一旦它处理完毕后，它会再次发送一个确认取消信息给客户端。
+
+这个时候客户端才是真正的断开连接。
+
+由此可见四次挥手为什么是四次呢？其实就是多了这么一个过程：它需要保证服务端已经把链接通道里面的数据已经处理完毕了，此时连接才能断开。
+
+<img src="./assets/image-20240508153101301.png" alt="image-20240508153101301" style="zoom:50%;" />
+
+----
+
+# 总结
+
+到目前为止关于网络编程三要素我们就彻底的学习完毕了，学完后，我们再来看之前跟大家说的参考模型，你就会非常的有感觉了。
+
+此时我们只需要来看中间的这个就行了，在以后我们还回去学习到很多其他的协议，例如我们现在在上网的时候用的最多的HTTP协议，这个HTTP协议只是在应用层的，它的底层其实就是我们今天所学习的TCP协议，因此我们学习的其实是底层的一些知识。
+
+TCP、UDP两个协议底层还有一些其他的东西，我们在连接、发送数据的时候，用到了IP。
+
+并且我们刚刚在学习TCP的时候说了，它里面有三次握手和四次挥手，三次握手和四次挥手的时候，客户端要跟服务器两者之间互发消息，此时消息采取的就是ICMP协议。
+
+最终在传输的时候，还是会转成二进制的形式进行数据的传输。
+
+![image-20240508153301894](./assets/image-20240508153301894.png)
+
+
+
+---
+
+# 183.综合练习1：多发多收
+
+```
+客户端：多次发送数据
+服务器：接收多次接收数据，并打印
+```
+
+**Client.java**
+
+~~~java
+//1. 创建Socket对象并连接服务端
+Socket socket = new Socket("127.0.0.1",10000);
+//2.写出数据
+Scanner sc = new Scanner(System.in);
+OutputStream os = socket.getOutputStream(); // 输出流只需要获取一次，因此放在循环外面
+while (true) {
+    System.out.println("请输入您要发送的信息");
+    String str = sc.nextLine();
+    if("886".equals(str)){
+        break;
+    }
+    os.write(str.getBytes());
+}
+//3.释放资源
+socket.close();
+~~~
+
+**Server.java**
+
+~~~java
+//1.创建对象绑定10000端口（因为客户端在连的时候连的就是10000端口）
+ServerSocket ss = new ServerSocket(10000);
+//2.等待客户端来连接
+Socket socket = ss.accept();
+//3.读取数据
+InputStreamReader isr = new InputStreamReader(socket.getInputStream());
+int b;
+while ((b = isr.read()) != -1){
+    System.out.print((char)b);
+}
+//4.释放资源
+socket.close();
+ss.close();
+~~~
+
+
+
+----
+
+# 184.综合练习2：接收和反馈
+
+```
+客户端：发送一条数据，接收服务端反馈的消息并打印
+服务器：接收数据并打印，再给客户端反馈消息
+```
+
+这一题你可以将它看做两部分来写，第一部分：客户端发，服务端接；第二部分：服务端发，客户端再去接。
+
+<img src="./assets/image-20240508162223677.png" alt="image-20240508162223677" style="zoom:67%;" />
+
+代码书写时数据的方向如下图
+
+![image-20240508162808653](./assets/image-20240508162808653.png)
+
+但是上图这个代码是有点问题的，如果直接运行上图代码，服务端回写的字是没有打出来的。
+
+此时我们可以通过输出语句来调试程序，就可以看见它到底卡死在哪里。
+
+![image-20240508163126550](./assets/image-20240508163126550.png)
+
+运行程序，可以发现控制台读取完客户端传过来的数据后，就没有任何操作了，此时就卡死在32行了。
+
+![image-20240508163152973](./assets/image-20240508163152973.png)
+
+32行结束后，它其实会回到循环中继续从通道继续读取数据，直到读到数据结尾为止。
+
+在左边的客户端中只给它传输了 `"见到你很高兴！"`，并没有给服务端一个结束标记，因此就会导致右边30行read方法它读不到结束标记，读不到技术标记程序就会停在read方法这个地方，继续等待你下面的数据，这个就是卡死的原因。
+
+完整代码如下。
+
+**Client.java**
+
+~~~java
+//1.创建Socket对象并连接服务端
+Socket socket = new Socket("127.0.0.1",10000);
+//2.写出数据
+String str = "见到你很高兴！";
+OutputStream os = socket.getOutputStream();
+os.write(str.getBytes());
+//写出一个结束标记，不要写-1，而是需要用socket调用shutdownOutput()方法，即将输出流结束，可以将它理解为结束标记
+socket.shutdownOutput();
+//3.接收服务端回写的数据
+InputStream is = socket.getInputStream();
+InputStreamReader isr = new InputStreamReader(is);
+int b;
+while ((b = isr.read()) != -1){
+    System.out.print((char)b);
+}
+//释放资源
+socket.close();
+~~~
+
+**Server.java**
+
+~~~java
+//1.创建对象并绑定10000端口
+ServerSocket ss = new ServerSocket(10000);
+//2.等待客户端连接
+Socket socket = ss.accept();
+//3.socket中获取输入流读取数据
+InputStream is = socket.getInputStream();
+InputStreamReader isr = new InputStreamReader(is);
+int b;
+//细节：
+//read方法会从连接通道中读取数据
+//但是，需要有一个结束标记，此处的循环才会停止
+//否则，程序就会一直停在read方法这里，等待读取下面的数据
+while ((b = isr.read()) != -1){
+    System.out.println((char)b);
+}
+//4.回写数据
+String str = "到底有多开心？";
+OutputStream os = socket.getOutputStream();
+os.write(str.getBytes());
+//释放资源
+socket.close();
+ss.close();
+~~~
+
+
+
+----
+
+# 185.综合练习3：上传文件
+
+```
+客户端：将本地文件上传到服务器。接收服务器的反馈。
+服务器：接收客户端上传的文件，上传完毕之后给出反馈。
+```
+
+针对于客户端而言，首先要从本地文件中利用 `FileInputStream` 读取本地文件里面的信息，读一个就需要将数据写到服务器中。
+
+服务器接收到后，要把这个数据保存到本地文件中，当这个文件全都上传完毕后，需要给客户端做一个回写，回写：上传成功。
+
+![image-20240508170657562](./assets/image-20240508170657562.png)
+
+**Client.java**
+
+```java
+//1. 创建Socket对象，并连接服务器
+Socket socket = new Socket("127.0.0.1", 10000);
+//2.读取本地文件中的数据，并写到服务器当中
+BufferedInputStream bis = new BufferedInputStream(new FileInputStream("mysocketnet\\clientdir\\a.jpg"));
+BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
+byte[] bytes = new byte[1024];
+int len;
+while ((len = bis.read(bytes)) != -1) {
+    bos.write(bytes, 0, len);
+}
+//往服务器写出结束标记
+socket.shutdownOutput();
+//3.接收服务器的回写数据
+BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+String line = br.readLine();
+System.out.println(line);
+//4.释放资源
+socket.close();
+```
+
+**Server.java**
+
+~~~java
+//1.创建对象并绑定端口
+ServerSocket ss = new ServerSocket(10000);
+//2.等待客户端来连接
+Socket socket = ss.accept();
+//3.读取数据并保存到本地文件中
+BufferedInputStream bis = new BufferedInputStream(socket.getInputStream());
+BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("mysocketnet\\serverdir\\a.jpg"));
+int len;
+byte[] bytes = new byte[1024];
+while ((len = bis.read(bytes)) != -1) {
+    bos.write(bytes, 0, len);
+}
+bos.close();
+//4.回写数据
+BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+bw.write("上传成功");
+bw.newLine();
+bw.flush();
+//5.释放资源
+socket.close();
+ss.close();
+~~~
+
+
+
+------
+
+# 186.综合练习4：上传文件（文件名重复问题）
+
+```
+客户端：将本地文件上传到服务器。接收服务器的反馈。
+服务器：接收客户端上传的文件，上传完毕之后给出反馈。
+解决上一题文件名重复问题，刚刚我们在上次文件的时候，每次上传文件的名字是固定的，那能不能解决文件重名的问题呢？
+```
+
+在Java中有一个类专门去管这件事情：`UUID`，这个类就表示 `通用唯一标识符` 的类。
+
+简单来说：它可以生成一个随机的字符串，而且字符串的内容是唯一的，因此我可以使用这个类去生成一个随机的文件名。
+
+想获取到这个类的对象，可以调用静态方法 `randomUUID()`，方法会给你返回一个UUID的对象。
+
+<img src="./assets/image-20240508172014873.png" alt="image-20240508172014873" style="zoom:67%;" />
+
+**UUIDTest.java**
+
+~~~java
+public static void main(String[] args) {
+    //UUID.randomUUID()对象中，里面的内容其实就是随机，而且是唯一的。
+    System.out.println(UUID.randomUUID()); // 8c31d904-934e-4014-b9d1-61aeaa28e552
+    //但是会有一个小问题，文件的名字我不想要这个 '-'，先将获取到的UUID先变成字符串，再去调用字符串的replace()，将-替换成长度为0的字符串
+    String str = UUID.randomUUID().toString().replace("-", "");
+    System.out.println(str);//9f15b8c356c54f55bfcb0ee3023fce8a，这个结果跟我们在网站上下载的图片/视频是一样的
+}
+~~~
+
+修改服务端代码
+
+~~~java
+String name = UUID.randomUUID().toString().replace("-", "");
+BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("mysocketnet\\serverdir\\" + name + ".jpg"));
+~~~
+
+
+
+-----
+
+# 187.综合练习5：多线程版的服务端
+
+```
+客户端：将本地文件上传到服务器。接收服务器的反馈。
+服务器：接收客户端上传的文件，上传完毕之后给出反馈。
+这一题还是解决上传文件的问题，此时需要用多线程进行改写，实现：让多个用户同时进行传递。
+```
+
+很多同学会想到循环，但是仅仅用循环是不合理的。
+
+最优的写法是 `循环 + 多线程` 的形式进行改写。
+
+单单用循环改写，如果第一个用户上传的文件比较大，代码还在运行，这个时候第二个用户来连接了，此时服务端就不能和第二个用户连接了。
+
+![image-20240508180246917](./assets/image-20240508180246917.png)
+
+这是我们用循环去改进的代码，其实这也是单线程程序的弊端，单线程程序只能一个一个的来，第一个用户传完了，第二个用户才能上传。
+
+但是这不是我们想要的，我们想要的是服务器能同时被多个用户上传，此时只能用多线程的形式。
+
+**MyRunnable.java**
+
+~~~java
+public class MyRunnable implements Runnable {
+
+    Socket socket;
+
+    //需要将客户端的连接对象socket传递给线程，这里可以通过构造方法进行传递。
+    public MyRunnable(Socket socket) {
+        this.socket = socket;
+    }
+
+    @Override
+    public void run() {
+        try {
+            //3.读取数据并保存到本地文件中
+            BufferedInputStream bis = new BufferedInputStream(socket.getInputStream());
+            String name = UUID.randomUUID().toString().replace("-", "");
+            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("mysocketnet\\serverdir\\" + name + ".jpg"));
+            int len;
+            byte[] bytes = new byte[1024];
+            while ((len = bis.read(bytes)) != -1) {
+                bos.write(bytes, 0, len);
+            }
+            bos.close();
+            //4.回写数据
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            bw.write("上传成功");
+            bw.newLine();
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            //5.释放资源，别忘了做非空判断
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+~~~
+
+**Client.java**
+
+~~~java
+public class Client {
+    public static void main(String[] args) throws IOException {
+        //客户端：将本地文件上传到服务器。接收服务器的反馈。
+        //服务器：接收客户端上传的文件，上传完毕之后给出反馈。
+
+
+        //1. 创建Socket对象，并连接服务器
+        Socket socket = new Socket("127.0.0.1", 10000);
+
+        //2.读取本地文件中的数据，并写到服务器当中
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream("mysocketnet\\clientdir\\a.jpg"));
+        BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
+        byte[] bytes = new byte[1024];
+        int len;
+        while ((len = bis.read(bytes)) != -1) {
+            bos.write(bytes, 0, len);
+        }
+
+        //往服务器写出结束标记
+        socket.shutdownOutput();
+
+        //3.接收服务器的回写数据
+        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        String line = br.readLine();
+        System.out.println(line);
+
+        //4.释放资源
+        socket.close();
+    }
+}
+~~~
+
+**Server.java**
+
+~~~java
+public class Server {
+    public static void main(String[] args) throws IOException {
+        //客户端：将本地文件上传到服务器。接收服务器的反馈。
+        //服务器：接收客户端上传的文件，上传完毕之后给出反馈。
+
+
+        //创建线程池对象
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(
+                3,//核心线程数量
+                16,//线程池总大小
+                60,//空闲时间
+                TimeUnit.SECONDS,//空闲时间（单位）
+                new ArrayBlockingQueue<>(2),//队列
+                Executors.defaultThreadFactory(),//线程工厂，让线程池如何创建线程对象
+                new ThreadPoolExecutor.AbortPolicy()//阻塞队列
+        );
+
+
+        //1.创建对象并绑定端口
+        ServerSocket ss = new ServerSocket(10000);
+
+        while (true) {
+            //2.等待客户端来连接
+            Socket socket = ss.accept();
+
+            //开启一条线程
+            //一个用户就对应服务端的一条线程
+            //new Thread(new MyRunnable(socket)).start();
+            pool.submit(new MyRunnable(socket));
+        }
+    }
+}
+~~~
+
+
+
+-----
+
+# 188.综合练习6：
+
+```
+客户端：将本地文件上传到服务器。接收服务器的反馈。
+服务器：接收客户端上传的文件，上传完毕之后给出反馈。
+频繁的创建线程并销毁线程非常的浪费系统资源，那能不能用线程池优化呢？
+```
 
 
 
 
 
+----
 
+# 189.综合练习7：
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+~~~java
+客户端：不需要我们自己写，客户端直接用浏览器
+服务器：接收浏览器请求的数据并打印
+~~~
 
