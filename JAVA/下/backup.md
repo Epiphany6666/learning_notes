@@ -18951,8 +18951,8 @@ ds.close();
 
 ~~~java
 //1.创建DatagramSocket对象，这个对象就表示是快递公司
-//细节：
-//在接收的时候，一定要绑定端口
+//细节：如果这里没有指定端口，那就表示你发送的时候是从随机端口去接收数据，那肯定是不行的
+//因此在接收的时候，一定要绑定端口
 //而且绑定的端口一定要跟发送的端口保持一致
 DatagramSocket ds = new DatagramSocket(10086);
 ~~~
@@ -18980,24 +18980,27 @@ PS：`receive()` 是阻塞的，简单理解：程序执行到这一步的时候
 ~~~java
 //2.接收数据包
 byte[] bytes = new byte[1024];
+//你要拿着这个数组里面哪些部分去接收数据呢？很显然我要拿着整个数组所有的空间去接收数据，将来在接收数据的时候，它就会尽可能将这个数组给装满
+//如果你这里写10，那么它只会用前10个来装数据
 DatagramPacket dp = new DatagramPacket(bytes, bytes.length);
 
 ds.receive(dp);
 ~~~
 
-我们还需要做第三步，那就是解析数据包。
+我们还需要做第三步，那就是解析数据包，所有的东西都在 `dp` 中，即箱子。
 
 在解析的时候我可以从这个箱子里面拿到很多很多的东西。
 
 <img src="./assets/image-20240508112655543.png" alt="image-20240508112655543" style="zoom:67%;" />
 
-第一个，获取数据：`dp.getData()`，获取的其实就是上面的这个数组
-
 ~~~java
 //3.解析数据包
-byte[] data = dp.getData();
+byte[] data = dp.getData(); // 获取发送过来的数据，获取的其实就是上面的这个数组
 int len = dp.getLength(); // 获取到多少字节数据
-InetAddress address = dp.getAddress(); // 是从哪台电脑发过来的
+// dp.getAddress()：是从哪台电脑发过来的，获取到真正的IP
+//当然真正的IP最后在后面最好再去调用一个getHostAddress()，这个才是真正的IP
+InetAddress address = dp.getAddress().getHostAddress();  
+String name = dp.getAddress().getHostName(); // 获取到主机名
 int port = dp.getPort(); // 对方是从哪个端口给你发过来的
 
 //打印的时候不能直接打印字节数组，字节数组是看不懂的，需要将字节数组变成字符串
@@ -19019,6 +19022,480 @@ ds.close();
 
 
 ----
+
+# 177.UDP练习（聊天室）
+
+## 一、代码示例
+
+```
+按照下面的要求实现程序
+    UDP发送数据：数据来自于键盘录入，直到输入的数据是886，发送数据结束
+    UDP接收数据：因为接收端不知道发送端什么时候停止发送，故采用死循环接收
+```
+
+**SendMessageDemo.java**
+
+```java
+//1.创建对象DatagramSocket的对象，这里没有指定端口，那就表示我会从随机端口发送数据
+DatagramSocket ds = new DatagramSocket();
+//2.打包数据
+Scanner sc = new Scanner(System.in);
+while (true) {
+    System.out.println("请输入您要说的话：");
+    String str = sc.nextLine();
+    if("886".equals(str)){
+        break;
+    }
+    byte[] bytes = str.getBytes();
+    InetAddress address = InetAddress.getByName("127.0.0.0");
+    int port = 10086;
+    DatagramPacket dp = new DatagramPacket(bytes, bytes.length, address,port);
+    //3.发送数据
+    ds.send(dp);
+}
+//4.释放资源
+ds.close();
+```
+
+**ReceiveMessageDemo.java**
+
+~~~java
+//1.创建对象DatagramSocket的对象
+DatagramSocket ds = new DatagramSocket(10086);
+//2.接收数据包，写在循环体外面，每次后面一次接收到的数据会将前面的数据给覆盖
+byte[] bytes = new byte[1024];
+DatagramPacket dp = new DatagramPacket(bytes, bytes.length);
+while (true) {
+    ds.receive(dp);
+    //3.解析数据包
+    byte[] data = dp.getData();
+    int len = dp.getLength();
+    String ip = dp.getAddress().getHostAddress();
+    String name = dp.getAddress().getHostName();
+    //4.打印数据
+    System.out.println("ip为：" + ip + ",主机名为：" + name + "的人，发送了数据：" + new String(data, 0, len));
+}
+~~~
+
+----
+
+## 二、扩展
+
+我们将这个代码改一改，就可以形成聊天室了
+
+点击右上角 `Edit Configurations`
+
+<img src="./assets/image-20240508125311366.png" alt="image-20240508125311366" style="zoom:67%;" />
+
+这里要确定一下类名跟包名，包名是 `com.itheima.a03udpdemo2`，类名是 `SendMessageDemo`，我要把这个类能重复的运行多次
+
+<img src="./assets/image-20240508125531229.png" alt="image-20240508125531229" style="zoom:57%;" />
+
+最后点击OK即可，一旦设置完后，发送端就可以运行多个了。
+
+此时可以将三个发送端看做是三个人，三个人所有的信息都会往接收端发送，这就是一个聊天室。
+
+![image-20240508125735490](./assets/image-20240508125735490.png)
+
+
+
+----
+
+# 178.单播、组播、广播
+
+## 一、介绍
+
+UDP在通信的时候有三种方式，分别是 `单播、组播、广播`。
+
+单播：一对一，左边的发送端只给右边的一台电脑发送数据。
+
+<img src="./assets/image-20240508130051893.png" alt="image-20240508130051893" style="zoom:35%;" />
+
+组播：顾名思义，可以给一组电脑发送信息。
+
+左边还是发送端，但是右边的接收端可以是一组。
+
+<img src="./assets/image-20240508130131197.png" alt="image-20240508130131197" style="zoom:35%;" />
+
+广播：左边的发送端，可以给局域网中所有的电脑发送数据。
+
+<img src="./assets/image-20240508130241644.png" alt="image-20240508130241644" style="zoom:35%;" />
+
+那么这三种方式代码该怎么写呢？
+
+单播很简单，我们之前写的所有的代码都是单播形式。因为我们之前写的代码就是一对一的形式。
+
+----
+
+## 二、组播
+
+组播地址，范围是 `224.0.0.0 ~ 239.255.255.255`，其中如果我们自己想用，只能用 `224.0.0.0 ~ 224.0.0.255` 范围内的，因为这个范围是给我们预留的组播地址。
+
+那这个组播地址和之前的IP有什么不一样呢？
+
+之前的IP只能表示一台电脑，而这里随便一个组播地址，就可以表示多台电脑。
+
+组播代码其实也是跟之前一模一样的。
+
+### 1）发送端代码
+
+在创建对象的时候，之前单播创建的是 `DatagramSocket`，但是现在是组播，因此我们需要创建 `MulticastSocket` 这个类的对象才行。
+
+其他的都是一样的，只不过在发送数据指定IP的时候，需要指定组播地址。
+
+```java
+public static void main(String[] args) throws IOException {
+    //创建MulticastSocket对象
+    MulticastSocket ms = new MulticastSocket();
+
+    // 创建DatagramPacket对象
+    String s = "你好,你好!";
+    byte[] bytes = s.getBytes();
+    InetAddress address = InetAddress.getByName("224.0.0.1");
+    int port = 10000;
+
+    DatagramPacket datagramPacket = new DatagramPacket(bytes, bytes.length, address, port);
+
+    // 调用MulticastSocket发送数据方法发送数据
+    ms.send(datagramPacket);
+
+    // 释放资源
+    ms.close();
+}
+```
+
+----
+
+### 2）接收端代码
+
+接收端同样也是创建 `MulticastSocket` 对象，但是在下面接收端多了一步：将当前本机，添加到 `224.0.0.1` 的这一组当中。
+
+下面一共写了三个接收端。当我们先运行接收端，再来运行发送端发送数据的时候你会发现，这里的三个接收端都可以接收到数据。
+
+~~~java
+public class ReceiveMessageDemo1 {
+    public static void main(String[] args) throws IOException {
+        //1. 创建MulticastSocket对象
+        MulticastSocket ms = new MulticastSocket(10000);
+
+        //2. 将将当前本机，添加到224.0.0.1的这一组当中
+        InetAddress address = InetAddress.getByName("224.0.0.1");
+        ms.joinGroup(address);
+
+        //3. 创建DatagramPacket数据包对象
+        byte[] bytes = new byte[1024];
+        DatagramPacket dp = new DatagramPacket(bytes, bytes.length);
+
+        //4. 接收数据
+        ms.receive(dp);
+
+        //5. 解析数据
+        byte[] data = dp.getData();
+        int len = dp.getLength();
+        String ip = dp.getAddress().getHostAddress();
+        String name = dp.getAddress().getHostName();
+
+        System.out.println("ip为：" + ip + ",主机名为：" + name + "的人，发送了数据：" + new String(data, 0, len));
+
+        //6. 释放资源
+        ms.close();
+    }
+}
+
+---------------------
+    
+public class ReceiveMessageDemo2 {
+    public static void main(String[] args) throws IOException {
+        //1. 创建MulticastSocket对象
+        MulticastSocket ms = new MulticastSocket(10000);
+
+        //2. 将将当前本机，添加到224.0.0.1的这一组当中
+        InetAddress address = InetAddress.getByName("224.0.0.1");
+        ms.joinGroup(address);
+
+        //3. 创建DatagramPacket数据包对象
+        byte[] bytes = new byte[1024];
+        DatagramPacket dp = new DatagramPacket(bytes, bytes.length);
+
+        //4. 接收数据
+        ms.receive(dp);
+
+        //5. 解析数据
+        byte[] data = dp.getData();
+        int len = dp.getLength();
+        String ip = dp.getAddress().getHostAddress();
+        String name = dp.getAddress().getHostName();
+
+        System.out.println("ip为：" + ip + ",主机名为：" + name + "的人，发送了数据：" + new String(data, 0, len));
+
+        //6. 释放资源
+        ms.close();
+    }
+}
+
+---------------------------
+    
+public class ReceiveMessageDemo3 {
+    public static void main(String[] args) throws IOException {
+        //1. 创建MulticastSocket对象
+        MulticastSocket ms = new MulticastSocket(10000);
+
+        //2. 将将当前本机，添加到224.0.0.2的这一组当中
+        InetAddress address = InetAddress.getByName("224.0.0.1");
+        ms.joinGroup(address);
+
+        //3. 创建DatagramPacket数据包对象
+        byte[] bytes = new byte[1024];
+        DatagramPacket dp = new DatagramPacket(bytes, bytes.length);
+
+        //4. 接收数据
+        ms.receive(dp);
+
+        //5. 解析数据
+        byte[] data = dp.getData();
+        int len = dp.getLength();
+        String ip = dp.getAddress().getHostAddress();
+        String name = dp.getAddress().getHostName();
+
+        System.out.println("ip为：" + ip + ",主机名为：" + name + "的人，发送了数据：" + new String(data, 0, len));
+
+        //6. 释放资源
+        ms.close();
+    }
+}
+~~~
+
+----
+
+## 三、广播
+
+如果我们发送信息的时候，发到的是 `255.255.255.255` 上，此时局域网中所有的电脑都可以接收到你的信息，这就是广播。
+
+广播其实是最简单的，代码几乎跟单播是一模一样的，我们只要把单播的地址改成 `255.255.255.255` 即可。
+
+此时在发送的时候，就可以给局域网里面所有的电脑都去发生数据了。
+
+~~~java
+//1.创建对象DatagramSocket的对象
+DatagramSocket ds = new DatagramSocket();
+
+//2.打包数据
+Scanner sc = new Scanner(System.in);
+while (true) {
+    System.out.println("请输入您要说的话：");
+    String str = sc.nextLine();
+    if ("886".equals(str)) {
+        break;
+    }
+    byte[] bytes = str.getBytes();
+    InetAddress address = InetAddress.getByName("255.255.255.255");
+    int port = 10086;
+    DatagramPacket dp = new DatagramPacket(bytes, bytes.length, address, port);
+    //3.发送数据
+    ds.send(dp);
+}
+
+//4.释放资源
+ds.close();
+~~~
+
+
+
+-----
+
+# 179.TCP协议
+
+## 一、介绍
+
+TCP通信协议是一种可靠的网络协议，它在通信的两段各建立一个Socket对象。
+
+在通信前，一定要保证连接已经建立。
+
+连接一旦建立后，会通过IO流来进行网络通信。
+
+例如下图，有两台电脑，左边的是发送端，我们也可以把它叫做客户端，现在是客户端要往服务器去发送数据，因此右边就是接收端，我们就将它叫做服务器。
+
+它们两个在发送数据前，一定要保证连接已经建立，如果连接不建立的话，TCP是无法发送数据的。
+
+连接一旦建立后，客户端就可以往服务端发送数据了，例如发一句：`你瞅啥？`
+
+<img src="./assets/image-20240508133450733.png" alt="image-20240508133450733" style="zoom:50%;" />
+
+但是要注意，在发送数据的时候它是通过IO流来进行网络通信的，所以就刚刚的这一个发送数据，流的方向是不一样的。
+
+- 针对于客户端来讲，它是往外发，所以它用的是输出流；
+
+- 针对于服务器来讲，它是接收数据，所以它要用输入流；
+
+<img src="./assets/image-20240508133729300.png" alt="image-20240508133729300" style="zoom:50%;" />
+
+在书写代码的时候它会有以下几步，先来看客户端
+
+① 创建客户端的Socket对象（Socket）与制定服务端连接
+
+在创建对象的时候需要传递服务器的IP和端口号。
+
+~~~java
+Socket(String host, int port)
+~~~
+
+② 因为客户端在发送数据的时候是写出，所以我们要获取到输出流 `OutputStream`，然后再写出数据。
+
+~~~java
+OutputStream getOutputStream()
+~~~
+
+③ 写完后直接释放资源即可。
+
+~~~java
+void close()
+~~~
+
+----
+
+再来看下服务器
+
+① 服务器第一步首先也是来创建Socket对象，但是它是叫做 `ServerSocket`
+
+在创建对象的时候需要去绑定一个端口号，此时服务器绑定的端口，要跟客户端连接的端口保持一致！
+
+~~~java
+ServerSocket(int port)
+~~~
+
+② 监听客户端连接，返回一个Socket对象
+
+如果有客户端来连了，此时这个方法会返回一个Socket对象，其实就表示下图红框的连接已经建立了。
+
+<img src="./assets/image-20240508134934930.png" alt="image-20240508134934930" style="zoom:50%;" />
+
+~~~java
+Socket accept()
+~~~
+
+③ 连接一旦建立后，服务器就可以获取到输入流 `InputStream` 去读取数据。
+
+~~~java
+InputStream getInputStream()
+~~~
+
+④ 释放资源
+
+~~~java
+void close()
+~~~
+
+----
+
+## 二、发送数据代码实现
+
+第一步，创建Socket对象
+
+细节：在创建对象的同时会连接服务端，如果连接不上，代码会报错
+
+<img src="./assets/image-20240508141149001.png" alt="image-20240508141149001" style="zoom:50%;" />
+
+~~~java
+Socket socket = new Socket("127.0.0.1", 10000);
+~~~
+
+一旦连接上了，下面的代码就很简单了
+
+~~~java
+//2.可以从连接通道中获取输出流
+OutputStream os = socket.getOutputStream();
+//写出数据，要注意字节流往外写出的时候只能写字节信息
+os.write("aaa".getBytes());
+
+//3.释放资源
+os.close();
+socket.close();
+~~~
+
+----
+
+## 三、接收数据代码实现
+
+~~~java
+public static void main(String[] args) throws IOException {
+    //1.创建对象ServerSocker
+    ServerSocket ss = new ServerSocket(10000);
+
+    //2.监听客户端的链接，其实说白了就是可以调用里面的accept方法去死等客户端来连，如果一直没有客户端来连，服务端的代码就会卡死在accept()中，但一旦有客户端来连，就会返回客户端的连接对象
+    Socket socket = ss.accept();
+
+    //3.从连接通道中获取输入流读取数据
+    InputStream is = socket.getInputStream();
+    //由于我也不知道你发过来的数据有多少，因此可以定义一个循环去读取
+    int b;
+    while ((b = is.read()) != -1) {
+        System.out.println((char) b);
+    }
+
+    //4.释放资源
+    socket.close(); //相当于端口和客户端连接
+    ss.close(); // 相当于关闭了服务器
+}
+~~~
+
+在运行的时候先运行服务端，再运行客户端。但是要注意的是，现在还不能发送中文，因为发送中文会乱码。
+
+
+
+----
+
+# 180.TCP协议（中文乱码问题）
+
+## 一、为什么会乱码？
+
+因为在客户端发数据的时候并没有制定编码表，因此它会使用平台默认的编码表，IDEA是UTF-8，此时就会将一个中文变成三个字节。
+
+四个中文就是12个字节，此时它是将12个字节全部写到了服务器。
+
+但是服务器在读的时候是一个字节一个字节的读取的，因此每次读取的时候只读取了 `1/3` 个中文，所以肯定乱码。
+
+![image-20240508142438294](./assets/image-20240508142438294.png)
+
+因此右边的服务器就需要将它改动一下，将is字节流变成字符流才可以。
+
+~~~java
+//3.从连接通道中获取输入流读取数据
+InputStream is = socket.getInputStream();
+InputStreamReader isr = new InputStreamReader(is);
+
+int b;
+while ((b = isr.read()) != -1){
+    System.out.print((char) b);
+}
+~~~
+
+运行程序，可以发现中文正常读取了。
+
+如果想要提高读取的效率，在外面还可以再去包一个缓冲流。
+
+~~~java
+//3.从连接通道中获取输入流读取数据
+//InputStream is = socket.getInputStream();
+//InputStreamReader isr = new InputStreamReader(is);
+//BufferedReader br = new BufferedReader(isr);
+
+BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+int b;
+while ((b = br.read()) != -1){
+    System.out.print((char) b);
+}
+~~~
+
+
+
+-----
+
+# 181.TCP协议（代码细节）
+
+
+
+
 
 
 

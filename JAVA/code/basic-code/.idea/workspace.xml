@@ -5,8 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="00008d0b-35e0-4f60-bde4-2a1f3fa1a981" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mysocketnet/mysocketnet.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mysocketnet/src/a02upddemo1/receipt.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mysocketnet/src/a02upddemo1/send.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../下/backup.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../下/backup.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../JavaWeb/JavaWeb笔记.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../JavaWeb/JavaWeb笔记.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,6 +28,10 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
   </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 8
+}]]></component>
   <component name="ProjectId" id="2g7XGnUG3gj9Jb4JDGXGmu5wRe9" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -33,22 +42,55 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.Test.executor": "Run",
+    "Application.receipt.executor": "Run",
+    "Application.send.executor": "Run",
     "Application.test5.Test.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
     "jdk.selected.JAVA_MODULE": "17",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="Application.test5.Test">
+  <component name="RunManager" selected="Application.receipt">
     <configuration name="Test" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="test4Case1.Test" />
       <module name="mythreadtest1" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="test4Case1.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="receipt" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="a02upddemo1.receipt" />
+      <module name="mysocketnet" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="a02upddemo1.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="send" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="a02upddemo1.send" />
+      <module name="mysocketnet" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="a02upddemo1.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -71,6 +113,8 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.receipt" />
+        <item itemvalue="Application.send" />
         <item itemvalue="Application.test5.Test" />
         <item itemvalue="Application.Test" />
       </list>
@@ -85,6 +129,7 @@
       <option name="presentableId" value="Default" />
       <updated>1715049498661</updated>
       <workItem from="1715049500233" duration="42000" />
+      <workItem from="1715128849245" duration="2659000" />
     </task>
     <servers />
   </component>
