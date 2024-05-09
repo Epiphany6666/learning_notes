@@ -8739,6 +8739,8 @@ ES官方提供了各种不同语言的客户端，用来操作ES。这些客户�
 
 ## 二、导入Demo工程
 
+### 1）导入数据库
+
 首先导入课前资料提供的数据库数据：
 
 ![image-20210720220400297](assets/image-20210720220400297-1711335607294.png) 
@@ -8763,28 +8765,28 @@ CREATE TABLE `tb_hotel` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
+---
 
-
-### 4.0.2.导入项目
+### 2）导入项目
 
 然后导入课前资料提供的项目:
 
 ![image-20210720220503411](assets/image-20210720220503411-1711335607294.png) 
 
-
-
 项目结构如图：
 
-![image-20210720220647541](assets/image-20210720220647541-1711335607294.png)
+<img src="assets/image-20210720220647541-1711335607294.png" alt="image-20210720220647541" style="zoom:57%;" />
 
+----
 
+## 三、mapping映射分析
 
-### 4.0.3.mapping映射分析
+### 1）分析思路
 
 创建索引库，最关键的是mapping映射，而mapping映射要考虑的信息包括：
 
-- 字段名
-- 字段数据类型
+- 字段名（基于表结构就明白了）
+- 字段数据类型（也是基于原来的表结构转为对应的ES类型）
 - 是否参与搜索
 - 是否需要分词
 - 如果分词，分词器是什么？
@@ -8796,9 +8798,124 @@ CREATE TABLE `tb_hotel` (
 - 是否分词呢要看内容，内容如果是一个整体就无需分词，反之则要分词
 - 分词器，我们可以统一使用ik_max_word
 
+我们先根据数据库表在浏览器中书写mapping映射，在写的时候对照着数据库表来写
 
+![image-20240509203310717](./assets/image-20240509203310717.png)
 
-来看下酒店数据的索引库结构:
+----
+
+### 2）一些特殊字段分析
+
+PS：这里的 `id` 在数据库中是 `bigint类型` 的，对应着Java中的 `long`，但是我们不能写成 `long`。
+
+我们来看之前，id明明是一个数字，但是在ES中却变成了一个字符串。
+
+也就是说 `id字段` 比较特殊，它将来都是这种字符串类型。但又因为它是一个整体，不可分隔，因此将来不分词，因此选择字符串中的 `keyword类型`
+
+<img src="./assets/image-20240509195732361.png" alt="image-20240509195732361" style="zoom:67%;" />
+
+因此这里 `id` 应该定义为字符串中的 `keyword` 类型，因为它不能分词
+
+~~~json
+"id": {
+    "type": "keyword"
+}
+~~~
+
+---
+
+老师这里讲酒店不根据地址搜索，既然不搜索，类型为keyword，`index` 就要定义为 `false`。
+
+~~~json
+"address":{
+    "type": "keyword",
+    "index": false
+}
+~~~
+
+----
+
+价格当然要参与搜索，因为要进行排序，但是不需要分词。
+
+~~~json
+"price":{
+    "type": "integer"
+}
+~~~
+
+----
+
+`starName`，这里不用 `_`，直接驼峰即可。
+
+~~~json
+"starName":{
+    "type": "keyword"
+},
+~~~
+
+----
+
+location字段说明：地理坐标，里面包含精度、纬度
+
+地理坐标说明：
+
+ES中支持两种地理坐标数据类型：
+
+- geo_point：由纬度（latitude）和经度（longitude）确定的一个点。例如："32.8752345, 120.2981576"（前面是维度，后面是精度，两个拼在一起形参一个字符串）。
+
+  虽然它的值是一个字符串，但是它的类型叫 `geo_point`，而且这个是由数据库中的 `latitude` 和 `longitude` 两个字段拼一起组成的，因此它不是两个字段，而是一个字段。
+
+  例如这里我给它起个名字叫 `location`
+
+- geo_shape：有多个geo_point组成的复杂几何图形。例如一条直线，"LINESTRING (-77.03653 38.897676, -77.009051 38.889939)"
+
+这里应该使用 `geo_point`，因为一个酒店在地球上就是一个点。
+
+~~~json
+"location":{
+    "type": "geo_point"
+}
+~~~
+
+-----
+
+但是除此之外，还有一个小问题：当我们的 `name字段` 和 `brand字段` 等等，都需要参与搜索。
+
+那么这些字段都要参与搜索，用户输入关键字的时候是有可能会根据多个字段进行搜索的，那么此时就要来想了，ES在搜索的时候是根据多个字段效率高，还是只根据一个字段搜索效率高？肯定是一个字段。
+
+ES就给我们提供了一个功能可以解决这个问题。
+
+字段拷贝可以使用copy_to属性将当前字段拷贝到指定字段。
+
+例如上面我想要根据 `name、brand、businuess` 搜索，我就可以把这三个都拷贝到一个字段中去，这个字段名可以随便起，例如叫 `all`。
+
+类型是 `text`，这样不管是 `name` 也好，还是 `brand` 也好，都可以通过 `copy_to属性` 拷贝进去。
+
+也就是 `all` 这一个字段，就同时具备了 `name`、`brand` 等等，凡是你拷进去的，这些字段的值都有。
+
+此时你就可以在一个字段里搜到多个字段的内容了。
+
+而且这种拷贝它还做了优化，它并不是真的将文档拷贝进去，而只是基于它创建倒排索引，将来去查的时候你其实看不到这个字段，它好像不存在一样，但搜却可以根据它搜，非常的舒服。
+
+~~~json
+"all": {
+    "type": "text",
+    "analyzer": "ik_max_word"
+},
+"name":{
+    "type": "text",
+    "analyzer": "ik_max_word",
+    "copy_to": "all"
+},
+"brand": {
+    "type": "keyword",
+    "copy_to": "all"
+}
+~~~
+
+----
+
+### 3）完整代码
 
 ```json
 PUT /hotel
@@ -8855,24 +8972,13 @@ PUT /hotel
 
 
 
-几个特殊字段说明：
+----
 
-- location：地理坐标，里面包含精度、纬度
-- all：一个组合字段，其目的是将多字段的值 利用copy_to合并，提供给用户搜索
+## 四、初始化RestClient
 
+刚刚我们已经在浏览器中编写了酒店的mapping映射，做好了创建索引库的初步准备了。
 
-
-地理坐标说明：
-
-![image-20210720222110126](assets/image-20210720222110126-1711335607294.png)
-
-copy_to说明：
-
-![image-20210720222221516](assets/image-20210720222221516-1711335607294.png)
-
-
-
-### 4.0.4.初始化RestClient
+最终我们创建索引库肯定还要用到ES的Java客户端 `Java Rest Client`。
 
 在elasticsearch提供的API中，与elasticsearch一切交互都封装在一个名为RestHighLevelClient的类中，必须先完成这个对象的初始化，建立与elasticsearch的连接。
 
@@ -8889,7 +8995,13 @@ copy_to说明：
 
 
 
-2）因为SpringBoot默认的ES版本是7.6.2，所以我们需要覆盖默认的ES版本：
+2）因为SpringBoot默认的ES版本是7.6.2
+
+<img src="./assets/image-20240509205236163.png" alt="image-20240509205236163" style="zoom:67%;" />
+
+由于它是定义在 `properties` 中，所以我们需要覆盖默认的ES版本也只需要找到我们自己的 `pom文件` 中的 `properties` 也来定义一个这样的值，然后将它改成7.12.1，这个版本一定要与服务端的版本保持一致。
+
+PS：如果ES不是在SpringBoot环境下创建的，那么直接在引入依赖的时候就指定版本即可。
 
 ```xml
 <properties>
@@ -8902,17 +9014,37 @@ copy_to说明：
 
 3）初始化RestHighLevelClient：
 
+客户端的创建方式是通过 `new` 的方式，然后在参数中通过 `RestClient` 去完成构建，构建的时候需要指定ES的ip和端口。
+
+这里我们通过一个单元测试去写这个功能
+
 初始化的代码如下：
 
+我们将它定义为成员变量，因为未来我们会在这里写很多很多的单元测试，如果在每一个单元测试中都去写这个对象的初始化，就很麻烦了，定义为成员变量就可以复用。
+
+既然定义为了成员变量，就得提前完成初始化，因此可以使用单元测试中的BeforeEach注解，可以在一开始就完成对象的初始化
+
+<img src="./assets/image-20240509210104469.png" alt="image-20240509210104469" style="zoom:67%;" />
+
 ```java
-RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(
+@BeforeEach
+void setUp() {
+    this.client = new RestHighLevelClient(RestClient.builder(
         HttpHost.create("http://192.168.150.101:9200")
-));
+    ));
+
+    // 如果将来是集群，那么还可以指定多个，这个参数是一个可变参数
+    this.client = new RestHighLevelClient(RestClient.builder(
+        HttpHost.create("http://192.168.150.101:9200"),
+        HttpHost.create("http://192.168.150.101:9200"),
+        HttpHost.create("http://192.168.150.101:9200")
+    ));
+}
 ```
 
+客户端创建完了，还需要销毁，因此这里加一个AfterEach注解
 
-
-这里为了单元测试方便，我们创建一个测试类HotelIndexTest，然后将初始化的代码编写在@BeforeEach方法中：
+<img src="./assets/image-20240509211709410.png" alt="image-20240509211709410" style="zoom:67%;" />
 
 ```java
 package cn.itcast.hotel;
@@ -8942,27 +9074,47 @@ public class HotelIndexTest {
 }
 ```
 
+完整代码，这样写的好处是：以后我们写的所有的单元测试都会先运行它都会去先运行 `Before` 再运行 `After`，这样依赖Client就可以自动完成初始化了。
 
+写一个单元测试测试一下
 
+<img src="./assets/image-20240509212337579.png" alt="image-20240509212337579" style="zoom:67%;" />
 
+可以发现初始化成功。
 
-## 4.1.创建索引库
+<img src="./assets/image-20240509212540948.png" alt="image-20240509212540948" style="zoom:67%;" />
 
-### 4.1.1.代码解读
+----
 
-创建索引库的API如下：
+## 五、创建索引库
 
-![image-20210720223049408](assets/image-20210720223049408-1711335607294.png)
+### 1）介绍
+
+创建索引库的API结合DSL语句更容易看懂。
+
+第一部分：指定请求方式与请求路径，请求路径一般就是索引库名称
+
+第二部分：JSON格式，它里面主要写的就是mapping映射。
+
+第三部分：点击发送请求的按钮，然后索引库就能创建了。
+
+即左边的三行代码跟左侧的DSL其实是类似的。
 
 代码分为三步：
 
 - 1）创建Request对象。因为是创建索引库的操作，因此Request是CreateIndexRequest。
-- 2）添加请求参数，其实就是DSL的JSON参数部分。因为json字符串很长，这里是定义了静态字符串常量MAPPING_TEMPLATE，让代码看起来更加优雅。
-- 3）发送请求，client.indices()方法的返回值是IndicesClient类型，封装了所有与索引库操作有关的方法。
 
+- 2）添加请求参数，其实就是DSL的JSON参数部分。因为json字符串很长，这里是定义了静态字符串常量MAPPING_TEMPLATE，让代码看起来更加优雅。第二个参数指定数据类型是JSON。
 
+- 3）发送请求，Java代码要做的事就是用Java代码来组织DSL，然后去发请求。其中 `indices()` 方法很重要，`indices` 就是 `index` 的复数形式，代表的就是索引库的索引操作。
 
-### 4.1.2.完整示例
+  `clinet.indices()` 就能拿到我们ES对于索引库操作的所有方法，这里调用了 `creat()` 方法，创建索引库，第一个参数将 `request对象` 传进来；第二个参数传入 `RequestOptions.DEFAULT`，这个是请求的一些参数，一般是指控制请求体信息，大多数情况下我们都不用去控制，默认的就行了，所以这里用了 `RequestOptions.DEFAULT`，这样整个请求就发出了，索引库的创建也就完成了。
+
+![image-20210720223049408](assets/image-20210720223049408-1711335607294.png)
+
+----
+
+### 2）完整示例
 
 在hotel-demo的cn.itcast.hotel.constants包下，创建一个类，定义mapping映射的JSON字符串常量：
 
@@ -9022,9 +9174,9 @@ public class HotelConstants {
 }
 ```
 
-
-
 在hotel-demo中的HotelIndexTest测试类中，编写单元测试，实现创建索引：
+
+如果忘记了没关系，我们可以先去调用发请求的方法，然后根据参数想起要创建的东西
 
 ```java
 @Test
@@ -9038,9 +9190,17 @@ void createHotelIndex() throws IOException {
 }
 ```
 
+运行单元测试，此时我们就可以到浏览器中测试一下
+
+<img src="./assets/image-20240509215056349.png" alt="image-20240509215056349" style="zoom:50%;" />
+
+可以发现查询成功，证明我们的索引库创建没有问题。
 
 
-## 4.2.删除索引库
+
+----
+
+## 六、删除索引库
 
 删除索引库的DSL语句非常简单：
 
@@ -9057,7 +9217,7 @@ DELETE /hotel
 所以代码的差异，注意体现在Request对象上。依然是三步走：
 
 - 1）创建Request对象。这次是DeleteIndexRequest对象
-- 2）准备参数。这里是无参
+- 2）准备参数。删除索引库是不需要参数的，因此这步不需要
 - 3）发送请求。改用delete方法
 
 在hotel-demo中的HotelIndexTest测试类中，编写单元测试，实现删除索引：
@@ -9072,9 +9232,9 @@ void testDeleteHotelIndex() throws IOException {
 }
 ```
 
+---
 
-
-## 4.3.判断索引库是否存在
+## 七、判断索引库是否存在
 
 判断索引库是否存在，本质就是查询，对应的DSL是：
 
@@ -9082,13 +9242,13 @@ void testDeleteHotelIndex() throws IOException {
 GET /hotel
 ```
 
-
-
 因此与删除的Java代码流程是类似的。依然是三步走：
 
 - 1）创建Request对象。这次是GetIndexRequest对象
 - 2）准备参数。这里是无参
 - 3）发送请求。改用exists方法
+
+判断是否存在有返回值
 
 ```java
 @Test
@@ -9102,9 +9262,17 @@ void testExistsHotelIndex() throws IOException {
 }
 ```
 
+-----
 
+## 八、总结
 
-## 4.4.总结
+将刚刚写的四个方法放在一起看，其实非常的有规律。
+
+所有的操作索引库的API都是放在 `client.indices()` 的返回值中。
+
+创建就用 `create`，删除就用 `delete`，判断就用 `exist`。
+
+不同的操作对应的请求也不一样，创建是 `CreateIndexRequest()`，删除是 `DeleteIndexRequest()`，判断是 `GetIndexRequest()`。
 
 JavaRestClient操作elasticsearch的流程基本类似。核心是client.indices()方法来获取索引库的操作对象。
 

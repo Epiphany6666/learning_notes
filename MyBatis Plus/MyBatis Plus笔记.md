@@ -360,7 +360,8 @@ List<T> selectByMap(@Param(Constants.COLUMN_MAP) Map<String, Object> columnMap);
 public void testInsert(){
     User user = new User(null, "张三", 23, "zhangsan@atguigu.com");
     //INSERT INTO user ( id, name, age, email ) VALUES ( ?, ?, ?, ? ) 
-    int result = userMapper.insert(user); System.out.println("受影响行数："+result);
+    int result = userMapper.insert(user); 
+    System.out.println("受影响行数："+result);
     //1475754982694199298
     System.out.println("id自动获取："+user.getId());
 }

@@ -5,13 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab55b25e-57b3-4f59-8162-f087b4ede80e" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../JAVA/code/basic-code/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../JAVA/code/basic-code/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../JavaWeb/JavaWeb笔记.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../JavaWeb/JavaWeb笔记.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../Linux/Linux笔记.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Linux/Linux笔记.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../SpringCloud.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../SpringCloud.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/cloud-demo.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -48,9 +42,9 @@
   <component name="MavenRunner">
     <option name="jreName" value="17" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 4
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="2ddKZ5Jh9VIbLbCnAcBuxfzcjug" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
@@ -69,7 +63,7 @@
     "WebServerToolWindowFactoryState": "false",
     "jdk.selected.JAVA_MODULE": "17",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "E:/课/黑马/SpringCloud/实用篇/day05-Elasticsearch01/代码/hotel-demo",
+    "last_opened_file_path": "E:/learning_notes/SpringCloud/program/hotel-demo",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -245,6 +239,7 @@
       <workItem from="1711154070318" duration="129000" />
       <workItem from="1711157067649" duration="622000" />
       <workItem from="1715213740048" duration="804000" />
+      <workItem from="1715253453396" duration="1151000" />
     </task>
     <servers />
   </component>
