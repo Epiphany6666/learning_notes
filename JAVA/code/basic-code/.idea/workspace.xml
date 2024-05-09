@@ -5,13 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="00008d0b-35e0-4f60-bde4-2a1f3fa1a981" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/mytest/mytest.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SpringCloud/program/cloud-demo/.idea/cloud-demo.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../上/JAVA.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../上/JAVA.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SpringCloud/program/cloud-demo/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SpringCloud/program/cloud-demo/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SpringCloud/program/cloud-demo/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SpringCloud/program/cloud-demo/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Linux/Linux笔记.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Linux/Linux笔记.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../SpringCloud/SpringCloud.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SpringCloud/SpringCloud.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../SpringCloud/program/cloud-demo/.idea/cloud-demo.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../SpringCloud/program/cloud-demo/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SpringCloud/program/cloud-demo/.idea/jarRepositories.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../SpringCloud/program/cloud-demo/.idea/modules.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../SpringCloud/program/cloud-demo/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SpringCloud/program/cloud-demo/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -157,7 +156,7 @@
       <workItem from="1715049500233" duration="42000" />
       <workItem from="1715128849245" duration="7710000" />
       <workItem from="1715161667278" duration="4729000" />
-      <workItem from="1715213942489" duration="300000" />
+      <workItem from="1715213942489" duration="800000" />
     </task>
     <servers />
   </component>

@@ -5,11 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab55b25e-57b3-4f59-8162-f087b4ede80e" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/../../../JAVA/code/basic-code/mytest/mytest.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/cloud-demo.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../JAVA/code/basic-code/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../JAVA/code/basic-code/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../JAVA/上/JAVA.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../JAVA/上/JAVA.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../JAVA/code/basic-code/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../JAVA/code/basic-code/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../JavaWeb/JavaWeb笔记.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../JavaWeb/JavaWeb笔记.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Linux/Linux笔记.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Linux/Linux笔记.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../SpringCloud.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../SpringCloud.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/cloud-demo.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -242,7 +244,7 @@
       <workItem from="1711097984565" duration="4128000" />
       <workItem from="1711154070318" duration="129000" />
       <workItem from="1711157067649" duration="622000" />
-      <workItem from="1715213740048" duration="332000" />
+      <workItem from="1715213740048" duration="804000" />
     </task>
     <servers />
   </component>
