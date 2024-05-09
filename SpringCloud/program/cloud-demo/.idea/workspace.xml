@@ -5,7 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab55b25e-57b3-4f59-8162-f087b4ede80e" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/../../SpringCloud.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../SpringCloud.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../JAVA/code/basic-code/mytest/mytest.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/cloud-demo.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../JAVA/code/basic-code/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../JAVA/code/basic-code/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../JAVA/上/JAVA.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../JAVA/上/JAVA.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a46ba4b6-b917-4799-9f72-bc2fd264ad0b.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,20 +30,25 @@
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
+        <option name="customMavenHome" value="F:/develop/apache-maven-3.6.1" />
         <option name="localRepository" value="F:\develop\apache-maven-3.6.1\maven-repo" />
-        <option name="mavenHome" value="F:/develop/apache-maven-3.6.1" />
+        <option name="mavenHomeTypeForPersistence" value="CUSTOM" />
         <option name="userSettingsFile" value="F:\develop\apache-maven-3.6.1\conf\settings.xml" />
       </MavenGeneralSettings>
     </option>
     <option name="importingSettings">
       <MavenImportingSettings>
         <option name="jdkForImporter" value="17 (2)" />
+        <option name="workspaceImportForciblyTurnedOn" value="true" />
       </MavenImportingSettings>
     </option>
   </component>
   <component name="MavenRunner">
     <option name="jreName" value="17" />
   </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 4
+}]]></component>
   <component name="ProjectId" id="2ddKZ5Jh9VIbLbCnAcBuxfzcjug" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
@@ -56,14 +66,17 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "jdk.selected.JAVA_MODULE": "17",
-    "last_opened_file_path": "E:/learning_notes/SpringCloud/program/mq-demo/pom.xml",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "E:/课/黑马/SpringCloud/实用篇/day05-Elasticsearch01/代码/hotel-demo",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "模块",
     "project.structure.proportion": "0.15429688",
     "project.structure.side.proportion": "0.2",
+    "run.configurations.included.in.services": "true",
     "settings.editor.selected.configurable": "reference.projectsettings.compiler.javacompiler",
     "spring.configuration.checksum": "2ab4fa379d1e4fffb09c95b241bc25c3",
     "vue.rearranger.settings.migration": "true"
@@ -94,11 +107,13 @@
   <component name="RunDashboard">
     <option name="configurationTypes">
       <set>
+        <option value="MicronautRunConfigurationType" />
+        <option value="QuarkusRunConfigurationType" />
         <option value="SpringBootApplicationConfigurationType" />
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="数据库脚本.cloud-user.sql">
+  <component name="RunManager" selected="Application.GatewayApplication">
     <configuration name="GatewayApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="cn.itcast.gateway.GatewayApplication" />
       <module name="gateway" />
@@ -186,22 +201,19 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Application.GatewayApplication" />
+      <item itemvalue="Database Script.cloud-order.sql" />
+      <item itemvalue="Database Script.cloud-user.sql" />
       <item itemvalue="Spring Boot.UserApplication3" />
       <item itemvalue="Spring Boot.OrderApplication" />
       <item itemvalue="Spring Boot.UserApplication" />
       <item itemvalue="Spring Boot.UserApplication2" />
       <item itemvalue="Spring Boot.GatewayApplication" />
       <item itemvalue="Spring Boot.EurekaApplication" />
-      <item itemvalue="应用程序.GatewayApplication" />
-      <item itemvalue="数据库脚本.cloud-order.sql" />
-      <item itemvalue="数据库脚本.cloud-user.sql" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Spring Boot.GatewayApplication" />
-        <item itemvalue="数据库脚本.cloud-user.sql" />
-        <item itemvalue="数据库脚本.cloud-order.sql" />
-        <item itemvalue="应用程序.GatewayApplication" />
         <item itemvalue="Spring Boot.EurekaApplication" />
       </list>
     </recent_temporary>
@@ -230,6 +242,7 @@
       <workItem from="1711097984565" duration="4128000" />
       <workItem from="1711154070318" duration="129000" />
       <workItem from="1711157067649" duration="622000" />
+      <workItem from="1715213740048" duration="332000" />
     </task>
     <servers />
   </component>

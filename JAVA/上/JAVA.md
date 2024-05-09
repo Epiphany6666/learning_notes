@@ -40750,8 +40750,7 @@ System.out.println(duration.toNanos());// 两个时间差的纳秒数
 LocalDateTime today = LocalDateTime.now();
 System.out.println(today);
 // 生日的日历对象
-LocalDateTime birthDate = LocalDateTime.of(2000, 1, 1,
-                                           0, 0, 0);202
+LocalDateTime birthDate = LocalDateTime.of(2000, 1, 1, 0, 0, 0);
 System.out.println(birthDate);
 
 // 再往下就可以计算两个时间的间隔了

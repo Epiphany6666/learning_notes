@@ -4217,6 +4217,8 @@ docker run --name containerName -p 80:80 -d nginx
 
 - nginx：镜像名称，例如nginx，没有写tag，就代表最新版本的意思。
 
+- -e：设置环境变量
+
 
 
 这里的`-p`参数，是将容器端口映射到宿主机端口。
@@ -4776,19 +4778,19 @@ Dockerfile的第一行必须是FROM，从一个基础镜像来构建，这个基
 
 - 步骤1：新建一个空文件夹docker-demo，这个文件时用来放我们构建镜像所需要的各种材料的。
 
-  ![image-20210801101207444](./assets/image-20210801101207444.png)
+  <img src="./assets/image-20210801101207444.png" alt="image-20210801101207444" style="zoom:57%;" />
 
 - 步骤2：拷贝课前资料中的docker-demo.jar（java项目）文件到docker-demo这个目录
 
-  ![image-20210801101314816](./assets/image-20210801101314816.png)
+  <img src="./assets/image-20210801101314816.png" alt="image-20210801101314816" style="zoom:50%;" />
 
 - 步骤3：拷贝课前资料中的jdk8.tar.gz文件到docker-demo这个目录
 
-  ![image-20210801101410200](./assets/image-20210801101410200.png)
+  <img src="./assets/image-20210801101410200.png" alt="image-20210801101410200" style="zoom:50%;" />
 
 - 步骤4：拷贝课前资料提供的Dockerfile（构建的说明书）到docker-demo这个目录
 
-  ![image-20210801101455590](./assets/image-20210801101455590.png)
+  <img src="./assets/image-20210801101455590.png" alt="image-20210801101455590" style="zoom:50%;" />
 
   其中的内容如下，所使用的基础镜像是干干净净的一个基础镜像，上面啥都没有，但是java项目运行必须基于jdk，所以在这个构建过程中它主要就是在安装JDK。
 
@@ -4823,7 +4825,7 @@ Dockerfile的第一行必须是FROM，从一个基础镜像来构建，这个基
   
   `.` 代表dockerFile所在的目录，build（构建）的时候需要知道dockerFile在哪里
   ```sh
-docker build -t javaweb:1.0 .
+  docker build -t javaweb:1.0 .
   ```
 
   并且拷贝的指令是从当前目录去拷，拷到指定位置，所以一定要复制到当前目录
@@ -4843,8 +4845,6 @@ docker images
 ~~~bash
 docker run --name web -p 8090:8090 -d javaweb:1.0
 ~~~
-
-
 
 最后访问 http://192.168.150.101:8090/hello/count，其中的ip改成你的虚拟机ip
 
@@ -4896,7 +4896,7 @@ docker run --name web -p 8090:8090 -d javaweb:1.0
 - ④ 使用docker build命令构建镜像
 
   ```sh
-docker build -t javaweb:1.0 .
+  docker build -t javaweb:1.0 .
   ```
 
 
@@ -7171,120 +7171,168 @@ SpringAMQP中消息的序列化和反序列化是怎么实现的？
 
 在前面几天的微服务学习过程中，曾经给大家提到过，随着业务的发展，数据量越来越庞大，传统的这种MySQL这种数据库就渐渐地难以满足我们复杂的业务需求了。在微服务架构下，一般都会用到一种分布式搜索的技术。今天就会带着大家去学习分布式搜索中最流行的一种elasticsearch它的一个基础用法
 
-# 1.初识elasticsearch
+# 78.什么是elasticsearch
 
-## 1.1.了解ES
+## 一、elasticsearch的作用
 
-
-
-### 1.1.1.elasticsearch的作用
+ES是elasticsearch的缩写。
 
 elasticsearch是一款非常强大的开源搜索引擎，具备非常多强大功能，可以帮助我们从海量数据中快速找到需要的内容
 
-例如：
+例如Github中搜索仓库，当你在搜索的时候，它不仅可以将相关仓库搜索出来，还能你所搜索的关键字它所相关的代码也给你展示出来。
 
-- 在GitHub搜索代码
+并且将它高亮显示。
 
-  ![image-20210720193623245](assets/image-20210720193623245-1711335607292.png)
+<img src="assets/image-20210720193623245-1711335607292.png" alt="image-20210720193623245" style="zoom:70%;" />
 
-- 在电商网站搜索商品
+在电商网站搜索商品
 
-  ![image-20210720193633483](assets/image-20210720193633483-1711335607293.png)
+<img src="assets/image-20210720193633483-1711335607293.png" alt="image-20210720193633483" style="zoom:67%;" />
 
-- 在百度搜索答案
+在百度搜索答案
 
-  ![image-20210720193641907](assets/image-20210720193641907-1711335607293.png)
+![image-20210720193641907](assets/image-20210720193641907-1711335607293.png)
 
-- 在打车软件搜索附近的车
+在打车软件搜索附近的车，每一辆车都是一个数据
 
-  ![image-20210720193648044](assets/image-20210720193648044-1711335607293.png)
+![image-20210720193648044](assets/image-20210720193648044-1711335607293.png)
 
+----
 
+## 二、ELK技术栈
 
+除此以外，elasticsearch中还包含了好几个组件。
 
+elasticsearch结合kibana、Logstash、Beats，他们合在一起称之为elastic stack（ELK）。被广泛应用在微服务的日志数据分析、实时监控等领域：
 
-### 1.1.2.ELK技术栈
+**日志数据分析**：项目在运行的过程中，会产生海量的日志信息，这些日志信息就是为了方便我们去定位系统所出现的问题。
 
-elasticsearch结合kibana、Logstash、Beats，也就是elastic stack（ELK）。被广泛应用在日志数据分析、实时监控等领域：
+例如现在系统报错了，怎么去找错呢？在线上运行的时候不可能打断点debug，一般都是采用这种日志分析的方式。
+
+而elasticsearch可以将这个日志信息可视化给你展示出来，所以将来做日志分析的时候就非常方便了。
 
 ![image-20210720194008781](assets/image-20210720194008781-1711335607293.png)
 
+**实时监控**：项目运行的过程中，它的运行状态也是数据，它每一刻都会有运行状态，例如CPU情况、内存情况等等，这些信息也会被elasticsearch关联起来，将来以可视化的形式给你展示出来，你就能非常清晰的知道你整个项目的运行情况了。
 
+整个ELK技术栈中，尽管它有很多组件，但核心就是elasticsearch，它负责存储、搜索、分析数据。
 
-而elasticsearch是elastic stack的核心，负责存储、搜索、分析数据。
+而 `Logstash、Beats` 主要是负责数据抓取的，例如日志数据就可以由它来抓取。
 
-![image-20210720194230265](assets/image-20210720194230265-1711335607293.png)
+`kibana` 是一个数据可视化的组件，也就是说将来你搜索出来的数据展示，可以用它来展示形成报表。
 
+那这种可视化的组件必须得用 `Kibana` 吗？像谷歌、百度、京东他们在展示结果的时候都有自己的网站自己去展示，因此这种可视化不不一定非得用 `Kibana` 做，完全可以自己实现。
 
+数据抓取也一样，我们完全可以自己去写Java代码，自己做数据，然后往elasticsearch中写
 
-### 1.1.3.elasticsearch和lucene
+<img src="assets/image-20210720194230265-1711335607293.png" alt="image-20210720194230265" style="zoom:50%;" />
 
-elasticsearch底层是基于**lucene**来实现的。
+所以 `kibana、Logstash、Beats` 它们都是可替换的组件，官方提供给你，你想用就用，不用也没关系，但是不可替换的就是elasticsearch。
 
-**Lucene**是一个Java语言的搜索引擎类库，是Apache公司的顶级项目，由DougCutting于1999年研发。官网地址：https://lucene.apache.org/ 。
+----
+
+## 三、elasticsearch和lucene
+
+elasticsearch底层是基于**lucene技术**来实现的。
+
+**Lucene**是一个Java语言的搜索引擎类库，是Apache公司的顶级项目，由DougCutting于1999年研发（它也是hadoop的作者）。官网地址：https://lucene.apache.org/ 。
 
 ![image-20210720194547780](assets/image-20210720194547780-1711335607293.png)
 
+那这个搜索引擎类库（类库简单来讲就是一个jar包），这个jar包具备一些优点。
 
+- 易扩展：你可以基于它去做二次开发和定制，实现一些更高级的功能
+- 高性能：这套API主要是实现了倒排索引这样的结构，这种结果查询起来性能非常的好
 
+这是它的两大优点，同时也是它的缺点，因为它是一个类库，而且是Java语言的类库，也就是说只能用于Java开发，其他语言就没法用了。
 
+缺点如下
+
+- 只限于Java语言开发
+
+- 它的API设计的相对复杂，学习曲线陡峭
+
+- 它这套类库只考虑到如何去实现搜索，因此没有这种面对高并发的场景，也不支持使用集群扩展这种东西。
+
+  因此如果你想实现这部分功能，就必须要进一步开发。
+
+而我们的elasticsearch正是基于Lucene做的二次开发
 
 **elasticsearch**的发展历史：
 
 - 2004年Shay Banon基于Lucene开发了Compass
+
+  据说这个软件是给它老婆做的，它老婆喜欢做饭，因此它就开发了这个，方便它老婆搜索食谱。由此可见，这个软件也没有考虑到企业这种高并发的环境，因此
+
 - 2010年Shay Banon 重写了Compass，取名为Elasticsearch。
+
+这次重写的过程中就考虑到了企业的需求了，所以它就能支持分布式了，而且elasticsearch这种分布式/集群的搭建非常的简单，天生就是支持集群的，所以可以应对这种海量数据和高并发的场景。
+
+并且它对外暴露的是Restfu接口，这种接口是跟语言无关的，因此任何语言都能调用这个接口，使用场景就更广泛了，脱离了语言的限制。
+
+正因为如此，elasticsearch在全球的下载量已经达到了两亿多，这家公司现在已经上市了，就叫elasticsearch，这哥们就是创始人，已经走上人生巅峰了。
 
 ![image-20210720195001221](assets/image-20210720195001221-1711335607293.png)
 
+elasticsearch在2010年的时候才真正问世，Lucene是在1999年，中间时隔十几年的时间，因此elasticsearch并不是一个唯一的搜索引擎技术，那为什么我们一定要用它呢？
 
+-----
 
-### 1.1.4.为什么不是其他搜索技术？
+## 四、为什么不是其他搜索技术？
 
 目前比较知名的搜索引擎技术排名：
+
+1、Elasticsearch：开源的分布式搜索引擎
+
+2、Splunk：商业项目，它是收费的，因此不在我们讨论范围内
+
+3、Solr：Apache的开源搜索引擎
 
 ![image-20210720195142535](assets/image-20210720195142535-1711335607293.png)
 
 虽然在早期，Apache Solr是最主要的搜索引擎技术，但随着发展elasticsearch已经渐渐超越了Solr，独占鳌头：
 
-![image-20210720195306484](assets/image-20210720195306484-1711335607293.png)
+<img src="assets/image-20210720195306484-1711335607293.png" alt="image-20210720195306484" style="zoom:67%;" />
 
+因此我们现在学习主要就是学Elasticsearch，而不是其他搜索引擎产品。
 
+----
 
-### 1.1.5.总结
+## 五、总结
 
 什么是elasticsearch？
 
 - 一个开源的分布式搜索引擎，可以用来实现搜索、日志统计、分析、系统监控等功能
+- 而且这个搜索引擎是一个分布式的搜索引擎，它能支持水平的扩展性跟集群
 
 什么是elastic stack（ELK）？
 
-- 是以elasticsearch为核心的技术栈，包括beats、Logstash、kibana、elasticsearch
+- 是以elasticsearch为核心的技术栈，包括很多组件 beats、Logstash、kibana、elasticsearch
 
 什么是Lucene？
 
-- 是Apache的开源搜索引擎类库，提供了搜索引擎的核心API
+- 是Apache的开源搜索引擎类库（即jar包），提供了搜索引擎的核心API
+- Elasticsearch就是基于它来实现的，做了二次开发
 
 
 
+-----
 
+# 79.倒排索引
 
+在上课我们介绍到Elasticsearch底层是基于Lucene来实现的，而Lucene中的核心技术就是倒排索引。
 
+倒排索引的概念是基于MySQL这样的正向索引对比而得出的一个名称。
 
-## 1.2.倒排索引
+## 一、正向索引
 
-倒排索引的概念是基于MySQL这样的正向索引而言的。
+那么什么是正向索引呢？例如给下表（tb_goods），数据库一般都会基于id去创建一个索引，然后形成一颗b+树，那么你根据id进行检索的速度就会非常快，这种方式的索引就是一个正向索引，但是如果我现在搜索的字段不是id，而是一个普通的标题字段。
 
-### 1.2.1.正向索引
+标题字段内容比较长，你不会给它加索引，即便你给它加了索引，我现在想搜的不是精确的标题值，而是其中的一部分，例如包含手机的，此时就需要像右边这样写一个模糊匹配来做。
 
-那么什么是正向索引呢？例如给下表（tb_goods）中的id创建索引：
+一旦你使用了这种模糊匹配，就算它有索引也不生效了，这种情况下没有索引，数据库是如何比较查询的呢？它就会采用逐条扫描的方式来判断每一行数据中是否包含手机。
 
-![image-20210720195531539](assets/image-20210720195531539-1711335607293.png)
-
-如果是根据id查询，那么直接走索引，查询速度非常快。
-
-
-
-但如果是基于title做模糊查询，只能是逐行扫描数据，流程如下：
+流程如下：
 
 1）用户搜索数据，条件是title符合`"%手机%"`
 
@@ -7294,36 +7342,37 @@ elasticsearch底层是基于**lucene**来实现的。
 
 4）如果符合则放入结果集，不符合则丢弃。回到步骤1
 
-
-
 逐行扫描，也就是全表扫描，随着数据量增加，其查询效率也会越来越低。当数据量达到数百万时，就是一场灾难。
 
+![image-20210720195531539](assets/image-20210720195531539-1711335607293.png)
 
+这就是正向索引，它在做这种局部内容检索的时候，效率就比较差了
 
+---
 
+## 二、倒排索引
 
-### 1.2.2.倒排索引
+倒排索引在创建的时候，会形成一张新的表，这张表里面会有两个字段：`词条、文档id`
 
-倒排索引中有两个非常重要的概念：
+- 文档（`Document`）：它代表的就是数据，其中的每一条数据就是一个文档。
 
-- 文档（`Document`）：用来搜索的数据，其中的每一条数据就是一个文档。例如一个网页、一个商品信息
+  例如商品表，那么每一个商品就是一个文档。
+
 - 词条（`Term`）：对文档数据或用户搜索数据，利用某种算法分词，得到的具备含义的词语就是词条。例如：我是中国人，就可以分为：我、是、中国人、中国、国人这样的几个词条
-
-
 
 **创建倒排索引**是对正向索引的一种特殊处理，流程如下：
 
 - 将每一个文档的数据利用算法分词，得到一个个词条
+
 - 创建表，每行数据包括词条、词条所在文档id、位置等信息
-- 因为词条唯一性，可以给词条创建索引，例如hash表结构索引
+
+  词条可能会大量重复，但是我们不能重复记录，而是记录唯一的一个，如果有重复词条出现，在后面记录文档id即可，这样可以确保倒排索引中，词条字段是绝对不会出现重复的。
+
+- 因为词条唯一性，可以给词条创建索引，例如hash表结构索引 / b+树，将来我们根据词条查询的速度就非常快了。
 
 如图：
 
 ![image-20210720200457207](assets/image-20210720200457207-1711335607293.png)
-
-
-
-
 
 倒排索引的**搜索流程**如下（以搜索"华为手机"为例）：
 
@@ -7339,13 +7388,11 @@ elasticsearch底层是基于**lucene**来实现的。
 
 ![image-20210720201115192](assets/image-20210720201115192-1711335607293.png)
 
-
-
 虽然要先查询倒排索引，再查询倒排索引，但是无论是词条、还是文档id都建立了索引，查询速度非常快！无需全表扫描。
 
+-----
 
-
-### 1.2.3.正向和倒排
+## 三、正向和倒排
 
 那么为什么一个叫做正向索引，一个叫做倒排索引呢？
 
@@ -7354,8 +7401,6 @@ elasticsearch底层是基于**lucene**来实现的。
 - 而**倒排索引**则相反，是先找到用户要搜索的词条，根据词条得到保护词条的文档的id，然后根据id获取文档。是**根据词条找文档的过程**。
 
 是不是恰好反过来了？
-
-
 
 那么两者方式的优缺点是什么呢？
 
@@ -7377,47 +7422,57 @@ elasticsearch底层是基于**lucene**来实现的。
 
 
 
+----
 
-
-## 1.3.es的一些概念
+# 80.ES与MySQL的概念对比
 
 elasticsearch中有很多独有的概念，与mysql中略有差别，但也有相似之处。
 
+## 一、文档和字段
 
+elasticsearch是面向**文档（Document）**存储的，可以是数据库中的一条商品数据，一个订单信息。
 
-### 1.3.1.文档和字段
+ES的文档存储是JSON风格的，也就是说商品也好、订单也好，最终一定会序列化为JSON的格式。
 
-elasticsearch是面向**文档（Document）**存储的，可以是数据库中的一条商品数据，一个订单信息。文档数据会被序列化为json格式后存储在elasticsearch中：
+文档数据会被序列化为json格式后存储在elasticsearch中：
 
 ![image-20210720202707797](assets/image-20210720202707797-1711335607293.png)
 
-
+这是ES与数据库存储比较大的差异：格式差异。
 
 而Json文档中往往包含很多的**字段（Field）**，类似于数据库中的列。
 
+----
 
+## 二、索引和映射
 
-### 1.3.2.索引和映射
+ES中文档肯定不止一条，会有非常非常多的文档，这些文档的结构是有差异的。
 
-**索引（Index）**，就是相同类型的文档的集合。
+<img src="./assets/image-20240509093945247.png" alt="image-20240509093945247" style="zoom:50%;" />
+
+**索引（Index）**，就是相同类型的文档的集合。即长一样的就放一起
 
 例如：
 
-- 所有用户文档，就可以组织在一起，称为用户的索引；
 - 所有商品的文档，可以组织在一起，称为商品的索引；
+- 所有用户文档，就可以组织在一起，称为用户的索引；
 - 所有订单的文档，可以组织在一起，称为订单的索引；
 
 ![image-20210720203022172](assets/image-20210720203022172-1711335607293.png)
 
+因此，我们可以把索引当做是数据库中的表，不同类型的放到不同索引库。
 
-
-因此，我们可以把索引当做是数据库中的表。
+这些索引的差别就是文档结构不同，这种文档我们以前在数据库中交表结构，在ES中叫索引的映射。
 
 数据库的表会有约束信息，用来定义表的结构、字段的名称、类型等信息。因此，索引库中就有**映射（mapping）**，是索引中文档的字段约束信息，类似表的结构约束。
 
+因此ES的概念和数据库的概念是有这种对应的关系的。
 
+-----
 
-### 1.3.3.mysql与elasticsearch
+## 三、mysql与elasticsearch
+
+MySQL的表对应到ES中就是索引，因为它俩都是数据的集合。
 
 我们统一的把mysql与elasticsearch的概念做一下对比：
 
@@ -7427,17 +7482,29 @@ elasticsearch是面向**文档（Document）**存储的，可以是数据库中�
 | Row       | Document          | 文档（Document），就是一条条的数据，类似数据库中的行（Row），文档都是JSON格式 |
 | Column    | Field             | 字段（Field），就是JSON文档中的字段，类似数据库中的列（Column） |
 | Schema    | Mapping           | Mapping（映射）是索引中文档的约束，例如字段类型约束。类似数据库的表结构（Schema） |
-| SQL       | DSL               | DSL是elasticsearch提供的JSON风格的请求语句，用来操作elasticsearch，实现CRUD |
+| SQL语句   | DSL语句           | DSL是elasticsearch提供的JSON风格的请求语句，用来操作elasticsearch，实现CRUD |
+
+MySQL和ES在发送的时候的一个差别
+
+在MySQL中，SQL写好了，通过Claction将东西发送出去，发送给MySQL，MySQL就能处理了。
+
+在ES中，写好了DSL后，需要通过HTTP请求发出去的，因为ES中对外暴露的是RestFul接口，这种接口的好处是跟语言无关，也就是说你任何的语言只要能发HTTP请求，都可以将你的DSL发给ES，ES就能处理了，此时ES就彻底脱离了语言的束缚了。
 
 是不是说，我们学习了elasticsearch就不再需要mysql了呢？
 
-并不是如此，两者各自有自己的擅长支出：
+并不是如此，两者各自有自己的擅长之处：
 
-- Mysql：擅长事务类型操作，可以确保数据的安全和一致性
+- Mysql：擅长事务类型操作，事务中有ACID的原则，可以确保数据的安全和一致性
+
+  但是ES没有事物的概念，所以无法保证事物的ACID
 
 - Elasticsearch：擅长海量数据的搜索、分析、计算
 
+例如下单、付款这样的业务，它对事物的要求很高，数据的安全性很高，就应该使用MySQL做数据储存。
 
+但如果你现在做的是一个商品的搜索或者页面的搜索，这种搜索比较复杂，那肯定是使用ES做。
+
+因此它们两个属于互补关系，而不是替代关系。
 
 因此在企业中，往往是两者结合使用：
 
@@ -7445,7 +7512,554 @@ elasticsearch是面向**文档（Document）**存储的，可以是数据库中�
 - 对查询性能要求较高的搜索需求，使用elasticsearch实现
 - 两者再基于某种方式，实现数据的同步，保证一致性
 
+例如下图，用户做一个订单的查询（CRUD），它的CRUD操作访问到服务器后，服务器就可以做一个判断了。
+
+如果你做的是增删改这样的写操作，如果是，就写到MySQL，这样数据就比较安全了。
+
+但如果你做的是读操作，做查询的，肯定建议你去ES中做一个搜索，因为ES搜索功能强一些。
+
+那也就意味着ES和MySQL中都得有数据，那怎么确保两个都有呢？
+
+我们一般都是写在MySQL中的，但是MySQL将来会基于某种方式将数据同步给ES，将来的读/复杂搜索都从ES中读。
+
 ![image-20210720203534945](assets/image-20210720203534945-1711335607293.png)
+
+----
+
+## 四、总结
+
+文档：一条数据就是一个文档，es中是JSON格式
+
+字段：Json文档中的字段
+
+索引：同类型文档的集合
+
+映射：索引中文档的约束，比如字段名称、类型
+
+elasticsearch与数据库是一种互补关系
+
+- 数据库负责事务类型操作
+- elasticsearch负责海量数据的搜索、分析、计算
+
+但是并不是以后我们所有数据都这么做，只有业务量比较大，搜索比较复杂的场景才需要实现两个库都去写；但是一些简答的查询（例如根据id查询），那么还是使用数据库没什么问题，因此需要在合适的场景下使用合适的技术。
+
+
+
+----
+
+# 81.安装elasticsearch
+
+接下来就动手安装ES和它的组件kibana，安装kibana中提供了一个工具，可以让我们非常方便的去编写ES中的DSL语句，从而去操作ES。
+
+## 一、创建网络
+
+因为我们还需要部署kibana容器，因此需要让es和kibana容器互联。如果用docker-compose其实是可以一键互联的，但是我们在这会采用分别部署的方式，不用 `docker-compose`，因为将来大家有可能不需要kibana，有可能只需要ES。
+
+接下来就需要手动的让他们互联了，这里先创建一个网络，然后让它们都加入到这个网络中就行了，网络名字可以随便起，这里就起 `es-net`。
+
+通过这个命令就可以创建一个全新的网络，然后我们就可以去运行docker命令，然后去创建ES容器了。
+
+```sh
+docker network create es-net
+```
+
+----
+
+## 二、加载镜像
+
+这里我们采用elasticsearch的7.12.1版本的镜像，这个镜像体积非常大，接近1G。不建议大家自己pull。
+
+课前资料提供了镜像的tar包：
+
+![image-20210510165308064](./assets/image-20210510165308064.png)
+
+大家将其上传到虚拟机中，然后运行命令加载即可：
+
+```sh
+# 导入数据
+docker load -i es.tar
+```
+
+同理还有`kibana`的tar包也需要这样做。
+
+----
+
+## 三、运行
+
+运行docker命令，部署单点es：
+
+```sh
+docker run -d \
+	--name es \
+    -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \ # -e：设置环境变量。环境变量有两个
+    -e "discovery.type=single-node" \
+    -v es-data:/usr/share/elasticsearch/data \
+    -v es-plugins:/usr/share/elasticsearch/plugins \
+    --privileged \
+    --network es-net \
+    -p 9200:9200 \
+    -p 9300:9300 \
+elasticsearch:7.12.1
+```
+
+命令解释：
+
+- `-e "cluster.name=es-docker-cluster"`：设置集群名称
+- `-e "http.host=0.0.0.0"`：监听的地址，可以外网访问
+- `-e "ES_JAVA_OPTS=-Xms512m -Xmx512m"`：配置JVM堆内存大小，ES底层是基于Java实现的，这里配置堆内存其实就是将来ES运行时的大小了，它的默认值是1G，但1G有点大了，因此这里设置为了512，但是不能比512更小，否则会出现一些内存不足的问题，ES堆内存的消耗还是比较大的。
+- `-e "discovery.type=single-node"`：配置运行模式，也就是我们的ES将来是单点运行，非集群模式
+- `-v es-data:/usr/share/elasticsearch/data`：挂载逻辑卷，绑定es的数据目录
+- `-v es-logs:/usr/share/elasticsearch/logs`：挂载逻辑卷，绑定es的日志目录
+- `-v es-plugins:/usr/share/elasticsearch/plugins`：挂载逻辑卷，绑定es的插件目录
+- `--privileged`：授予逻辑卷访问权
+- `--network es-net` ：加入一个名为es-net的网络中
+- `-p 9200:9200`：将来暴露的HTTP端口，就是将来用户访问的
+- `-p 9300:9300`：将来ES容器各个节点之间互联的端口，这个端口我们现在用不到，不暴露也没关系
+- `elasticsearch:7.12.1`：容器名称
+
+----
+
+## 四、测试
+
+在浏览器中输入：http://192.168.150.101:9200 即可看到elasticsearch的响应结果：
+
+![image-20210506101053676](./assets/image-20210506101053676.png)
+
+---
+
+# 82.部署kibana
+
+kibana一定要和ES在同一个网络中，即我们刚刚所用的 `es-net`
+
+kibana可以给我们提供一个elasticsearch的可视化界面，便于我们学习。
+
+## 一、部署
+
+运行docker命令，部署kibana
+
+```sh
+docker run -d \
+--name kibana \
+-e ELASTICSEARCH_HOSTS=http://es:9200 \
+--network=es-net \
+-p 5601:5601  \
+kibana:7.12.1
+```
+
+- `--network es-net` ：加入一个名为es-net的网络中，与elasticsearch在同一个网络中
+
+- `-e ELASTICSEARCH_HOSTS=http://es:9200"`：ELASTICSEARCH_HOSTS是设置elasticsearch的地址，`es:9200` 中的es就是上面创建elasticsearch容器的名称，因为kibana已经与elasticsearch在一个网络，因此可以用容器名直接访问elasticsearch，即互联
+
+  因为kibana可以帮助我们去操作es，因此需要知道es的地址，`容器名 + 9200` 即 `es:9200`，kibana将来就能连上es了
+
+- `--network=es-net`：也加入到 `es-net` 网络中
+
+- `-p 5601:5601`：端口映射配置，因此kibana端口是5601
+
+- `kibana:7.12.1`：容器名，kibana的版本一定要和ES的版本保持一致
+
+kibana启动一般比较慢，需要多等待一会，可以通过命令：
+
+```sh
+docker logs -f kibana
+```
+
+查看运行日志，当查看到下面的日志，说明成功，端口是5601：
+
+![image-20210109105135812](./assets/image-20210109105135812.png)
+
+此时，在浏览器输入地址访问：http://192.168.150.101:5601，即可看到结果。
+
+它会有两种使用方式，一种是自己开始玩，另一种是让他导入一些数据，这里我们选择自己玩。
+
+点击左边的菜单，这里面牵扯到ES中的各种各样的管理，包括安全管理等等。
+
+接下来带着大家用一下 `Dev Tools` 工具。
+
+----
+
+## 二、DevTools
+
+这个就是我刚刚将的DSL控制台，它可以让我们非常方便的去发送DSL的请求。
+
+kibana中提供了一个DevTools界面：
+
+这一串JSON格式就是DSL语句了，第一个语句的含义就是查询所有的的数据。前面的GET表示我们发的是一个GET请求，`_search` 代表这里要做一次搜索，当我们点击 `开始的图标`，它就会将请求给发出去，发给ES。
+
+那它怎么知道ES在哪呢？我们在刚刚创建kibana容器的时候指定了ES的地址，因此我们在这里只需要将DSL语句、启动方式、路径准备好，它就会帮你把DSL发给ES了，是不是很方便（前面不用再去指定ES地址。
+
+![image-20210506102630393](./assets/image-20210506102630393.png)
+
+这个界面中可以编写DSL来操作elasticsearch。并且对DSL语句有自动补全功能。
+
+
+
+# 3.安装IK分词器
+
+
+
+## 3.1.在线安装ik插件（较慢）
+
+```shell
+# 进入容器内部
+docker exec -it elasticsearch /bin/bash
+
+# 在线下载并安装
+./bin/elasticsearch-plugin  install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.12.1/elasticsearch-analysis-ik-7.12.1.zip
+
+#退出
+exit
+#重启容器
+docker restart elasticsearch
+```
+
+## 3.2.离线安装ik插件（推荐）
+
+### 1）查看数据卷目录
+
+安装插件需要知道elasticsearch的plugins目录位置，而我们用了数据卷挂载，因此需要查看elasticsearch的数据卷目录，通过下面命令查看:
+
+```sh
+docker volume inspect es-plugins
+```
+
+显示结果：
+
+```json
+[
+    {
+        "CreatedAt": "2022-05-06T10:06:34+08:00",
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker/volumes/es-plugins/_data",
+        "Name": "es-plugins",
+        "Options": null,
+        "Scope": "local"
+    }
+]
+```
+
+说明plugins目录被挂载到了：`/var/lib/docker/volumes/es-plugins/_data `这个目录中。
+
+
+
+### 2）解压缩分词器安装包
+
+下面我们需要把课前资料中的ik分词器解压缩，重命名为ik
+
+![image-20210506110249144](./assets/image-20210506110249144.png)
+
+### 3）上传到es容器的插件数据卷中
+
+也就是`/var/lib/docker/volumes/es-plugins/_data `：
+
+![image-20210506110704293](./assets/image-20210506110704293.png)
+
+
+
+###  4）重启容器
+
+```shell
+# 4、重启容器
+docker restart es
+```
+
+```sh
+# 查看es日志
+docker logs -f es
+```
+
+### 5）测试：
+
+IK分词器包含两种模式：
+
+* `ik_smart`：最少切分
+
+* `ik_max_word`：最细切分
+
+
+
+```json
+GET /_analyze
+{
+  "analyzer": "ik_max_word",
+  "text": "黑马程序员学习java太棒了"
+}
+```
+
+结果：
+
+```json
+{
+  "tokens" : [
+    {
+      "token" : "黑马",
+      "start_offset" : 0,
+      "end_offset" : 2,
+      "type" : "CN_WORD",
+      "position" : 0
+    },
+    {
+      "token" : "程序员",
+      "start_offset" : 2,
+      "end_offset" : 5,
+      "type" : "CN_WORD",
+      "position" : 1
+    },
+    {
+      "token" : "程序",
+      "start_offset" : 2,
+      "end_offset" : 4,
+      "type" : "CN_WORD",
+      "position" : 2
+    },
+    {
+      "token" : "员",
+      "start_offset" : 4,
+      "end_offset" : 5,
+      "type" : "CN_CHAR",
+      "position" : 3
+    },
+    {
+      "token" : "学习",
+      "start_offset" : 5,
+      "end_offset" : 7,
+      "type" : "CN_WORD",
+      "position" : 4
+    },
+    {
+      "token" : "java",
+      "start_offset" : 7,
+      "end_offset" : 11,
+      "type" : "ENGLISH",
+      "position" : 5
+    },
+    {
+      "token" : "太棒了",
+      "start_offset" : 11,
+      "end_offset" : 14,
+      "type" : "CN_WORD",
+      "position" : 6
+    },
+    {
+      "token" : "太棒",
+      "start_offset" : 11,
+      "end_offset" : 13,
+      "type" : "CN_WORD",
+      "position" : 7
+    },
+    {
+      "token" : "了",
+      "start_offset" : 13,
+      "end_offset" : 14,
+      "type" : "CN_CHAR",
+      "position" : 8
+    }
+  ]
+}
+```
+
+
+
+
+
+## 3.3 扩展词词典
+
+随着互联网的发展，“造词运动”也越发的频繁。出现了很多新的词语，在原有的词汇列表中并不存在。比如：“奥力给”，“传智播客” 等。
+
+所以我们的词汇也需要不断的更新，IK分词器提供了扩展词汇的功能。
+
+1）打开IK分词器config目录：
+
+![image-20210506112225508](./assets/image-20210506112225508.png)
+
+2）在IKAnalyzer.cfg.xml配置文件内容添加：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+        <comment>IK Analyzer 扩展配置</comment>
+        <!--用户可以在这里配置自己的扩展字典 *** 添加扩展词典-->
+        <entry key="ext_dict">ext.dic</entry>
+</properties>
+```
+
+3）新建一个 ext.dic，可以参考config目录下复制一个配置文件进行修改
+
+```properties
+传智播客
+奥力给
+```
+
+4）重启elasticsearch 
+
+```sh
+docker restart es
+
+# 查看 日志
+docker logs -f elasticsearch
+```
+
+![image-20201115230900504](./assets/image-20201115230900504.png)
+
+日志中已经成功加载ext.dic配置文件
+
+5）测试效果：
+
+```json
+GET /_analyze
+{
+  "analyzer": "ik_max_word",
+  "text": "传智播客Java就业超过90%,奥力给！"
+}
+```
+
+> 注意当前文件的编码必须是 UTF-8 格式，严禁使用Windows记事本编辑
+
+## 3.4 停用词词典
+
+在互联网项目中，在网络间传输的速度很快，所以很多语言是不允许在网络上传递的，如：关于宗教、政治等敏感词语，那么我们在搜索时也应该忽略当前词汇。
+
+IK分词器也提供了强大的停用词功能，让我们在索引时就直接忽略当前的停用词汇表中的内容。
+
+1）IKAnalyzer.cfg.xml配置文件内容添加：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+        <comment>IK Analyzer 扩展配置</comment>
+        <!--用户可以在这里配置自己的扩展字典-->
+        <entry key="ext_dict">ext.dic</entry>
+         <!--用户可以在这里配置自己的扩展停止词字典  *** 添加停用词词典-->
+        <entry key="ext_stopwords">stopword.dic</entry>
+</properties>
+```
+
+3）在 stopword.dic 添加停用词
+
+```properties
+习大大
+```
+
+4）重启elasticsearch 
+
+```sh
+# 重启服务
+docker restart elasticsearch
+docker restart kibana
+
+# 查看 日志
+docker logs -f elasticsearch
+```
+
+日志中已经成功加载stopword.dic配置文件
+
+5）测试效果：
+
+```json
+GET /_analyze
+{
+  "analyzer": "ik_max_word",
+  "text": "传智播客Java就业率超过95%,习大大都点赞,奥力给！"
+}
+```
+
+> 注意当前文件的编码必须是 UTF-8 格式，严禁使用Windows记事本编辑
+
+
+
+
+
+# 4.部署es集群
+
+部署es集群可以直接使用docker-compose来完成，不过要求你的Linux虚拟机至少有**4G**的内存空间
+
+
+
+首先编写一个docker-compose文件，内容如下：
+
+```sh
+version: '2.2'
+services:
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
+    container_name: es01
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+  es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
+    container_name: es02
+    environment:
+      - node.name=es02
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data02:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+  es03:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
+    container_name: es03
+    environment:
+      - node.name=es03
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data03:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+
+volumes:
+  data01:
+    driver: local
+  data02:
+    driver: local
+  data03:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
+```
+
+
+
+Run `docker-compose` to bring up the cluster:
+
+```sh
+docker-compose up
+```
 
 
 
