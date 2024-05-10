@@ -15810,15 +15810,15 @@ public interface EmpMapper {
 
 重启SpringBoot服务，使用postman测试部门删除：
 
-![image-20230107140057729](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230107140057729.png)
+![image-20230107140057729](./assets/image-20230107140057729.png)
 
 
 
 代码正常情况下，dept表和Em表中的数据已删除
 
-![image-20230107140130199](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230107140130199.png)
+![image-20230107140130199](./assets/image-20230107140130199.png)
 
-![image-20230107140221425](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230107140221425.png)
+![image-20230107140221425](./assets/image-20230107140221425.png)
 
 
 
@@ -15854,9 +15854,9 @@ public class DeptServiceImpl implements DeptService {
 
 重启SpringBoot服务，使用postman测试部门删除：
 
-![image-20230107140618199](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230107140618199.png)
+![image-20230107140618199](./assets/image-20230107140618199.png)
 
-![image-20230107140706301](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230107140706301.png)
+![image-20230107140706301](./assets/image-20230107140706301.png)
 
 
 
@@ -15864,11 +15864,11 @@ public class DeptServiceImpl implements DeptService {
 
 - 删除了2号部门
 
-![image-20230107140726701](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230107140726701.png)
+![image-20230107140726701](./assets/image-20230107140726701.png)
 
 - 2号部门下的员工数据没有删除
 
-![image-20230107140221425](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230107140221425.png)
+![image-20230107140221425](./assets/image-20230107140221425.png)
 
 
 
@@ -15898,7 +15898,7 @@ public class DeptServiceImpl implements DeptService {
 
 此时，我们就需要在delete删除业务功能中添加事务。
 
-![image-20230107141652636](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230107141652636.png)
+![image-20230107141652636](./assets/image-20230107141652636.png)
 
 在方法运行之前，开启事务，如果方法成功执行，就提交事务，如果方法执行的过程当中出现异常了，就回滚事务。
 
@@ -15967,15 +15967,15 @@ public class DeptServiceImpl implements DeptService {
 
 在业务功能上添加@Transactional注解进行事务管理后，我们重启SpringBoot服务，使用postman测试：
 
-![image-20230107143339917](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230107143339917.png)
+![image-20230107143339917](./assets/image-20230107143339917.png)
 
 
 
 添加Spring事务管理后，由于服务端程序引发了异常，所以事务进行回滚。
 
-![image-20230107144312892](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230107144312892.png)
+![image-20230107144312892](./assets/image-20230107144312892.png)
 
-![image-20230107143720961](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230107143720961.png)
+![image-20230107143720961](./assets/image-20230107143720961.png)
 
 
 
@@ -16067,13 +16067,13 @@ public void delete(Integer id) throws Exception {
 
 > 现有表中数据：
 >
-> ![image-20230107140726701](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230107140726701.png)
+> ![image-20230107140726701](./assets/image-20230107140726701.png)
 
 
 
 使用postman测试，删除5号部门
 
-![image-20230108142359592](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230108142359592.png)
+![image-20230108142359592](./assets/image-20230108142359592.png)
 
 
 
@@ -16081,11 +16081,11 @@ public void delete(Integer id) throws Exception {
 
 发生了Exception异常，但事务依然提交了
 
-![image-20230108142555310](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230108142555310.png)
+![image-20230108142555310](./assets/image-20230108142555310.png)
 
 > dept表中数据：
 >
-> ![image-20230108142707351](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230108142707351.png)
+> ![image-20230108142707351](./assets/image-20230108142707351.png)
 
 
 
@@ -16123,15 +16123,15 @@ public class DeptServiceImpl implements DeptService {
 
 接下来我们重新启动服务，测试删除部门的操作：
 
-![image-20230108184912155](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230108184912155.png)
+![image-20230108184912155](./assets/image-20230108184912155.png)
 
 控制台日志：执行了删除3号部门的操作， 因为异常又进行了事务回滚
 
-![image-20230108185432083](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230108185432083.png)
+![image-20230108185432083](./assets/image-20230108185432083.png)
 
 数据表：3号部门没有删除
 
-![image-20230107143720961](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230107143720961.png)
+![image-20230107143720961](./assets/image-20230107143720961.png)
 
 
 
@@ -16156,7 +16156,7 @@ public class DeptServiceImpl implements DeptService {
 
 例如：两个事务方法，一个A方法，一个B方法。在这两个方法上都添加了@Transactional注解，就代表这两个方法都具有事务，而在A方法当中又去调用了B方法。
 
-![image-20230112152543953](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230112152543953.png) 
+![image-20230112152543953](./assets/image-20230112152543953.png) 
 
 所谓事务的传播行为，指的就是在A方法运行的时候，首先会开启一个事务，在A方法当中又调用了B方法， B方法自身也具有事务，那么B方法在运行的时候，到底是加入到A方法的事务当中来，还是B方法在运行的时候新建一个事务？这个就涉及到了事务的传播行为。
 
@@ -16323,11 +16323,11 @@ public class DeptServiceImpl implements DeptService {
 - 程序发生Exception异常
 - 执行事务回滚（删除、插入操作因为在一个事务范围内，两个操作都会被回滚）
 
-![image-20230109154025262](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230109154025262.png)
+![image-20230109154025262](./assets/image-20230109154025262.png)
 
 然后在dept_log表中没有记录日志数据
 
-![image-20230109154344393](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230109154344393.png) 
+![image-20230109154344393](./assets/image-20230109154344393.png) 
 
 
 
@@ -16343,7 +16343,7 @@ public class DeptServiceImpl implements DeptService {
 
 - 此时：delete和insert操作使用了同一个事务，同一个事务中的多个操作，要么同时成功，要么同时失败，所以当异常发生时进行事务回滚，就会回滚delete和insert操作
 
-![image-20230109162420479](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230109162420479.png)
+![image-20230109162420479](./assets/image-20230109162420479.png)
 
 
 
@@ -16376,7 +16376,7 @@ public class DeptLogServiceImpl implements DeptLogService {
 
 重启SpringBoot服务，再次测试删除3号部门：
 
-![image-20230109170002879](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230109170002879.png)
+![image-20230109170002879](./assets/image-20230109170002879.png)
 
 那此时，DeptServiceImpl中的delete方法运行时，会开启一个事务。 当调用  deptLogService.insert(deptLog)  时，也会创建一个新的事务，那此时，当insert方法运行完毕之后，事务就已经提交了。 即使外部的事务出现异常，内部已经提交的事务，也不会回滚了，因为是两个独立的事务。
 
@@ -16406,7 +16406,7 @@ public class DeptLogServiceImpl implements DeptLogService {
 
 比如，我们这里有一个项目，项目中开发了很多的业务功能。
 
-![image-20230112154547523](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230112154547523.png) 
+![image-20230112154547523](./assets/image-20230112154547523.png) 
 
 
 
@@ -16416,13 +16416,13 @@ public class DeptLogServiceImpl implements DeptLogService {
 
 可能多数人首先想到的就是在每一个业务方法运行之前，记录这个方法运行的开始时间。在这个方法运行完毕之后，再来记录这个方法运行的结束时间。拿结束时间减去开始时间，不就是这个方法的执行耗时吗？
 
-<img src="O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230112154605206.png" alt="image-20230112154605206" style="zoom:80%;" /> 
+<img src="./assets/image-20230112154605206.png" alt="image-20230112154605206" style="zoom:80%;" /> 
 
 
 
 以上分析的实现方式是可以解决需求问题的。但是对于一个项目来讲，里面会包含很多的业务模块，每个业务模块又包含很多增删改查的方法，如果我们要在每一个模块下的业务方法中，添加记录开始时间、结束时间、计算执行耗时的代码，就会让程序员的工作变得非常繁琐。
 
-<img src="O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230112154627546.png" alt="image-20230112154627546" style="zoom:80%;" /> 
+<img src="./assets/image-20230112154627546.png" alt="image-20230112154627546" style="zoom:80%;" /> 
 
 
 
@@ -16432,7 +16432,7 @@ public class DeptLogServiceImpl implements DeptLogService {
 
 我们要想完成统计各个业务方法执行耗时的需求，我们只需要定义一个模板方法，将记录方法执行耗时这一部分公共的逻辑代码，定义在模板方法当中，在这个方法开始运行之前，来记录这个方法运行的开始时间，在方法结束运行的时候，再来记录方法运行的结束时间，中间就来运行原始的业务方法。
 
-<img src="O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230112154530101.png" alt="image-20230112154530101" style="zoom:80%;" /> 
+<img src="./assets/image-20230112154530101.png" alt="image-20230112154530101" style="zoom:80%;" /> 
 
 
 
@@ -16448,7 +16448,7 @@ public class DeptLogServiceImpl implements DeptLogService {
 - 运行原始的业务方法（那此时原始的业务方法，就是 list 方法）
 - 记录方法运行结束时间，计算方法执行耗时
 
-<img src="O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230112155813944.png" alt="image-20230112155813944" style="zoom:80%;" /> 
+<img src="./assets/image-20230112155813944.png" alt="image-20230112155813944" style="zoom:80%;" /> 
 
 不论，我们运行的是那个业务方法，最后其实运行的就是我们定义的模板方法，而在模板方法中，就完成了原始方法执行耗时的统计操作 。(那这样呢，我们就通过一个模板方法就完成了指定的一个或多个业务方法执行耗时的统计)
 
@@ -16533,13 +16533,13 @@ public class TimeAspect {
 
 - 查询3号部门信息
 
-![image-20230110143404792](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230110143404792.png)
+![image-20230110143404792](./assets/image-20230110143404792.png)
 
-![image-20230110143611669](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230110143611669.png)
+![image-20230110143611669](./assets/image-20230110143611669.png)
 
 > 我们可以再测试下：查询所有部门信息（同样执行AOP程序）
 >
-> ![image-20230110143815479](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230110143815479.png)
+> ![image-20230110143815479](./assets/image-20230110143815479.png)
 
 
 
@@ -16576,7 +16576,7 @@ public class TimeAspect {
 
 ​	连接点指的是可以被aop控制的方法。例如：入门程序当中所有的业务方法都是可以被aop控制的方法。
 
-​	![image-20230112160708474](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230112160708474.png) 
+​	![image-20230112160708474](./assets/image-20230112160708474.png) 
 
 ​	在SpringAOP提供的JoinPoint当中，封装了连接点方法在执行时的相关信息。（后面会有具体的讲解）
 
@@ -16588,7 +16588,7 @@ public class TimeAspect {
 
 ​	但是在AOP面向切面编程当中，我们只需要将这部分重复的代码逻辑抽取出来单独定义。抽取出来的这一部分重复的逻辑，也就是共性的功能。
 
-​	<img src="O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230112160852883.png" alt="image-20230112160852883" style="zoom:80%;" /> 
+​	<img src="./assets/image-20230112160852883.png" alt="image-20230112160852883" style="zoom:80%;" /> 
 
 ​	
 
@@ -16598,7 +16598,7 @@ public class TimeAspect {
 
 ​	在aop的开发当中，我们通常会通过一个切入点表达式来描述切入点(后面会有详解)。
 
-​	<img src="O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230112161131937.png" alt="image-20230112161131937" style="zoom:80%;" /> 
+​	<img src="./assets/image-20230112161131937.png" alt="image-20230112161131937" style="zoom:80%;" /> 
 
 ​	假如：切入点表达式改为DeptServiceImpl.list()，此时就代表仅仅只有list这一个方法是切入点。只有list()方法在运行的时候才会应用通知。
 
@@ -16608,7 +16608,7 @@ public class TimeAspect {
 
 ​	当通知和切入点结合在一起，就形成了一个切面。通过切面就能够描述当前aop程序需要针对于哪个原始方法，在什么时候执行什么样的操作。
 
-​	<img src="O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230112161335186.png" alt="image-20230112161335186" style="zoom:80%;" /> 
+​	<img src="./assets/image-20230112161335186.png" alt="image-20230112161335186" style="zoom:80%;" /> 
 
 ​	切面所在的类，我们一般称为**切面类**（被@Aspect注解标识的类）
 
@@ -16618,7 +16618,7 @@ public class TimeAspect {
 
 ​	目标对象指的就是通知所应用的对象，我们就称之为目标对象。
 
-​	![image-20230112161657667](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230112161657667.png) 
+​	![image-20230112161657667](./assets/image-20230112161657667.png) 
 
 
 
@@ -16626,7 +16626,7 @@ public class TimeAspect {
 
 AOP的核心概念我们介绍完毕之后，接下来我们再来分析一下我们所定义的通知是如何与目标对象结合在一起，对目标对象当中的方法进行功能增强的。
 
-<img src="O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230112161821401.png" alt="image-20230112161821401" style="zoom:80%;" /> 
+<img src="./assets/image-20230112161821401.png" alt="image-20230112161821401" style="zoom:80%;" /> 
 
 Spring的AOP底层是基于动态代理技术来实现的，也就是说在程序运行的时候，会自动的基于动态代理技术为目标对象生成一个对应的代理对象。在代理对象当中就会对目标对象当中的原始方法进行功能的增强。
 
@@ -16745,11 +16745,11 @@ public class MyAspect1 {
 
 - 使用postman测试查询所有部门数据
 
-![image-20230110165514461](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230110165514461.png)
+![image-20230110165514461](./assets/image-20230110165514461.png)
 
 - 查看idea中控制台日志输出
 
-![image-20230110165806934](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230110165806934.png)
+![image-20230110165806934](./assets/image-20230110165806934.png)
 
 > 程序没有发生异常的情况下，@AfterThrowing标识的通知方法不会执行。
 
@@ -16785,7 +16785,7 @@ public class DeptServiceImpl implements DeptService {
 
 - 查看idea中控制台日志输出
 
-![image-20230110171006874](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230110171006874.png)
+![image-20230110171006874](./assets/image-20230110171006874.png)
 
 > 程序发生异常的情况下：
 >
@@ -16986,11 +16986,11 @@ public class MyAspect4 {
 
 - 使用postman测试查询所有部门数据
 
-![image-20230110165514461](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230110165514461.png)
+![image-20230110165514461](./assets/image-20230110165514461.png)
 
 - 查看idea中控制台日志输出
 
-![image-20230110211208549](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230110211208549.png)
+![image-20230110211208549](./assets/image-20230110211208549.png)
 
 
 
@@ -17074,7 +17074,7 @@ public class MyAspect4 {
 
 重新启动SpringBoot服务，测试通知执行顺序：
 
-![image-20230110212523787](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230110212523787.png)
+![image-20230110212523787](./assets/image-20230110212523787.png)
 
 
 
@@ -17104,11 +17104,11 @@ public class MyAspect4 {
 
   1. execution(……)：根据方法的签名来匹配
 
-  ![image-20230110214150215](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230110214150215.png)
+  ![image-20230110214150215](./assets/image-20230110214150215.png)
 
   2. @annotation(……) ：根据注解匹配
 
-  ![image-20230110214242083](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230110214242083.png)
+  ![image-20230110214242083](./assets/image-20230110214242083.png)
 
 首先我们先学习第一种最为常见的execution切入点表达式。
 
@@ -17369,7 +17369,7 @@ public class MyAspect6 {
 
 重启SpringBoot服务，测试查询所有部门数据，查看控制台日志：
 
-![image-20230110224447047](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230110224447047.png)
+![image-20230110224447047](./assets/image-20230110224447047.png)
 
 
 
@@ -17450,7 +17450,7 @@ public class MyAspect7 {
 
 重新启动SpringBoot服务，执行查询部门数据的功能：
 
-![image-20230110231629140](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230110231629140.png)
+![image-20230110231629140](./assets/image-20230110231629140.png)
 
 
 
@@ -17731,11 +17731,11 @@ public class LogAspect {
 
 - 添加一个新的部门
 
-![image-20230111001114301](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230111001114301.png)
+![image-20230111001114301](./assets/image-20230111001114301.png)
 
 - 数据表
 
-![image-20230111001230731](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day13-SpringBootWeb AOP/讲义/assets/image-20230111001230731.png)
+![image-20230111001230731](./assets/image-20230111001230731.png)
 
 
 
