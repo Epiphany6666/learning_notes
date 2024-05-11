@@ -72,7 +72,7 @@ HTML 超文本标记语言——HyperText Markup Language。
 
 需要包裹内容一定是双标签，如果是换行什么的就是单标签
 
-![1680242555328](assets/1680242555328.png)
+<img src="assets/1680242555328.png" alt="1680242555328" style="zoom:50%;" />
 
 # 5.HTML骨架
 

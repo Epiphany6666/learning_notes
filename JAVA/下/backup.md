@@ -5021,7 +5021,8 @@ list.stream().map(new Function<String, Integer>() {
 list.stream()
     // 将parseInt()直接当做是map()形参中接口的抽象方法的方法体
     .map(Integer::parseInt)
-    .forEach(s-> System.out.println(s));
+    // 将println()直接当做是forEach()形参中接口的抽象方法的方法体
+    .forEach(System.out::println);
 ~~~
 
 
@@ -14598,7 +14599,7 @@ fos.close();
 
 ### 2）读取（`store()`）
 
-- `load()`：加载，将 `properties` 中的数据读取到集合中。
+`load()`：加载，将 `properties` 中的数据读取到集合中。
 
 这个方法可以传入字符输入流，也可以传入字节输入流
 

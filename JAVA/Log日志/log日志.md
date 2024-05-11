@@ -267,9 +267,23 @@ Logback日志系统的特性都是通过核心配置文件logback.xml控制的�
 
 为什么要有日志级别？因为我们会根据不同的情况来选择不同的日志级别进行输出。
 
+TRACE太小了，一般不会用到它的，我们从第二个开始看。
+
+`DEBUGB` 表示在调试的时候要用到。
+
+`INFO` 表示要记录一些用户的信息，就要用到它。
+
+`WARN` 表示代码中出现一些警告的时候，要用到它。
+
+`ERROR` 代码出错了就要用到这个。
+
+用到最多的是 `DEBUG、INFO`
+
 ```
 TRACE < DEBUG < INFO < WARN < ERROR
 ```
+
+作用：用于控制系统中哪些日志级别是可以输出的，只输出级别不低于设定级别的日志信息。
 
 还有两个特殊的：
 
@@ -277,11 +291,18 @@ TRACE < DEBUG < INFO < WARN < ERROR
 
 ​	OFF：关闭所有日志
 
-日志级别从小到大的关系：
+如下，如果写的是INFO，表示只输出级别不低于设定级别的日志信息，即大于等于自己（INFO、WARN、ERROR）
 
-​	TRACE < DEBUG < INFO < WARN < ERROR
+但一般这里写 `ALL` 就行了，表示打印所有
 
+~~~xml
+<root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE" />
+</root>
+~~~
 
+PS：在写的时候大写小写都是可以的，因为在写的时候是忽略大小写的。
 
 
 
