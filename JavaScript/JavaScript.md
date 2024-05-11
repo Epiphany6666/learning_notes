@@ -3091,7 +3091,7 @@ Web APIs - 第1天笔记
 
 严格意义上讲，我们在 JavaScript 阶段学习的知识绝大部分属于 ECMAScript 的知识体系，ECMAScript 简称 ES 它提供了一套语言标准规范，如变量、数据类型、表达式、语句、函数等语法规则都是由 ECMAScript 规定的。浏览器将 ECMAScript 大部分的规范加以实现，并且在此基础上又扩展一些实用的功能，这些被扩展出来的内容我们称为 Web APIs。
 
-![guide](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第一天/02-笔记/assets/guide.png)
+![guide](./assets/guide.png)
 
 ECMAScript 运行在浏览器中然后再结合 Web APIs 才是真正的 JavaScript，Web APIs 的核心是 DOM 和 BOM。
 
@@ -3123,7 +3123,7 @@ DOM（Document Object Model —— 文档对象模型）是用来呈现以及与
 
 观察一个小例子：
 
-![demo](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第一天/02-笔记/assets/demo.gif)
+![demo](./assets/demo.gif)
 
 上述的例子中当用户分分别点击【开始】或【结束】按钮后，通过右侧调试窗口可以观察到 html 标签的内容在不断的发生改变，这便是通过 DOM 实现的。
 
@@ -3151,7 +3151,7 @@ DOM（Document Object Model —— 文档对象模型）是用来呈现以及与
 
 如下图所示，将 HTML 文档以树状结构直观的表现出来，我们称之为文档树或 DOM 树，**文档树直观的体现了标签与标签之间的关系。**（整个页面就叫document，最大的标签是HTML）
 
-![dom](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第一天/02-笔记/assets/web-api.jpg)
+![dom](./assets/web-api.jpg)
 
 #### DOM 节点
 
