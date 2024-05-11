@@ -10363,7 +10363,9 @@ Student s = new Student(); // 报错
 
 既然要描述用户，类名就叫做 `User`。成员变量就是：用户名、密码、确认密码、邮箱、性别、年龄。
 
-User.java
+**User.java**
+
+PS：如果有属性是boolean类型的，那么它的 `get` 方法的名字叫做 `isAdmin`，`get方法` 所对应的成员变量是 `admin`。
 
 ~~~java
 package com.itheima.test6;

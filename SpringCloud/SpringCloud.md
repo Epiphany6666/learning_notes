@@ -9044,7 +9044,7 @@ void setUp() {
 
 客户端创建完了，还需要销毁，因此这里加一个AfterEach注解
 
-<img src="./assets/image-20240509211709410.png" alt="image-20240509211709410" style="zoom:67%;" />
+<img src="./assets/image-20240511182637598.png" alt="image-20240511182637598" style="zoom:50%;" />
 
 ```java
 package cn.itcast.hotel;
@@ -9078,7 +9078,7 @@ public class HotelIndexTest {
 
 写一个单元测试测试一下
 
-<img src="./assets/image-20240509212337579.png" alt="image-20240509212337579" style="zoom:67%;" />
+<img src="./assets/image-20240511182733724.png" alt="image-20240511182733724" style="zoom:60%;" />
 
 可以发现初始化成功。
 

@@ -46,7 +46,7 @@ XML优点：易于阅读。可以配置成组的数据。
 
 以后选择配置文件的时候，TXT文件肯定不选
 
-![image-20240511084121620](./assets/image-20240511084121620.png)
+<img src="./assets/image-20240511084121620.png" alt="image-20240511084121620" style="zoom:50%;" />
 
 XML在配置的时候非常的方便，它可以配置成组成组的数据。
 
@@ -71,6 +71,8 @@ XML在配置的时候非常的方便，它可以配置成组成组的数据。
 
 + 以及帮助残障人士有效获得Web信息的无障碍指南（WCAG）等
 
+  有效促进了Web技术的互相兼容，对互联网技术的发展和应用起到了基础性和根本性的支撑作用。
+
   ![01_w3c概述](./assets/01_w3c概述.png)
 
 XML的全称为（EXtensible Markup Language），是一种可扩展的标记语言。
@@ -85,6 +87,13 @@ XML的全称为（EXtensible Markup Language），是一种可扩展的标记语
 
 可扩展：标签的名字是可以自己定义的。
 
+规则：
+
+1. 名称可以包含字母、数字以及其他的字符
+2. 名称不能以数字或者标点符号开始
+3. 名称不能以字母 xml （或者 Xml、 XML等等）开始
+4. 名称不能包含空格
+
 XML作用：
 
 - 用于进行存储数据和传输数据（这个作用用的很少。）
@@ -94,6 +103,12 @@ XML作用：
   **传输数据**（由于XML格式是固定的，如果现在有两个系统（A系统和B系统），A系统可以给B系统传XML文件，B系统接收到后，就可以将XML文件进行解析，获取到里面的一些数据，同样的道理，B系统可以回一个文件给A系统）
 
 - 作为软件的配置文件
+
+与html的区别
+
+1. xml标签都是自定义的，html标签是预定义。
+2. xml的语法严格，html语法松散
+3. xml是存储数据的，html是展示数据
 
 ----
 
@@ -111,15 +126,22 @@ XML作用：
 
 文档声明必须是**第一行第一列**，其实就是用来声明现在写的XML文件，里面会写两个属性。
 
+格式：`<?xml 属性列表 ?> ` 
+
 注意并且要顶格写，并且前面还不能加空格，否则也会报错！
 
 ![image-20240511095537697](./assets/image-20240511095537697.png)
 
 - version：该属性是必须存在的，只能写成1.0
 
-- encoding：该属性不是必须的，表示打开当前xml文件的时候应该是使用什么字符编码表，默认就是UTF-8，并且我们在实际开发中默认中的编码表就是UTF-8，不能写成其他的。
+- encoding：该属性不是必须的，表示打开当前xml文件的时候应该是使用什么字符编码表，如果不写，默认是默认值：ISO-8859-1，但是我们在实际开发中默认中的编码表就是UTF-8，不能写成其他的。
 
-- standalone: 该属性不是必须的，描述XML文件是否依赖其他的xml文件，取值为yes/no
+- standalone：是否独立。（但现在这个属性几乎都不设置了）` 这个文件有可能会依赖于其他的文件`
+
+  取值：
+
+  ​		yes：不依赖其他文件
+  ​		no：依赖其他文件
 
 ~~~xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes”?>
@@ -237,9 +259,9 @@ XML是作为软件的配置文件而存在的，当软件刚开始运行的时�
 
 因此我们自己在编写XML文件的时候，一定要按照软件所规定的要求来进行书写，`软件所规定的要求` 专业来讲就叫做 `文档约束`。
 
-文档约束：用来限定XML文件中的标签以及属性应该怎么写。
+**文档约束：用来限定XML文件中的标签以及属性应该怎么写。**
 
-**此时的这个限定就可以将它理解为是一个强制的要求，强制要求程序员必须按照文档约束的规定来变成XML文件。**
+此时的这个限定就可以将它理解为是一个强制的要求，强制要求程序员必须按照文档约束的规定来变成XML文件。
 
 文档约束有两个分类，所有的约束我们只需要了解一下就行了，因为以后我们不会自己去编写约束，约束一般是别人写的，软件写的，我们要掌握的是：别人给你个约束，去写一个符合要求的XML文件就行了。
 
@@ -256,9 +278,14 @@ XML是作为软件的配置文件而存在的，当软件刚开始运行的时�
 
 我们要知道，约束本身它也是一个文件，文件的后缀名就叫做 `.dtd`
 
-`ELEMENT` 是元素，`<!ELEMENT 书架（书+）` 表示：根标签只能是书架，如果叫其他的就错了。
+定义一个元素的格式为：`<!ELEMENT 元素名 元素类型>`，`<!ELEMENT 书架（书+）` 表示：根标签只能是书架，如果叫其他的就错了。
 
-书架后面有个括号，表示是书架里面的子标签是 `书`，`+` 表示：正则表达式中的 `+`，表示它出现的次数必须是一个或多个
+书架后面有个括号，表示是书架里面的子标签是 `书`，`+` 表示：正则表达式中的 `+`，表示它出现的次数必须是一个或多个。
+
+> 复杂元素：
+> ​	直接写子元素名称. 多个子元素可以使用","或者"|"隔开；
+> ​	","表示定义子元素的顺序 ; "|": 表示子元素只能出现任意一个
+> ​	"?"零次或一次, "+"一次或多次, "*"零次或多次;如果不写则表示出现一次
 
 再往下，它定义了 `ELEMENT 书` ，这个里面应该有 `书名、作者、售价` 这三个子标签。
 
@@ -268,13 +295,34 @@ XML是作为软件的配置文件而存在的，当软件刚开始运行的时�
 
 作者、售价同样也是 `PCDATA` ，即文本数据。
 
+> 简单元素：
+>
+> ​	EMPTY: 表示标签体为空
+>
+> ​	ANY: 表示标签体可以为空也可以不为空
+>
+> ​	PCDATA: 表示该元素的内容部分为字符串
+>
+> ![03_DTD语法定义元素](./assets/03_DTD语法定义元素.png)
+
 <img src="./assets/image-20240511104612747.png" alt="image-20240511104612747" style="zoom:67%;" />
+
+定义一个属性的格式为：`<!ATTLIST 元素名称 属性名称 属性的类型 属性的约束>`
+
+> 属性的类型：
+> ​	CDATA类型：普通的字符串
+>
+> 属性的约束:
+>
+> ​	// #REQUIRED： 必须的
+> ​	// #IMPLIED： 属性不是必需的
+> ​	// #FIXED value：属性值是固定的
 
 ---
 
 ### ② 导入dtd
 
-- 本地dtd：让电脑中的本地文件去约束 / 限定XML文件的书写
+本地dtd：让电脑中的本地文件去约束 / 限定XML文件的书写
 
 <img src="./assets/image-20240511104736266.png" alt="image-20240511104736266" style="zoom:50%;" />
 
@@ -302,6 +350,65 @@ XML是作为软件的配置文件而存在的，当软件刚开始运行的时�
 
 ----
 
+#### 引入本地DTD约束
+
+```xml
+// 这是persondtd.dtd文件中的内容,已经提前写好
+<!ELEMENT persons (person)>
+<!ELEMENT person (name,age)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT age (#PCDATA)>
+
+// 在person1.xml文件中引入persondtd.dtd约束
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE persons SYSTEM 'persondtd.dtd'>
+
+<persons>
+    <person>
+        <name>张三</name>
+        <age>23</age>
+    </person>
+
+</persons>
+```
+
+#### 在xml文件内部引入
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE persons [
+        <!ELEMENT persons (person)>
+        <!ELEMENT person (name,age)>
+        <!ELEMENT name (#PCDATA)>
+        <!ELEMENT age (#PCDATA)>
+        ]>
+
+<persons>
+    <person>
+        <name>张三</name>
+        <age>23</age>
+    </person>
+
+</persons>
+```
+
+#### 引入网络dtd
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE persons PUBLIC "dtd文件的名称" "dtd文档的URL">
+
+<persons>
+    <person>
+        <name>张三</name>
+        <age>23</age>
+    </person>
+
+</persons>
+```
+
+----
+
 ### ④ 弊端
 
 它不能约束具体的数据类型。
@@ -313,6 +420,15 @@ XML是作为软件的配置文件而存在的，当软件刚开始运行的时�
 ~~~
 
 所以此时有了第二种约束文件：schema
+
+---
+
+### ⑤  schema和dtd的区别
+
+1. schema约束文件也是一个xml文件，符合xml的语法，这个文件的后缀名.xsd
+2. 一个xml中可以引用多个schema约束文件，多个schema使用名称空间区分（名称空间类似于java包名）
+3. dtd里面元素类型的取值比较单一常见的是PCDATA类型，但是在schema里面可以支持很多个数据类型
+4. schema 语法更加的复杂
 
 ----
 
@@ -416,7 +532,25 @@ schema本身也是一个xml文件，既然它本身也是一个xml文件，因�
 
 ---
 
-### ④ 引入schema约束文件步骤
+### ④ 编写schema约束
+
+1，创建一个文件，这个文件的后缀名为.xsd。
+2，定义文档声明
+3，schema文件的根标签为： <schema>
+4，在<schema>中定义属性：
+​	xmlns=http://www.w3.org/2001/XMLSchema
+5，在<schema>中定义属性 ：
+​	targetNamespace = 唯一的url地址，指定当前这个schema文件的名称空间。
+6，在<schema>中定义属性 ：
+​	elementFormDefault="qualified“，表示当前schema文件是一个质量良好的文件。
+7，通过element定义元素
+8，判断当前元素是简单元素还是复杂元素
+
+![05_schema约束编写](./assets/05_schema约束编写.png)
+
+----
+
+### ⑤ 引入schema约束
 
 这个xml文件还要写一个 `-instance` 表示它是顶级约束下的一个实例，格式是固定的
 
@@ -570,58 +704,7 @@ Document document = saxReader.read(new File("myxml\\xml\\student.xml"));
 </students>
 ~~~
 
-
-
 ```java
-// 上边是已经准备好的student.xml文件
-public class Student {
-    private String id;
-    private String name;
-    private int age;
-
-    public Student() {
-    }
-
-    public Student(String id, String name, int age) {
-        this.id = id;
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public String toString() {
-        return "Student{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
-}
-
 /**
  * 利用dom4j解析xml文件
  */
@@ -650,367 +733,171 @@ Document document = saxReader.read(new File("myxml\\xml\\student.xml"));
 
 下面一层一层的获取里面的内容就好了。
 
+<img src="./assets/image-20240511155033010.png" alt="image-20240511155033010" style="zoom:57%;" />
+
+字节解析的时候一定要一层一层的解析
+
 ~~~java
-//3.获取到根标签
-        Element rootElement = document.getRootElement();
-        //4.通过根标签来获取student标签
-        //elements():可以获取调用者所有的子标签.会把这些子标签放到一个集合中返回.
-        //elements("标签名"):可以获取调用者所有的指定的子标签,会把这些子标签放到一个集合中并返回
-        //List list = rootElement.elements();
-        List<Element> studentElements = rootElement.elements("student");
-        //System.out.println(list.size());
+//3.获取到根标签，并且根标签只能有一个，因此方法没有s，而是Element
+Element rootElement = document.getRootElement();
+//4.通过根标签来获取student标签
+//elements():可以获取调用者所有的子标签.会把这些子标签放到一个集合中返回.
+//elements("标签名"):可以获取调用者所有的指定的子标签,传入需要获取的子标签名，会把这些子标签放到一个集合中并返回
+//PS：只能获取到它最直接的子标签，再里面就获取不到了
+//List list = rootElement.elements();
+List<Element> studentElements = rootElement.elements("student");
+//System.out.println(list.size());
 
-        //用来装学生对象
-        ArrayList<Student> list = new ArrayList<>();
+//用来装学生对象
+ArrayList<Student> list = new ArrayList<>();
 
-        //5.遍历集合,得到每一个student标签
-        for (Element element : studentElements) {
-            //element依次表示每一个student标签
-  
-            //获取id这个属性
-            Attribute attribute = element.attribute("id");
-            //获取id的属性值
-            String id = attribute.getValue();
+//5.遍历集合,得到每一个student标签
+for (Element element : studentElements) {
+    //获取到标签名
+    sout(element.getName())
+    //element依次表示每一个student标签
 
-            //获取name标签
-            //element("标签名"):获取调用者指定的子标签
-            Element nameElement = element.element("name");
-            //获取这个标签的标签体内容
-            String name = nameElement.getText();
+    //获取id这个属性，由于id不是标签（element）而是属性，因此方法名叫attribute
+    Attribute attribute = element.attribute("id");
+    //获取id的属性值
+    String id = attribute.getValue();
 
-            //获取age标签
-            Element ageElement = element.element("age");
-            //获取age标签的标签体内容
-            String age = ageElement.getText();
+    //获取name标签
+    //element("标签名"):获取调用者指定的子标签
+    Element nameElement = element.element("name");
+    //获取这个标签的标签体内容
+    String name = nameElement.getText();
 
-//            System.out.println(id);
-//            System.out.println(name);
-//            System.out.println(age);
+    //获取age标签
+    Element ageElement = element.element("age");
+    //获取age标签的标签体内容
+    String age = ageElement.getText();
 
-            Student s = new Student(id,name,Integer.parseInt(age));
-            list.add(s);
-        }
-        //遍历操作
-        for (Student student : list) {
-            System.out.println(student);
-        }
-    }
+    //            System.out.println(id);
+    //            System.out.println(name);
+    //            System.out.println(age);
+    //将学生对象存储到集合中，属性的类型需要和XML中的保持一致
+    //以后我们在解析XML文件的时候，第一反应就是将它们都封装成一个对象，否则解析出来的数据都是零散的
+    Student s = new Student(id, name, Integer.parseInt(age));
+    list.add(s);
+}
+//遍历操作
+for (Student student : list) {
+    System.out.println(student);
 }
 ~~~
 
+----
 
+# 九、xpath
 
-### 1.5DTD约束【理解】
+## 1）介绍
 
-+ 什么是约束
+如果我不需要获取XML文件整体，而是获取文件中的一标签里面的值，就可以只用XPath。
 
-  用来限定xml文件中可使用的标签以及属性
+XPath在解析XML文档方面提供了独树一帜的路径思想，更加优雅、高效。
 
-+ 约束的分类
+XPath使用**路径表达式**来定位XML文档中的元素节点或属性节点。
 
-  + DTD
-  + schema
+这里的路径跟IO流学的路径不一样，IO流中写的是在硬盘中真实存在的。
 
-+ 编写DTD约束
+而在XML文件中路径也是从根节点开始，一层一层找到自己想要获取的标签。
 
-  + 步骤
+它有两种写法：单斜线和双个斜线的写法。
 
-    1. 创建一个文件，这个文件的后缀名为.dtd
+<img src="./assets/image-20240511163129670.png" alt="image-20240511163129670" style="zoom:67%;" />
 
-    2. 看xml文件中使用了哪些元素
+由于XPath也是第三方提供的，所以我们需要导入一个Jar包。
 
-       <!ELEMENT> 可以定义元素
+要注意的是 XPath技术依赖Dom4j技术，即XPath底层用的还是dom4j，只不过代码不需要我们自己写了而已。
 
-    3. 判断元素是简单元素还是复杂元素
+因此在使用XPath的时候，除了导XPath的jar包，还需要导入Dom4j的jar包。
 
-       简单元素：没有子元素。
-       复杂元素：有子元素的元素；
+<img src="./assets/image-20240511163332583.png" alt="image-20240511163332583" style="zoom:67%;" />
 
-  + 代码实现
+获取符合表达式的唯一元素时，如果有多个元素，就会获取第一个。
 
-    ```java
-    <!ELEMENT persons (person)>
-    <!ELEMENT person (name,age)>
-    <!ELEMENT name (#PCDATA)>
-    <!ELEMENT age (#PCDATA)>
-    ```
+<img src="./assets/image-20240511163224858.png" alt="image-20240511163224858" style="zoom:50%;" />
 
-+ 引入DTD约束
+---
 
-  + 引入DTD约束的三种方法
+## 2）代码示例
 
-    + 引入本地dtd
+XPath的四大检索方案
 
-      <!DOCTYPE 根元素名称 SYSTEM ‘DTD文件的路径'>
+- 绝对路径
 
-    + 在xml文件内部引入
+  <img src="./assets/image-20240511163616553.png" alt="image-20240511163616553" style="zoom:50%;" />
 
-      <!DOCTYPE 根元素名称 [ dtd文件内容 ]>
+- 相对路径
 
-    + 引入网络dtd
+- 全文检索
 
-      <!DOCTYPE 根元素的名称 PUBLIC "DTD文件名称" "DTD文档的URL">
+- 属性查找
 
-  + 代码实现
+![image-20240511163453123](./assets/image-20240511163453123.png)
 
-    + 引入本地DTD约束
+### 绝对路径检索单个
 
-      ```xml
-      // 这是persondtd.dtd文件中的内容,已经提前写好
-      <!ELEMENT persons (person)>
-      <!ELEMENT person (name,age)>
-      <!ELEMENT name (#PCDATA)>
-      <!ELEMENT age (#PCDATA)>
-      
-      // 在person1.xml文件中引入persondtd.dtd约束
-      <?xml version="1.0" encoding="UTF-8" ?>
-      <!DOCTYPE persons SYSTEM 'persondtd.dtd'>
-      
-      <persons>
-          <person>
-              <name>张三</name>
-              <age>23</age>
-          </person>
-      
-      </persons>
-      ```
+<img src="./assets/image-20240511163718769.png" alt="image-20240511163718769" style="zoom:67%;" />
 
-    + 在xml文件内部引入
+----
 
-      ```xml
-      <?xml version="1.0" encoding="UTF-8" ?>
-      <!DOCTYPE persons [
-              <!ELEMENT persons (person)>
-              <!ELEMENT person (name,age)>
-              <!ELEMENT name (#PCDATA)>
-              <!ELEMENT age (#PCDATA)>
-              ]>
-      
-      <persons>
-          <person>
-              <name>张三</name>
-              <age>23</age>
-          </person>
-      
-      </persons>
-      ```
+### 相对路径检索
 
-    + 引入网络dtd
+获取的时候就不是使用document去获取了，因为相对路径应该是有个参照物的。
 
-      ```xml
-      <?xml version="1.0" encoding="UTF-8" ?>
-      <!DOCTYPE persons PUBLIC "dtd文件的名称" "dtd文档的URL">
-      
-      <persons>
-          <person>
-              <name>张三</name>
-              <age>23</age>
-          </person>
-      
-      </persons>
-      ```
-
-+ DTD语法
-
-  + 定义元素
-
-    定义一个元素的格式为：<!ELEMENT 元素名 元素类型>
-    简单元素：
-
-    ​	EMPTY: 表示标签体为空
-
-    ​	ANY: 表示标签体可以为空也可以不为空
-
-    ​	PCDATA: 表示该元素的内容部分为字符串
-
-    复杂元素：
-    ​	直接写子元素名称. 多个子元素可以使用","或者"|"隔开；
-    ​	","表示定义子元素的顺序 ; "|": 表示子元素只能出现任意一个
-    ​	"?"零次或一次, "+"一次或多次, "*"零次或多次;如果不写则表示出现一次
-
-    ![03_DTD语法定义元素](./assets/03_DTD语法定义元素.png)
-
-
-  + 定义属性
-
-    格式
-
-    定义一个属性的格式为：<!ATTLIST 元素名称 属性名称 属性的类型 属性的约束>
-    属性的类型：
-    ​	CDATA类型：普通的字符串
-
-    属性的约束:
-
-    ​	// #REQUIRED： 必须的
-    ​	// #IMPLIED： 属性不是必需的
-    ​	// #FIXED value：属性值是固定的
-
-  + 代码实现
-
-    ```java
-    <!ELEMENT persons (person+)>
-    <!ELEMENT person (name,age)>
-    <!ELEMENT name (#PCDATA)>
-    <!ELEMENT age (#PCDATA)>
-    <!ATTLIST person id CDATA #REQUIRED>
-    
-    <?xml version="1.0" encoding="UTF-8" ?>
-    <!DOCTYPE persons SYSTEM 'persondtd.dtd'>
-    
-    <persons>
-        <person id="001">
-            <name>张三</name>
-            <age>23</age>
-        </person>
-    
-        <person id = "002">
-            <name>张三</name>
-            <age>23</age>
-        </person>
-    
-    </persons>
-    ​```
-    ```
-
-### 1.6schema约束【理解】
-
-+ schema和dtd的区别
-
-  1. schema约束文件也是一个xml文件，符合xml的语法，这个文件的后缀名.xsd
-  2. 一个xml中可以引用多个schema约束文件，多个schema使用名称空间区分（名称空间类似于java包名）
-  3. dtd里面元素类型的取值比较单一常见的是PCDATA类型，但是在schema里面可以支持很多个数据类型
-  4. schema 语法更加的复杂
-
-  ![04_schema约束介绍](./assets/04_schema约束介绍.png)
-
-+ 编写schema约束
-
-  + 步骤
-
-    1，创建一个文件，这个文件的后缀名为.xsd。
-    2，定义文档声明
-    3，schema文件的根标签为： <schema>
-    4，在<schema>中定义属性：
-    ​	xmlns=http://www.w3.org/2001/XMLSchema
-    5，在<schema>中定义属性 ：
-    ​	targetNamespace =唯一的url地址，指定当前这个schema文件的名称空间。
-    6，在<schema>中定义属性 ：
-    ​	elementFormDefault="qualified“，表示当前schema文件是一个质量良好的文件。
-    7，通过element定义元素
-    8，判断当前元素是简单元素还是复杂元素
-
-    ![05_schema约束编写](./assets/05_schema约束编写.png)
-
-  + 代码实现
-
-    ```java
-    <?xml version="1.0" encoding="UTF-8" ?>
-    <schema
-        xmlns="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://www.itheima.cn/javase"
-        elementFormDefault="qualified"
-    >
-    
-        <!--定义persons复杂元素-->
-        <element name="persons">
-            <complexType>
-                <sequence>
-                    <!--定义person复杂元素-->
-                    <element name = "person">
-                        <complexType>
-                            <sequence>
-                                <!--定义name和age简单元素-->
-                                <element name = "name" type = "string"></element>
-                                <element name = "age" type = "string"></element>
-                            </sequence>
-                            
-                        </complexType>
-                    </element>
-                </sequence>
-            </complexType>
-    
-        </element>
-    
-    </schema>
-    
-    ```
-
-+ 引入schema约束
-
-  + 步骤
-
-    1，在根标签上定义属性xmlns="http://www.w3.org/2001/XMLSchema-instance"
-    2，通过xmlns引入约束文件的名称空间
-    3，给某一个xmlns属性添加一个标识，用于区分不同的名称空间
-    ​	格式为: xmlns:标识=“名称空间地址” ,标识可以是任意的，但是一般取值都是xsi
-    4，通过xsi:schemaLocation指定名称空间所对应的约束文件路径
-    ​	格式为：xsi:schemaLocation = "名称空间url 文件路径“
-
-  + 代码实现
-
-    ```java
-    <?xml version="1.0" encoding="UTF-8" ?>
-    
-    <persons
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="http://www.itheima.cn/javase"
-        xsi:schemaLocation="http://www.itheima.cn/javase person.xsd"
-    >
-        <person>
-            <name>张三</name>
-            <age>23</age>
-        </person>
-    
-    </persons>
-    ​```
-    ```
-
-+ schema约束定义属性
-
-  + 代码示例
-
-    ```java
-    <?xml version="1.0" encoding="UTF-8" ?>
-    <schema
-        xmlns="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://www.itheima.cn/javase"
-        elementFormDefault="qualified"
-    >
-    
-        <!--定义persons复杂元素-->
-        <element name="persons">
-            <complexType>
-                <sequence>
-                    <!--定义person复杂元素-->
-                    <element name = "person">
-                        <complexType>
-                            <sequence>
-                                <!--定义name和age简单元素-->
-                                <element name = "name" type = "string"></element>
-                                <element name = "age" type = "string"></element>
-                            </sequence>
-                            
-                            <!--定义属性，required( 必须的)/optional( 可选的)-->
-                            <attribute name="id" type="string" use="required"></attribute>
-                        </complexType>
-                        
-                    </element>
-                </sequence>
-            </complexType>
-        </element>
-        
-    </schema>
-    
-    <?xml version="1.0" encoding="UTF-8" ?>
-    <persons
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="http://www.itheima.cn/javase"
-        xsi:schemaLocation="http://www.itheima.cn/javase person.xsd"
-    >
-        <person id="001">
-            <name>张三</name>
-            <age>23</age>
-        </person>
-    
-    </persons>
-    ```
+<img src="./assets/image-20240511163743552.png" alt="image-20240511163743552" style="zoom: 50%;" />
+
+一开始的 `.` 表示自己
+
+<img src="./assets/image-20240511163936424.png" alt="image-20240511163936424" style="zoom:67%;" />
+
+----
+
+### 全文检索
+
+全文检索：即在整个文档中查找。
+
+它是两个 `/`，如果使用 `//` 跟 `/` 相结合的方式查找，一定有一个前提条件：name一定是contact的子节点
+
+`//contact//name`：可以跨级
+
+<img src="./assets/image-20240511164054449.png" alt="image-20240511164054449" style="zoom:50%;" />
+
+<img src="./assets/image-20240511164634218.png" alt="image-20240511164634218" style="zoom:50%;" />
+
+<img src="./assets/image-20240511164140490.png" alt="image-20240511164140490" style="zoom:67%;" />
+
+<img src="./assets/image-20240511164908626.png" alt="image-20240511164908626" style="zoom:67%;" />
+
+---
+
+### 属性检索
+
+在全文中搜索属性，或者带属性的元素
+
+ 语法如下
+
+<img src="./assets/image-20240511165004027.png" alt="image-20240511165004027" style="zoom:67%;" />
+
+泛型需要写 `Attribute`
+
+<img src="./assets/image-20240511170417237.png" alt="image-20240511170417237" style="zoom:67%;" />
+
+---
+
+如果想要让父级标签有文本内容，写一下即可
+
+<img src="./assets/image-20240511170855457.png" alt="image-20240511170855457" style="zoom:67%;" />
+
+如果打印出来出来的有很多空格，表示 `getText()` 将很多空格、换行也获取到了。
+
+但是一般带有子标签的父级标签我们不会去写它的文本内容。
+
+<img src="./assets/image-20240511170751055.png" alt="image-20240511170751055" style="zoom:60%;" />
+
+---
+
+<img src="./assets/image-20240511171029222.png" alt="image-20240511171029222" style="zoom:67%;" />
+
