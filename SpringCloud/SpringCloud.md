@@ -8662,8 +8662,9 @@ PUT /heima/_doc/1
 ```json
 POST /{索引库名}/_update/文档id
 {
-    "doc": {
-         "字段名": "新的值",
+    "doc": {
+        "字段名": "新的值",
+        "字段名": "新的值"
     }
 }
 ```
@@ -8673,9 +8674,10 @@ POST /{索引库名}/_update/文档id
 ```json
 POST /heima/_update/1
 {
-  "doc": {
-    "email": "ZhaoYun@itcast.cn"
-  }
+    "doc": {
+        "name": "Rose",
+        "email": "ZhaoYun@itcast.cn"
+    }
 }
 ```
 
@@ -8984,7 +8986,7 @@ PUT /hotel
 
 分为三步：
 
-1）引入es的RestHighLevelClient依赖：
+### 1）引入es的RestHighLevelClient依赖
 
 ```xml
 <dependency>
@@ -8993,9 +8995,9 @@ PUT /hotel
 </dependency>
 ```
 
+----
 
-
-2）因为SpringBoot默认的ES版本是7.6.2
+### 2）因为SpringBoot默认的ES版本是7.6.2
 
 <img src="./assets/image-20240509205236163.png" alt="image-20240509205236163" style="zoom:67%;" />
 
@@ -9010,9 +9012,9 @@ PS：如果ES不是在SpringBoot环境下创建的，那么直接在引入依赖
 </properties>
 ```
 
+----
 
-
-3）初始化RestHighLevelClient：
+### 3）初始化RestHighLevelClient
 
 客户端的创建方式是通过 `new` 的方式，然后在参数中通过 `RestClient` 去完成构建，构建的时候需要指定ES的ip和端口。
 
@@ -9022,7 +9024,7 @@ PS：如果ES不是在SpringBoot环境下创建的，那么直接在引入依赖
 
 我们将它定义为成员变量，因为未来我们会在这里写很多很多的单元测试，如果在每一个单元测试中都去写这个对象的初始化，就很麻烦了，定义为成员变量就可以复用。
 
-既然定义为了成员变量，就得提前完成初始化，因此可以使用单元测试中的BeforeEach注解，可以在一开始就完成对象的初始化
+既然定义为了成员变量，就得提前完成初始化，因此可以使用单元测试中的Before注解，可以在一开始就完成对象的初始化
 
 <img src="./assets/image-20240509210104469.png" alt="image-20240509210104469" style="zoom:67%;" />
 
@@ -9042,9 +9044,11 @@ void setUp() {
 }
 ```
 
-客户端创建完了，还需要销毁，因此这里加一个AfterEach注解
+客户端创建完了，还需要销毁，因此这里加一个After注解
 
 <img src="./assets/image-20240511182637598.png" alt="image-20240511182637598" style="zoom:50%;" />
+
+完整代码
 
 ```java
 package cn.itcast.hotel;
@@ -9104,7 +9108,7 @@ public class HotelIndexTest {
 
 - 1）创建Request对象。因为是创建索引库的操作，因此Request是CreateIndexRequest。
 
-- 2）添加请求参数，其实就是DSL的JSON参数部分。因为json字符串很长，这里是定义了静态字符串常量MAPPING_TEMPLATE，让代码看起来更加优雅。第二个参数指定数据类型是JSON。
+- 2）添加请求参数，其实就是DSL的JSON参数部分。因为json字符串很长，这里是定义了静态字符串常量MAPPING_TEMPLATE（另建一个类，专门存放这个常量），让代码看起来更加优雅。第二个参数指定数据类型是JSON。
 
 - 3）发送请求，Java代码要做的事就是用Java代码来组织DSL，然后去发请求。其中 `indices()` 方法很重要，`indices` 就是 `index` 的复数形式，代表的就是索引库的索引操作。
 
@@ -9176,7 +9180,7 @@ public class HotelConstants {
 
 在hotel-demo中的HotelIndexTest测试类中，编写单元测试，实现创建索引：
 
-如果忘记了没关系，我们可以先去调用发请求的方法，然后根据参数想起要创建的东西
+如果忘记怎么写代码了没关系，我们可以先去调用发请求的方法，然后根据参数想起要创建的东西
 
 ```java
 @Test
@@ -9195,8 +9199,6 @@ void createHotelIndex() throws IOException {
 <img src="./assets/image-20240509215056349.png" alt="image-20240509215056349" style="zoom:50%;" />
 
 可以发现查询成功，证明我们的索引库创建没有问题。
-
-
 
 ----
 
@@ -9285,14 +9287,16 @@ JavaRestClient操作elasticsearch的流程基本类似。核心是client.indices
 
 
 
+----
 
+# 95.RestClient操作文档
 
-# 5.RestClient操作文档
+<img src="./assets/image-20240512203601706.png" alt="image-20240512203601706" style="zoom:50%;" />
 
 为了与索引库操作分离，我们再次参加一个测试类，做两件事情：
 
 - 初始化RestHighLevelClient
-- 我们的酒店数据在数据库，需要利用IHotelService去查询，所以注入这个接口
+- 我们的酒店数据在数据库，需要利用IHotelService去查询，所以需要在类上加上@SpringBootTest，然后注入这个接口
 
 ```java
 package cn.itcast.hotel;
@@ -9330,15 +9334,13 @@ public class HotelDocumentTest {
 
 ```
 
+----
 
-
-
-
-## 5.1.新增文档
+## 一、新增文档
 
 我们要将数据库的酒店数据查询出来，写入elasticsearch中。
 
-### 5.1.1.索引库实体类
+### 1）索引库实体类
 
 数据库查询后的结果是一个Hotel类型的对象。结构如下：
 
@@ -9399,6 +9401,7 @@ public class HotelDoc {
         this.city = hotel.getCity();
         this.starName = hotel.getStarName();
         this.business = hotel.getBusiness();
+        // location这里会进行拼接
         this.location = hotel.getLatitude() + ", " + hotel.getLongitude();
         this.pic = hotel.getPic();
     }
@@ -9406,9 +9409,9 @@ public class HotelDoc {
 
 ```
 
+-----
 
-
-### 5.1.2.语法说明
+### 2）语法说明
 
 新增文档的DSL语句如下：
 
@@ -9420,23 +9423,21 @@ POST /{索引库名}/_doc/1
 }
 ```
 
-对应的java代码如图：
+对应的java代码如图
 
 ![image-20210720230027240](assets/image-20210720230027240-1711335607294.png)
-
-
 
 可以看到与创建索引库类似，同样是三步走：
 
 - 1）创建Request对象
 - 2）准备请求参数，也就是DSL中的JSON文档
-- 3）发送请求
+- 3）发送请求，这里的 `client.index()` 就是在创建倒排索引，后面的 `RequestOptions` 依然采用 `DEFAULT`
 
 变化的地方在于，这里直接使用client.xxx()的API，不再需要client.indices()了。
 
+-----
 
-
-### 5.1.3.完整代码
+### 3）完整代码
 
 我们导入酒店数据，基本流程一致，但是需要考虑几点变化：
 
@@ -9458,14 +9459,14 @@ POST /{索引库名}/_doc/1
 ```java
 @Test
 void testAddDocument() throws IOException {
-    // 1.根据id查询酒店数据
+    // 1.根据id查询酒店数据，由于id是bigint即long类型，因此后面加l
     Hotel hotel = hotelService.getById(61083L);
     // 2.转换为文档类型
     HotelDoc hotelDoc = new HotelDoc(hotel);
     // 3.将HotelDoc转json
     String json = JSON.toJSONString(hotelDoc);
 
-    // 1.准备Request对象
+    // 1.准备Request对象，由于索引库中对于id的要求都是keyword类型，因此这里传入id的时候需要传入字符串
     IndexRequest request = new IndexRequest("hotel").id(hotelDoc.getId().toString());
     // 2.准备Json文档
     request.source(json, XContentType.JSON);
@@ -9474,13 +9475,11 @@ void testAddDocument() throws IOException {
 }
 ```
 
+-----
 
+## 二、查询文档
 
-
-
-## 5.2.查询文档
-
-### 5.2.1.语法说明
+### 1）语法说明
 
 查询的DSL语句如下：
 
@@ -9490,14 +9489,14 @@ GET /hotel/_doc/{id}
 
 非常简单，因此代码大概分两步：
 
-- 准备Request对象
+- 准备Request对象（传入索引库名和id）
 - 发送请求
 
 不过查询的目的是得到结果，解析为HotelDoc，因此难点是结果的解析。完整代码如下：
 
 ![image-20210720230811674](assets/image-20210720230811674-1711335607294.png)
 
-可以看到，结果是一个JSON，其中文档放在一个`_source`属性中，因此解析就是拿到`_source`，反序列化为Java对象即可。
+可以看到，结果是一个JSON，其中文档放在一个`_source`属性中，因此解析就是拿到`_source`，调用 `getSourceAsString()` 当，即当做字符串返回，那就是一个JSON风格，因此它得到的结果是一个JSON对象，反序列化为Java对象即可。
 
 与之前类似，也是三步走：
 
@@ -9505,13 +9504,13 @@ GET /hotel/_doc/{id}
 - 2）发送请求，得到结果。因为是查询，这里调用client.get()方法
 - 3）解析结果，就是对JSON做反序列化
 
+----
 
+### 2）完整代码
 
+在hotel-demo的HotelDocumentTest测试类中，编写单元测试
 
-
-### 5.2.2.完整代码
-
-在hotel-demo的HotelDocumentTest测试类中，编写单元测试：
+所及代码怎么写都没关系，可以从后往前写，根据参数提示再去创建对应的对象。
 
 ```java
 @Test
@@ -9523,59 +9522,22 @@ void testGetDocumentById() throws IOException {
     // 3.解析响应结果
     String json = response.getSourceAsString();
 
+    //利用fastjson实现反序列化，第二个传入得到对象的类型即可，如果不指定返回的就是Object类型的对象
     HotelDoc hotelDoc = JSON.parseObject(json, HotelDoc.class);
     System.out.println(hotelDoc);
 }
 ```
 
+----
 
+## 三、修改文档
 
-
-
-## 5.3.删除文档
-
-删除的DSL为是这样的：
-
-```json
-DELETE /hotel/_doc/{id}
-```
-
-与查询相比，仅仅是请求方式从DELETE变成GET，可以想象Java代码应该依然是三步走：
-
-- 1）准备Request对象，因为是删除，这次是DeleteRequest对象。要指定索引库名和id
-- 2）准备参数，无参
-- 3）发送请求。因为是删除，所以是client.delete()方法
-
-
-
-在hotel-demo的HotelDocumentTest测试类中，编写单元测试：
-
-```java
-@Test
-void testDeleteDocument() throws IOException {
-    // 1.准备Request
-    DeleteRequest request = new DeleteRequest("hotel", "61083");
-    // 2.发送请求
-    client.delete(request, RequestOptions.DEFAULT);
-}
-```
-
-
-
-
-
-
-
-## 5.4.修改文档
-
-### 5.4.1.语法说明
+### 1）语法说明
 
 修改我们讲过两种方式：
 
 - 全量修改：本质是先根据id删除，再新增
 - 增量修改：修改文档中的指定字段值
-
-
 
 在RestClient的API中，全量修改与新增的API完全一致，判断依据是ID：
 
@@ -9594,11 +9556,13 @@ void testDeleteDocument() throws IOException {
 - 2）准备参数。也就是JSON文档，里面包含要修改的字段
 - 3）更新文档。这里调用client.update()方法
 
+第二步准备参数的写法有点特殊，它里面接收的是一个可变参数，参数间用逗号各个，每两个一对。
 
+<img src="./assets/image-20240512211700104.png" alt="image-20240512211700104" style="zoom:50%;" />
 
+----
 
-
-### 5.4.2.完整代码
+### 2）完整代码
 
 在hotel-demo的HotelDocumentTest测试类中，编写单元测试：
 
@@ -9617,11 +9581,39 @@ void testUpdateDocument() throws IOException {
 }
 ```
 
+----
 
+## 四、删除文档
 
+删除的DSL为是这样的：
 
+```json
+DELETE /hotel/_doc/{id}
+```
 
-## 5.5.批量导入文档
+与查询相比，仅仅是请求方式从DELETE变成GET，可以想象Java代码应该依然是三步走：
+
+- 1）准备Request对象，因为是删除，这次是DeleteRequest对象。要指定索引库名和id
+- 2）准备参数，无参
+- 3）发送请求。因为是删除，所以是client.delete()方法
+
+在hotel-demo的HotelDocumentTest测试类中，编写单元测试：
+
+```java
+@Test
+void testDeleteDocument() throws IOException {
+    // 1.准备Request
+    DeleteRequest request = new DeleteRequest("hotel", "61083");
+    // 2.发送请求
+    client.delete(request, RequestOptions.DEFAULT);
+}
+```
+
+----
+
+## 五、批量导入文档
+
+### 1）需求
 
 案例需求：利用BulkRequest批量将数据库数据导入到索引库中。
 
@@ -9633,9 +9625,9 @@ void testUpdateDocument() throws IOException {
 
 - 利用JavaRestClient中的BulkRequest批处理，实现批量新增文档
 
+----
 
-
-### 5.5.1.语法说明
+### 2）语法说明
 
 批量处理BulkRequest，其本质就是将多个普通的CRUD请求组合在一起发送。
 
@@ -9653,19 +9645,17 @@ void testUpdateDocument() throws IOException {
 
 ![image-20210720232431383](assets/image-20210720232431383-1711335607294.png)
 
-
-
 其实还是三步走：
 
-- 1）创建Request对象。这里是BulkRequest
+- 1）创建Request对象。这里是BulkRequest，这里面不需要写参数，它的作用就是将其他的请求进行一个封装
 - 2）准备参数。批处理的参数，就是其它Request对象，这里就是多个IndexRequest
 - 3）发起请求。这里是批处理，调用的方法为client.bulk()方法
 
-
-
 我们在导入酒店数据时，将上述代码改造成for循环处理即可。
 
-### 5.5.2.完整代码
+----
+
+### 3）完整代码
 
 在hotel-demo的HotelDocumentTest测试类中，编写单元测试：
 
@@ -9691,11 +9681,9 @@ void testBulkRequest() throws IOException {
 }
 ```
 
+----
 
-
-
-
-## 5.6.小结
+## 六、小结
 
 文档操作的基本步骤：
 
@@ -9709,51 +9697,80 @@ void testBulkRequest() throws IOException {
 
 ---
 
-# 分布式搜索引擎02
+# ----------------------------------------------
 
-在昨天的学习中，我们已经导入了大量数据到elasticsearch中，实现了elasticsearch的数据存储功能。但elasticsearch最擅长的还是搜索和数据分析。
+# Day6 分布式搜索引擎02
+
+在昨天的学习中，我们已经导入了大量酒店数据到elasticsearch中，实现了elasticsearch的数据存储功能。但数据存储不是目的，elasticsearch最擅长的还是搜索和数据分析。
 
 所以今天，我们研究下elasticsearch的数据搜索功能。我们会分别使用**DSL**和**RestClient**实现搜索。
 
+----
 
-
-# 0.学习目标
-
-
-
-
-
-# 1.DSL查询文档
+# DSL查询文档
 
 elasticsearch的查询依然是基于JSON风格的DSL来实现的。
 
-## 1.1.DSL查询分类
+# 101.DSL查询分类
 
-Elasticsearch提供了基于JSON的DSL（[Domain Specific Language](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html)）来定义查询。常见的查询类型包括：
+## 一、介绍
 
-- **查询所有**：查询出所有数据，一般测试用。例如：match_all
+Elasticsearch提供了基于JSON的DSL来定义查询，也就是说JSON去描述我们的查询条件，然后发送给ES服务，ES服务就可以基于这些查询条件返回结果给你。
 
-- **全文检索（full text）查询**：利用分词器对用户输入内容分词，然后去倒排索引库中匹配。例如：
+DSL的官方文档：https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
+
+可以看见DSL中包含的查询的种类非常的多，因此我们不太可能逐一学习完，我们会挑几个最常见的，如果以后有需要也可以来官网上查看剩下的查询。
+
+![image-20240512213642586](./assets/image-20240512213642586.png)
+
+常见的查询类型包括：
+
+- **查询所有**：查询出所有数据（即不加条件限制，理论上会查询所有，但是它会有一个分页的设置，一次可能只能查询20条左右），一般测试用。例如：match_all
+
+- **全文检索（full text）查询**：全文检索查询跟之前讲倒排索引查询的时候是一样的了。
+
+  原理：利用分词器对用户输入内容分词，得到一系列的词条，然后拿着这些词条去倒排索引库中匹配，匹配到了词条，就可以找到文档所对应的id，然后再拿着文档id查询文档，返回给用户。
+
+  它包含的种类非常多，其中有两种常见的：
+
   - match_query
   - multi_match_query
-- **精确查询**：根据精确词条值查找数据，一般是查找keyword、数值、日期、boolean等类型字段。例如：
-  - ids
-  - range
-  - term
-- **地理（geo）查询**：根据经纬度查询。例如：
+
+- **精确查询**：根据精确词条值查找数据，一般是查找keyword、数值、日期、boolean等类型字段，这些类型共同的特点是：不需要分词，但是它们也会建立倒排索引，即将它们的内容整体作为一个词条存入倒排索引，因此在查找的时候也不需要分词了，这就是精确查询。而全文查询就是查询分词的字段。
+  
+  常见的精确查询有以下这些：
+  
+  - ids（根据id精确匹配）
+  - range（根据数值范围做查询）
+  - term（按照数据的值进行查询）
+  
+- **地理（geo）查询**：根据经纬度查询。
+  
+  之前学习的时候讲过：ES中的地理坐标是有一种特殊表示的，所以它在查询的时候也有一种特殊的查询。
+  
+  例如：
+  
   - geo_distance
   - geo_bounding_box
-- **复合（compound）查询**：复合查询可以将上述各种查询条件组合起来，合并查询条件。例如：
-  - bool
-  - function_score
+  
+- **复合（compound）查询**：这种查询本身是没有查询条件的，复合查询可以将上述各种查询条件组合起来，合并一个新的查询查询条件。
+  
+  不同的符合查询组合的方式和目的是不一样的，例如：
+  
+  - bool（利用布尔/逻辑运算将其他查询组合起来）
+  - function_score（为了控制相关度算分的）
 
+----
 
+## 二、代码示例
 
 查询的语法基本一致：
 
 ```json
 GET /indexName/_search
+// DSL就是来描述查询的条件的
 {
+  //query：查询
   "query": {
     "查询类型": {
       "查询条件": "条件值"
@@ -9764,8 +9781,8 @@ GET /indexName/_search
 
 我们以查询所有为例，其中：
 
-- 查询类型为match_all
-- 没有查询条件
+- 查询类型为match_all，即查询所有
+- 查询所有没有查询条件，因此后面就空出来了
 
 ```json
 // 查询所有
@@ -9780,13 +9797,20 @@ GET /indexName/_search
 
 其它查询无非就是**查询类型**、**查询条件**的变化。
 
+返回的结果是一个对象，对象里面有很多属性。
+
+- `took`：花了多少时间，有没有超时
+- `hits`：命中的数据，点开，`total` 中的 `value` 表示搜索到的总条数；`max_score` 表示文档的相关得分， `hits` 就是真正的文档了，它是一个数组，这个数组中就装了一个一个的文档对象
+
+总共两百多条，但是 `hits` 中只会显示十多条的数据返回，因为它避免你一下子全查出来，对内存、服务器来讲有过多的压力。
+
+![image-20240512215208292](./assets/image-20240512215208292.png)
 
 
-## 1.2.全文检索查询
 
+----
 
-
-### 1.2.1.使用场景
+# 102.全文检索查询
 
 全文检索查询的基本流程如下：
 
