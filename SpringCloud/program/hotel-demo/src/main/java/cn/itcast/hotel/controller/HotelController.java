@@ -6,6 +6,9 @@ import cn.itcast.hotel.service.IHotelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/hotel")
 public class HotelController {
@@ -18,8 +21,8 @@ public class HotelController {
         return hotelService.search(params);
     }
 
-    @GetMapping("/filters")
-    public PageResult filters(@RequestBody RequestParams params) {
-
+    @PostMapping("/filters")
+    public Map<String, List<String>> getFilters(@RequestBody RequestParams params){
+        return hotelService.filters(params);
     }
 }

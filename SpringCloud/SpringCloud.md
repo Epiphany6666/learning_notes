@@ -11522,9 +11522,9 @@ GET /indexName/_search
     },
     {
       "_geo_distance" : {
-          "FIELD" : "纬度，经度",
-          "order" : "asc",
-          "unit" : "km"
+          "FIELD" : "纬度，经度",// 前端传进来的坐标，即中心点坐标
+          "order" : "asc", // 排序方式
+          "unit" : "km" // 单位
       }
     }
   ]
@@ -11564,8 +11564,11 @@ public PageResult search(RequestParams params) {
         String location = params.getLocation();
         if (location != null && !location.equals("")) {
             request.source().sort(SortBuilders
-                                  .geoDistanceSort("location", new GeoPoint(location))
+                                  .geoDistanceSort("location", 
+                                                   // 中心点坐标有多种表示方式，可以指定维度和经度，具体的看代码下面的图片
+                                                   new GeoPoint(location))
                                   .order(SortOrder.ASC)
+                                  // 单位使用的是枚举
                                   .unit(DistanceUnit.KILOMETERS)
                                  );
         }
@@ -11579,6 +11582,12 @@ public PageResult search(RequestParams params) {
     }
 }
 ```
+
+中心点坐标有多种表示方式，可以指定维度和经度，也可以用geohashes，哈希的这种先对坐标做哈希处理，我们没用过。
+
+因此这两种都不符合，只能用GeoPoint，它的构造方法里面接收的是一个字符串，前面维度后面经度，也就是我们的location。
+
+<img src="./assets/image-20240514130412263.png" alt="image-20240514130412263" style="zoom:67%;" />
 
 ---
 
@@ -11648,7 +11657,7 @@ public class HotelDoc {
 
 2）修改HotelService中的handleResponse方法
 
-![image-20210722100613966](assets/image-20210722100613966-1711335630925.png)
+<img src="assets/image-20210722100613966-1711335630925.png" alt="image-20210722100613966" style="zoom:67%;" />
 
 
 
@@ -11664,19 +11673,15 @@ public class HotelDoc {
 
 需求：让指定的酒店在搜索结果中排名置顶
 
-### 4.4.1.需求分析
+### 1）需求分析
 
-要让指定酒店在搜索结果中排名置顶，效果如图：
+要让指定酒店在搜索结果中排名置顶，效果如图，看酒店右上角，有一个广告的标识：
 
 ![image-20210722100947292](assets/image-20210722100947292-1711335630925.png)
 
 页面会给指定的酒店添加**广告**标记。
 
-
-
 那怎样才能让指定的酒店排名置顶呢？
-
-
 
 我们之前学习过的function_score查询可以影响算分，算分高了，自然排名也就高了。而function_score包含3个要素：
 
@@ -11709,17 +11714,17 @@ public class HotelDoc {
 
 3. 修改search方法，添加function score功能，给isAD值为true的酒店增加权重
 
+---
 
-
-### 4.4.2.修改HotelDoc实体
+### 2）修改HotelDoc实体
 
 给`cn.itcast.hotel.pojo`包下的HotelDoc类添加isAD字段：
 
-![image-20210722101908062](assets/image-20210722101908062-1711335630925.png)
+<img src="assets/image-20210722101908062-1711335630925.png" alt="image-20210722101908062" style="zoom:67%;" />
 
+----
 
-
-### 4.4.3.添加广告标记
+### 3）添加广告标记
 
 接下来，我们挑几个酒店，添加isAD字段，设置为true：
 
@@ -11750,9 +11755,9 @@ POST /hotel/_update/2056105938
 }
 ```
 
+----
 
-
-### 4.4.4.添加算分函数查询
+### 4）添加算分函数查询
 
 接下来我们就要修改查询条件了。之前是用的boolean 查询，现在要改成function_socre查询。
 
@@ -11765,6 +11770,12 @@ function_score查询结构如下：
 
 
 对应的JavaAPI如下：
+
+`functionScoreQuery` 构建的时候需要传入两个参数：原始查询条件、function。
+
+第二个参数对应的就是一个function数据，跟DSL是一样的。
+
+`FilterFunctionBuilder` 是 `FunctionScoreQueryBuilder` 的内部类 的数据
 
 ![image-20210722102850818](assets/image-20210722102850818-1711335630925.png)
 
@@ -11829,17 +11840,21 @@ private void buildBasicQuery(RequestParams params, SearchRequest request) {
 
 
 
+----
+
 # 分布式搜索引擎03
 
+# 120.数据聚合
 
+我们以前在学习MySQL的时候，也有聚合功能，在MySQL中有一种东西叫：聚合函数，我们可以利用avg求平均值、max求最大值、min求最小值、sum求和等等，MySQL的聚合函数一般需要结合 `group by` 分组去实现。
 
-# 0.学习目标
+ES也具备MySQL类似的这种功能，而且还做了更丰富、更完善的其他的一些聚合功能。
 
+**[聚合（](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)[aggregations](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)[）](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)**可以让我们极其方便的实现对数据的统计、分析、运算。
 
+官网：https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
 
-# 1.数据聚合
-
-**[聚合（](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)[aggregations](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)[）](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)**可以让我们极其方便的实现对数据的统计、分析、运算。例如：
+例如：
 
 - 什么品牌的手机最受欢迎？
 - 这些手机的平均价格、最高价格、最低价格？
@@ -11847,59 +11862,85 @@ private void buildBasicQuery(RequestParams params, SearchRequest request) {
 
 实现这些统计功能的比数据库的sql要方便的多，而且查询速度非常快，可以实现近实时搜索效果。
 
-## 1.1.聚合的种类
+## 一、聚合的种类
 
 聚合常见的有三类：
 
 - **桶（Bucket）**聚合：用来对文档做分组
-  - TermAggregation：按照文档字段值分组，例如按照品牌值分组、按照国家分组
-  - Date Histogram：按照日期阶梯分组，例如一周为一组，或者一月为一组
+  
+  这种就类似于MySQL中的group by了，那它为什么要叫做桶呢？
 
+  例如在小区中，都会有这样的一个垃圾桶，垃圾桶上都会有标识，表示不同的垃圾，这就是在对垃圾做分类。
+  
+  因此桶就是起一个分类和分组的作用，因此 `bucket聚合` 就是对数据做分组的。
+  
+  当然bucket中的功能要比group by丰富的多，它里面有很多类型，比较常见的有下面两个
+  
+  - TermAggregation：按照文档字段值分组，值一样的就放到一个桶中，这个跟MySQL中的group by效果是一致的。例如按照品牌值分组、按照国家分组
+  
+  - Date Histogram：按照日期阶梯分组，例如一周为一组，或者一月为一组
+  
+    这个功能更如果在MySQL中实现，就复杂多了，在ES中是需要一个DateHistogram
+  
 - **度量（Metric）**聚合：用以计算一些值，比如：最大值、最小值、平均值等
+  
+  度量顾名思义就是做运算，度量聚合并且肯定是针对数值类型的聚合，肯定是不能根据字符串做聚合。
+  
   - Avg：求平均值
   - Max：求最大值
   - Min：求最小值
   - Stats：同时求max、min、avg、sum等
+  
 - **管道（pipeline）**聚合：其它聚合的结果为基础做聚合
 
+  例如对酒店数据按照品牌数据做一个分组，这个就属于Bucket聚合；但是在分组的同时，我想算一算它的价格、平均值怎么样，这个时候就是度量聚合了，算完平均值以后，又要对平均值做排序 / 平均值中求最大值最小值，这个时候就是对度量结果再次聚合了，就要用到管道聚合了。
 
+  但这种使用的比较少。
 
-> **注意：**参加聚合的字段必须是keyword、日期、数值、布尔类型
+> **注意：**参加聚合的字段必须是keyword、日期、数值、布尔类型，这些不分组的类型
 
+在官方文档中给出了聚合的分类，并且在右边的目录结构中每种类型展开，每种类型又分为分多种。
 
+这么多种，不可能全部学会，有需要再来官方文档看就行了。
 
+![image-20240514150323566](./assets/image-20240514150323566.png)
 
-
-## 1.2.DSL实现聚合
+---
 
 现在，我们要统计所有数据中的酒店品牌有几种，其实就是按照品牌对数据分组。此时可以根据酒店品牌的名称做聚合，也就是Bucket聚合。
 
-### 1.2.1.Bucket聚合语法
+这里显然使用term。
 
-语法如下：
+## 一、Bucket聚合语法
+
+语法如下：可以发现语法跟查询的语法基本上是一致的，区别在于下面的DSL语句不同
 
 ```json
 GET /hotel/_search
 {
-  "size": 0,  // 设置size为0，结果中不包含文档，只包含聚合结果
-  "aggs": { // 定义聚合
-    "brandAgg": { //给聚合起个名字
-      "terms": { // 聚合的类型，按照品牌值聚合，所以选择term
-        "field": "brand", // 参与聚合的字段
-        "size": 20 // 希望获取的聚合结果数量
-      }
-    }
-  }
+    //这个是以前搜索的分页参数，以前还有query，但是这里查询不是目的，这里主要目的是做聚合
+    "size": 0,  // 设置size为0，即显示的文档数据为0，结果中不包含文档，只包含聚合结果
+    "aggs": { // 定义聚合，全称：aggregations，也就是将来这里可以定义好多个聚合
+        "brandAgg": { //给聚合起个名字，聚合名称是自定义的，`brandAgg`: brandAggregations，品牌聚合的意思
+            "terms": { // 聚合的类型，按照品牌值聚合，所以选择term
+                "field": "brand", // 参与聚合的字段
+                "size": 20 // 希望获取的聚合结果数量，如果不指定，默认就是10。即：如果做聚合品牌，假设统计出来的品牌一共有两百多种，但是这里限定了20，因此它只会显示前20个。
+            }
+        }
+    }
 }
 ```
 
-结果如图：
+结果如图：结果是一个倒序排序，统计结果越多，排名越靠前。
 
-![image-20210723171948228](assets/image-20210723171948228-1711335658971.png)
+- `key`：字段的值
+- `doc_count`：文档数量
 
+<img src="assets/image-20210723171948228-1711335658971.png" alt="image-20210723171948228" style="zoom:67%;" />
 
+---
 
-### 1.2.2.聚合结果排序
+## 二、聚合结果排序
 
 默认情况下，Bucket聚合会统计Bucket内的文档数量，记为_count，并且按照_count降序排序。
 
@@ -11923,9 +11964,13 @@ GET /hotel/_search
 }
 ```
 
+但是一般情况下按默认的降序就行了。
 
+现在这个搜索其实是在对整个索引库的搜索做聚合搜索，但如果索引库中有上亿条数据，这个聚合对内存的消耗就非常非常大了，此时我们就需要去限定聚合搜索的范围。
 
-### 1.2.3.限定聚合范围
+----
+
+## 三、限定聚合范围
 
 默认情况下，Bucket聚合是对索引库的所有文档做聚合，但真实场景下，用户会输入搜索条件，因此聚合必须是对搜索结果聚合。那么聚合必须添加限定条件。
 
@@ -11953,21 +11998,25 @@ GET /hotel/_search
 }
 ```
 
-
-
 这次，聚合得到的品牌明显变少了：
 
 ![image-20210723172404836](assets/image-20210723172404836-1711335658971.png)
 
+----
 
+## 四、Metric聚合语法
 
-### 1.2.4.Metric聚合语法
-
-上节课，我们对酒店按照品牌分组，形成了一个个桶。现在我们需要对桶内的酒店做运算，获取每个品牌的用户评分的min、max、avg等值。
+刚刚我们对酒店按照品牌分组，形成了一个个桶。现在我们需要对桶内的酒店做运算，获取每个品牌的用户评分的min、max、avg等值。
 
 这就要用到Metric聚合了，例如stat聚合：就可以获取min、max、avg等结果。
 
-语法如下：
+例如，我们要求获取每个品牌的用户评分的min、max、avg等值。
+
+用户评分是 `score字段`，它是一个数值类型，这里要求min、max、avg等值其实就是度量，而且要同时求多个，就可以使用stats查询。
+
+由于我们是在品牌内取做限定，因此必须跟上一节讲的Bucket聚合结合使用。
+
+语法如下，可以发现在 `brandAgg` 的内部多了一个新的属性 `aggs`，也就是说在品牌聚合的基础上又做了一次聚合，这就叫做聚合的嵌套。
 
 ```json
 GET /hotel/_search
@@ -11980,7 +12029,7 @@ GET /hotel/_search
         "size": 20
       },
       "aggs": { // 是brands聚合的子聚合，也就是分组后对每组分别计算
-        "score_stats": { // 聚合名称
+        "scoreAgg": { // 聚合名称
           "stats": { // 聚合类型，这里stats可以计算min、max、avg等
             "field": "score" // 聚合字段，这里是score
           }
@@ -11991,21 +12040,15 @@ GET /hotel/_search
 }
 ```
 
+可以发现结果除了 `doc_count`，现在多了一个 `scoreAgg`，由于它是 `brandAgg` 的子聚合，因此它出现在 `brandAgg` 的内部。
 
-
-这次的score_stats聚合是在brandAgg的聚合内部嵌套的子聚合。因为我们需要在每个桶分别计算。
-
-
-
-另外，我们还可以给聚合结果做个排序，例如按照每个桶的酒店平均分做排序：
+另外，我们还可以给聚合结果做个排序，例如按照每个桶的酒店平均分做排序（注意排序是写在桶里）：
 
 ![image-20210723172917636](assets/image-20210723172917636-1711335658971.png)
 
+----
 
-
-
-
-### 1.2.5.小结
+## 五、小结
 
 aggs代表聚合，与query同级，此时query的作用是？
 
@@ -12025,72 +12068,129 @@ aggs代表聚合，与query同级，此时query的作用是？
 
 
 
-## 1.3.RestAPI实现聚合
+---
 
-### 1.3.1.API语法
+# 123.RestAPI实现聚合
+
+与以前所学的搜索功能类似，聚合也分成了请求条件的组装以及响应结果解析两个部分。
 
 聚合条件与query条件同级别，因此需要使用request.source()来指定聚合条件。
 
+`request.source()` 代表的就是这个大的DSL，在source里面可以指定查询条件、分页条件、聚合条件
+
 聚合条件的语法：
+
+根据提示，它里面要传的是一个 `AggregationBuilder` 
+
+<img src="./assets/image-20240514161117362.png" alt="image-20240514161117362" style="zoom:67%;" />
+
+上面 `AggregationBuilder` 是抽象类，下面的 `AggregationBuilders` 才是真正可以使用的工具类。
+
+![image-20240514161152809](./assets/image-20240514161152809.png)
+
+这个工具类中有各种各样的聚合，这里我们使用的就是Bucket中的terms聚合
+
+![image-20240514161654682](./assets/image-20240514161654682.png)
 
 ![image-20210723173057733](assets/image-20210723173057733-1711335658971.png)
 
-
-
 聚合的结果也与查询结果不同，API也比较特殊。不过同样是JSON逐层解析：
+
+注意根据名称获取聚合结果的时候，得到的应该是Terms，因为我们的聚合就是一个Terms聚合。
+
+遍历时得到的每一个bucket，其实就是右边中每一个bucket。
+
+我们的目的是为了获取key，key就是品牌信息。`bucket.getKeyAdString()` 就是在获取 `key`。
+
+这里可以作为字符串接收，也可以作为数字接收，这里显然是作为字符串接收。
+
+![image-20240514162723397](./assets/image-20240514162723397.png)
 
 ![image-20210723173215728](assets/image-20210723173215728-1711335658971.png)
 
+**完整代码**
+
+```java
+@Test
+void testAgg() throws IOException {
+    // 1.准备请求
+    SearchRequest request = new SearchRequest("hotel");
+    // 2.请求参数
+    // 2.1.size
+    request.source().size(0);
+    // 2.2.聚合
+    request.source().aggregation(
+        AggregationBuilders.terms("brandAgg").field("brand").size(20));
+    // 3.发出请求
+    SearchResponse response = client.search(request, RequestOptions.DEFAULT);
+    // 4.解析结果
+    Aggregations aggregations = response.getAggregations();
+    // 4.1.根据聚合名称，获取聚合结果
+    Terms brandAgg = aggregations.get("brandAgg");
+    // 4.2.获取buckets
+    List<? extends Terms.Bucket> buckets = brandAgg.getBuckets();
+    // 4.3.遍历
+    for (Terms.Bucket bucket : buckets) {
+        String brandName = bucket.getKeyAsString();
+        System.out.println("brandName = " + brandName);
+        long docCount = bucket.getDocCount();
+        System.out.println("docCount = " + docCount);
+    }
+}
+```
+
+----
 
 
-### 1.3.2.业务需求
 
-需求：搜索页面的品牌、城市等信息不应该是在页面写死，而是通过聚合索引库中的酒店数据得来的：
+# RestAPI聚合练习
+
+## 一、业务需求
+
+案例：在IUserService中定义方法，实现对品牌、城市、星级的聚合
+
+我们这里的城市、星级等都是直接写死在页面的，但是在真实企业中，这些是不能直接写死的，应该是索引库中包含的哪些城市，这里就应该展示哪些城市。因此我们需要从海量数据中，得出城市、品牌等有哪些，这不就是聚合功能吗？
+
+因此我们只需要对索引库中的数据针对城市字段、品牌字段做聚合，就可以知道索引库中包含哪些品牌、哪些城市了。
+
+然后我们再将这些结果封装，然后返回到页面，一渲染就有效果了。
 
 ![image-20210723192605566](assets/image-20210723192605566-1711335658971.png)
-
-
-
-分析：
-
-目前，页面的城市列表、星级列表、品牌列表都是写死的，并不会随着搜索结果的变化而变化。但是用户搜索条件改变时，搜索结果会跟着变化。
-
-例如：用户搜索“东方明珠”，那搜索的酒店肯定是在上海东方明珠附近，因此，城市只能是上海，此时城市列表中就不应该显示北京、深圳、杭州这些信息了。
-
-
-
-也就是说，搜索结果中包含哪些城市，页面就应该列出哪些城市；搜索结果中包含哪些品牌，页面就应该列出哪些品牌。
-
-如何得知搜索结果中包含哪些品牌？如何得知搜索结果中包含哪些城市？
-
-
-
-使用聚合功能，利用Bucket聚合，对搜索结果中的文档基于品牌分组、基于城市分组，就能得知包含哪些品牌、哪些城市了。
-
-因为是对搜索结果聚合，因此聚合是**限定范围的聚合**，也就是说聚合的限定条件跟搜索文档的条件一致。
-
-
 
 查看浏览器可以发现，前端其实已经发出了这样的一个请求：
 
 ![image-20210723193730799](assets/image-20210723193730799-1711335658972.png)
 
-请求**参数与搜索文档的参数完全一致**。
+请求**参数与搜索文档（/list）的参数完全一致**，那为什么查过滤项的时候需要带条件呢？
 
+过滤项查询将来需要通过聚合实现，而聚合一旦加了条件就可以限定聚合的范围。
 
+如果在搜索时没有加任何条件，搜到的就是索引库的所有数据，此时对索引库的所有数据聚合得到的结果是没问题的，但是假设我现在搜了 `虹桥`，那么得到的结果一定是跟上海、虹桥有关的结果集，因此它对应的城市一定是上海，但是你却对索引库所有数据去做聚合，那么得到的城市一定包含了所有的城市，此时就不对了。
+
+因此我们不应该对索引库所有数据做聚合，用户输出的关键词既然是 `虹桥`，那么就需要对 `虹桥` 相关的酒店去做聚合，即限定聚合的范围。为什么该如何限定聚合范围呢？
+
+其实就是加查询条件。
+
+那么我在查酒店时用的是什么查询条件，在做聚合的时候也就用什么条件，这样就是在查询出酒店集合的基础上做聚合，这样聚合结果就更准确了。因此我们在查询过滤项时和查询酒店要用相同的查询条件
 
 返回值类型就是页面要展示的最终结果：
 
+左侧是过滤项名称，右侧部分是过滤出来的集合，这就是一个典型的key-value结构
+
 ![image-20210723203915982](assets/image-20210723203915982-1711335658972.png)
 
-结果是一个Map结构：
+因此结果是一个Map结构：
 
 - key是字符串，城市、星级、品牌、价格
 - value是集合，例如多个城市的名称
 
+~~~java
+Map<String, List<String>> filters(RequestParams params);
+~~~
 
+---
 
-### 1.3.3.业务实现
+## 二、业务实现
 
 在`cn.itcast.hotel.web`包的`HotelController`中添加一个方法，遵循下面的要求：
 
@@ -12102,15 +12202,15 @@ aggs代表聚合，与query同级，此时query的作用是？
 代码：
 
 ```java
-    @PostMapping("filters")
-    public Map<String, List<String>> getFilters(@RequestBody RequestParams params){
-        return hotelService.getFilters(params);
-    }
+@PostMapping("filters")
+public Map<String, List<String>> getFilters(@RequestBody RequestParams params){
+    return hotelService.filters(params);
+}
 ```
 
 
 
-这里调用了IHotelService中的getFilters方法，尚未实现。
+这里调用了IHotelService中的filters方法，尚未实现。
 
 在`cn.itcast.hotel.service.IHotelService`中定义新方法：
 
@@ -12129,7 +12229,7 @@ public Map<String, List<String>> filters(RequestParams params) {
         // 1.准备Request
         SearchRequest request = new SearchRequest("hotel");
         // 2.准备DSL
-        // 2.1.query
+        // 2.1.query，在搜索酒店时怎么写，这就要怎么写，查询酒店是调用了buildBasicQuery()，对整个请求参数构造做了一个封装，因此这里也使用之前写好的方法，这样就可以确保我在做聚合时的查询条件跟查询酒店时的查询条件完全一致了。
         buildBasicQuery(params, request);
         // 2.2.设置size
         request.source().size(0);
@@ -12138,15 +12238,17 @@ public Map<String, List<String>> filters(RequestParams params) {
         // 3.发出请求
         SearchResponse response = client.search(request, RequestOptions.DEFAULT);
         // 4.解析结果
+        //key就是过滤项，value就是过滤出来的集合
         Map<String, List<String>> result = new HashMap<>();
+        // 由于添加聚合的时候我们添加了三个聚合，那么结果中肯定也会有三个聚合，我们可以根据名称分别来取，然后取完后去做逐个处理
         Aggregations aggregations = response.getAggregations();
-        // 4.1.根据品牌名称，获取品牌结果
+        // 4.1.根据聚合名称，获取品牌结果
         List<String> brandList = getAggByName(aggregations, "brandAgg");
         result.put("品牌", brandList);
-        // 4.2.根据品牌名称，获取品牌结果
+        // 4.2.根据聚合名称，获取城市城市
         List<String> cityList = getAggByName(aggregations, "cityAgg");
         result.put("城市", cityList);
-        // 4.3.根据品牌名称，获取品牌结果
+        // 4.3.根据聚合名称，获取星级结果
         List<String> starList = getAggByName(aggregations, "starAgg");
         result.put("星级", starList);
 
@@ -12156,11 +12258,12 @@ public Map<String, List<String>> filters(RequestParams params) {
     }
 }
 
+// 将聚合条件的构建封装到一个函数中，这样看起来会相对优雅一些。
 private void buildAggregation(SearchRequest request) {
     request.source().aggregation(AggregationBuilders
                                  .terms("brandAgg")
                                  .field("brand")
-                                 .size(100)
+                                 .size(100) // size值建议给大点，因为聚合结果可能很多
                                 );
     request.source().aggregation(AggregationBuilders
                                  .terms("cityAgg")
@@ -12192,41 +12295,33 @@ private List<String> getAggByName(Aggregations aggregations, String aggName) {
 
 
 
+----
 
+# 126.自动补全
 
-
-
-# 2.自动补全
-
-当用户在搜索框输入字符时，我们应该提示出与该字符有关的搜索项，如图：
+当用户在搜索框输入字符时，我们应该提示出与该字符有关的搜索项，如图：输入h，出现的搜索项都是以h拼音首字母开头
 
 ![image-20210723204936367](assets/image-20210723204936367-1711335658972.png)
 
 这种根据用户输入的字母，提示完整词条的功能，就是自动补全了。
 
-
-
 因为需要根据拼音字母来推断，因此要用到拼音分词功能。
 
+---
 
-
-## 2.1.拼音分词器
-
-
+## 一、拼音分词器
 
 要实现根据字母做补全，就必须对文档按照拼音分词。在GitHub上恰好有elasticsearch的拼音分词插件。地址：https://github.com/medcl/elasticsearch-analysis-pinyin
 
-![image-20210723205932746](assets/image-20210723205932746-1711335658972.png)
+下面是它可配置的属性以及一些用法
 
+<img src="./assets/image-20240514174350711.png" alt="image-20240514174350711" style="zoom:47%;" />
 
-
-
+<img src="assets/image-20210723205932746-1711335658972.png" alt="image-20210723205932746" style="zoom:67%;" />
 
 课前资料中也提供了拼音分词器的安装包：
 
 ![image-20210723205722303](assets/image-20210723205722303-1711335658972.png) 
-
-
 
 安装方式与IK分词器一样，分三步：
 
@@ -12234,55 +12329,89 @@ private List<String> getAggByName(Aggregations aggregations, String aggName) {
 
 ​	②上传到虚拟机中，elasticsearch的plugin目录
 
+<img src="./assets/image-20240514174857789.png" alt="image-20240514174857789" style="zoom:100%;" />
+
 ​	③重启elasticsearch
 
 ​	④测试
-
-
-
-详细安装步骤可以参考IK分词器的安装过程。
-
-
-
-
 
 测试用法如下：
 
 ```json
 POST /_analyze
 {
-  "text": "如家酒店还不错",
+  "text": ["如家酒店还不错"],
   "analyzer": "pinyin"
 }
 ```
 
-结果：
+结果：将每个字的拼音都分成了一个，还有将所有内容的拼音首字母分成了一个
 
-![image-20210723210126506](assets/image-20210723210126506-1711335658972.png) 
+<img src="assets/image-20210723210126506-1711335658972.png" alt="image-20210723210126506" style="zoom:80%;" /> 
 
+----
 
+## 二、自定义分词器
 
+问题一：默认的拼音分词器会将每个汉字单独分为拼音，或者将整个文本的拼音首字母提取出来，这也就说明，默认的拼音分词器是不会分词的
 
+问题二：用户使用拼音搜索的情况是占少数的，大多数情况下还是会使用中文进行搜索，但是默认的拼音分词器有拼音，但是汉字却没有了
 
-## 2.2.自定义分词器
-
-默认的拼音分词器会将每个汉字单独分为拼音，而我们希望的是每个词条形成一组拼音，需要对拼音分词器做个性化定制，形成自定义分词器。
-
-
+因此需要对拼音分词器做个性化定制，形成自定义分词器。要想自定义分词器，就需要先了解ES中分词器的构成。
 
 elasticsearch中分词器（analyzer）的组成包含三部分：
 
 - character filters：在tokenizer之前对文本进行处理。例如删除字符、替换字符
-- tokenizer：将文本按照一定的规则切割成词条（term）。例如keyword，就是不分词；还有ik_smart
+- tokenizer：这个是真正的分词器，它将文本按照一定的规则切割成词条（term）。例如keyword，就是不分词；还有ik_smart
 - tokenizer filter：将tokenizer输出的词条做进一步处理。例如大小写转换、同义词处理、拼音处理等
-
-
 
 文档分词时会依次由这三部分来处理文档：
 
-   ![image-20210723210427878](assets/image-20210723210427878-1711335658972.png)
+- character filters：将`开心的这个表情` 替换成 `开心`，将 `伤心的标签` 替换成 `伤心`
+- tokenizer：分词，得到多个词条，多个词条再交给 tokenizer filter 处理
+- tokenizer filter：拼音处理
+
+![image-20210723210427878](assets/image-20210723210427878-1711335658972.png)
+
+这样就解决了我们之前所说的两个问题了：拼音分词器不会分词，那就先用ik tokenizer分词，然后再交给pinyin插件作为过滤处理，形参拼音就好了。
+
+要求：自定义分词器一定是在创建索引库的时候设置，并且要放到 `settings(配置)` 中，因此这个配置只对当前索引库有效。
 
 声明自定义分词器的语法如下：
+
+~~~json
+PUT /test
+{
+    "settings": {
+        "analysis": {
+            "analyzer": { // 自定义分词器
+                "my_analyzer": {  // 分词器名称
+                    // 由于character filters是对特殊字符处理，但是我们这里又没有，因此这里就不指定了。
+                    // 也就是说不一定要三个都有，可以只有一个或两个或三个
+                    "tokenizer": "ik_max_word",
+                    "filter": "pinyin"
+                }
+            }
+        }
+    }
+}
+~~~
+
+由于拼音分词器在转成拼音的时候是一个字一个字的转，这不是我们想要的。
+
+并且它还会将中文去掉，因此如果我们直接交给py处理器的话还是有问题的，因此我们需要对yinpin过滤器做进一步的定制
+
+在pinyin分词器的官方网站上给出了很多Optional Parameters，这些参数可以控制pinyin分词器的效果。
+
+例如 `keep_full_pinyin` 就是将它分成一个一个字，默认是true，我们可以改为false。
+
+再例如 `keep_joined_full_pinyin(全拼)` 即将 `刘德华` 变成 `liudehua`，这显然是我们想要的，它默认为false，我们可以改为true。
+
+`keep_original` ：是否保留中文，默认为false，我们可以改为true。
+
+![image-20240514182115644](./assets/image-20240514182115644.png)
+
+由于配置参数很复杂，我们直接CV即可。
 
 ```json
 PUT /test
@@ -12291,7 +12420,10 @@ PUT /test
     "analysis": {
       "analyzer": { // 自定义分词器
         "my_analyzer": {  // 分词器名称
+          // 由于character filters是对特殊字符处理，但是我们这里又没有，因此这里就不指定了。
+          // 也就是说不一定要三个都有，可以只有一个或两个或三个
           "tokenizer": "ik_max_word",
+          // 这里将pinyin改为了py，它是在下面定义了一个名字叫py的过滤器，这个py的本质还是pinyin，但是我们可以定义各种属性
           "filter": "py"
         }
       },
