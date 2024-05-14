@@ -3,6 +3,11 @@ package cn.itcast.hotel.pojo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 public class HotelDoc {
@@ -20,6 +25,7 @@ public class HotelDoc {
     // 排序时的 距离值
     private Object distance;
     private Boolean isAD;
+    private List<String> suggestion;
 
     public HotelDoc(Hotel hotel) {
         this.id = hotel.getId();
@@ -33,5 +39,17 @@ public class HotelDoc {
         this.business = hotel.getBusiness();
         this.location = hotel.getLatitude() + ", " + hotel.getLongitude();
         this.pic = hotel.getPic();
+        // suggestion字段不是让我们重新编一些信息，而是由现有的信息放进去就行了
+        // 组装suggestion
+        if(this.business.contains("/")){
+            // business有多个值，需要切割
+            String[] arr = this.business.split("/");
+            // 添加元素
+            this.suggestion = new ArrayList<>();
+            this.suggestion.add(this.brand);
+            Collections.addAll(this.suggestion, arr);
+        } else {
+            this.suggestion = Arrays.asList(this.brand, this.business);
+        }
     }
 }

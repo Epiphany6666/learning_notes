@@ -12353,6 +12353,8 @@ POST /_analyze
 
 ## 二、自定义分词器
 
+### 1）引入
+
 问题一：默认的拼音分词器会将每个汉字单独分为拼音，或者将整个文本的拼音首字母提取出来，这也就说明，默认的拼音分词器是不会分词的
 
 问题二：用户使用拼音搜索的情况是占少数的，大多数情况下还是会使用中文进行搜索，但是默认的拼音分词器有拼音，但是汉字却没有了
@@ -12374,6 +12376,10 @@ elasticsearch中分词器（analyzer）的组成包含三部分：
 ![image-20210723210427878](assets/image-20210723210427878-1711335658972.png)
 
 这样就解决了我们之前所说的两个问题了：拼音分词器不会分词，那就先用ik tokenizer分词，然后再交给pinyin插件作为过滤处理，形参拼音就好了。
+
+---
+
+### 2）配置
 
 要求：自定义分词器一定是在创建索引库的时候设置，并且要放到 `settings(配置)` 中，因此这个配置只对当前索引库有效。
 
@@ -12440,6 +12446,65 @@ PUT /test
       }
     }
   },
+  // 分词器配置好后，肯定是到mapping映射中使用
+  "mappings": {
+    "properties": {
+      "name": {
+        "type": "text",
+        "analyzer": "my_analyzer"
+      }
+    }
+  }
+}
+```
+
+测试记得加上 `/test` ，指定索引库，这样才能使用上面创建好的索引库中自定义的分词器my_analyzer：
+
+这样分词也有，拼音也有，中文也ok，完全符合我们的预期
+
+![image-20210723211829150](assets/image-20210723211829150-1711335658972.png)
+
+但此时还有一个问题，当我们搜索 `狮子` 的时候，它将同音的词也搜索出来了
+
+![image-20240514192159372](./assets/image-20240514192159372.png)
+
+---
+
+### 3）解决Bug
+
+创建倒排索引的时候插入一条 `狮子`，然后狮子按照我们的分词方式，会分成 `中文分词`、`全拼`、`缩写`，然后创建倒排索引的时候形成词条以及文档编号。
+
+然后你再插入 `虱子`，由于它俩的拼音是一样的，除了中文以外，其他的都一致，将来往词条里面插的时候，`虱子` 作为一个全新词条，而 `shizi`、`sz` 由于已经存在，因此只是记录一下文档id，这样就会导致 `狮子` 和 `虱子` 这两个文档的拼音是一样的。
+
+当用户在搜索 `狮子` 的时候，会有一个分词叫 `shizi` ，此时它就会搜到两个文档。
+
+![image-20240514193253968](./assets/image-20240514193253968.png)
+
+**因此拼音分词器适合在创建倒排索引的时候使用，但不能在搜索的时候使用。**
+
+搜索的时候如果搜的是中文，应该拿中文去搜；如果用户输入的是拼音，此时才拿着拼音去搜。
+
+因此我们需要分开，创建倒排索引的时候，和搜索时用的是不同分词器。
+
+那怎么才能让它分开呢？语法如下，在做mapping映射时指定两个：analyzer（创建索引时用）、search_analyzer（搜索时用）
+
+字段在创建倒排索引时应该用my_analyzer分词器；字段在搜索时应该使用ik_smart分词器
+
+~~~java
+PUT /test
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_analyzer": {
+          "tokenizer": "ik_max_word", "filter": "py"
+        }
+      },
+      "filter": {
+        "py": { ... }
+      }
+    }
+  },
   "mappings": {
     "properties": {
       "name": {
@@ -12450,53 +12515,53 @@ PUT /test
     }
   }
 }
-```
+~~~
 
+此时删除原来的test索引库，然后重新创建、重新新增文档，最后重新查询，可以发现，此时搜 `狮子`，就不会再搜出 `虱子` 了。
 
+![image-20240514194939289](./assets/image-20240514194939289.png)
 
-测试：
+---
 
-![image-20210723211829150](assets/image-20210723211829150-1711335658972.png)
-
-
-
-
-
-总结：
+### 4）总结
 
 如何使用拼音分词器？
 
-- ①下载pinyin分词器
+- ① 下载pinyin分词器
 
-- ②解压并放到elasticsearch的plugin目录
+- ② 解压并放到elasticsearch的plugin目录
 
-- ③重启即可
+- ③ 重启即可
 
 如何自定义分词器？
 
-- ①创建索引库时，在settings中配置，可以包含三部分
+- ① 创建索引库时，在settings中配置，可以包含三部分
 
-- ②character filter
+- ② character filter
 
-- ③tokenizer
+- ③ tokenizer
 
-- ④filter
+- ④ tokenizer filter
 
 拼音分词器注意事项？
 
-- 为了避免搜索到同音字，搜索时不要使用拼音分词器
+- 创建索引库的时候使用拼音分词器，但是为了避免搜索到同音字，搜索时不要使用拼音分词器
 
+----
 
+## 三、自动补全查询
 
+elasticsearch提供了[Completion Suggester](https://www.elastic.co/guide/en/elasticsearch/reference/7.6/search-suggesters.html)查询来实现自动补全功能。这个查询会匹配以用户输入内容为前缀的所有词条并返回。为了提高补全查询的效率，对于文档中字段的类型有一些约束：
 
+- **参与补全查询的字段必须是completion类型，它就是专门用来做自动查询的。**
 
-## 2.3.自动补全查询
+- **字段的内容一般是用来补全的多个词条形成的数组。**
 
-elasticsearch提供了[Completion Suggester](https://www.elastic.co/guide/en/elasticsearch/reference/7.6/search-suggesters.html)查询来实现自动补全功能。这个查询会匹配以用户输入内容开头的词条并返回。为了提高补全查询的效率，对于文档中字段的类型有一些约束：
+  如下面示例中的 `title`，第一个文档就是 `sony` 和产品信息 `WH-1000XM3`，那为什么要分开呢？
 
-- 参与补全查询的字段必须是completion类型。
+  因为自动补全是根据词条做自动补全的，如果我们将它俩合成一个字符串，将来我们做自动补全时，只能通过 `S` 来补全，当用户输入 `W` 的时候它就不可能补全出产品名称了。
 
-- 字段的内容一般是用来补全的多个词条形成的数组。
+  但如果我们写成数组，当用户输入 `S` 的时候就能补全 `Sony`，用户输入 `W` 的时候就能补全产品名称，这样更加的人性化，因此我们尽量将词语分成词条放到一个个的数组中。
 
 比如，一个这样的索引库：
 
@@ -12532,19 +12597,17 @@ POST test/_doc
 }
 ```
 
-
-
 查询的DSL语句如下：
 
 ```json
 // 自动补全查询
 GET /test/_search
 {
-  "suggest": {
-    "title_suggest": {
-      "text": "s", // 关键字
-      "completion": {
-        "field": "title", // 补全查询的字段
+  "suggest": { // 由于不是搜索了，而是自动补全，因此不是query，而是suggest
+    "title_suggest": { // 给查询起个名，这里叫title_suggest，即基于标题的一个建议
+      "text": "s", // 用户输入的关键字，可以理解为前缀，用户输入s，就可以提示出s开头的词条，查询的时候是不区分大小写的
+      "completion": { // 表示自动补全的类型，自动补全的类型有三种，这里只用了其中一种
+        "field": "title", // 补全查询的字段，这个字段只能是completion类型的
         "skip_duplicates": true, // 跳过重复的
         "size": 10 // 获取前10条结果
       }
@@ -12553,13 +12616,21 @@ GET /test/_search
 }
 ```
 
+查询结果如下，这个options中就是查询自动补全的结果了，它是一个数组，因为查询出来的词条肯定不止一个。
+
+`text` 中就是匹配出来符合条件的词条。
+
+除了返回 `text` 自动补全的结果外，它还返回了文档的原始信息
+
+![image-20240514202058248](./assets/image-20240514202058248.png)
 
 
 
+---
 
+# 129.实现酒店搜索框自动补全
 
-
-## 2.4.实现酒店搜索框自动补全
+## 一、分析
 
 现在，我们的hotel索引库还没有设置拼音分词器，需要修改索引库中的配置。但是我们知道索引库是无法修改的，只能删除然后重新创建。
 
@@ -12575,13 +12646,13 @@ GET /test/_search
 
 3. 索引库添加一个新字段suggestion，类型为completion类型，使用自定义的分词器
 
-4. 给HotelDoc类添加suggestion字段，内容包含brand、business
+4. 改Java代码，给HotelDoc类添加suggestion字段，内容包含brand、business
 
 5. 重新导入数据到hotel库
 
+---
 
-
-### 2.4.1.修改酒店映射结构
+## 二、修改酒店映射结构
 
 代码如下：
 
@@ -12589,16 +12660,17 @@ GET /test/_search
 // 酒店数据索引库
 PUT /hotel
 {
-  "settings": {
+  "settings": { // 定义索引库的分词器
     "analysis": {
-      "analyzer": {
+      "analyzer": { // 这里定义了两个分词器
         "text_anlyzer": {
           "tokenizer": "ik_max_word",
           "filter": "py"
         },
         "completion_analyzer": {
-          "tokenizer": "keyword",
-          "filter": "py"
+          "tokenizer": "keyword", // 采用keyword分词，也就是说这个词条直接作为一个整体。因为将来参与自动补全的肯定是一个个的词条，我们会将词条放到数组中，因此它本身就是一个词条，就没有必要再分词了，因此这里直接将它作为一个keyword
+          "filter": "py" // 然后再去使用拼音分词器转成拼音。
+          // 将来全文检索的时候使用text_anlyzer，自动补全使用completion_analyzer
         }
       },
       "filter": {
@@ -12661,7 +12733,7 @@ PUT /hotel
         "analyzer": "text_anlyzer",
         "search_analyzer": "ik_smart"
       },
-      "suggestion":{
+      "suggestion":{ // 这个字段将来是来做自动补全的
           "type": "completion",
           "analyzer": "completion_analyzer"
       }
@@ -12670,11 +12742,15 @@ PUT /hotel
 }
 ```
 
+---
 
-
-### 2.4.2.修改HotelDoc实体
+## 三、修改HotelDoc实体
 
 HotelDoc中要添加一个字段，用来做自动补全，内容可以是酒店品牌、城市、商圈等信息。按照自动补全字段的要求，最好是这些字段的数组。
+
+`completion` 之前讲过，是多个词条形参的数组，数组对应到Java中可以是一个集合，因此这里使用结合来接收。
+
+由于集合中装的是词条，并且这些词条是不需要分词的，因此类型为 `String`。
 
 因此我们在HotelDoc中添加一个suggestion字段，类型为`List<String>`，然后将brand、city、business等信息放到里面。
 
@@ -12721,7 +12797,9 @@ public class HotelDoc {
         this.business = hotel.getBusiness();
         this.location = hotel.getLatitude() + ", " + hotel.getLongitude();
         this.pic = hotel.getPic();
+        // suggestion字段不是让我们重新编一些信息，而是由现有的信息放进去就行了
         // 组装suggestion
+        // 由于有些酒店的商圈信息有多个，中间会使用/分开，例如：江湾/五角场商业区，那么在提示的时候，只有江才能提示，不能根据五提示。因此我们需要将它拆分成两个词条作为数组中的元素，而不是像现在这样拼成一个字符串
         if(this.business.contains("/")){
             // business有多个值，需要切割
             String[] arr = this.business.split("/");
@@ -12729,48 +12807,108 @@ public class HotelDoc {
             this.suggestion = new ArrayList<>();
             this.suggestion.add(this.brand);
             Collections.addAll(this.suggestion, arr);
-        }else {
+        } else {
             this.suggestion = Arrays.asList(this.brand, this.business);
         }
     }
 }
 ```
 
+---
 
+## 四、重新导入
 
-### 2.4.3.重新导入
-
-重新执行之前编写的导入数据功能，可以看到新的酒店数据中包含了suggestion：
+重新执行之前编写的导入数据功能，可以看到新的酒店数据中包含了suggestion，并且商业多个词条也分开了。
 
 ![image-20210723213546183](assets/image-20210723213546183-1711335658972.png)
 
+可以使用DSL语句来测试一下是否可以正常查询
 
+~~~java
+GET /hotel/_search
+{
+  "suggest": {
+    "title_suggest": {
+      "text": "s",
+      "completion": {
+        "field": "suggestion",
+        "skip_duplicates": true,
+        "size": 10
+      }
+    }
+  }
+}
+~~~
 
+![image-20240514211527858](./assets/image-20240514211527858.png)
 
+----
 
-### 2.4.4.自动补全查询的JavaAPI
+## 五、自动补全查询的JavaAPI
 
 之前我们学习了自动补全查询的DSL，而没有学习对应的JavaAPI，这里给出一个示例：
 
+关键字是使用 `prefix()` 来定义的，因为自动查询本质上来讲就是根据前缀查询。
+
+`SuggestBuilders` 中有各种各样的suggestion，这里我们要用的肯定是自动补全的 `comletionSuggestion()`，在这里面指定补全的字段。
+
 ![image-20210723213759922](assets/image-20210723213759922-1711335658972.png)
 
-
+----
 
 而自动补全的结果也比较特殊，解析的代码如下：
 
+从suggest中通过名字获取到里面的内容后，IDEA给它定的类型的泛型很长，其实就是一个CompletionSuggestion类型的。
+
+~~~java
+// Suggest.Suggestion<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>> suggestion = suggest.getSuggestion("hotelSuggest");
+CompletionSuggestion suggestion = suggest.getSuggestion("hotelSuggest");
+~~~
+
 ![image-20210723213917524](assets/image-20210723213917524-1711335658972.png)
 
+完整代码
 
+~~~java
+@Test
+void testSuggest() throws IOException {
+    // 1.准备请求
+    SearchRequest request = new SearchRequest("hotel");
+    // 2.请求参数
+    request.source().suggest(new SuggestBuilder()
+                             .addSuggestion(
+                                 "hotelSuggest",
+                                 SuggestBuilders
+                                 .completionSuggestion("suggestion")
+                                 .size(10)
+                                 .skipDuplicates(true)
+                                 .prefix("s")
+                             ));
+    // 3.发出请求
+    SearchResponse response = client.search(request, RequestOptions.DEFAULT);
+    // 4.解析
+    Suggest suggest = response.getSuggest();
+    // 4.1.根据名称获取结果
+    Suggest.Suggestion<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>> suggestion1 = suggest.getSuggestion("hotelSuggest");
+    CompletionSuggestion suggestion = suggest.getSuggestion("hotelSuggest");
+    // 4.2.获取options
+    for (CompletionSuggestion.Entry.Option option : suggestion.getOptions()) {
+        // 4.3.获取补全的结果
+        String str = option.getText().toString();
+        System.out.println(str);
+    }
+}
+~~~
 
-### 2.4.5.实现搜索框自动补全
+----
 
-查看前端页面，可以发现当我们在输入框键入时，前端会发起ajax请求：
+## 六、实现搜索框自动补全
+
+查看前端页面，可以发现当我们在输入框键入时，前端会发起ajax请求，请求参数key就是用户输入的前缀：
 
 ![image-20210723214021062](assets/image-20210723214021062-1711335658972.png)
 
 返回值是补全词条的集合，类型为`List<String>`
-
-
 
 1）在`cn.itcast.hotel.web`包下的`HotelController`中添加新接口，接收新的请求：
 
@@ -12816,7 +12954,7 @@ public List<String> getSuggestions(String prefix) {
         // 4.2.获取options
         List<CompletionSuggestion.Entry.Option> options = suggestions.getOptions();
         // 4.3.遍历
-        List<String> list = new ArrayList<>(options.size());
+        List<String> list = new ArrayList<>(options.size()); // 集合的大小现在就可以直接确定了
         for (CompletionSuggestion.Entry.Option option : options) {
             String text = option.getText().toString();
             list.add(text);
@@ -12830,21 +12968,25 @@ public List<String> getSuggestions(String prefix) {
 
 
 
+---
 
+# 131.数据同步
 
-# 3.数据同步
+## 一、引出问题
 
 elasticsearch中的酒店数据来自于mysql数据库，因此mysql数据发生改变时，elasticsearch也必须跟着改变，这个就是elasticsearch与mysql之间的**数据同步**。
 
+其实不仅仅ES有数据同步的问题，凡是数据库双写的情况，例如redis与MySQL，它都会存在数据同步问题，这些问题该如何解决呢？
 
+如果是单体项目，就很好办，无非就是在写增删改查的时候，同时将索引库也一起更新了就好了。
+
+但是我们现在是微服务项目，在微服务项目下，不同的业务有可能会在不同的项目下，如下图。
 
 ![image-20210723214758392](assets/image-20210723214758392-1711335658972.png)
 
+---
 
-
-
-
-## 3.1.思路分析
+## 二、思路分析
 
 常见的数据同步方案有三种：
 
@@ -12852,20 +12994,28 @@ elasticsearch中的酒店数据来自于mysql数据库，因此mysql数据发生
 - 异步通知
 - 监听binlog
 
-
-
-### 3.1.1.同步调用
+### 1）同步调用
 
 方案一：同步调用
+
+假设这两个服务是不能互相访问对方的数据库，酒店管理服务只能访问MySQL、酒店搜索服务只能访问ES，这样比较符合微服务中的标准和规范。当我在酒店管理服务中完成了酒店的新增，那么ES该如何同步呢？
 
 ![image-20210723214931869](assets/image-20210723214931869-1711335658972.png)
 
 基本步骤如下：
 
-- hotel-demo对外提供接口，用来修改elasticsearch中的数据
-- 酒店管理服务在完成数据库操作后，直接调用hotel-demo提供的接口，
+- hotel-demo对外暴露接口，用来修改elasticsearch中的数据
+- 酒店管理服务在完成数据库操作后，直接调用hotel-demo提供的接口
 
+上图三个步骤是依次执行的，也就是说写完数据库后才能调接口，调用接口后才能调ES的API实现更新，更新完成后结果才能返回到hotel-demo，hotel-demo处理完了才会返回给hotel-admin，hotel-admin才会返回给用户。可以发现这个过程是依次执行的，因此这种方式自然就叫同步调用方式了。
 
+这种方式数据耦合、业务耦合，原来我只是写数据库，写完就结束了，但是现在在写数据库的代码后面需要加上调用hotel-demo的代码，业务逻辑需要修改，而且调用hotel-demo的业务和新增酒店的业务两者间没有任何关系，但你却将它们写在了一起。那就是业务耦合了，业务耦合必然会影响性能，即耗时增加。
+
+并且这三步中，但凡有一个步骤出现异常，整个业务都会出问题，这就是耦合带来的问题。
+
+因此就出现了异步通知方案，基于MQ来实现的。
+
+----
 
 ### 3.1.2.异步通知
 

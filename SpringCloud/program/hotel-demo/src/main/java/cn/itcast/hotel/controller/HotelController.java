@@ -25,4 +25,9 @@ public class HotelController {
     public Map<String, List<String>> getFilters(@RequestBody RequestParams params){
         return hotelService.filters(params);
     }
+
+    @GetMapping("suggestion")
+    public List<String> getSuggestions(@RequestParam("key") String prefix) {
+        return hotelService.getSuggestions(prefix);
+    }
 }

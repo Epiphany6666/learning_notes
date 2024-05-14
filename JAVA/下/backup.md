@@ -1785,7 +1785,7 @@ public class CollectionsDemo {
 
 参数一：集合，类型是 `Collection<T>`，也就是说这个方法只能给单列集合进行批量添加，双列集合Map是不行的。
 
-参数二：可变参数。
+参数二：可变参数。可变参数本质就是一个数组，因此如果传递一个数组进来也是可以的。
 
 ~~~java
 public static <T> boolean addAll(Collection<T> c, T... elements);  // 批量添加元素。
