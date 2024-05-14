@@ -9862,9 +9862,9 @@ GET /indexName/_search
 {
     "query": {
         "matct": {
-            //FIELD代表字段，即：你要根据哪个字段去查询。
+            //FIELD代表字段，即：你要根据哪个字段去查询。TEXT：用户输入的关键字
             //一个文档中包含的字段是非常多的，而且字段的类型各不相同。
-            //由于全文检索需要对内容做分词，然后做匹配，因此一般情况下，全文检索所要查询的字段就是text类型的。
+            //由于全文检索需要对内容做分词，然后做匹配，因此参与搜索的字段也必须是可分词的text类型的字段。
             //以我们创建的酒店索引为例，在酒店索引中text类型还挺多，但是我们将品牌、名字、商品等信息，都拷到了all字段下，将来我们检索的时候就比较方便了，此时FIELD的位置填写的就是all
             "FIELD": "TEXT"
         }
@@ -10754,31 +10754,42 @@ GET /hotel/_search
 - 第一步，创建`SearchRequest`对象，指定索引库名
 
 - 第二步，利用`request.source()`构建DSL，DSL中可以包含查询、分页、排序、高亮等
+  
+  可以发现它的返回值是 `SearchSourceBuilder`，`SearchSource` 就是搜索的DSL，`Builder` 是构建器，也就是说在ES搜索API中，它是利用构建器帮助我们构造DSL的，而不是以前手动拼JSON
+  
+  <img src="./assets/image-20240514075909177.png" alt="image-20240514075909177" style="zoom:67%;" />
+  
   - `query()`：代表查询条件，利用`QueryBuilders.matchAllQuery()`构建一个match_all查询的DSL
   
     可以发现这次准备参数跟之前略有差别，不是自己手写JSON了，而是使用这种API的形式来实现的，ES对这块API的封装做的比较好。
   
 - 第三步，利用client.search()发送请求，得到响应
 
-这里关键的API有两个，一个是`request.source()`，其中包含了查询、排序、分页、高亮等所有功能：
+这里关键的API有两个，一个是`request.source()`，其中包含了查询、排序、分页、高亮等所有功能，因此我们不用手动拼JSON了，而是直接用它。
 
 ![image-20210721215640790](assets/image-20210721215640790-1711335630925.png)
 
-另一个是`QueryBuilders`，其中包含match、term、function_score、bool等各种查询：
+`QueryBuilder` 是一个接口，它里面有很多不同的实现，查询的类型不同，实现就不同，但是我们不要自己去用这个接口，而是使用 `QueryBuilders`，它是一个工具。
+
+<img src="./assets/image-20240514083158760.png" alt="image-20240514083158760" style="zoom:67%;" />
+
+其中包含match、term、function_score、bool等各种查询：
 
 ![image-20210721215729236](assets/image-20210721215729236-1711335630925.png)
 
+----
 
-
-### 3.1.2.解析响应
+### 2）解析响应
 
 响应结果的解析：
 
 ![image-20210721214221057](assets/image-20210721214221057-1711335630925.png)
 
+elasticsearch返回的结果是一个JSON字符串，可以发现API它直接将ES返回的JSON直接封装成SearchResponse对象返回给我们了。
 
+<img src="./assets/image-20240514081005773.png" alt="image-20240514081005773" style="zoom:67%;" />
 
-elasticsearch返回的结果是一个JSON字符串，结构包含：
+我们需要从这个对象中解析出我们想要的结果，它的结构包含：
 
 - `hits`：命中的结果
   - `total`：总条数，其中的value是具体的总条数值
@@ -10793,9 +10804,9 @@ elasticsearch返回的结果是一个JSON字符串，结构包含：
   - `SearchHits#getHits()`：获取SearchHit数组，也就是文档数组
     - `SearchHit#getSourceAsString()`：获取文档结果中的_source，也就是原始的json文档数据
 
+---
 
-
-### 3.1.3.完整代码
+### 3）完整代码
 
 完整代码如下：
 
@@ -10833,9 +10844,9 @@ private void handleResponse(SearchResponse response) {
 }
 ```
 
+---
 
-
-### 3.1.4.小结
+### 4）小结
 
 查询的基本步骤是：
 
@@ -10853,23 +10864,19 @@ private void handleResponse(SearchResponse response) {
 
 
 
+-----
 
-
-## 3.2.match查询
+## 二、match查询
 
 全文检索的match和multi_match查询与match_all的API基本一致。差别是查询条件，也就是query的部分。
 
 ![image-20210721215923060](assets/image-20210721215923060-1711335630925.png) 
-
-
 
 因此，Java代码上的差异主要是request.source().query()中的参数了。同样是利用QueryBuilders提供的方法：
 
 ![image-20210721215843099](assets/image-20210721215843099-1711335630925.png) 
 
 而结果解析代码则完全一致，可以抽取并共享。
-
-
 
 完整代码如下：
 
@@ -10889,11 +10896,9 @@ void testMatch() throws IOException {
 }
 ```
 
+---
 
-
-
-
-## 3.3.精确查询
+## 三、精确查询
 
 精确查询主要是两者：
 
@@ -10906,21 +10911,15 @@ void testMatch() throws IOException {
 
 ![image-20210721220305140](assets/image-20210721220305140-1711335630925.png) 
 
+---
 
-
-
-
-## 3.4.布尔查询
+## 四、布尔查询
 
 布尔查询是用must、must_not、filter等方式组合其它查询，代码示例如下：
 
 ![image-20210721220927286](assets/image-20210721220927286-1711335630925.png)
 
-
-
 可以看到，API与其它查询的差别同样是在查询条件的构建，QueryBuilders，结果解析等其他代码完全不变。
-
-
 
 完整代码如下：
 
@@ -10946,17 +10945,19 @@ void testBool() throws IOException {
 }
 ```
 
+----
 
+# 113.RestClient搜索结果处理
 
-## 3.5.排序、分页
+## 一、排序、分页
 
-搜索结果的排序和分页是与query同级的参数，因此同样是使用request.source()来设置。
+搜索结果的排序和分页是与query同级的参数，因此同样是使用request.source()来设置，这个 `source()` 代表的就是外层最大的JSON对象，`query`、`from`、`size`、`sort` 都属于这个source。
+
+由于 `from()` 返回的值还是 `source()`，因此可以采用链式编程，在后面直接 `size()`
 
 对应的API如下：
 
 ![image-20210721221121266](assets/image-20210721221121266-1711335630925.png)
-
-
 
 完整代码示例：
 
@@ -10973,32 +10974,35 @@ void testPageAndSort() throws IOException {
     request.source().query(QueryBuilders.matchAllQuery());
     // 2.2.排序 sort
     request.source().sort("price", SortOrder.ASC);
-    // 2.3.分页 from、size
+    // 2.3.分页 真实开发中from、size
     request.source().from((page - 1) * size).size(5);
     // 3.发送请求
     SearchResponse response = client.search(request, RequestOptions.DEFAULT);
     // 4.解析响应
     handleResponse(response);
-
 }
 ```
 
+----
 
-
-## 3.6.高亮
+## 二、高亮
 
 高亮的代码与之前代码差异较大，有两点：
 
 - 查询的DSL：其中除了查询条件，还需要添加高亮条件，同样是与query同级。
 - 结果解析：结果除了要解析_source文档数据，还要解析高亮结果
 
-### 3.6.1.高亮请求构建
+### 1）高亮请求构建
 
 高亮请求的构建API如下：
 
 ![image-20210721221744883](assets/image-20210721221744883-1711335630925.png)
 
 上述代码省略了查询条件部分，但是大家不要忘了：高亮查询必须使用全文检索查询，并且要有搜索关键字，将来才可以对关键字高亮。
+
+ES中API一个非常大的特点就是全部支持链式编程，如果后面还想加标签，也是可以继续加的。
+
+![image-20240514101025556](./assets/image-20240514101025556.png)
 
 完整代码如下：
 
@@ -11016,13 +11020,12 @@ void testHighlight() throws IOException {
     SearchResponse response = client.search(request, RequestOptions.DEFAULT);
     // 4.解析响应
     handleResponse(response);
-
 }
 ```
 
+---
 
-
-### 3.6.2.高亮结果解析
+### 2）高亮结果解析
 
 高亮的结果与查询的文档结果默认是分离的，并不在一起。
 
@@ -11033,14 +11036,22 @@ void testHighlight() throws IOException {
 代码解读：
 
 - 第一步：从结果中获取source。hit.getSourceAsString()，这部分是非高亮结果，json字符串。还需要反序列为HotelDoc对象
-- 第二步：获取高亮结果。hit.getHighlightFields()，返回值是一个Map，key是高亮字段名称，值是HighlightField对象，代表高亮值
+
+- 第二步：获取高亮结果。hit.getHighlightFields()，返回值是一个Map，key是高亮字段名称（上图的name），值是HighlightField对象，代表高亮值
+
+  `highlight` 对应的值是JSON的对象，JSON的对象对应到Java中就是Map。
+
 - 第三步：从map中根据高亮字段名称，获取高亮字段值对象HighlightField
-- 第四步：从HighlightField中获取Fragments，并且转为字符串。这部分就是真正的高亮字符串了
+
+- 第四步：从HighlightField中获取Fragments（碎片，即name所对应的数组），返回的是Text，它是一个文本的类，它描述的就是一个文本。
+
+  我们可以调用Text中的`string()`转为字符串。这部分就是真正的高亮字符串了
+
 - 第五步：用高亮的结果替换HotelDoc中的非高亮结果
 
+- 给代码加上健壮性，spring中有一个工具类：CollectionUtils，这个工具类可以帮助我们直接判断Map是否为空，底层原理就是 `return map == null || map.isEmpty();`
 
-
-完整代码如下：
+完整代码
 
 ```java
 private void handleResponse(SearchResponse response) {
@@ -11076,9 +11087,11 @@ private void handleResponse(SearchResponse response) {
 
 
 
+----
 
+# 115.黑马旅游案例
 
-# 4.黑马旅游案例
+## 一、启动项目
 
 下面，我们通过黑马旅游的案例来实战演练下之前学习的知识。
 
@@ -11089,21 +11102,23 @@ private void handleResponse(SearchResponse response) {
 - 我周边的酒店
 - 酒店竞价排名
 
+在 `resources/static` 目录下已经准备好了前端页面
 
+<img src="./assets/image-20240514103104253.png" alt="image-20240514103104253" style="zoom:67%;" />
 
 启动我们提供的hotel-demo项目，其默认端口是8089，访问http://localhost:8090，就能看到项目页面了：
 
+<img src="./assets/image-20240514103201012.png" alt="image-20240514103201012" style="zoom:67%;" />
+
 ![image-20210721223159598](assets/image-20210721223159598-1711335630925.png)
 
+----
 
-
-
-
-## 4.1.酒店搜索和分页
+## 二、酒店搜索和分页
 
 案例需求：实现黑马旅游的酒店搜索功能，完成关键字搜索和分页
 
-### 4.1.1.需求分析
+### 1）需求分析
 
 在项目的首页，有一个大大的搜索框，还有分页按钮：
 
@@ -11111,13 +11126,11 @@ private void handleResponse(SearchResponse response) {
 
 点击搜索按钮，可以看到浏览器控制台发出了请求：
 
-![image-20210721224033789](assets/image-20210721224033789-1711335630925.png)
+<img src="assets/image-20210721224033789-1711335630925.png" alt="image-20210721224033789" style="zoom:77%;" />
 
 请求参数如下：
 
-![image-20210721224112708](assets/image-20210721224112708-1711335630925.png)
-
-
+<img src="assets/image-20210721224112708-1711335630925.png" alt="image-20210721224112708" style="zoom:80%;" />
 
 由此可以知道，我们这个请求的信息如下：
 
@@ -11127,12 +11140,12 @@ private void handleResponse(SearchResponse response) {
   - key：搜索关键字
   - page：页码
   - size：每页大小
-  - sortBy：排序，目前暂不实现
+  - sortBy：排序字段，例如点击评价，将来就会按照评价区排序目前暂不实现
 - 返回值：分页查询，需要返回分页结果PageResult，包含两个属性：
   - `total`：总条数
   - `List<HotelDoc>`：当前页的数据
 
-
+---
 
 因此，我们实现业务的流程如下：
 
@@ -11140,9 +11153,9 @@ private void handleResponse(SearchResponse response) {
 - 步骤二：编写controller，接收页面的请求
 - 步骤三：编写业务实现，利用RestHighLevelClient实现搜索、分页
 
+---
 
-
-### 4.1.2.定义实体类
+### 2）定义实体类
 
 实体类有两个，一个是前端的请求参数实体，一个是服务端应该返回的响应结果实体。
 
@@ -11175,7 +11188,7 @@ public class RequestParams {
 }
 ```
 
-
+---
 
 2）返回值
 
@@ -11208,9 +11221,9 @@ public class PageResult {
 }
 ```
 
+----
 
-
-### 4.1.3.定义controller
+### 3）定义controller
 
 定义一个HotelController，声明查询接口，满足下列要求：
 
@@ -11220,8 +11233,6 @@ public class PageResult {
 - 返回值：PageResult，包含两个属性
   - `Long total`：总条数
   - `List<HotelDoc> hotels`：酒店数据
-
-
 
 因此，我们在`cn.itcast.hotel.web`中定义HotelController：
 
@@ -11240,9 +11251,9 @@ public class HotelController {
 }
 ```
 
+----
 
-
-### 4.1.4.实现搜索业务
+### 4）实现搜索业务
 
 我们在controller调用了IHotelService，并没有实现该方法，因此下面我们就在IHotelService中定义方法，并且去实现业务逻辑。
 
@@ -11259,12 +11270,12 @@ PageResult search(RequestParams params);
 
 
 
-2）实现搜索业务，肯定离不开RestHighLevelClient，我们需要把它注册到Spring中作为一个Bean。在`cn.itcast.hotel`中的`HotelDemoApplication`中声明这个Bean：
+2）实现搜索业务，肯定离不开RestHighLevelClient，我们需要把它注册到Spring中作为一个Bean。在`cn.itcast.hotel`中的`HotelDemoApplication（启动类）`中声明这个Bean：
 
 ```java
 @Bean
 public RestHighLevelClient client(){
-    return  new RestHighLevelClient(RestClient.builder(
+    return new RestHighLevelClient(RestClient.builder(
         HttpHost.create("http://192.168.150.101:9200")
     ));
 }
@@ -11272,11 +11283,12 @@ public RestHighLevelClient client(){
 
 
 
-
-
 3）在`cn.itcast.hotel.service.impl`中的`HotelService`中实现search方法：
 
 ```java
+@Autowired
+private RestHighLevelClient client;
+
 @Override
 public PageResult search(RequestParams params) {
     try {
@@ -11286,16 +11298,14 @@ public PageResult search(RequestParams params) {
         // 2.1.query
         String key = params.getKey();
         if (key == null || "".equals(key)) {
-            boolQuery.must(QueryBuilders.matchAllQuery());
+            request.source().query(QueryBuilders.matchAllQuery());
         } else {
-            boolQuery.must(QueryBuilders.matchQuery("all", key));
+            request.source().query(QueryBuilders.matchQuery("all", key));
         }
-
         // 2.2.分页
         int page = params.getPage();
         int size = params.getSize();
         request.source().from((page - 1) * size).size(size);
-
         // 3.发送请求
         SearchResponse response = client.search(request, RequestOptions.DEFAULT);
         // 4.解析响应
@@ -11320,7 +11330,7 @@ private PageResult handleResponse(SearchResponse response) {
         String json = hit.getSourceAsString();
         // 反序列化
         HotelDoc hotelDoc = JSON.parseObject(json, HotelDoc.class);
-		// 放入集合
+        // 放入集合
         hotels.add(hotelDoc);
     }
     // 4.4.封装返回
@@ -11328,15 +11338,13 @@ private PageResult handleResponse(SearchResponse response) {
 }
 ```
 
+----
 
-
-
-
-## 4.2.酒店结果过滤
+## 三、酒店结果过滤
 
 需求：添加品牌、城市、星级、价格等过滤功能
 
-### 4.2.1.需求分析
+### 1）需求分析
 
 在页面搜索框下面，会有一些过滤项：
 
@@ -11358,9 +11366,9 @@ private PageResult handleResponse(SearchResponse response) {
 - 修改请求参数的对象RequestParams，接收上述参数
 - 修改业务逻辑，在搜索条件之外，添加一些过滤条件
 
+-----
 
-
-### 4.2.2.修改实体类
+### 2）修改实体类
 
 修改在`cn.itcast.hotel.pojo`包下的实体类RequestParams：
 
@@ -11380,9 +11388,9 @@ public class RequestParams {
 }
 ```
 
+---
 
-
-### 4.2.3.修改搜索业务
+### 3）修改搜索业务
 
 在HotelService的search方法中，只有一个地方需要修改：requet.source().query( ... )其中的查询条件。
 
@@ -11398,13 +11406,9 @@ public class RequestParams {
 - 关键字搜索放到must中，参与算分
 - 其它过滤条件放到filter中，不参与算分
 
-
-
 因为条件构建的逻辑比较复杂，这里先封装为一个函数：
 
-![image-20210722092935453](assets/image-20210722092935453-1711335630925.png)
-
-
+<img src="assets/image-20210722092935453-1711335630925.png" alt="image-20210722092935453" style="zoom:67%;" />
 
 buildBasicQuery的代码如下：
 
@@ -11446,32 +11450,30 @@ private void buildBasicQuery(RequestParams params, SearchRequest request) {
 
 
 
+----
 
-
-## 4.3.我周边的酒店
+## 四、我周边的酒店
 
 需求：我附近的酒店
 
-### 4.3.1.需求分析
+### 1）需求分析
 
 在酒店列表页的右侧，有一个小地图，点击地图的定位按钮，地图会找到你所在的位置：
 
-![image-20210722093414542](assets/image-20210722093414542-1711335630925.png) 
+<img src="./assets/image-20240514113006575.png" alt="image-20240514113006575" style="zoom:50%;" /> 
 
 并且，在前端会发起查询请求，将你的坐标发送到服务端：
 
 ![image-20210722093642382](assets/image-20210722093642382-1711335630925.png) 
-
-
 
 我们要做的事情就是基于这个location坐标，然后按照距离对周围酒店排序。实现思路如下：
 
 - 修改RequestParams参数，接收location字段
 - 修改search方法业务逻辑，如果location有值，添加根据geo_distance排序的功能
 
+---
 
-
-### 4.3.2.修改实体类
+### 2）修改实体类
 
 修改在`cn.itcast.hotel.pojo`包下的实体类RequestParams：
 
@@ -11497,9 +11499,9 @@ public class RequestParams {
 
 ```
 
+----
 
-
-### 4.3.3.距离排序API
+### 3）距离排序API
 
 我们以前学习过排序功能，包括两种：
 
@@ -11533,17 +11535,13 @@ GET /indexName/_search
 
 ![image-20210722095227059](assets/image-20210722095227059-1711335630925.png)
 
+---
 
-
-
-
-### 4.3.4.添加距离排序
+### 4）添加距离排序
 
 在`cn.itcast.hotel.service.impl`的`HotelService`的`search`方法中，添加一个排序功能：
 
-![image-20210722095902314](assets/image-20210722095902314-1711335630925.png)
-
-
+<img src="assets/image-20210722095902314-1711335630925.png" alt="image-20210722095902314" style="zoom:67%;" />
 
 完整代码：
 
@@ -11582,19 +11580,15 @@ public PageResult search(RequestParams params) {
 }
 ```
 
+---
 
-
-### 4.3.5.排序距离显示
+### 5）排序距离显示
 
 重启服务后，测试我的酒店功能：
 
 ![image-20210722100040674](assets/image-20210722100040674-1711335630925.png)
 
-
-
 发现确实可以实现对我附近酒店的排序，不过并没有看到酒店到底距离我多远，这该怎么办？
-
-
 
 排序完成后，页面还要获取我附近每个酒店的具体**距离**值，这个值在响应结果中是独立的：
 
@@ -11606,8 +11600,6 @@ public PageResult search(RequestParams params) {
 
 - 修改HotelDoc，添加排序距离字段，用于页面显示
 - 修改HotelService类中的handleResponse方法，添加对sort值的获取
-
-
 
 1）修改HotelDoc类，添加距离字段
 
@@ -11666,9 +11658,9 @@ public class HotelDoc {
 
 
 
+----
 
-
-## 4.4.酒店竞价排名
+## 五、酒店竞价排名
 
 需求：让指定的酒店在搜索结果中排名置顶
 
