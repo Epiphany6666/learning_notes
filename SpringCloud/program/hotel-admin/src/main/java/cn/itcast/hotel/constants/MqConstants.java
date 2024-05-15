@@ -1,6 +1,6 @@
 package cn.itcast.hotel.constants;
 
-public class MqConstants {
+    public class MqConstants {
     /**
      * 交换机
      */

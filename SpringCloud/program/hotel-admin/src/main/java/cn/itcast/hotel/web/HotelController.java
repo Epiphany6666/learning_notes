@@ -1,9 +1,11 @@
 package cn.itcast.hotel.web;
 
+import cn.itcast.hotel.constants.MqConstants;
 import cn.itcast.hotel.pojo.Hotel;
 import cn.itcast.hotel.pojo.PageResult;
 import cn.itcast.hotel.service.IHotelService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,8 @@ public class HotelController {
 
     @Autowired
     private IHotelService hotelService;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @GetMapping("/{id}")
     public Hotel queryById(@PathVariable("id") Long id){
@@ -34,6 +38,7 @@ public class HotelController {
     @PostMapping
     public void saveHotel(@RequestBody Hotel hotel){
         hotelService.save(hotel);
+        rabbitTemplate.convertAndSend(MqConstants.HOTEL_EXCHANGE, MqConstants.HOTEL_INSERT_KEY, hotel.getId());
     }
 
     @PutMapping()
@@ -42,10 +47,12 @@ public class HotelController {
             throw new InvalidParameterException("id不能为空");
         }
         hotelService.updateById(hotel);
+        rabbitTemplate.convertAndSend(MqConstants.HOTEL_EXCHANGE, MqConstants.HOTEL_INSERT_KEY, hotel.getId());
     }
 
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable("id") Long id) {
         hotelService.removeById(id);
+        rabbitTemplate.convertAndSend(MqConstants.HOTEL_EXCHANGE, MqConstants.HOTEL_INSERT_KEY, id);
     }
 }

@@ -6275,9 +6275,9 @@ spring:
     password: 123321 # 密码
 ```
 
+然后在consumer服务的`cn.itcast.mq.listener`包中新建一个类SpringRabbitListener，监听的时候，都是通过实体类进行监听。
 
-
-然后在consumer服务的`cn.itcast.mq.listener`包中新建一个类SpringRabbitListener，Spring已经帮我们跟MQ建立了连接，这些杂七杂八的事情我们就不用管了，我们唯一要操心的就是：我们要监听哪个队列，监听到这个队列了，我要干什么事，干什么事其实就是行为，行为直接封装到方法。但在Spring当中，我们只需要写一个类，然后定义一个方法，这个方法就是处理消息的行为，但是你要加注解告诉Spring，先加@Component把这个类声明为一个bean，此时spring就可以找到它了，然后再方法上加上 `@RabbitListener` 注解，这个注解是用来声明队列的名称的，加上这个注解后，这个方法就成为了消息处理的方法。将来一旦有这个队列的消息，就会立即投放到这个方法中去了，这个方法就能处理对应的消息了，看这个方法的参数，就是消息。也就是说spring会自动把消息投递给这个方法，然后参数里传给你，然后你就可以拿到这个消息为所欲为了。
+Spring已经帮我们跟MQ建立了连接，这些杂七杂八的事情我们就不用管了，我们唯一要操心的就是：我们要监听哪个队列，监听到这个队列了，我要干什么事，干什么事其实就是行为，行为直接封装到方法。但在Spring当中，我们只需要写一个类，然后定义一个方法，这个方法就是处理消息的行为，但是你要加注解告诉Spring，先加@Component把这个类声明为一个bean，此时spring就可以找到它了，然后再方法上加上 `@RabbitListener` 注解，这个注解是用来声明队列的名称的，加上这个注解后，这个方法就成为了消息处理的方法。将来一旦有这个队列的消息，就会立即投放到这个方法中去了，这个方法就能处理对应的消息了，看这个方法的参数，就是消息。也就是说spring会自动把消息投递给这个方法，然后参数里传给你，然后你就可以拿到这个消息为所欲为了。
 
 ```java
 package cn.itcast.mq.listener;
@@ -13135,6 +13135,8 @@ MQ结构如图：
 
 #### ② 在yml文件中配置AMQP的地址
 
+在hotel-admin和hotel-demo中的yml文件中配置AMQP的地址
+
 ~~~yml
 spring:
   rabbitmq:
@@ -13149,7 +13151,7 @@ spring:
 
 #### ③ 声明队列交换机名称
 
-在hotel-admin和hotel-demo中的`cn.itcast.hotel.constatnts`包下新建一个类`MqConstants`：
+在hotel-admin和hotel-demo中的`cn.itcast.hotel.constants`包下新建一个类`MqConstants`：
 
 ```java
 package cn.itcast.hotel.constatnts;
@@ -13182,7 +13184,15 @@ package cn.itcast.hotel.constatnts;
 
 #### ④ 声明队列交换机
 
+声明队列和交换机一般都是在消费者中声明。
+
 在hotel-demo中，定义配置类，声明队列、交换机：
+
+`TopicExchange()` 方法的参数如下
+
+1. **exchangeName**：指定交换机的名称，这里是`MqConstants.HOTEL_EXCHANGE`，即交换机的名称为`HOTEL_EXCHANGE`。
+2. **durable**：指定交换机是否持久化。第二个参数为`true`表示交换机是持久化的，即在服务器重启之后仍然存在；为`false`表示交换机是非持久化的，即在服务器重启之后会被删除。这里是`true`，表示交换机是持久化的。
+3. **autoDelete**：指定交换机是否自动删除。第三个参数为`true`表示交换机是自动删除的，即在至少一个队列或者交换机与这个交换机绑定之后，没有任何消费者使用它了，就会自动删除；为`false`表示交换机是非自动删除的。这里是`false`，表示交换机不会自动删除。
 
 ```java
 package cn.itcast.hotel.config;
@@ -13204,6 +13214,7 @@ public class MqConfig {
 
     @Bean
     public Queue insertQueue(){
+        // 第二个参数依旧是持久化
         return new Queue(MqConstants.HOTEL_INSERT_QUEUE, true);
     }
 
@@ -13214,6 +13225,7 @@ public class MqConfig {
 
     @Bean
     public Binding insertQueueBinding(){
+        // with()：使用哪个routingKey
         return BindingBuilder.bind(insertQueue()).to(topicExchange()).with(MqConstants.HOTEL_INSERT_KEY);
     }
 
@@ -13224,24 +13236,26 @@ public class MqConfig {
 }
 ```
 
+---
 
-
-### 3.2.4.发送MQ消息
+### 4）发送MQ消息
 
 在hotel-admin中的增、删、改业务中分别发送MQ消息：
 
+思考：当新增一条数据时，是不是要将新增的对象发过去？
+
+其实可以这么做，但是没有必要，因为你发送的消息将来在MQ中是需要保存的，而MQ是基于内存的，如果你把整个酒店对象发过去，其实是比较消耗内存的，对于MQ来讲，很容易将队列占满，所以我们建议在发送消息的时候，发送体尽量小一点，此时我们就可以只发酒店的id过去，此时对方根据酒店id其实是可以查到酒店数据的。
+
 ![image-20210723221843816](assets/image-20210723221843816-1711335658972.png)
 
+----
 
-
-### 3.2.5.接收MQ消息
+### 5）监听 / 接收MQ消息
 
 hotel-demo接收到MQ消息要做的事情包括：
 
 - 新增消息：根据传递的hotel的id查询hotel信息，然后新增一条数据到索引库
 - 删除消息：根据传递的hotel的id删除索引库中的一条数据
-
-
 
 1）首先在hotel-demo的`cn.itcast.hotel.service`包下的`IHotelService`中新增新增、删除业务
 
@@ -13251,7 +13265,7 @@ void deleteById(Long id);
 void insertById(Long id);
 ```
 
-
+----
 
 2）给hotel-demo中的`cn.itcast.hotel.service.impl`包下的HotelService中实现业务：
 
@@ -13288,9 +13302,11 @@ public void insertById(Long id) {
 }
 ```
 
-
+----
 
 3）编写监听器
+
+监听的时候，都是通过实体类进行监听
 
 在hotel-demo中的`cn.itcast.hotel.mq`包新增一个类：
 
@@ -13314,6 +13330,7 @@ public class HotelListener {
      * @param id 酒店id
      */
     @RabbitListener(queues = MqConstants.HOTEL_INSERT_QUEUE)
+    // 由于生产者发送的是Long类型的id，因此消费者接受的同样也是Long类型的id
     public void listenHotelInsertOrUpdate(Long id){
         hotelService.insertById(id);
     }
@@ -13329,11 +13346,21 @@ public class HotelListener {
 }
 ```
 
+----
+
+### 6）测试
+
+首先找到消息的接收方（
 
 
 
 
-# 4.集群
+
+
+
+----
+
+# 138.集群
 
 单机的elasticsearch做数据存储，必然面临两个问题：海量数据存储问题、单点故障问题。
 
