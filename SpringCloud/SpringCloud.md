@@ -5195,7 +5195,7 @@ gateway：
 
 ## 5）部署
 
-最后，我们需要将文件整个cloud-demo文件夹上传到虚拟机中，理由DockerCompose部署。
+最后，我们需要将文件整个cloud-demo文件夹上传到虚拟机中，由DockerCompose部署。
 
 上传到任意目录：
 
@@ -8016,93 +8016,6 @@ IK分词器如何拓展词条？如何停用词条？
 - 在词典中添加拓展词条或者停用词条
 
 
-
-----
-
-# 部署es集群
-
-部署es集群可以直接使用docker-compose来完成，不过要求你的Linux虚拟机至少有**4G**的内存空间
-
-首先编写一个docker-compose文件，内容如下：
-
-```sh
-version: '2.2'
-services:
-  es01:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
-    container_name: es01
-    environment:
-      - node.name=es01
-      - cluster.name=es-docker-cluster
-      - discovery.seed_hosts=es02,es03
-      - cluster.initial_master_nodes=es01,es02,es03
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - data01:/usr/share/elasticsearch/data
-    ports:
-      - 9200:9200
-    networks:
-      - elastic
-  es02:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
-    container_name: es02
-    environment:
-      - node.name=es02
-      - cluster.name=es-docker-cluster
-      - discovery.seed_hosts=es01,es03
-      - cluster.initial_master_nodes=es01,es02,es03
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - data02:/usr/share/elasticsearch/data
-    networks:
-      - elastic
-  es03:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
-    container_name: es03
-    environment:
-      - node.name=es03
-      - cluster.name=es-docker-cluster
-      - discovery.seed_hosts=es01,es02
-      - cluster.initial_master_nodes=es01,es02,es03
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - data03:/usr/share/elasticsearch/data
-    networks:
-      - elastic
-
-volumes:
-  data01:
-    driver: local
-  data02:
-    driver: local
-  data03:
-    driver: local
-
-networks:
-  elastic:
-    driver: bridge
-```
-
-Run `docker-compose` to bring up the cluster:
-
-```sh
-docker-compose up
-```
 
 ----
 
@@ -13346,30 +13259,45 @@ public class HotelListener {
 }
 ```
 
-----
-
-### 6）测试
-
-首先找到消息的接收方（
-
-
-
-
-
 
 
 ----
 
-# 138.集群
+# 138.单机出现的问题
 
 单机的elasticsearch做数据存储，必然面临两个问题：海量数据存储问题、单点故障问题。
 
-- 海量数据存储问题：将索引库从逻辑上拆分为N个分片（shard），存储到多个节点
-- 单点故障问题：将分片数据在不同节点备份（replica ）
+也就是说，如果你现在只存储在一台机器上，这台机器如果挂了，或者出现了不可逆的损失导致数据丢失了，因此面临这两个问题，我们就不得不用集群去解决了。
 
-**ES集群相关概念**:
+## 一、海量数据存储问题
 
-* 集群（cluster）：一组拥有共同的 cluster name 的 节点。
+如果现在我们只有一个集群（节点），然后将索引库的数据全部存在这个节点上，这个节点存储能力是有上限的，因为ES对内存消耗比较大。
+
+解决方案就是：将索引库从逻辑上拆分为N份，每一份叫一个分片（shard），存储到多个节点上去，所以此时我们就可以有多台机器了，这样存储能力就是多个节点存储能力之和。
+
+机器越多，理论上存储能力也就越高，像阿里、滴滴它们的ES集群往往能达到数千台。
+
+![image-20240515203001690](./assets/image-20240515203001690.png)
+
+但是如果现在其中有一个节点挂了，数据就不完整了，因为有一个分片数据丢失了，单词单点故障问题还没解决
+
+----
+
+## 二、单点故障问题
+
+解决方案：将分片数据在不同节点备份（replica ）
+
+备份就是将数据拷贝一份，例如这里有三个片，我每一份都给它拷一份，拷一份后还放在这个机器上肯定不行，如果机器挂了，数据还是丢失了，因此需要放到别的机器上，node1挂了后，但node2和node3数据加在一起依然是完整数据；同理，node2挂了，node1和node3数据也是完整的，这样就可以一定程度上解决单点故障了。
+
+将来你机器越多，备份replica越多，数据的安全性也就越高。
+
+![image-20240515204337453](./assets/image-20240515204337453.png)
+
+---
+
+# ES集群相关概念
+
+* 集群（cluster）：一组拥有共同的 cluster name 的 节点。（每个集群都有一个唯一的 cluster name）
 
 * <font color="red">节点（node)</font>   ：集群中的一个 Elasticearch 实例
 
@@ -13377,7 +13305,7 @@ public class HotelListener {
 
   解决问题：数据量太大，单点存储量有限的问题。
 
-  ![image-20200104124440086](assets/image-20200104124440086-5602723-1711335658972.png)
+  <img src="assets/image-20200104124440086-5602723-1711335658972.png" alt="image-20200104124440086" style="zoom:67%;" />
 
   > 此处，我们把数据分成3片：shard0、shard1、shard2
 
@@ -13396,7 +13324,7 @@ public class HotelListener {
 
 这样可以大大减少所需要的服务节点数量，如图，我们以3分片，每个分片备份一份为例：
 
-![image-20200104124551912](assets/image-20200104124551912-1711335658972.png)
+<img src="assets/image-20200104124551912-1711335658972.png" alt="image-20200104124551912" style="zoom:67%;" />
 
 现在，每个分片都有1个备份，存储在3个节点：
 
@@ -13404,19 +13332,224 @@ public class HotelListener {
 - node1：保存了分片0和2
 - node2：保存了分片1和2
 
+---
+
+# 139.部署es集群
+
+我们会部署三个节点，但是我们并没有真的有三台机器，因此我们会使用docker容器来模拟节点，因为docker容器间项目隔离，因此用它来模拟三台机器是没有任何问题的。
+
+部署es集群可以直接使用docker-compose来完成，不过要求你的Linux虚拟机至少有**4G**的内存空间
+
+首先编写一个docker-compose文件，课前资料中已经准备好了 `docker-compose.yml`
+
+![image-20240515215313146](./assets/image-20240515215313146.png)
+
+内容如下：
+
+```yml
+version: '2.2'
+services:
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
+    container_name: es01
+    environment:
+      - node.name=es01 # 节点名称，在ES中每个节点都需要有一个自己的名字，不能重复，为了方便记忆，节点名跟容器名保持一致，但是这两个不是必须得一样
+      - cluster.name=es-docker-cluster # ES是天生支持集群的，只要让它们的集群名称一样，ES就会自动将它们组装成一个集群
+      - discovery.seed_hosts=es02,es03 # 其实就是另外两个节点的ip地址，但这里没写地址的原因是：这里用的是docker容器，容器内可以直接使用容器名互联，因此这里写的就是它们的容器名
+      - cluster.initial_master_nodes=es01,es02,es03 # 初始化的主节点，既然是集群，一定有主从之分，其中的主需要选举得来，这里配置的集群多可以参与选举
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # 配置JVM对内存的大小，最小内存和最大内存都配成了512M
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes: # 配置数据券
+      - data01:/usr/share/elasticsearch/data
+    ports: # 容器内使用9200，容器外也使用9200
+      - 9200:9200
+    networks:
+      - elastic
+  es02:
+    image: elasticsearch:7.12.1
+    container_name: es02
+    environment:
+      - node.name=es02
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - data02:/usr/share/elasticsearch/data
+    ports: # 由于es01已经占用了宿主机的9200了，因此这里只能使用9201了，否则冲突。但容器内都可以使用9200，因为它们是相互独立的
+      - 9201:9200
+    networks:
+      - elastic
+  es03:
+    image: elasticsearch:7.12.1
+    container_name: es03
+    environment:
+      - node.name=es03
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - data03:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+    ports:
+      - 9202:9200
+volumes:
+  data01:
+    driver: local
+  data02:
+    driver: local
+  data03:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
+```
+
+将文件上传到虚拟机中
+
+Run `docker-compose` to bring up the cluster:
+
+```sh
+docker-compose up
+```
+
+es运行需要修改一些linux系统权限，修改`/etc/sysctl.conf`文件
+
+```sh
+vi /etc/sysctl.conf
+```
+
+添加下面的内容：
+
+```sh
+vm.max_map_count=262144
+```
+
+然后执行命令，让配置生效：
+
+这样虚拟机内存大小就放开了，ES就可以正常运行了。
+
+```sh
+sysctl -p
+```
+
+将之前创建的ES容器停止，然后通过docker-compose启动集群：
+
+```sh
+docker-compose up -d
+```
+
+通过命令可以查看日志
+
+~~~java
+docker logs -f es01
+~~~
+
+----
+
+# 集群状态监控
+
+kibana只能默认连接到其中的一个节点，但是如果将来连接的节点出现了故障，将来切换就不太方便了；并且新版本需要依赖es的x-pack 功能，配置比较复杂，要安装一些其他的东西。
+
+这里推荐使用cerebro来监控es集群状态，官方网址：https://github.com/lmenezes/cerebro
+
+课前资料已经提供了安装包：
+
+![image-20210602220751081](./assets/image-20210602220751081.png)
+
+解压即可使用，非常方便。
+
+解压好的目录如下：
+
+![image-20210602220824668](./assets/image-20210602220824668.png)
+
+进入对应的bin目录：
+
+![image-20210602220846137](./assets/image-20210602220846137.png)
+
+
+
+双击其中的cerebro.bat文件即可启动服务。
+
+![image-20210602220941101](./assets/image-20210602220941101.png)
+
+
+
+访问http://localhost:9000 即可进入管理界面：
+
+![image-20210602221115763](./assets/image-20210602221115763.png)
+
+输入你的elasticsearch的任意节点的地址和端口，点击connect即可：
+
+
+
+![image-20210109181106866](./assets/image-20210109181106866.png)
+
+绿色的条，代表集群处于绿色（健康状态）。
+
+
+
+## 4.3.创建索引库
+
+### 1）利用kibana的DevTools创建索引库
+
+在DevTools中输入指令：
+
+```json
+PUT /itcast
+{
+  "settings": {
+    "number_of_shards": 3, // 分片数量
+    "number_of_replicas": 1 // 副本数量
+  },
+  "mappings": {
+    "properties": {
+      // mapping映射定义 ...
+    }
+  }
+}
+```
 
 
 
 
-## 4.1.搭建ES集群
 
-参考课前资料的文档：
+### 2）利用cerebro创建索引库
 
-![image-20210723222732427](assets/image-20210723222732427-1711335658972.png) 
+利用cerebro还可以创建索引库：
 
-其中的第四章节：
+![image-20210602221409524](./assets/image-20210602221409524.png)
 
-![image-20210723222812619](assets/image-20210723222812619-1711335658972.png) 
+填写索引库信息：
+
+![image-20210602221520629](./assets/image-20210602221520629.png)
+
+点击右下角的create按钮：
+
+![image-20210602221542745](./assets/image-20210602221542745.png)
+
+
+
+## 4.4.查看分片效果
+
+回到首页，即可查看索引库分片效果：
+
+![image-20210602221914483](./assets/image-20210602221914483.png)
+
+
+
+----
+
+
+
+ 
 
 
 
