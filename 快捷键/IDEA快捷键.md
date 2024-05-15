@@ -203,3 +203,20 @@ PTG插件可以1秒生成标准Javabean。
 快捷键 ctrl + d ：向下复制一行
 
 `XXX.sout`：直接出现打印语句。
+
+---
+
+打开IDEA，<kbd>ctrl + N</kbd> 搜索 `java.lang包` 下的 `ArrayList`。
+
+<img src="./assets/image-20240426101007102.png" alt="image-20240426101007102" style="zoom:67%;" />
+
+这个类的源码比较多，看起来不太方便，因此我们需要将它的大纲视图罗列出来，有两种办法
+
+① <kbd>alt + 数字7</kbd> ，此时在左边就会有 `ArrayList` 的大纲。你想要看哪个方法直接用鼠标点就行了。
+
+<img src="./assets/image-20240426101449804.png" alt="image-20240426101449804" style="zoom:80%;" />
+
+但是在左边感觉看着有点不舒服，因此我们可以将它移动到右边去
+
+<img src="./assets/image-20240426101536926.png" alt="image-20240426101536926" style="zoom:67%;" />
+

@@ -4209,7 +4209,7 @@ docker run --name containerName -p 80:80 -d nginx
 
 - -p ：将宿主机端口与容器端口映射，冒号左侧是宿主机端口，右侧是容器端口
 
-  冒号左侧：宿主机端口，右侧：容器内端口。宿主机端口是可以任意编写的，只要没被占用，容器内端口往往取决于这个应用程序本身，nginx一般接近的都是80.
+  冒号左侧：宿主机端口，右侧：容器内端口。宿主机端口是可以任意编写的，只要没被占用，容器内端口往往取决于这个应用程序本身，nginx一般接近的都是80。
 
 - -d：后台运行容器，不加-d就是前台运行，如果点击关闭，就会写换到后台。
 
@@ -5423,8 +5423,6 @@ docker pull 192.168.150.101:8080/nginx:1.0
 
 # RabbitMQ
 
-
-
 **同步和异步通讯**
 
 微服务间通讯有同步和异步两种方式：
@@ -5556,7 +5554,7 @@ Broker 是一个像数据总线一样的东西，所有的服务要接收数据�
 
 # 64.MQ技术对比
 
-刚刚学习了异步通信的事件驱动架构，我们知道在这个架构当中，最重要的东西就是Broker了，因为Broker需要来做事件的管理。因此Broke的可用性、稳定性、并发能力就成为了事件驱动架构中最重要的一个问题了。好在我们的前辈经过不断地探索也给出了一些解决方案，其实MQ就是一种常见的解决方案了。
+刚刚学习了异步通信的事件驱动架构，我们知道在这个架构当中，最重要的东西就是Broker了，因为Broker需要来做事件的管理。因此Broker的可用性、稳定性、并发能力就成为了事件驱动架构中最重要的一个问题了。好在我们的前辈经过不断地探索也给出了一些解决方案，其实MQ就是一种常见的解决方案了。
 
 MQ，中文是消息队列（MessageQueue），字面来看就是存放消息的队列。也就是事件驱动架构中的Broker。
 
@@ -5680,7 +5678,7 @@ docker load -i mq.tar
 ```sh
 docker run \
  -e RABBITMQ_DEFAULT_USER=itcast \
- -e RABBITMQ_DEFAULT_PASS=123321 \
+ -e RABBITMQ_DEFAULT_PASS=123456 \
  --name mq \
  --hostname mq1 \
  -p 15672:15672 \
@@ -5787,7 +5785,7 @@ RabbitMQ中的一些角色：
 
 ![image-20240323115843805](assets/image-20240323115843805.png)
 
-
+----
 
 ## MQ的结构和概念
 
@@ -6035,7 +6033,7 @@ connection.close();
 
 接下来就是Consumer（消费者）来接手
 
-
+---
 
 ## 3）consumer实现
 
@@ -6132,8 +6130,6 @@ AMQP的全称是：`Advanced Message Queuing Protocol`（高级消息队列协�
 RabbitMQ恰好就实现了AMQP协议。SpringAMQP显然是spring对AMQP这种协议的一种具体的实现。它在实现的时候还提供了一套API的规范，并且定义了一套模板来实现消息的发送和接收。回想以前学习Spring Redis，Spring也提供了一套模板，称之为RedisTemplate。
 
 那这套API由谁来实现呢，所以SpringAMQP项目里就包含了两部分内容，一部分就是SpringAMQP，它是一层API的抽象和规范，再往下的具体实现是由spring-rabbit来实现的，所以底层封装的其实就是rabbit的客户端。
-
-SpringAMQP是基于RabbitMQ封装的一套模板（Template），并且还利用SpringBoot对其实现了自动装配，使用起来非常方便。
 
 <img src=".\assets\image-20210717164038678.png" alt="image-20210717164038678" style="zoom:50%;" />
 
@@ -6291,7 +6287,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SpringRabbitListener {
-
     // 参数：队列，这个队列可以指定多个也可以指定一个
     @RabbitListener(queues = "simple.queue")
     // 发送的消息是什么类型的这里就用什么类型接，将来都会有spring帮我们自动处理
@@ -6307,7 +6302,7 @@ public class SpringRabbitListener {
 
 启动consumer服务，这个类是spring中的一个bean，将来接收消息是用spring来处理的，它投递给你你才能处理消息，所以现在必须要将整个spring运行起来。此时可以发现消息接收成功：
 
-![image-20240323174415260](assets/image-20240323174415260.png)
+<img src="assets/image-20240323174415260.png" alt="image-20240323174415260" style="zoom:80%;" />
 
 再去浏览器中看一眼，可以发现消息已经变成0条了，再一次证明了我们之前的结论：RabbitMQ阅后即焚，不可以重复消费。
 
@@ -6336,7 +6331,7 @@ Work模型的使用：
 - 多个消费者绑定到一个队列，同一条消息只会被一个消费者处理
 - 通过设置prefetch来控制消费者预取的消息数量
 
-
+---
 
 ## 案例：模拟WorkQueue，实现一个队列绑定多个消费者
 
@@ -6348,7 +6343,7 @@ Work模型的使用：
 
 3. 消费者1每秒处理50条消息，消费者2每秒处理10条消息，加在一起每秒钟就能处理60条消息，已经超出了我们这个发送频率了。
 
-   理论上将，我们应该能够在一秒内把这50条消息处理完。
+   理论上讲，我们应该能够在一秒内把这50条消息处理完。
 
 
 
@@ -6388,9 +6383,7 @@ public class SpringAmqpTest {
 
 ```
 
-
-
-
+---
 
 **2）消息接收**
 
@@ -6521,9 +6514,7 @@ SpringAMQP就提供了一系列的API，可以帮助我们实现这件事。因�
 
 ![image-20210717165509466](.\assets\image-20210717165509466.png)
 
-
-
-
+---
 
 **1）声明队列和交换机**
 
@@ -6618,9 +6609,7 @@ public class FanoutConfig {
 
 ![image-20240323210910117](assets/image-20240323210910117.png)
 
-
-
-
+---
 
 **3）消息接收**
 
@@ -6718,7 +6707,7 @@ public void testSendFanoutExchange() {
 
 ![image-20210717170223317](.\assets\image-20210717170223317.png)
 
-
+---
 
 **1）基于注解声明队列和交换机、消息接收**
 
@@ -6743,6 +6732,8 @@ bindings里面就可以声明Queue、exchange、key（这个key就是bindingKey�
 虽然代码很复杂，但是在写的时候每一步都是有提示的，可以先把 `@QueueBiding` 的属性先补齐，然后再填写name、type等属性。
 
 在consumer的SpringRabbitListener中添加两个消费者，同时基于注解来声明队列和交换机。
+
+<img src="./assets/image-20240515103114299.png" alt="image-20240515103114299" style="zoom:67%;" />
 
 ```java
 // 以前这里只需要加一个队列，但现在需要声明：1.队列 2.交换机 3.绑定的key
@@ -6779,15 +6770,13 @@ public void listenDirectQueue2(String msg) {
 
 <img src="assets/image-20240323231737841.png" alt="image-20240323231737841" style="zoom:50%;" />
 
-
-
-
+----
 
 **2）消息发送**
 
 在publisher服务的SpringAmqpTest类中添加测试方法：
 
-一、绑定key给blue人收到
+一、绑定key给blue的人收到
 
 ```java
 @Test
@@ -6869,10 +6858,6 @@ public void testSendDirectExchange() {
 # 75.TopicExchange
 
 `Topic`类型的`Exchange`与`Direct`相比，都是可以根据`RoutingKey`把消息路由到不同的队列。区别在于 `TopicExchange` 的  `Routing key` 必须是多个单词的列表，并且多个单词之间以 ”.” 分割，例如： `item.insert`。
-
-
-
-
 
 举例：可以看见下面这种 `RoutingKey` 它是表示一种类、话题，所以这种交换机叫 `Topic` ，也就是话题类型的交换机。
 
@@ -12986,7 +12971,7 @@ elasticsearch中的酒店数据来自于mysql数据库，因此mysql数据发生
 
 ---
 
-## 二、思路分析
+## 二、数据同步的解决方案
 
 常见的数据同步方案有三种：
 
@@ -12994,9 +12979,9 @@ elasticsearch中的酒店数据来自于mysql数据库，因此mysql数据发生
 - 异步通知
 - 监听binlog
 
-### 1）同步调用
+---
 
-方案一：同步调用
+### 1）方案一：同步调用
 
 假设这两个服务是不能互相访问对方的数据库，酒店管理服务只能访问MySQL、酒店搜索服务只能访问ES，这样比较符合微服务中的标准和规范。当我在酒店管理服务中完成了酒店的新增，那么ES该如何同步呢？
 
@@ -13017,26 +13002,29 @@ elasticsearch中的酒店数据来自于mysql数据库，因此mysql数据发生
 
 ----
 
-### 3.1.2.异步通知
-
-方案二：异步通知
+### 2）方案二：异步通知
 
 ![image-20210723215140735](assets/image-20210723215140735-1711335658972.png)
 
-
-
 流程如下：
 
-- hotel-admin对mysql数据库数据完成增、删、改后，发送MQ消息
+- hotel-admin对mysql数据库数据完成增、删、改后，不调用任何接口，而是发送MQ消息，通知一下别人
+
+  至于谁来监听这个消息，监听了后做什么，什么时候做？跟我都没有关系。这样一来业务的耦合就解除了。
+
+  并且右边更新耗时多少，与左边也没有影响，我写完数据库发完消息就结束了，因此性能也得到了提升。
+
+  由此就解决了之前同步出现的问题。
+
 - hotel-demo监听MQ，接收到消息后完成elasticsearch数据修改
 
+这种方案是比较推荐的一个方案，但是这种方案依靠于MQ的可靠性，由于引入了新的中间件，因此实现的复杂度有一定上升。
 
+----
 
+### 3）方案三：监听binlog
 
-
-### 3.1.3.监听binlog
-
-方案三：监听binlog
+了解MySQL中的主从同步应该知道，MySQL里面binlog默认是关闭的，但是一旦你开启了binlog，那么每当MySQL做增删改时，都会将相应的操作记录在binlog中，我们就可以使用类似于canal的中间件去监听binlog，一旦发现binlog发生了变化，立马通知对应的微服务。
 
 ![image-20210723215518541](assets/image-20210723215518541-1711335658972.png)
 
@@ -13046,9 +13034,15 @@ elasticsearch中的酒店数据来自于mysql数据库，因此mysql数据发生
 - mysql完成增、删、改操作都会记录在binlog中
 - hotel-demo基于canal监听binlog变化，实时更新elasticsearch中的内容
 
+在这种方案中，它其实完全依赖于中间件去监听MySQL。这种方式跟酒店管理服务没有任何的关系，当有人来新增时，酒店管理服务写数据，写完数据后就结束，它既不用发消息也不要调用任何人，完全解除了服务间的耦合。
 
+因此这种方案耦合度是最低的，但是因为要开启MySQL的binlog，所以对于MySQL来讲，压力就增加了。
 
-### 3.1.4.选择
+并且还需要引入一个新的中间件，它的部署和搭建还是有一定难度的，因此实现起来有点困难。
+
+---
+
+### 4）选择
 
 方式一：同步调用
 
@@ -13065,15 +13059,21 @@ elasticsearch中的酒店数据来自于mysql数据库，因此mysql数据发生
 - 优点：完全解除服务间耦合
 - 缺点：开启binlog增加数据库负担、实现复杂度高
 
+如果你更在意的是实现耦合度的问题，那肯定不能用第一种，需要使用方式二或方式三。
 
+至于是用MQ还是其他的中间件，这个就看你们企业中目前的一个情况了，如果已经有了MQ了，那就直接用MQ异步通知就行了，没有必要用其他中间件了。
 
-## 3.2.实现数据同步
+如果追求的是极致的耦合和性能，那就选择方案三、
 
+---
 
+## 三、实现数据同步
 
-### 3.2.1.思路
+数据同步那肯定是有一个微服务操作MySQL，另一个操作ES，现在我们已经写好了操作ES的搜索服务了，因此我们还缺少MySQL数据管理的服务。
 
-利用课前资料提供的hotel-admin项目作为酒店管理的微服务。当酒店数据发生增、删、改时，要求对elasticsearch中数据也要完成相同操作。
+### 1）思路
+
+利用课前资料提供的hotel-admin项目作为酒店管理的微服务。当酒店数据（MySQL）发生增、删、改时，要求对elasticsearch中数据也要完成相同操作。
 
 步骤：
 
@@ -13081,21 +13081,21 @@ elasticsearch中的酒店数据来自于mysql数据库，因此mysql数据发生
 
 - 声明exchange、queue、RoutingKey
 
-- 在hotel-admin中的增、删、改业务中完成消息发送
+- 在hotel-admin中的增、删、改业务中完成消息发送。虽然有三个动作，但是并不是要三个不同的exchange、queue、RoutingKey。
+
+  虽然酒店发生的事件是增、删、改，但是对应到ES中，增 / 改，都是往ES中插入数据，因为在ES中往里面插入数据，ID不存在就是新增，ID存在就是修改，因此完全可以将增、改合成一个业务。
+
+  因此将来消息的类型可以认为就是两类。
 
 - 在hotel-demo中完成消息监听，并更新elasticsearch中数据
 
 - 启动并测试数据同步功能
 
+![image-20240515110541656](./assets/image-20240515110541656.png)
 
+---
 
-
-
-
-
-
-
-### 3.2.2.导入demo
+### 2）导入demo
 
 导入课前资料提供的hotel-admin项目：
 
@@ -13105,23 +13105,21 @@ elasticsearch中的酒店数据来自于mysql数据库，因此mysql数据发生
 
 ![image-20210723220354464](assets/image-20210723220354464-1711335658972.png)
 
-
-
 其中包含了酒店的CRUD功能：
 
-![image-20210723220511090](assets/image-20210723220511090-1711335658972.png)
+<img src="assets/image-20210723220511090-1711335658972.png" alt="image-20210723220511090" style="zoom:80%;" />
 
+----
 
-
-### 3.2.3.声明交换机、队列
+### 3）声明交换机、队列
 
 MQ结构如图：
 
 ![image-20210723215850307](assets/image-20210723215850307-1711335658972.png)
 
+----
 
-
-#### 1）引入依赖
+#### ① 引入依赖
 
 在hotel-admin、hotel-demo中引入rabbitmq的依赖：
 
@@ -13133,9 +13131,23 @@ MQ结构如图：
 </dependency>
 ```
 
+---
 
+#### ② 在yml文件中配置AMQP的地址
 
-#### 2）声明队列交换机名称
+~~~yml
+spring:
+  rabbitmq:
+    host: 192.168.88.130 # 主机名
+    port: 5672 # 端口
+    virtual-host: / # 虚拟主机
+    username: itcast # 用户名
+    password: 123456 # 密码
+~~~
+
+----
+
+#### ③ 声明队列交换机名称
 
 在hotel-admin和hotel-demo中的`cn.itcast.hotel.constatnts`包下新建一个类`MqConstants`：
 
@@ -13166,9 +13178,9 @@ package cn.itcast.hotel.constatnts;
 }
 ```
 
+---
 
-
-#### 3）声明队列交换机
+#### ④ 声明队列交换机
 
 在hotel-demo中，定义配置类，声明队列、交换机：
 
