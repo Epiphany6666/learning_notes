@@ -14661,6 +14661,8 @@ System.out.println(prop);
 
 # day31 多线程&JUC
 
+JUC是java.util.concurrent包的简称，在Java5.0添加，目的就是为了更好的支持高并发任务。让开发者进行多线程编程时减少竞争条件和死锁的问题！
+
 # 135.什么是多线程？
 
 ## 一、引入

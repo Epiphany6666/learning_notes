@@ -1,3 +1,27 @@
+# Markdown语法
+
+1. markdown支持1-6级标题
+
+   - #+空格
+   - ctrl+1
+
+2. 列表
+
+   - -无序列表
+   - 1.有序列表
+
+3. 字体
+
+   - *斜体
+   - **加粗
+   - ~~删除
+
+4. 代码块
+
+   三个`
+
+5. 分隔线---
+
 # markdown的使用说明
 
 参考视频以及开源笔记借鉴网址：[【Typora 教程】手把手教你如何用Typora撰写笔记_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1h84y1Y7nn/?spm_id_from=333.337.search-card.all.click)

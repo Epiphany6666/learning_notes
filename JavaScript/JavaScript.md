@@ -80,6 +80,8 @@ JavaScript是一种运行在客户端（浏览器）的**编程语言**，实现
 
 > HTML，CSS属于标记语言
 
+**ECMA：** ECMA国际（前身为欧洲计算机制造商协会），制定了标准化的脚本程序设计语言 ECMAScript，这种语言得到广泛应用。
+
 JavaScript遵循的是ECMAScript的语法规范，因为ECMAScript规定的语法规范还有JScript，微软出的脚本语言
 
 JavaScript权威网站：MDN
@@ -100,7 +102,7 @@ JavaScript的组成
   - DOM   文档对象模型， 定义了一套操作HTML文档的API
   - BOM   浏览器对象模型，定义了一套操作浏览器窗口的API
 
- ![67604738945](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第五天/04-笔记/assets/1676047389456.png)
+ ![67604738945](./assets/1676047389456.png)
 
 ## 
 
@@ -125,11 +127,11 @@ JavaScript 程序不能独立运行，它需要被嵌入 HTML 中，然后浏览
 
 通过 `script` 标签包裹 JavaScript 代码
 
-规范：script标签写在</body>上面
+规范：script标签写在 `</body>` 上面
 
 > 注意事项：
 >
-> 我们将<script>放在HTML文件的底部附近的原因是浏览器会按照代码在文件中的顺序加载 HTML。有了标签，才能找到这个标签，然后去执行对应的操作
+> 我们将 `<script>` 放在HTML文件的底部附近的原因是浏览器会按照代码在文件中的顺序加载 HTML。有了标签，才能找到这个标签，然后去执行对应的操作
 > 如果先加载的 JavaScript 期望修改其下方的 HTML，那么它可能由于 HTML 尚未被加载而失效。
 > 因此，将 JavaScript 代码放在 HTML页面的底部附近通常是最好的策略。
 
@@ -172,7 +174,7 @@ document.write('嗨，欢迎来传智播学习前端技术！')
 </html>
 ```
 
-如果 script 标签使用 src 属性引入了某 .js 文件，那么 标签的代码会被忽略！！！如下代码所示：
+如果 script 标签使用 `src` 属性引入了某 `.js` 文件，那么 标签的代码会被忽略！！！如下代码所示：
 
 ```html
 <!DOCTYPE html>
@@ -285,9 +287,17 @@ document.write('嗨，欢迎来传智播学习前端技术！')
 
 JavaScript 可以接收用户的输入，然后再将输入的结果输出：
 
-> PS：中文一定要加引号 ' '，'  ' 并不会被打印出来
+> PS：中文一定要加引号 `''`，`''` 并不会被打印出来
 
 `alert()`、`document.wirte()、console.log('控制台打印')`
+
+**输出语句**
+
+| api              | 描述                  |
+| ---------------- | --------------------- |
+| window.alert()   | 浏览器弹出警告框      |
+| document.write() | 写入HTML,在浏览器展示 |
+| console.log()    | 写入浏览器控制台      |
 
 以数字为例，向 `alert()` 或 `document.write()`输入任意数字，他都会以弹窗形式展示（输出）给用户。
 
@@ -297,7 +307,7 @@ eg：
 
 可以注意到，下方已经加了一个h1标签
 
-<img src="C:\Users\Epiphany\AppData\Roaming\Typora\typora-user-images\image-20231228131847505.png" alt="image-20231228131847505" style="zoom:50%;" />
+<img src=".\assets\image-20231228131847505.png" alt="image-20231228131847505" style="zoom:50%;" />
 
 ```html
 <script>
@@ -1755,11 +1765,11 @@ for 语句
 
 利用循环的知识来对比一个简单的天文知识，我们知道地球在自转的同时也在围绕太阳公转，如果把自转和公转都看成是循环的话，就相当于是循环中又嵌套了另一个循环。
 
-![universe](O:/BaiduSyncdisk/other/课/黑马/JavaScript/1.JavaScript基础/资料/JavaScript基础笔记和作业/JavaScript基础第三天/02-笔记/assets/universe.gif)
+![universe](./assets/universe.gif)
 
 实际上 JavaScript 中任何一种循环语句都支持循环的嵌套，如下代码所示：
 
-![64791826139](O:/BaiduSyncdisk/other/课/黑马/JavaScript/1.JavaScript基础/资料/JavaScript基础笔记和作业/JavaScript基础第三天/02-笔记/assets/1647918261399.png)
+![64791826139](./assets/1647918261399.png)
 
 ```html
 // 1. 外面的循环 记录第n天 
@@ -1788,7 +1798,7 @@ for (let i = 1; i <= 5; i++) {
 }
 ~~~
 
- ![64791867895](O:/BaiduSyncdisk/other/课/黑马/JavaScript/1.JavaScript基础/资料/JavaScript基础笔记和作业/JavaScript基础第三天/02-笔记/assets/1647918678956.png)
+ ![64791867895](./assets/1647918678956.png)
 
 九九乘法表
 
@@ -1826,7 +1836,7 @@ for (let i = 1; i <= 9; i++) {
 }
 ~~~
 
-![64791873467](O:/BaiduSyncdisk/other/课/黑马/JavaScript/1.JavaScript基础/资料/JavaScript基础笔记和作业/JavaScript基础第三天/02-笔记/assets/1647918734677.png)
+![64791873467](./assets/1647918734677.png)
 
 # 42.数组的基本使用以及案例
 
@@ -1874,7 +1884,7 @@ for (let i = 1; i <= 9; i++) {
 
 索引值实际是按着数据单元在数组中的位置依次排列的，注意是从` 0` 开始的，如下图所示：
 
-![array](O:/BaiduSyncdisk/other/课/黑马/JavaScript/1.JavaScript基础/资料/JavaScript基础笔记和作业/JavaScript基础第三天/02-笔记/assets/array.jpg)
+![array](./assets/array.jpg)
 
 观察上图可以数据单元【小明】对应的索引值为【0】，数据单元【小红】对应的索引值为【2】
 
@@ -2103,7 +2113,7 @@ JavaScript 基础 - 第4天笔记
 
 声明（定义）一个完整函数包括关键字、函数名、形式参数、函数体、返回值5个部分
 
-![function](O:/BaiduSyncdisk/other/课/黑马/JavaScript/1.JavaScript基础/资料/JavaScript基础笔记和作业/JavaScript基础第四天/03-笔记/assets/function.jpg)
+![function](./assets/function.jpg)
 
 **调用**
 
@@ -2222,11 +2232,11 @@ JavaScript 基础 - 第4天笔记
 
 # 51.形参和实参、参数的默认值
 
-形参：声明函数时写在函数名右边小括号里的叫形参（形式上的参数）
+形参：**声明**函数时写在函数名右边小括号里的叫形参（形式上的参数）
 
-实参：调用函数时写在函数名右边小括号里的叫实参（实际上的参数）
+实参：**调用**函数时写在函数名右边小括号里的叫实参（实际上的参数）
 
-形参可以理解为是在这个函数内声明的变量（比如 num1 = 10）实参可以理解为是给这个变量赋值
+形参可以理解为是在这个函数内声明的变量（比如 num1 = 10），实参可以理解为是给这个变量赋值
 
 开发中尽量保持形参和实参个数一致
 
@@ -2263,7 +2273,7 @@ console.log(getSum(1, 2)) //3
 console.log(getSum());//NaN
 ~~~
 
-改进代码：用户不输入实参，可以给 形参默认值，可以默认为 0, 这样程序更严谨
+改进代码：用户不输入实参，可以给形参默认值，可以默认为 0, 这样程序更严谨
 
 > 这个默认值只会在缺少实参参数传递时 才会被执行，所以有参数会优先执行传递过来的实参, 否则默认为 undefined
 
@@ -6576,7 +6586,7 @@ BOM里包含DOM，只不过BOM平时使用的少
 
 - window对象下的属性和方法调用的时候可以省略window
 
- ![67604743636](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第五天/04-笔记/assets/1676047436362.png)
+ ![67604743636](./assets/1676047436362.png)
 
 
 
@@ -6808,11 +6818,11 @@ history (历史)是对象，主要管理历史记录， 该对象与浏览器地
 
 history对象一般在实际开发中比较少用，但是会在一些OA 办公系统中见到。
 
-![67604783479](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第五天/04-笔记/assets/1676047834796.png)
+![67604783479](./assets/1676047834796.png)
 
 常见方法：
 
-![67604784659](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第五天/04-笔记/assets/1676047846593.png)
+![67604784659](./assets/1676047846593.png)
 
 ~~~html
 <body>
@@ -7150,6 +7160,8 @@ map 可以遍历数组处理数据，并且返回**新的数组**，并不会改
 >map 也称为映射。映射是个术语，指两个元素的集之间元素相互“对应”的关系。
 >
 >map重点在于有返回值，forEach没有返回值（undefined）
+
+----
 
 ### join方法
 
@@ -8580,6 +8592,8 @@ getSum(1, 2, 3, 4, 2, 2, 3, 4)
 2. `arguments` 的作用是动态获取函数的实参
 3. 可以通过for循环依次得到传递过来的实参
 
+---
+
 ## 剩余参数
 
 剩余参数允许我们将一个不定数量的参数表示为一个数组
@@ -8596,13 +8610,13 @@ getSum(1, 2, 3, 4, 5)
 
 总结：
 
-1. `...` 是语法符号，置于最末函数形参之前，用于获取多余的实参
+1. `...` 是语法符号，取的是最末位的函数形参，用于获取多余的实参
 2. 借助 `...` 获取的剩余实参，是个真数组
 3. 开发中，还是提倡多使用 剩余参数。因为以后写的箭头函数里面没有arguments
 
 ## 展开运算符
 
-展开运算符(…),将一个数组进行展开，也可以运用于对象
+展开运算符(…)：将一个数组进行展开，也可以运用于对象，这里讲解的是数组
 
 **典型运用场景： 求数组最大值(最小值)、合并数组等**
 
@@ -8614,7 +8628,7 @@ console.log(...arr) // 1 5 3 8 2
 说明：
 
 1. 不会修改原数组
-2. 和剩余参数不同的是，这两个写的位置不一样，一个是写在函数内部，一个是用在数组
+2. 和剩余参数不同的是，这两个写的位置不一样，一个是写在函数内部，一个是用在数组 / 数组
 
 ~~~js
 const arr1 = [1, 2, 3]
@@ -9831,13 +9845,13 @@ console.log(num.toString())
 
  举个栗子：蛋炒饭
 
-![67679290689](O:/BaiduSyncdisk/other/课/黑马/JavaScript/3.JS进阶/资料/JavaScript进阶第三天/02-笔记/assets/1676792906898.png)
+![67679290689](./assets/1676792906898.png)
 
 ### 面向对象（OOP）
 
 面向对象是把事务分解成为一个个对象，然后由对象之间分工与合作。
 
-![67679293032](O:/BaiduSyncdisk/other/课/黑马/JavaScript/3.JS进阶/资料/JavaScript进阶第三天/02-笔记/assets/1676792930329.png)
+![67679293032](./assets/1676792930329.png)
 
 在面向对象程序开发思想中，每一个对象都是功能中心，具有明确分工。
 
@@ -10221,7 +10235,7 @@ console.log(pink)
 1. 只要是对象就有`__proto__`
 2. 只要是原型对象，里面就有constructor
 
-![67679338869](O:/BaiduSyncdisk/other/课/黑马/JavaScript/3.JS进阶/资料/JavaScript进阶第三天/02-笔记/assets/1676793388695.png)
+![67679338869](./assets/1676793388695.png)
 
 ```js
 // function Objetc() {}
