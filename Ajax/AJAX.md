@@ -4679,58 +4679,70 @@ Node.js 作用除了编写后端应用程序，也可以对前端代码进行压
 
 如下图，在浏览器中有 `window浏览器对象模型`、`document文档对象模型`、AJAX相关的原理：`XMLHttpRequest` 等等。
 
-其次Node.js 基于Chrome V8 引擎封装（运行环境），独立执行 JS 代码，但是语法和浏览器环境的 V8 有所不同，没有 document 和 window 但是都支持 ECMAScript 标准的代码语法
+而在 `Node.js` 中，因为脱离了浏览器，因此 `Node.js` 中是没有 `window` 和 `document` 这两个对象的，取而代之，它有fs和path模块等独立的API，可以主动的来读取我们本机中的一些文件内容。
 
-区别：都支持 ECMAScript 标准语法，Node.js 有独立的 API
+但是它们两个都支持 ECMAScript 标准的代码语法
 
 <img src="./assets/image-20240516163756345.png" alt="image-20240516163756345" style="zoom:50%;" />
 
-1. 要求：下载 node-v16.19.0.msi 安装程序（指定版本：兼容 vue-admin-template 模板）
+---
 
-2. 想要得到 Node.js 需要把这个软件安装到电脑，在素材里有安装程序（window 和 mac 环境的）参考 PPT 默认下一步安装即可
+## 三、下载 `Node.js`
 
-3. Node.js 没有图形化界面，需要使用 cmd 终端命令行（利用一些命令来操控电脑执行某些程序软件）输入，node -v 检查是否安装成功
+推荐下载 node-v16.19.0.msi 安装程序，因为在以后你的电脑中可能会使用vue相关的模版项目（vue-admin-template模版），而这个模版项目是基于 `Node.js` 的版本创建的，因此如果你安装了更高级的 `Node.js版本` 也是可以的，但是可能会在使用这个模版的时候报出一些错误。
 
-   ```bash
-   node -v
-   ```
+VSCode中默认是powershell终端，这个是Windows10新出的终端，它默认不允许我们执行自定义的脚本命令
 
-4. 需求：新建 index.js 文件，编写打印代码和 for 循环打印 3 个 6
+![image-20240516194858262](./assets/image-20240516194858262.png)
 
-   ```js
-   /**
-    * 目标：编写 js 代码，用 node 命令执行
-    * 终端作用：敲击命令，调用对应程序执行
-    * 终端打开：目标文件->右键->在集成终端中打开
-    * 命令：node xxx.js （注意路径）
-    */
-   console.log('Hello, World')
-   for (let i = 0; i < 3; i++) {
-     console.log(6)
-   }
-   ```
+点击 `选择默认配置文件`
 
-   
+![image-20240516195353930](./assets/image-20240516195353930.png)
 
-5. Node.js 执行目标 JS 文件，需要使用 node xxx.js 命令来执行（我们可以借助 VSCode 集成终端使用，好处：可以快速切换到目标 JS 文件所在终端目录，利用相对路径找到要执行的目标 JS 文件
+选择cmd（Command）即可
 
-   ![image-20230330112925228](./assets/image-20230330112925228.png)
-
-VSCode中默认是powershell终端，它里面不允许我们执行默认的命令
-
-![image-20240121212543061](.\assets\image-20240121212543061.png)
-
-选择cmd即可
-
-![image-20240121212617604](.\assets\image-20240121212617604.png)
+![image-20240516195431550](./assets/image-20240516195431550.png)
 
 这里可以直接终止终端
 
-![image-20240121212951209](.\assets\image-20240121212951209.png)
+![image-20240516195006976](./assets/image-20240516195006976.png)
 
-直接在想要的文件右击，选择在集成终端中打开，这样它就会自动切换终端中的路径
+此时重新新建终端的时候就是cmd终端了
 
-![image-20240121213114653](.\assets\image-20240121213114653.png)
+Node.js 没有图形化界面，需要使用 cmd 终端命令行（利用一些命令来操控电脑执行某些程序软件）输入，node -v 检查是否安装成功
+
+```bash
+node -v
+```
+
+---
+
+## 四、使用 `NodeJS` 运行js代码
+
+需求：新建 index.js 文件，编写打印代码和 for 循环打印 3 个 6
+
+```js
+/**
+ * 目标：编写 js 代码，用 node 命令执行
+ * 终端作用：敲击命令，调用对应程序执行
+ * 终端打开：目标文件->右键->在集成终端中打开
+ * 命令：node xxx.js （注意路径）
+ */
+console.log('Hello, World')
+for (let i = 0; i < 3; i++) {
+  console.log(6)
+}
+```
+
+Node.js 执行目标 JS 文件，需要使用 node xxx.js 命令来执行（我们可以借助 VSCode 集成终端使用，好处：可以快速切换到目标 JS 文件所在终端目录，利用相对路径找到要执行的目标 JS 文件
+
+![image-20230330112925228](./assets/image-20230330112925228.png)
+
+
+
+----
+
+## 五、总结
 
 1. Node.js 有什么用？
 
@@ -4776,109 +4788,113 @@ VSCode中默认是powershell终端，它里面不允许我们执行默认的命�
 
 
 
+----
+
 # 84.fs模块-读写文件
 
-1. 模块：类似插件，封装了方法和属性供我们使用
+模块：类似插件，封装了方法和属性供我们使用
 
-2. fs 模块：封装了与本机文件系统进行交互的，方法和属性，用于读写本机文件内容
+fs 模块：封装了与本机文件系统进行交互的，方法和属性，用于读写本机文件内容
 
-3. fs 模块使用语法如下：
+fs 模块使用语法如下：
 
-   * 加载 fs 模块，得到 fs 对象
+* 将 `fs模块` 加载到自己编写的js文件中，得到 fs 对象
 
-     ```js
-     const fs = require('fs') // require是固定的函数，传入的是模块标识符：模块的名字，这个模块是node安装后，内部自带的，引入之后，在原地会留下一个对象，用fs常量进行接收
-     ```
+  require是固定名字的函数，传入的是模块标识符：即模块的名字。这个模块是node安装后，内部自带的，引入之后，在原地会留下一个对象，用fs常量进行接收。
 
-   * 写入文件内容语法：
+  ```js
+  const fs = require('fs') 
+  ```
 
-     ```js
-     fs.writeFile('文件路径', '写入内容', err => { //writeFile是这个文件内封装好的方法，这里需要传入三个参数，第二个写入的内容建议是个字符串，第三个参数是回调函数，可以用err接收本次写入的错误信息，写入错误，err参数就有值，写入正确，err参数就为空
-       // 写入后的回调函数
-     })
-     ```
+* 写入文件内容语法：
 
-   * 读取文件内容的语法：
+  writeFile是这个文件内封装好的方法，这里需要传入三个参数，第二个写入的内容建议使用字符串，第三个参数是回调函数，可以用err接收本次写入的错误信息，如果写入错误，err参数就有值；如果写入正确，err参数就为空
 
-     ```js
-     fs.readFile('文件路径', (err, data) => {
-       // 读取后的回调函数，形参1是错误信息
-       // data 是文件内容的 Buffer 数据流（实际上我们读出来的字符串内容是以16进制的格式展示的，调用buffer数据流的toString方法，就可以把这个数据流转化成我们认识的字符串格式
-     })
-     ```
+  ```js
+  fs.writeFile('文件路径', '写入内容', err => { 
+    // 写入后的回调函数
+  })
+  ```
 
-文件在计算机中保存的二进制数据转出来的对应的16进制的数据
+* 读取文件内容的语法：
 
-![image-20240121214506243](.\assets\image-20240121214506243.png)
+  ```js
+  fs.readFile('文件路径', (err, data) => {
+    // 读取后的回调函数，形参1是错误信息
+    // data 是文件内容的 Buffer 数据流（实际上我们读出来的字符串内容是以16进制的格式展示的，调用buffer数据流的toString方法，就可以把这个数据流转化成我们认识的字符串格式
+  })
+  ```
 
-4. 需求：向 test.txt 文件写入内容并读取打印
+需求：向 test.txt 文件写入内容并读取打印
 
-   ```js
-   /**
-    * 目标：基于 fs 模块读写文件内容
-    *  1. 加载 fs 模块对象
-    *  2. 写入文件内容
-    *  3. 读取文件内容
-    */
-   // 1. 加载 fs 模块对象
-   const fs = require('fs')
-   // 2. 写入文件内容
-   fs.writeFile('./test.txt', 'hello, Node.js', (err) => {
-       if (err) console.log(err)
-       else console.log('写入成功')
-   })
-   // 3. 读取文件内容
-   fs.readFile('./test.txt', (err, data) => {
-       if (err) console.log(err)
-       // data 是 buffer 16 进制数据流对象
-       // .toString() 转换成字符串
-       else console.log(data.toString())
-   })
-   ```
+```js
+/**
+ * 目标：基于 fs 模块读写文件内容
+ *  1. 加载 fs 模块对象
+ *  2. 写入文件内容
+ *  3. 读取文件内容
+ */
+// 1. 加载 fs 模块对象
+const fs = require('fs')
+// 2. 写入文件内容
+fs.writeFile('./test.txt', 'hello, Node.js', (err) => {
+    if (err) console.log(err)
+    else console.log('写入成功')
+})
+// 3. 读取文件内容
+fs.readFile('./test.txt', (err, data) => {
+    if (err) console.log(err)
+    // data 是 buffer 16 进制数据流对象
+    // .toString() 转换成字符串
+    else console.log(data.toString())
+})
+```
 
+---
 
 # 85.path模块-路径处理
 
-1. 为什么在 Node.js 待执行的 JS 代码中要用绝对路径：
+为什么在 Node.js 待执行的 JS 代码中要用绝对路径：
 
-   > Node.js 执行 JS 代码时，代码中的路径都是以终端所在文件夹出发查找相对路径，而不是以我们认为的从代码本身出发，会遇到问题，所以在 Node.js 要执行的代码中，访问其他文件，建议使用绝对路径
+> Node.js 执行 JS 代码时，代码中的路径都是以终端所在文件夹出发查找相对路径，而不是以我们认为的从代码本身出发，会遇到问题，所以在 Node.js 要执行的代码中，访问其他文件，建议使用绝对路径
 
-2. 新建 03 文件夹编写待执行的 JS 代码，访问外层相对路径下的文件，<span style="color: red;">然后在最外层终端路径来执行目标文件，造成问题</span>
+新建 03 文件夹编写待执行的 JS 代码，访问外层相对路径下的文件，<span style="color: red;">然后在最外层终端路径来执行目标文件，造成问题</span>
 
-   ![image-20230330113929178](./assets/image-20230330113929178.png)
+![image-20230330113929178](./assets/image-20230330113929178.png)
 
-   ![image-20230330113942679](./assets/image-20230330113942679.png)
+![image-20230330113942679](./assets/image-20230330113942679.png)
+
+问题原因：就是从代码文件夹出发，使用`../text.txt`解析路径，找不到目标文件，报错了！
+
+解决方案：使用fd模块内置变量 `__dirname`配合 path.join()或者path.resolve() 来得到绝对路径使用
+
+- windows： D:\备课代码\3-B站课程\03_Node.js与Webpack\03-code\03（window系统是反斜线）
+- mac： /Users/xxx/Desktop/备课代码/3-B站课程/03_Node.js与Webpack/03-code/03（mac系统是斜线）
+- path.join() 会使用特定于平台的分隔符，作为定界符，将所有给定的路径片段连接在一起
+- 语法：
+  1. 加载 path 模块
+  2. 使用 path.join 方法，拼接路径
+
+```js
+const fs = require('fs')
+console.log(__dirname) // D:\备课代码\2_node_3天\Node_代码\Day01_Node.js入门\代码\03
+
+// 1. 加载 path 模块
+const path = require('path')
+// 2. 使用 path.join() 来拼接路径
+// const pathStr = path.join(__dirname, '..', 'text.txt')
+const pathStr = path.join(__dirname, '../text.txt') //直接写成这样，传入到这个方法中，它也会帮我们把这个斜线进行转换
+console.log(pathStr)
+
+fs.readFile(pathStr, (err, data) => {
+  if (err) console.log(err)
+  else console.log(data.toString())
+})
+```
 
 
 
-3. 问题原因：就是从代码文件夹出发，使用`../text.txt`解析路径，找不到目标文件，报错了！
-
-4. 解决方案：使用模块内置变量 `__dirname`配合 path.join()或者path.resolve() 来得到绝对路径使用
-
-   - windows： D:\备课代码\3-B站课程\03_Node.js与Webpack\03-code\03（window系统是反斜线）
-   - mac： /Users/xxx/Desktop/备课代码/3-B站课程/03_Node.js与Webpack/03-code/03（mac系统是斜线）
-   - path.join() 会使用特定于平台的分隔符，作为定界符，将所有给定的路径片段连接在一起
-   - 语法：
-     1. 加载 path 模块
-     2. 使用 path.join 方法，拼接路径
-
-   ```js
-   const fs = require('fs')
-   console.log(__dirname) // D:\备课代码\2_node_3天\Node_代码\Day01_Node.js入门\代码\03
-   
-   // 1. 加载 path 模块
-   const path = require('path')
-   // 2. 使用 path.join() 来拼接路径
-   // const pathStr = path.join(__dirname, '..', 'text.txt')
-   const pathStr = path.join(__dirname, '../text.txt') //直接写成这样，传入到这个方法中，它也会帮我们把这个斜线进行转换
-   console.log(pathStr)
-   
-   fs.readFile(pathStr, (err, data) => {
-     if (err) console.log(err)
-     else console.log(data.toString())
-   })
-   ```
-
+---
 
 # 86.案例-压缩前端html
 
@@ -5056,41 +5072,42 @@ server.listen(8080, () => {
 
 
 
-Node.js模块化
+----
+
+# Node.js模块化
 
 # 90.模块化简介
 
-定义：在 Node.js 中每个文件都被当做是一个独立的模块
+下图是从NodeJS官网截取下来的定义
 
-模块内定义的变量和函数都是独立作用域的，因为 Node.js 在执行模块代码时，将使用如下所示的函数封装器对其进行封装
+![image-20240516213335683](./assets/image-20240516213335683.png)
 
-![image-20230331150152299](./assets/image-20230331150152299.png)
+最关键的一句话就是：在 Node.js 中每个文件都被当做是一个独立的模块。
 
-​	
+之前我们写代码的时候就已经用过模块化的概念了，例如我们之前在编写Web服务的时候，`index.js` 其实就是一个模块，在这个模块中我们编写了一些JS的代码。
 
-而且项目是由多个模块组成的，每个模块之间都是独立的，而且提高模块代码复用性，按需加载，独立作用域
+- 并且当我有读写文件的需求时，我又借助了另外的一个模块：fs，然后将它引入到我们自己的代码中
+- 当我又想拼接一个路径时，又借助了path模块，然后将它也引入我们自己的代码中
+- 当我要创建web服务时，需要借助http模块
+- 想要将查询参数字符串转成查询对象，需要用到 `querystring模块`
 
-> 把查询参数转为查询对象，使用的就是querystring模块
->
-> 我们不光可以引入NodeJS内置的模块，还可以自己定义一些JS的模块文件，然后引入到自己的代码中进行使用
+而且我们不光可以引入NodeJS内置的模块，还可以自己定义一些JS的模块文件，然后引入到自己的代码中进行使用，例如下图的 `utils.js`。
 
 ![image-20230331150407659](./assets/image-20230331150407659.png)
 
-概念：项目是由很多个模块文件组成的
+**因此我们的项目是由多个模块组成的**，每个模块之间都是独立的（定义变量的时候就不用担心变量名是否会跟其他的模块冲突），而且提高模块代码复用性（多个js文件共用一个模块），按需加载（需要时就引入，不需要时就不引入），独立作用域。
 
-好处：提高代码复用性，按需加载，独立作用域
+模块内定义的变量和函数都是独立作用域的，因为 Node.js 在执行模块代码时，将使用如下所示的函数封装器对其进行封装，即 `立即执行函数`。
 
-使用：需要标准语法（CommonJS标准）导出和导入进行使用
+![image-20230331150152299](./assets/image-20230331150152299.png)
 
+既然每个模块都是独立的作用域，如果我在 `util.js` 中封装了一个属性或方法，然后想要再我们自己的 `index.js` 中引入过来使用，此时我们就需要使用特定的标准语法（CommonJS标准），将我们自己写的这个模块内 想要向外暴露的`属性 / 方法`进行到处，在使用的时候还需要用对应的标准语法进行导入才能使用。
 
+---
 
 ## CommonJS标准
 
-但是因为模块内的属性和函数都是私有的，如果对外使用，需要使用标准语法导出和导入才可以，而这个标准叫 CommonJS 标准，接下来我们在一个需求中，体验下模块化导出和导入语法的使用
-
-需求：定义 utils.js 模块，封装基地址和求数组总和的函数，导入到 index.js 使用查看效果
-
-![image-20230331150506876](./assets/image-20230331150506876.png)
+但是因为模块内的属性和函数都是私有的，如果对外使用，需要使用标准语法导出和导入才可以，而这个标准叫 CommonJS 标准，接下来我们在一个需求中，体验下模块化导出和导入语法的使用。
 
 1. 导出语法：
 
@@ -5101,7 +5118,7 @@ Node.js模块化
    }
    ```
 
-6. 导入语法：
+2. 导入语法：
 
    ```js
    // 这里的变量名就相当于上面暴露出来的对象
@@ -5109,9 +5126,13 @@ Node.js模块化
    // Node.js 环境内置模块直接写模块名（例如：fs，path，http）
    // 自定义模块：写模块文件路径（例如：./utils.js)
    ```
-```
-   
+
+
 > 变量名的值接收的就是目标模块导出的对象
+
+需求：定义 utils.js 模块，封装基地址和求数组总和的函数，导入到 index.js 使用查看效果
+
+![image-20230331150506876](./assets/image-20230331150506876.png)
 
 代码实现
 
@@ -5129,7 +5150,6 @@ Node.js模块化
     url: baseURL,
     arraySum: getArraySum
   }
-```
 
 * index.js：导入使用
 
@@ -5144,6 +5164,7 @@ Node.js模块化
   console.log(result)
   ```
 
+----
 
 # 91.ECMAScript标准-默认导出和导入
 
@@ -5172,7 +5193,7 @@ CommonJS 规范是 Node.js 环境中默认的，后来官方推出 ECMAScript �
 ```json
 { 
     // "type": "commonjs" 是默认的
-    “type”: "module" 
+    "type": "module" 
 }
 ```
 
@@ -5226,11 +5247,11 @@ ECMAScript 标准的语法有很多，常用的就是默认和命名导出和导
 2. 命名导入语法：
 
    ```js
-   // 多个变量使用逗号分隔
+   // 多个变量使用逗号分隔，记得大括号
    import { 同名变量 } from '模块名或路径'
    ```
 
-   > 注意：同名变量指的是模块内导出的变量名
+   > 注意：同名变量指的是模块内导出的变量名，`模块内导出的变量名` 和 `这里写的变量名` 需要一样
 
 
 Node.js 支持 2 种模块化标准
@@ -5272,6 +5293,8 @@ Node.js 支持 2 种模块化标准
   const result = getArraySum([10, 21, 33])
   console.log(result)
   ```
+
+---
 
 # 93.包的概念
 
