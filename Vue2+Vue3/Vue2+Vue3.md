@@ -1402,7 +1402,9 @@ item从 1 开始，到 10 结束
 ...
 ```
 
-> select下拉框有些特殊，选中该元素，然后使用F12工具查看select，可以使用$0查看该元素
+浏览器中 `$0` 表示你当前选中的元素
+
+> select下拉框有些特殊，选中 `<select>` 标签
 >
 > ![image-20240129203528585](.\assets\image-20240129203528585.png)
 >
@@ -17379,13 +17381,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->       
+>          
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->       
+>          
 >    <style scoped>
 >    </style>
 >    ~~~

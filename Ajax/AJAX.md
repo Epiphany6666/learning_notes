@@ -343,6 +343,8 @@ npm config set registry https://registry.npm.taobao.org --global
 
    * 需要学习，method 和 data 这2个新的选项了（大家不用担心，这2个学完，axios常用的选项就都学完了）
 
+     method如果不传，默认就是发送GET请求
+
    * data是在请求体提交参数和值
 
      ```js

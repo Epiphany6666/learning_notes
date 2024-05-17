@@ -1,5 +1,5 @@
-function myAxios(config: { url: string; method?: string }) {}
+function myAxios(config: { url ; method?: string }) {}
 
 myAxios({
-  url: ''
+  url: '1'
 })

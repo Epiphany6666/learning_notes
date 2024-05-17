@@ -3936,7 +3936,28 @@ end.addEventListener('click', function () {
 
 - 区别：
 
-  on方式会被覆盖，addEventListener方式可绑定多次，拥有事件更多特性，推荐使用
+  on方式会出现事件被覆盖的问题，addEventListener方式可绑定多次，拥有事件更多特性，推荐使用
+  
+  ~~~ts
+  const btn = document.querySelector('button')
+  // 由于这种方法是赋值的方式，因此如果点击了 `btn按钮`，那么只会弹出 `22`，后面的将前面的给覆盖了
+  btn.onclick = function () {
+    alert(11)
+  }
+  btn.onclick = function () {
+    alert(22)
+  }
+  
+  // 但如果下面这么写，就会先弹出 `11`，后弹出 `22` ，并不会出现覆盖的情况
+  btn.addEventListener('click', function () {
+    alert(11)
+  })
+  btn.addEventListener('click', function () {
+    alert(22)
+  })
+  ~~~
+  
+  
 
 发展史：
 
@@ -4004,7 +4025,7 @@ mouseleave：鼠标离开
 
 鼠标事件是指跟鼠标操作相关的事件，如单击、双击、移动等。
 
-1. `mouseenter 监听鼠标是否移入 DOM 元素
+1. `mouseenter` 监听鼠标是否移入 DOM 元素
 
 ```html
 <body>
@@ -4358,7 +4379,7 @@ textarea.addEventListener('keyup', function (e) {
    </script>
    ~~~
 
-6. 直接调用函数，其实相当于是 window.函数，所以 this 指代 window
+6. 直接调用函数，其实相当于是 `window.函数`，所以 this 指代 window
 
 ## 回调函数
 
