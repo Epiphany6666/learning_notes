@@ -7,6 +7,9 @@ enum Direction {
   Right = 'RIGHT'
 }
 
+console.log(Direction)
 function changeDirection(direction: Direction) {}
 
 changeDirection(Direction.Up)
+
+
