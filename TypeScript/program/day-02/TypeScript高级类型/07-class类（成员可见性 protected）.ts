@@ -12,7 +12,7 @@ class Animal {
 }
 
 const a = new Animal()
-// a.move()
+a.move()
 
 // 子类
 class Dog extends Animal {

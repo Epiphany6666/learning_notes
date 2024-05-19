@@ -9343,7 +9343,7 @@ function Pig(uname, age) {
 // console.log(new Pig('佩奇', 6))
 // console.log(new Pig('乔治', 3))
 const p = new Pig('佩奇', 6)
-console.log(p)
+console.log(p) // Pig {uname: '佩奇', age: 6}
 
 //  const pepa = { uname: '佩奇', age: 6 }
 
