@@ -9121,7 +9121,7 @@ header {
 
 **基本写法**
 
-![1682667975274](O:/BaiduSyncdisk/other/课/黑马/HTML+CSS+移动web/移动Web/day05资料/笔记/assets/1682667975274.png)
+![1682667975274](./assets/1682667975274.png)
 
 * max-width：最大宽度（小于等于）
 * min-width：最小宽度（大于等于）
@@ -9135,7 +9135,7 @@ header {
 
 需求：网页宽度小于等于768px则隐藏左侧区域
 
-![1682668088236](O:/BaiduSyncdisk/other/课/黑马/HTML+CSS+移动web/移动Web/day05资料/笔记/assets/1682668088236.png)
+![1682668088236](./assets/1682668088236.png)
 
 * HTML 结构
 
@@ -9176,7 +9176,7 @@ header {
 
 # 189.媒体查询-完整写法
 
-![1682668186585](O:/BaiduSyncdisk/other/课/黑马/HTML+CSS+移动web/移动Web/day05资料/笔记/assets/1682668186585.png)
+![1682668186585](./assets/1682668186585.png)
 
 #### 关键词 / 逻辑操作符
 
@@ -9204,7 +9204,7 @@ header {
 
 ### 媒体查询-外部CSS
 
-![1682668446411](O:/BaiduSyncdisk/other/课/黑马/HTML+CSS+移动web/移动Web/day05资料/笔记/assets/1682668446411.png)
+![1682668446411](./assets/1682668446411.png)
 
 ~~~css
 <!-- 即便只有一个媒体特性，小括号也必须写 -->
@@ -9233,7 +9233,7 @@ Bootstrap 是由 Twitter 公司开发维护的前端 UI 框架，它提供了大
 >
 > ![image-20240105140804777](.\assets\image-20240105140804777.png)
 
-![1682668529209](O:/BaiduSyncdisk/other/课/黑马/HTML+CSS+移动web/移动Web/day05资料/笔记/assets/1682668529209.png)
+![1682668529209](./assets/1682668529209.png)
 
 bootstrap.min.css：进行了压缩，所有代码都放到了一行，这种文件体积较小。
 
@@ -9271,7 +9271,7 @@ bootstrap.min.css：进行了压缩，所有代码都放到了一行，这种文
 
 做响应式效果，第一点要保证的就是版心不一样
 
-![1682668611644](O:/BaiduSyncdisk/other/课/黑马/HTML+CSS+移动web/移动Web/day05资料/笔记/assets/1682668611644.png)
+![1682668611644](./assets/1682668611644.png)
 
 * row 类：行，可以让内容在一行排（flex布局）
 
@@ -9309,7 +9309,7 @@ Bootstrap中快速找到对应的代码
 
 #### 按钮
 
-![1682668666364](O:/BaiduSyncdisk/other/课/黑马/HTML+CSS+移动web/移动Web/day05资料/笔记/assets/1682668666364.png)
+![1682668666364](./assets/1682668666364.png)
 
 类名
 
@@ -9325,7 +9325,7 @@ v5官方文档：
 
 #### 表格
 
-![1682668706851](O:/BaiduSyncdisk/other/课/黑马/HTML+CSS+移动web/移动Web/day05资料/笔记/assets/1682668706851.png)
+![1682668706851](./assets/1682668706851.png)
 
 表格类：
 
@@ -9429,7 +9429,7 @@ js文件在</body>的上面引入即可
 
 **准备工作**
 
-![1682668919871](O:/BaiduSyncdisk/other/课/黑马/HTML+CSS+移动web/移动Web/day05资料/笔记/assets/1682668919871.png)
+![1682668919871](./assets/1682668919871.png)
 
 * HTML 结构
 
