@@ -5978,29 +5978,61 @@ Webpack 打包后的前端代码是如何运行的?
 
 # 103.优化-提取 css 代码
 
+上节我们已经让Webpack能够成功打包CSS代码了，这节课来做一个优化：将打包在JS文件中的CSS代码，单独提取成一个独立的CSS文件。
+
 好处：css 文件可以和js一起被浏览器缓存，减少 js 文件体积
 
 > 浏览器可以并行下载css和js代码，可以让网页更快地显示在用户眼前
 
-注意：不能和 style-loader 一起使用
+要完成这个优化，提取CSS代码的效果，我们就需要给Webpack寻找一件强有力的装备，这个强有力的插件就叫做 `mini-css-extract-plugin`，它的主要作用就是提取CSS代码。
 
-> 因为 style-loader 是把css代码打包到了js中，然后插入到DOM上，而 min-css-extract-plugin 是为了把css代码独立出来
+需求：让 webpack 把 css 代码内容字符串单独提取到 dist 下的 css 文件中
 
-求：让 webpack 把 css 代码内容字符串单独提取到 dist 下的 css 文件中
+需要： [mini-css-extract-plugin](https://webpack.docschina.org/plugins/mini-css-extract-plugin/)插件来实现。
 
-需要： [mini-css-extract-plugin)](https://webpack.docschina.org/plugins/mini-css-extract-plugin/)插件来实现
+---
+
+## 一、找到提取CSS代码用到的插件
+
+在上节我们查看 `css-loader插件` 的时候，它其实在最下面已经给出了一个示例。
 
 ![image-20240127141917472](.\assets\image-20240127141917472.png)
 
-我们可以阅读 推荐示例 也可以自己百度搜索`webpack 提取 css 代码`这种关键字的方式，但由于我们搜索到的可能是几百年前，可以使用搜索工具进行过滤
+点击后就会跳到GitHub上面，最关键的一句话就是：`mini-css-extract-plugin` 不能和 `style-loader` 一起使用。
 
-但如果有webpack4的，那是因为它买了百度推广的广告，它会置顶在上面
+因为 style-loader 是把css代码打包到了js中，然后插入到DOM上，而 min-css-extract-plugin 是为了把css代码独立出来。
+
+![image-20240520195207420](./assets/image-20240520195207420.png)
+
+此时就找到了插件：`mini-css-extract-plugin`
+
+官方给出的实例大家看着可能也是一头雾水，这里建议大家把每一句代码的详细意思都通过百度找到对应的解释，一句一句写注释后，你就明白这里面的作用。
+
+![image-20240520195715324](./assets/image-20240520195715324.png)
+
+---
+
+除了通过上面的方式找到这个插件，也可以我们也可以自己百度搜索`webpack 提取 css 代码`这种关键字的方式，但由于我们搜索到的可能是几百年前，可以使用搜索工具进行过滤，但如果还有webpack4的，那是因为它买了百度推广的广告，它会置顶在上面。
 
 ![image-20240127142610826](.\assets\image-20240127142610826.png)
 
-下面红框的地方就是Webpack4使用的插件
 
-![image-20240127151246639](.\assets\image-20240127151246639.png)
+
+---
+
+## 二、阅读官方文档
+
+通过以上两种方式搜索后，我们就定位到了这个插件的名字，然后我们再去Webpack文档找到这个名字的插件即可。
+
+![image-20240520200710541](./assets/image-20240520200710541.png)
+
+接下来就来阅读这个插件怎么使用
+
+![image-20240520201020038](./assets/image-20240520201020038.png)
+
+----
+
+## 三、代码示例
 
 步骤：
 
@@ -6037,19 +6069,31 @@ Webpack 打包后的前端代码是如何运行的?
 
 3. 打包后观察效果
 
+可以发现css代码已经打包进了 `main.css`，`main.css` 中也包含bootstrap相关的代码
+
+![image-20240520201628770](./assets/image-20240520201628770.png)
+
+翻到最下面，就有我们自己在css文件中写的代码
+
+<img src="./assets/image-20240520201614537.png" alt="image-20240520201614537" style="zoom:67%;" />
+
 并且在html里面也引入了css的路径
 
-![image-20240127152130262](.\assets\image-20240127152130262.png)
+![image-20240520201506744](./assets/image-20240520201506744.png)
+
+
+
+----
 
 # 104.优化压缩过程
 
-> 由于我们提取好的css文件，如下图，bootstrap.min.css 文件本身就是压缩好的，而自己写的代码并没有经过压缩
->
-> ![image-20240127152328954](.\assets\image-20240127152328954.png)
+由于我们提取好的css文件，如下图，bootstrap.min.css 文件本身就是压缩好的，而自己写的代码并没有经过压缩
+
+![image-20240127152328954](.\assets\image-20240127152328954.png)
 
 需求：把提出的 css 文件内样式代码压缩
 
-需要：css-minimizer-webpack-plugin 插件来实现
+需要：`css-minimizer-webpack-plugin` 插件来实现
 
 ![image-20240127152553072](.\assets\image-20240127152553072.png)
 

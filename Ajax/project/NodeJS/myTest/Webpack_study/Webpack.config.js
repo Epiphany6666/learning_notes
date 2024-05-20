@@ -1,5 +1,6 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 module.exports = {
     entry: path.resolve(__dirname, 'src/login/index.js'),
     output: {
@@ -14,13 +15,15 @@ module.exports = {
             // filename: './login/index.html' 
             template: path.resolve(__dirname, 'public/login.html'), // 模板文件
             filename: path.resolve(__dirname, 'dist/login/index.html') // 输出文件
-        })
+        }),
+        new MiniCssExtractPlugin()
     ],
     module: { // module就是放一些加载器的配置项
         rules: [ // 规则列表
             {
                 test: /\.css$/i, // 匹配 .css 结尾的文件
-                use: ['style-loader', 'css-loader'], // 使用从后到前的加载器来解析 css 代码和插入到 DOM
+                // use: ['style-loader', 'css-loader'], // 使用从后到前的加载器来解析 css 代码和插入到 DOM
+                use: [MiniCssExtractPlugin.loader, "css-loader"],
             }
         ]
     }

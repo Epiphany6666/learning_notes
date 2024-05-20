@@ -2506,6 +2506,8 @@ TS会首先去查看类自身中有没有 `.d.ts`文件，如果没有再到 `@t
 
 一种方式就是将类型写多次，这样的话将来要改也需要改多次，更好的方式就是我们自己手动创建一个类型声明文件，假设就叫 `index.d.ts`。
 
+**index.d.ts**
+
 ~~~ts
 type Props = { x: number; y: number }
 
@@ -2548,28 +2550,238 @@ export { Props }
 
 ![image-20240520152005075](./assets/image-20240520152005075.png)
 
-演示：基于最新的 ESModule（import/export）（即最新的ES6模块化方案为例）来为已有 .js 文件，创建类型声明文件。
-
 ---
 
-##### 2】演示
+##### 2】环境准备
+
+演示：基于最新的 `ESModule（import/export）`（即最新的ES6模块化方案为例）来为已有 `.js` 文件，创建类型声明文件。
 
 开发环境准备：使用 webpack 搭建，通过 ts-loader 处理 .ts 文件。
 
-在有了 `ts-loader` 配置项后，它会有一个要求：项目的根目录中（即package.json所在的目录），必须有一个 `tsconfig.json`，也就是TS的配置文件，使用 `tsc --init` 就可以自动生成`tsconfig.json` 文件了。
+项目目录结构
 
-建议看视频，有了这个项目后，就可以来使用ES6的模块化方案了。
+<img src="./assets/image-20240520211606029.png" alt="image-20240520211606029" style="zoom:80%;" />
 
-说明：TS 项目中也可以使用 .js 文件。
+**webpack.config.js**
 
-说明：在导入 .js 文件时，TS 会自动加载与 .js 同名的 .d.ts 文件，以提供类型声明。
+~~~js
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-declare 关键字：用于类型声明，为其他地方（比如，.js 文件）已存在的变量声明类型，而不是创建一个新的变量。
+module.exports = {
+    entry: './src/index.ts',
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: 'main.js',
+    },
+    resolve: {
+        // 指定哪些文件类型可省略后缀名称
+        extensions: ['.js', '.ts', '.tsx']
+    },
 
-1. 对于 type、interface 等这些明确就是 TS 类型的（只能在 TS 中使用的），可以省略 declare 关键字。
-2. 对于 let、function 等具有双重含义（在 JS、TS 中都能用），应该使用 declare 关键字，明确指定此处用于类型声明。
+    devtool: 'eval-cheap-module-source-map',
+
+    devServer: {
+        open: true, 
+        hot: true,
+        port: 9000 // 通过devServer启动一个开发期间用到的服务器，端口号是9000
+    },
+    // 接下来就是重点内容了：关于文件的处理方式
+    module: {
+        rules: [
+            // 处理 .ts or .tsx 文件
+            // .tsx文件就是react的jsx对应到ts后的文件形式
+            {
+                test: '/\.tsx?$/',
+                use: 'ts-loader', // 使用ts-loader来处理ts文件
+                exclude: /node_modules/ // 不去处理node_modules中的ts文件
+            }
+        ]
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            // 指定html的输出位置，将来在启动服务器的时候就可以来打开这个页面了
+            template: path.join(__dirname, './src/index.html')
+        }
+    )],
+};
+~~~
+
+PS：在有了 `ts-loader` 配置项后，它会有一个要求：项目的根目录中（即package.json所在的目录），必须有一个 `tsconfig.json`，也就是TS的配置文件，使用 `tsc --init` 就可以自动生成`tsconfig.json` 文件了。
+
+**package.json**
+
+~~~json
+"scripts": {
+    "dev": "webpack serve --mode development"
+}
+~~~
+
+在控制台输入 `num run dev`，这样就能启动我们的项目了，可以发现成功运行，也就代表 `index.ts` 文件正常运行。
+
+之所以能够运行，就是因为 `ts-loader` 处理后的结果。
 
 ----
+
+##### 3】创建自己的类型声明文件
+
+有了这个项目后，就可以来使用ES6的模块化方案了，在正式演示代码之前，我们先来看两点个说明。
+
+说明：TS 项目中也可以使用 .js 文件。（因为TS是JS的超集，所以TS项目 / TS文件也是可以使用 `.js` 内容的）
+
+说明：在导入 .js 文件时，**TS 会自动加载与 .js 同名的 .d.ts 文件**，以提供类型声明。
+
+这样就不需要我们做额外的事情，只需要像原来一样通过 `import(ES6语法)` 导入 `.js文件` 的时候，就可以自动取加载这个文件的类型声明文件，**因此我们在给JS文件提供类型声明的时候，只需要做到一点：让声明文件的名字和JS文件的名称相同，然后以 `.d.ts` 结尾即可。**
+
+接下来就可以回到代码中，为已有的类型文件提供类型声明了。
+
+以下使用 `utils.js` 文件去模拟项目中用JS实现的功能。但是我们现在要在新的功能里面使用TS了，并且新的功能中还用到了JS文件的内容，此时就需要通过 `import` 导入JS文件。
+
+但是当你在 `index.ts` 中导入 `utils.js` 时，就会报错。
+
+![image-20240520211829687](./assets/image-20240520211829687.png)
+
+此时就需要为这个JS文件提供类型声明了：在 `utils.js` 所在的目录新建 `utils.d.ts` 文件即可。
+
+在提供类型声明之前，需要先知道一个关键字：declare 关键字。
+
+---
+
+**declare 关键字**：**用于类型声明，为其他地方**（比如，.js 文件）**已存在的变量声明类型，而不是创建一个新的变量**。
+
+例如：在JS文件中已经有 `count变量` 了，那么在 `utils.d.ts` 文件中，我们要做的事情就是为已存在的 `count变量` 来提供一个类型声明。此时在 `utils.d.ts` 中就可以通过 `declare` 为已存在的变量来提供类型声明。
+
+通过前面的 `declare关键字`，TS就知道你现在并不是要声明一个新变量 `count`，而是为已存在的 `count` 提供一个类型。
+
+但是如果你不加 `declare`，`let count: number` 就相当于是在声明一个新变量。
+
+![image-20240520212616320](./assets/image-20240520212616320.png)
+
+因此在为JS文件提供类型声明的时候推荐大家使用 `declare关键字` 去提供类型声明，但是也并不是所有的地方都要用到 `declare`。
+
+1. 对于 type、interface 等这些明确就是 TS 类型的（或者说它们只能在 TS 中使用的），可以省略 declare 关键字。
+2. 对于 let、function 等具有双重含义（在 JS、TS 中都能用），应该使用 declare 关键字，明确指定此处用于类型声明，而不是去声明一个变量的。
+
+例如：`position变量` 的类型是一个对象，并且下面有一个函数 `point`，也需要使用到这个对象类型，此时我们就可以使用一个接口来提供这个类型。因为接口只能在TS中使用，因此我们就不需要加 `declare`了。
+
+![image-20240520213531013](./assets/image-20240520213531013.png)
+
+---
+
+完整类型声明如下。技巧：你可以看着你的JS代码中用的什么方式声明的变量，那么在声明文件中就用什么样的方式来声明类型就行了
+
+~~~ts
+// 为 utils.js 文件来提供类型声明
+declare let count: number
+declare let songName: string
+interface Point {
+  x: number
+  y: number
+}
+declare let position: Point
+
+// 由于这里是类型声明文件，函数就不要加{}然后写函数的具体实现了，这对于类型声明来说是没有意义的
+declare function add(x: number, y: number): number
+declare function changeDirection(
+  direction: 'up' | 'down' | 'left' | 'right'
+): void
+
+// 为函数表达式指定类型
+type FomartPoint = (point: Point) => void // 通过类型别名的方式创建的自定义类型
+declare const fomartPoint: FomartPoint
+// 当然也可以一步到位
+declare const fomartPoint: FomartPoint = (point: Point) => void
+
+// 之前说过，类型声明的书写跟模块化方案有关，这里使用的是ES6的模块化方案
+// 注意：类型提供好以后，需要使用 模块化方案 中提供的模块化语法，来导出声明好的类型。然后，才能在其他的 .ts 文件中使用
+// 但是如果你使用的是其他的模块化方案，那么这里的导出可能就不太一样了
+export { count, songName, position, add, changeDirection, fomartPoint, Point }
+~~~
+
+将这些写好的类型都导出后，再回到 `index.ts` 文件中，此时代码就不报错了。
+
+并且鼠标放上去后，它告诉你这是一个模块了。
+
+![image-20240520214753920](./assets/image-20240520214753920.png)
+
+在进行导入的时候，都会有代码提示以及对应的类型。
+
+![image-20240520214823006](./assets/image-20240520214823006.png)
+
+此时在 `index.ts` 文件中使用JS文件中的变量时，就会有相应的代码提示和类型校验了，就跟你使用普通的TS是一样的了。
+
+~~~ts
+import { count, songName, add, Point } from './utils'
+
+type Person = {
+  name: string
+  age: number
+}
+
+let p: Partial<Person> = {
+  name: 'jack'
+}
+
+let p1: Point = {
+  x: 10,
+  y: 20
+}
+
+// console.log('项目启动了')
+console.log('count', count)
+console.log('songName', songName)
+console.log('add()', add(1, 4))
+~~~
+
+查看浏览器，可以发现都是正常打印的。
+
+![image-20240520215032627](./assets/image-20240520215032627.png)
+
+
+
+----
+
+# 76.在React中使用TypeScript
+
+## 一、概述
+
+现在，我们已经掌握了 TS 中基础类型、高级类型的使用了。但是，如果要在前端项目开发中使用 TS，还需要掌握 React、Vue、Angular 等这些库或框架中提供的 API 的类型，以及在 TS 中是如何使用的。
+
+接下来，我们以 React 为例，来学习如何在 React 项目中使用 TS。包括以下内容：
+
+1. 使用 CRA 创建支持 TS 的项目（CRA是React脚手架的简称）
+2. TS 配置文件 `tsconfig.json`（指在编译TS时需要用到的一些相应的配置）
+3. React 中使用TS时的常用类型
+
+----
+
+## 二、使用 CRA 创建支持 TS 的项目
+
+不管你使用的是Vue还是React还是Angular，一般都是先通过脚手架工具来帮助我们快速的搭建一个项目的开发环境，然后再来进行项目的开发。
+
+React 脚手架工具 `create-react-app`（简称：CRA），并且它默认支持 TypeScript。
+
+因此如果需要通过脚手架创建支持 TS 的项目，只需要在创建项目的命令后面添加一个标记（命令参数）就行了 `--template typescript`。
+
+~~~cmd
+npx create-react-app 项目名称 --template typescript
+~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
