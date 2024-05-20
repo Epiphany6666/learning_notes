@@ -1,4 +1,5 @@
-type Props = { a: number; b: string; c: boolean }
+type Props = { a: number; b: number; c: boolean }
+
 
 type TypeA = Props['a']
 
