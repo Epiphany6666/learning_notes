@@ -10,5 +10,11 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './index.css'
 import { checkPhone, checkCode } from '../utils/check.js'
+import './index.less'
+import imgObj from './assets/logo.png'
+const theImg = document.createElement('img')
+theImg.src = imgObj
+console.log(imgObj);
+document.querySelector('.login-wrap').appendChild(theImg)
 console.log(checkPhone('13900002020'))
 console.log(checkCode('123123123123'))
