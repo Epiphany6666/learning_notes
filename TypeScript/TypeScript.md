@@ -2741,9 +2741,7 @@ console.log('add()', add(1, 4))
 
 ----
 
-# 76.在React中使用TypeScript
-
-## 一、概述
+# 76.在React中使用TypeScript概述
 
 现在，我们已经掌握了 TS 中基础类型、高级类型的使用了。但是，如果要在前端项目开发中使用 TS，还需要掌握 React、Vue、Angular 等这些库或框架中提供的 API 的类型，以及在 TS 中是如何使用的。
 
@@ -2755,7 +2753,9 @@ console.log('add()', add(1, 4))
 
 ----
 
-## 二、使用 CRA 创建支持 TS 的项目
+# 77.使用 CRA 创建支持 TS 的项目
+
+## 一、从 `0` 创建一个项目
 
 不管你使用的是Vue还是React还是Angular，一般都是先通过脚手架工具来帮助我们快速的搭建一个项目的开发环境，然后再来进行项目的开发。
 
@@ -2767,27 +2767,400 @@ React 脚手架工具 `create-react-app`（简称：CRA），并且它默认支�
 npx create-react-app 项目名称 --template typescript
 ~~~
 
+它询问：你是否需要安装 `create-react-app`，输入y即可
+
+![image-20240521080637868](./assets/image-20240521080637868.png)
+
+这样这个命令就来帮我们安装基于TS的react项目了，看见这里有一个 `Success`，就代表我们的项目已经创建成功了。
+
+![image-20240521080756302](./assets/image-20240521080756302.png)
+
+接下来就可以运行项目了
+
+~~~ts
+cd react-ts-basic
+npm start
+~~~
+
+默认端口号是3000，在浏览器中就打开了这个默认的项目，并且做了一个基础的展示了。
+
+---
+
+## 二、在已有项目中使用 TS
+
+React官方文档：https://create-react-app.dev/docs/adding-typescript/
+
+文档中就告诉我们如何在脚手架中添加TS，我们刚刚使用的命令就是这个了。
+
+![image-20240521081324516](./assets/image-20240521081324516.png)
+
+再往下面看，就有：如何将TS添加到一个已经存在的CRA项目。
+
+这里就需要单独安装一些包了，`typescript @types/node @types/react @types/react-dom @types/jest`
+
+`@types/node`：也就是node对应的一些TS类型；`@types/react`：react对应的一些TS类型.....
+
+`jest`：用来做测试的。
+
+装好了包后，它告诉你：此时你就可以将 `.js` 换成 `.tsx`，然后重启你的开发服务器，这样就行了。
+
+![image-20240521081940420](./assets/image-20240521081940420.png)
 
 
 
+----
+
+# 78.React支持TS的项目目录结构说明
+
+## 一、对比非TS项目目录的变化
+
+相对于非 TS 项目，目录结构主要由以下三个变化：
+
+1. 项目根目录中增加了 `tsconfig.json` 配置文件：`指定 TS 的编译选项`（比如，编译时是否移除注释）。
+2. React 组件的文件扩展名变为：`*.tsx`。（在不使用TS的时候，react组件扩展名可以有两个：`.js`、`.jsx`，但是如果使用TS了，那么react组件扩展名只能用 `tsx`）
+3. src 目录中增加了 `react-app-env.d.ts`：**React 项目默认的类型声明文件**。
+
+<img src="./assets/image-20240521082919332.png" alt="image-20240521082919332" style="zoom:67%;" />
+
+---
+
+## 二、`react-app-env.d.ts`
+
+react-app-env.d.ts：React 项目默认的类型声明文件。
+
+**三斜线指令**：指定依赖的其他类型声明文件，types 表示依赖的类型声明文件包的名称。类似于JS中的 `import导入`
+
+**`react-app-env.d.ts`**
+
+~~~
+/// <reference types="react-scripts" />
+~~~
+
+解释：告诉 TS 帮我加载 react-scripts 这个包提供的类型声明。
+
+react-scripts 的类型声明文件包含了两部分类型：
+
+1. react、react-dom、node 的类型
+
+2. 图片、样式等模块的类型，以允许在代码中导入图片、SVG 等文件。
+
+   有了这些资源模块类型后，将来我们就可以在TS中像导入普通的JS文件一样来导入图片、样式等文件
+
+我们可以手动查看这个文件包含哪些内容：就像去查看JS方法类型声明一样，将鼠标放在 `react-scripts` 包名字上，然后按住 `ctrl` 点击，这样就会跳转到它引用的 `类型声明文件` 里面了，也就是 `react-app.d.dts`。
+
+可以发现它在 `react-scripts` 包中，这个包名就是我们上面指定的包名。
+
+![image-20240521090152767](./assets/image-20240521090152767.png)
+
+这个文件中的声明又分为两部分：
+
+上面又通过三斜线指令来指定了加载 `node`、`react`、`react-dom` 这三个包对应的类型。
+
+下面的内容就是用来指定在项目开发中可能会用到的资源了，例如 `*.module.sass*`，有了这样的一个声明后，我们就可以在TS代码中导入这个结尾的sass文件了。
+
+除了这些资源文件之外，还额外提供了 `ProcessEnv`，也就是跟环境变量相关的：`development`：开发环境、`production`：生产环境、`test`：测试环境。
+
+不管是 `namespace` 还是 `module` 都属于不同的模块化方案对应到的类型文件的书写方式了。
+
+- `namespace` 一般情况下当你去用一个全局模块，或者在JS没有模块化之前创建的JS库，如果你要给它去提供类型的话，就使用 `namepace` 处理。
+- `module`：给模块化的库提供类型声明的，例如 `NodeJS` 中的 `fs模块(文件模块)`，这个文件模块对应到的类型声明在TS中就是使用 `declare module 'fs'`。
+
+<img src="./assets/image-20240521092419132.png" alt="image-20240521092419132" style="zoom:67%;" />
+
+像 `*.module.sass*` 这种模块的类型，就是刚刚提到的图片、样式等模块的类型。
+
+我们可以随意查看一张图片，可以发现它指向的就是 `module "*.svg"`，这个内容实际上就是 `react-app.d.ts`
+
+![image-20240521091615709](./assets/image-20240521091615709.png)
+
+ctrl 然后使用鼠标点进去
+
+![image-20240521091801036](./assets/image-20240521091801036.png)
+
+双击点进去后，可以发现就是这个文件
+
+![image-20240521091853666](./assets/image-20240521091853666.png)
+
+由此可见 `react-app.d.ts` 中的类型声明就允许我们在TS中像JS中导入资源的文件了。
+
+PS：TS 会自动加载该 `.d.ts` 文件，以提供类型声明（通过修改 tsconfig.json 中的 include 配置，这个配置就是用来指定哪些TS文件会被处理）。
+
+如下图，`src` 指的就是 `src目录`，意思就是说：只要是在src目录中提供的 `ts文件`、`tsx文件`、`类型声明文件` 都会被TS处理。
+
+对于类型声明文件来说，TS会自动加载类型声明文件。
+
+<img src="./assets/image-20240521092623780.png" alt="image-20240521092623780" style="zoom:67%;" />
+
+因此当我们写react项目的时候，就自动的拥有了 `react-scripts` 包中提供的所有的类型声明了。
+
+----
+
+# 79.TS  配置文件 `tsconfig.json`
+
+## 一、文档
+
+tsconfig.json 指定：**项目文件和项目编译所需的配置项**。
+
+注意：TS 的配置项非常多（100+），并且很多配置项都不常用，因此学习的时候以 CRA 项目中的配置为例来学习，其他的配置项用到时查**文档**（https://www.typescriptlang.org/tsconfig）即可。
+
+配置项不需要记，记了也没什么作用，只需要会查文档即可。
+
+例如想要查看 `include`，此时就可以看见它的作用说明了：指定一个数组，数组可以包含文件名称，或者文件的路径模式，并且它们所指定的文件会被包含在这个项目中。大白话：只有include中指定的内容才会被TS处理。
+
+它下面给出了一个示例，然后给出了一个目录结构，打 `√` 的说明这些文件是被包裹在内的，打 `×` 的说明这些文件是不会被处理的。
+
+`/**`：表示src下所有的文件夹，所有文件夹下的所有文件都可以被TS处理，因此src下所有的文件都是打钩了的。
+
+除了这些之前，它还会告诉你可以使用其他的一些规则。
+
+![image-20240521093822122](./assets/image-20240521093822122.png)
+
+---
+
+## 二、TS配置文件 `tsconfig.json` 常用的配置项
+
+接下来看看CRA项目中提供的相应的配置
+
+1. `tsconfig.json` 文件所在目录为项目根目录（与 `package.json` 同级）。
+2. `tsconfig.json` 可以自动生成，命令：`tsc --init`。
+
+- 说明：所有的配置项都可以通过鼠标移入的方式，来查看配置项的解释说明。
+
+这里还是以include为例，这个说明的内容跟刚刚文档上看到的基本上是一样的。
+
+但如果你感觉这里面解释不清楚，那就去查看文档即可。
+
+![image-20240521094838489](./assets/image-20240521094838489.png)
+
+从整体上看分为 `compilerOptions(编译选项)`、`include`，文件相关的配置项是单独列出来的，所有跟配置相关的都在 `compilerOptions` 中。
+
+如果有某个选项看不懂，就往下划，下面有解释
+
+```json
+{
+  // 编译选项
+  "compilerOptions": {
+    // 生成代码的语言版本，TS将来是要被编译成JS的，这里就可以指定TS编译成哪个版本的JS
+    "target": "es5",
+    // 指定要包含在编译中的 library
+    "lib": ["dom", "dom.iterable", "esnext"],
+    // 允许 ts 编译器编译 js 文件，这样会提升TS的效率，但是会降低类型的准确性，要不要开启还是看项目准确的需求，一般开启是不会有太大问题的
+    "allowJs": true,
+    // 跳过声明文件的类型检查
+    "skipLibCheck": true,
+    // es 模块 互操作，屏蔽 ESModule 和 CommonJS 之间的差异
+    // 也就是说如果你用的库是用CommonJS方式写的，但是我们在导入这个库的时候，也是可以使用ES6的模块化语法来进行导入的
+    "esModuleInterop": true,
+    // 即使模块没有显式指定 default 导出也允许通过 import x from 'y' 
+    "allowSyntheticDefaultImports": true,
+    // 开启严格模式
+    "strict": true,
+    // 对文件名称强制区分大小写
+    "forceConsistentCasingInFileNames": true,
+    // 为 switch 语句启用错误报告，通过这个配置项可以让switch在使用的时候更加的严谨一些
+    "noFallthroughCasesInSwitch": true,
+    // 生成代码的模块化标准。也就是说你要将我们现在写的代码将来生成JS时，生成什么样的模块化方式，esnext 表示最新的模块化方式
+    "module": "esnext",
+    // 模块解析（查找）策略，node：按照node中模块解析（查找）策略来处理TS文件
+    // 例如当你在代码中导入一个模块的时候，TS要按照什么样的策略来查找这个模块。
+    "moduleResolution": "node",
+    // 允许导入扩展名为.json的模块
+    "resolveJsonModule": true,
+    // 是否将没有 import/export 的文件视为旧（全局而非模块化）脚本文件。
+    "isolatedModules": true,
+    // 编译时不生成任何文件（让TS在当前项目中只进行类型检查，而不再去帮我们生成JS文件了）
+    // 那如果不编译成JS文件，那TS文件如何运行呢？
+    // 其实当TS在配合像vibe这样编译工具的时候，一般会设置为true，这就表示不让TS编译器去编译代码了，而是vibe来帮我们进行处理，vibe也是可以来进行代码的转换，然后再通过vibe提供的相应的loader就可以来处理TS文件了
+    "noEmit": true,
+    // 指定将 JSX 编译成什么形式
+    "jsx": "react-jsx"
+  },
+  // 指定允许 ts 处理的目录，默认指定的是src目录
+  "include": ["src"]
+}
+```
+
+---
+
+想要查看 **`target`** 还能有什么，可以点击它的文档。
+
+![image-20240521095518417](./assets/image-20240521095518417.png)
+
+文档告诉你默认值是 `ES3`，除了 `ES3` 外，还可以有 `ES5`、`ES6` 等
+
+![image-20240521100005357](./assets/image-20240521100005357.png)
+
+----
+
+假设**lib**中指定了dom，也就是说跟dom相关的所有类型默认都提供了，那么我们都可以去使用了
+
+例如可以在组件的代码中使用 `document.querySelector()` 中所有的类型提示都有了
+
+<img src="./assets/image-20240521100643101.png" alt="image-20240521100643101" style="zoom:67%;" />
+
+但是如果你将dom从配置中移除掉了，那么使用dom的地方都会报错
+
+![image-20240521100906004](./assets/image-20240521100906004.png)
+
+---
+
+**严格模式**也可以查看有哪些严格模式
+
+![image-20240521101739704](./assets/image-20240521101739704.png)
+
+点进文档，就可以看见，例如
+
+- `strictNullChecks`：严格的 `null值` 检查
+- `strictFunctionTypes`：严格的函数类型
+
+等等，在项目开发，为了严谨性，strict一般都是需要开启的。
+
+![image-20240521101951653](./assets/image-20240521101951653.png)
+
+---
+
+同样的，如果你想了解一下，鼠标放到 `noFallthroughCasesInSwitch` 上，然后点击相关链接
+
+![image-20240521102425965](./assets/image-20240521102425965.png)
+
+此时就可以来看到到底是什么样的一个功能了。通过查看下面示例就很清晰了，当开启后，代码就报错了，因为 `case 0` 的时候，没有 `break`，这样 `0` 和 `1` 就共用一个break，这个代码相当于有一个穿透的效果。开启这个配置项后，是不允许有这样的情况出现的，因此代码就报错了。
+
+<img src="./assets/image-20240521102640112.png" alt="image-20240521102640112" style="zoom:67%;" />
+
+---
+
+同样也可以来查看 `生成代码的模块化标准` 还有哪些配置项
+
+![image-20240521102856429](./assets/image-20240521102856429.png)
+
+点进链接，这里就明确告诉我们了，默认是 `CommonJS`，除此之外还有 `ES6`、`ES2015` 等
+
+![image-20240521103009708](./assets/image-20240521103009708.png)
+
+---
+
+`isolatedModules` 由于这个配置项的存在，会导致一个问题：
+
+现在暂时没遇到，留个空位。
+
+---
+
+`"jsx": "react-jsx"` 表示什么含义呢？将鼠标放到jsx上，可以发现这里并没有提供一个链接
+
+<img src="./assets/image-20240521104537196.png" alt="image-20240521104537196" style="zoom:80%;" />
+
+此时可以回到文档，自己搜索。
+
+可以发现搜索到的jsx比较多，此时可以直接翻到最上面，然后点击 `jsx`
+
+![image-20240521104657833](./assets/image-20240521104657833.png)
+
+此时就会跳转到配置项，可以发现这个是React17中最新的一种处理jsx语法的形式，通过 `react/jsx-runtime` 来处理jsx
+
+<img src="./assets/image-20240521104741397.png" alt="image-20240521104741397" style="zoom:67%;" />
+
+除此之外，默认值 `jsx` 的值设置为 `React`，它就会将我们写的jsx转化成React.creatElement这样的形式
+
+![image-20240521105043813](./assets/image-20240521105043813.png)
 
 
 
+----
+
+# 80.通过命令行方式使用编译配置
+
+除了在 tsconfig.json 文件中使用编译配置外，还可以通过命令行来使用。
+
+在 `tsc hello.ts` 编译TS文件的命令后面还可以来指定编译配置的，例如 `--target es6` 这个配置项来讲TS生成哪个版本的JS代码
+
+使用演示：`tsc hello.ts --target es6`
+
+可以发现生成的JS代码就按照ES6的方式来执行的了，即这里用了 `let` 关键字去声明的变量
+
+<img src="./assets/image-20240521111742792.png" alt="image-20240521111742792" style="zoom:67%;" />
+
+但是如果在编译的时候不加这个配置项，那么生成的JS代码就是使用 `var` 生成的变量，通过这个对比，就说明 `--target es6` 配置项生效了。
+
+<img src="./assets/image-20240521111716215.png" alt="image-20240521111716215" style="zoom:67%;" />
+
+注意：
+
+1. tsc 后**带有输入文件**时（比如，tsc hello.ts），将忽略 tsconfig.json 文件中设置好的相应的配置，这个时候它就会启用所有默认的配置，如果你想要修改默认的配置，就需要通过上面命令后面加上配置项的形式来指定了。
+2. tsc 后**不带输入文件**时（比如，tsc），才会启用 tsconfig.json 文件中设置好的相应的配置。
+
+推荐使用：tsconfig.json 配置文件，因为如果使用命令行的方式，那太繁琐了，而且配置项一旦多了，也变的不清晰了。
+
+演示：首先手动生成 `tsconfig.json` 配置文件：`tsc --init`
+
+然后直接在终端输入 `tsc` 即可，此时会将 `tsconfig.json` 中所在的目录中所以的TS文件编译，因此它会去自动读取 `tsconfig.json` 中相应的内容。
+
+`"use strict";` ：使用严格模式
+
+<img src="./assets/image-20240521111958607.png" alt="image-20240521111958607" style="zoom:67%;" />
 
 
 
+---
 
+# 81.React 中的常用类型
 
+前提说明：现在，基于 class 组件来讲解 `React + TS` 的使用（最新的 React Hooks，在后面讲解这个技术配合TS的使用）。
 
+在不使用 TS 时，可以使用 prop-types 库，为 React 组件提供类型检查（https://reactjs.org/docs/typechecking-with-proptypes.html）。
 
+说明：但是在TS 项目中，推荐使用 TypeScript 实现组件类型校验（代替 PropTypes）。
 
+打开文档，里面就提到了你可以使用JS的扩展，像Flow或者TypeScript来进行类型检查，因此官方也是推荐我们，如果我们使用了TS，那么直接使用TS来进行类型检查就行了。
 
+![image-20240521112626464](./assets/image-20240521112626464.png)
 
+也就是说，我们现在有了TS后，就不需要有一个单独的库来做类型检查了，因为TS的类型检查要比propTypes这个库提供的类型检查的功能强大的多。
 
+不管是 React 还是 Vue，只要是支持 TS 的库，这些库里面都提供了很多类型，来满足该库对类型的需求。
 
+例如React中有函数组件和class组件，因此React中就针对于函数组件和class组件提供了很多类型，来去满足我们对应组件开发的需求。
 
+注意：
 
+1. React 项目是通过 `@types/react`、`@types/react-dom` 类型声明包，来提供类型的。
+2. 这些包 `CRA` 已帮我们安装好了（`react-app-env.d.ts`），直接用即可。
 
+参考资料：React文档-静态类型检查（https://legacy.reactjs.org/docs/static-type-checking.html） 、React+TS备忘单（https://github.com/typescript-cheatsheets/react）
+
+其中 `React文档-静态类型检查` 对两种类型检查（Flow、TypeScript）做了一个详细的类型说明，并且也说了：推荐使用Flow和TypeScript代替PropTypes来帮助我们做类型检查。
+
+下面就是有关Flow的介绍，和如何将Flow添加到项目中，以及基本的使用说明。
+
+![image-20240521113255504](./assets/image-20240521113255504.png)
+
+同样的往下翻，就可以看见TypeScript使用介绍，和如何在项目中添加TS。
+
+![image-20240521113417835](./assets/image-20240521113417835.png)
+
+---
+
+`React+TS备忘单` 就是一个GitHub仓库，这个仓库提供了很多React配合TS使用的技巧。
+
+![image-20240521113354695](./assets/image-20240521113354695.png)
+
+----
+
+# 82.React函数组件的类型
+
+React 是组件化开发模式，React 开发主要任务就是**写组件**，它包含了两种组件：1、函数组件； 2、class 组件。
+
+我们先来学习函数组件中常用的类型件，主要包括以下内容：
+
+1. 组件的类型
+2. 组件的属性（props）
+3. 组件属性的默认值（defaultProps）
+4. 事件绑定和事件对象
+
+## 一、函数组件的类型以及组件的属性
+
+这里假设有一个 `Hello组件`，函数组件实际上就是通过函数来创建的组件，因此这里可以通过一个箭头函数来帮助我们创建组件。
+
+既然是一个箭头函数，我们就可以直接在函数名称的后面通过 `:(冒号)` 来为这个函数指定类型了。
 
 
 
