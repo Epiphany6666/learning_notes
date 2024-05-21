@@ -16223,18 +16223,17 @@ npm install / npm i
 > 
 > // https://vitejs.dev/config/
 > export default defineConfig({
->   plugins: [
->     vue(),
->   ],
->   resolve: {
->     // 别名
->     alias: {
->       // 这句话的意思就是允许在项目当中支持@去访问目录，这个在脚手架里是自带的，但是vite里面需要进行配置
->       '@': fileURLToPath(new URL('./src', import.meta.url))
->     }
->   }
+>       plugins: [
+>            vue(),
+>       ],
+>       resolve: {
+>            // 别名
+>            alias: {
+>                // 这句话的意思就是允许在项目当中支持@去访问目录，这个在脚手架里是自带的，但是vite里面需要进行配置
+>                '@': fileURLToPath(new URL('./src', import.meta.url))
+>            }
+>       }
 > })
-> 
 > ~~~
 
 
@@ -17381,13 +17380,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->             
+>                
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->             
+>                
 >    <style scoped>
 >    </style>
 >    ~~~

@@ -9,3 +9,6 @@
 // 此时并不需要加from去接收，这是因为我们只是想让CSS代码被引入过来，让Webpack处理就行了，接收CSS对象在下面用不上，所以我们可以省略变量和from的书写，直接引入就行了
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './index.css'
+import { checkPhone, checkCode } from '../utils/check.js'
+console.log(checkPhone('13900002020'))
+console.log(checkCode('123123123123'))

@@ -1,6 +1,7 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 module.exports = {
     entry: path.resolve(__dirname, 'src/login/index.js'),
     output: {
@@ -16,7 +17,11 @@ module.exports = {
             template: path.resolve(__dirname, 'public/login.html'), // 模板文件
             filename: path.resolve(__dirname, 'dist/login/index.html') // 输出文件
         }),
-        new MiniCssExtractPlugin()
+        new MiniCssExtractPlugin(),
+        new MiniCssExtractPlugin({
+            filename: "[name].css",
+            chunkFilename: "[id].css",
+        }),
     ],
     module: { // module就是放一些加载器的配置项
         rules: [ // 规则列表
@@ -26,5 +31,12 @@ module.exports = {
                 use: [MiniCssExtractPlugin.loader, "css-loader"],
             }
         ]
-    }
+    },
+    optimization: {
+        minimizer: [
+            // For webpack@5 you can use the `...` syntax to extend existing minimizers (i.e. `terser-webpack-plugin`), uncomment the next line
+            `...`,
+            new CssMinimizerPlugin(),
+        ],
+    },
 };

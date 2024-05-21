@@ -6087,23 +6087,29 @@ Webpack 打包后的前端代码是如何运行的?
 
 # 104.优化压缩过程
 
-由于我们提取好的css文件，如下图，bootstrap.min.css 文件本身就是压缩好的，而自己写的代码并没有经过压缩
+由于我们提取好的css文件，如下图，上面 `bootstrap.min.css` 文件本身就是压缩好的，而下面自己写的代码并没有经过压缩
 
 ![image-20240127152328954](.\assets\image-20240127152328954.png)
 
 需求：把提出的 css 文件内样式代码压缩
 
-需要：`css-minimizer-webpack-plugin` 插件来实现
+解决：`css-minimizer-webpack-plugin` 插件来实现
 
-![image-20240127152553072](.\assets\image-20240127152553072.png)
+这个名字的插件可以通过文档 / 百度来进行查找。
 
-具体的使用可以点击 [css-minimizer-webpack-plugin ](https://webpack.docschina.org/plugins/css-minimizer-webpack-plugin/)跳转到详细文档
+## 一、阅读官方文档
 
-![image-20240127152816008](.\assets\image-20240127152816008.png)
+在刚刚我们查看的 `MiniCssExtractPlugin文档` 中，除了查看 `快速开始`，下面还有一些其他的功能，然后找到 `生产模式压缩` 的关键词，此时就来到了对应的文档中，此时就找到了这个插件。
 
-点击之后就来到了具体的文档
+我们可以点击这个插件，然后它就会跳到这个插件的文档上，也可以直接阅读下面的使用。
 
-![image-20240127153031557](.\assets\image-20240127153031557.png)
+![image-20240521131205273](./assets/image-20240521131205273.png)
+
+我们这里选择点击之后就来到了具体的文档。
+
+可以发现还是那三步：找包、下包、配置包
+
+![image-20240521131358378](./assets/image-20240521131358378.png)
 
 ~~~js
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -6113,7 +6119,7 @@ module.exports = {
   module: {
     rules: [
       {
-        // 类似于less，而我们使用的是原生的CSS，所以后面的加载器我们不需要写，所以这一部分和这个插件好像并没有什么关系
+        // 正则表达式 /.s?css$/ 用于匹配以 .scss 或 .css 结尾的文件。类似于less，由于我们使用的是原生的CSS，所以后面的'sass-loader'加载器我们不需要写，所以这一部分和这个插件好像并没有什么关系，我们不需要管
         test: /.s?css$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
       },
@@ -6122,7 +6128,7 @@ module.exports = {
   // 这里开始就是最关键的了
   optimization: {
     minimizer: [
-      // 这里注释的意思就是说，我们添加这个选项之后，就是告诉我们的webpack，整个打包的优化我们需要自己来设置了，这个时候虽然我们设置了压缩CSS代码，但是原本当中压缩js的功能也没有了，所以作者在这里写了一段注释，这里使用 `...` 字符串的语法，它就可以把原本压缩js优化的功能继续留在原地，如果不使用 `...` ，也可以自行下载这个名字的插件（即 `terser-webpack-plugin`），然后new这个插件的对象，就可以压缩js的代码
+      // 这里注释的意思就是说，我们添加这个选项之后，就是告诉我们的webpack，整个打包的优化我们需要自己来设置了，这个时候虽然我们设置了压缩CSS代码，但是原本当中压缩js的功能也没有了，所以作者在这里写了一段注释，这里使用 `...` 字符串的语法，它就可以把原本压缩js优化的功能继续留在原地，如果不使用 `...` ，也可以自行下载这个名字的插件（即 `terser-webpack-plugin`），然后new这个插件的对象，就可以压缩js的代码，因此我们在使用的时候就会将注释放开
       // 在 webpack@5 中，你可以使用 `...` 语法来扩展现有的 minimizer（即 `terser-webpack-plugin`），将下一行取消注释
       // `...`,
       new CssMinimizerPlugin(),
@@ -6133,7 +6139,9 @@ module.exports = {
 };
 ~~~
 
+---
 
+## 二、代码实现
 
 步骤：
 
@@ -6147,13 +6155,14 @@ module.exports = {
 
    ```js
    // ...
+   // 引入构造函数
    const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
    
    module.exports = {
      // ...
      // 优化
      optimization: {
-       // 最小化
+       // 最小化，最小化需要使用到的插件就是刚刚下载过的插件对象
        minimizer: [
          `...`,
          new CssMinimizerPlugin(),
@@ -6161,12 +6170,18 @@ module.exports = {
      }
    };
    ```
-   
-3. 打包后观察 css 文件内自己代码是否被压缩了
 
-一定要有折叠的好习惯
+3. 打包后观察 css 文件内自己代码是否被压缩了，并且JS代码也没有受到影响
 
-![image-20240127154410214](.\assets\image-20240127154410214.png)
+   ![image-20240521132922167](./assets/image-20240521132922167.png)
+
+PS：一定要有折叠的好习惯
+
+<img src=".\assets\image-20240127154410214.png" alt="image-20240127154410214" style="zoom:67%;" />
+
+
+
+---
 
 # 105.Webpack-打包 less 代码
 
@@ -7314,4 +7329,4 @@ const config = {
 
 
 
-2.打包观察效�
+2.打包观察效
