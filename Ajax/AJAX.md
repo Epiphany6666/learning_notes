@@ -6905,15 +6905,17 @@ if (argv.mode === 'development') {
 };
 ~~~
 
-但是这种解决方案局限性大，因为 `mode属性` 的值只接受 2 种模式，那如果项目中配置不仅区分于两个环境，可能还有测试环境、预发布环境.....此时第一种方案就不行了，因此这个时候我们就需要使用那第二种解决方案了。
+但是这种解决方案局限性大，因为 `mode属性` 的值只接受 2 种模式，那如果项目中配置不仅区分于两个环境，可能还有测试环境、预发布环境.....此时第一种方案就不行了，因此这个时候我们就需要使用那第二种解决方案了，而且也是我推荐大家使用的。
 
 ----
 
 ## 三、方案二
 
-方案二：借助 cross-env （跨平台通用）包命令，设置参数区分环境（推荐）
+### 1）代码实现
 
-> cross-env是一个全局软件包，下载到项目中，可以接住它提供的命令，给NodeJS，设置一些环境变量
+方案二：需要借助 `cross-env （跨平台通用）` 全局软件包，设置参数区分环境（推荐）
+
+> cross-env是一个全局软件包，下载到项目中，可以**借助它提供的命令，可以给NodeJS设置一些环境变量**。
 >
 > 环境变量指的就是一些自定义参数名和对应的值，从而就可以区分不同的打包运行环境。
 >
@@ -6927,84 +6929,86 @@ if (argv.mode === 'development') {
    npm i cross-env --save-dev
    ~~~
 
-2. 通过命令给NodeJS环境注入环境变量：配置自定义命令，传入参数名和值（会绑定到 process.env 对象下，添加对应的参数名和参数值）
+2. 通过命令给NodeJS环境注入环境变量，由于这个命令还是在项目中使用，因此还是局部的自定义配置自定义命令。
 
-   > 参数名一定要使用一样的，因为在代码里面，比如说：.node-env，接着运行不同的命令，它就会给代码里参数名会传不同的值，所以就能在代码中使用它传入具体值的字符串区分当下是什么样的环境
+   然后传入我们自己定义的参数名和值（会绑定到 process.env 环境变量对象下，添加参数名和对应的参数值）
+
+   > 参数名一定要使用一样的，因为在代码里面，比如说：`.node-env`，接着运行不同的命令，它就会给代码里参数名会传不同的值，所以就能在代码中使用它传入具体值的字符串区分当下是什么样的环境。
+   >
+   > 参数名和参数值是可以随便写的，但是最好见名知意。
 
    ![image-20240128121619290](.\assets\image-20240128121619290.png)
 
-3. 在 webpack.config.js 区分不同环境使用不同配置
+3. 在 `webpack.config.js` 区分不同环境使用不同配置
 
-   ~~~js
+   ~~~json
    {
        test: /\.css$/i, // 匹配 .css 结尾的文件
-           use: [
-               // process.env 是node环境中内置的环境变量，给这个对象新增了NODE_ENV
-               // 这一句代码在执行赋予的时候，它会赋予对应不同的值，所以当我们运行开发环境时，这个变量的值就为development
-               process.env.NODE_ENV === 'development' ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader'
-           ], // 使用从后到前的加载器来解析 css 代码和插入到 DOM
+       use: [
+           // process.env 是node环境中内置的环境变量，给这个对象新增了NODE_ENV
+           // 这一句代码在执行赋予的时候，它会赋予对应不同的值，所以当我们运行开发环境时，这个变量的值就为development
+           process.env.NODE_ENV === 'development' ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader'
+       ], // 使用从后到前的加载器来解析 css 代码和插入到 DOM
    },
-       {
-           test: /\.less$/i,
-               // 先使用 "less-loader" 把less文件里的代码转成css代码
-               // 再借助 "css-loader" 来分析css代码
-               // 然后使用 'style-loader' 帮我们插入到DOM上
-               use: [
-                   // 'style-loader',
-                   process.env.NODE_ENV === 'development' ? 'style-loader' : MiniCssExtractPlugin.loader,
-                   "css-loader",
-                   "less-loader"]
-       }
+   {
+       test: /\.less$/i,
+       // 先使用 "less-loader" 把less文件里的代码转成css代码
+       // 再借助 "css-loader" 来分析css代码
+       // 然后使用 'style-loader' 帮我们插入到DOM上
+       use: [
+           // 'style-loader',
+           process.env.NODE_ENV === 'development' ? 'style-loader' : MiniCssExtractPlugin.loader,
+           "css-loader",
+           "less-loader"
+       ]
+   }
    ~~~
-
-   
 
 4. 重新打包观察两种配置区别
 
    这个和webpack在打包时候的内置模式，是没有任何关系的，只不过我们是为了让语义明确，名字一样而已
 
+---
+
+### 2）测试
+
+运行构建命令，可以发现 `NODE_ENV` 的值为 `production`
+
+<img src="./assets/image-20240521194558035.png" alt="image-20240521194558035" style="zoom:67%;" />
+
+观察打包后的目录，发现CSS文件是单独提取出来的。
+
+<img src="./assets/image-20240521195349140.png" alt="image-20240521195349140" style="zoom:67%;" />
+
+接下来也将 `build` 命令中的 `production` 改为 `develoption`，因为执行下面的命令，它运行在内存中，我们也看不到。
+
+<img src="./assets/image-20240521194959456.png" alt="image-20240521194959456" style="zoom:67%;" />
+
+然后再次执行 `build命令`，可以发现 `NODE_ENV` 的值为 `development` 了
+
+<img src="./assets/image-20240521195021228.png" alt="image-20240521195021228" style="zoom:67%;" />
+
+观察打包后的目录，发现CSS文件也没有单独提取出来
+
+<img src="./assets/image-20240521195251707.png" alt="image-20240521195251707" style="zoom:77%;" />
+
+由此可见，Webpack在NodeJS下的设置生效了。
+
+这个方案我们就借助了这个包给NodeJS环境 `process.env对象` 上注入了不同的环境变量，从而让 `webpack.config.js` 能够做出适应不同环境的不同配置的使用。
+
+接下来我们还有第三种解决方案，因为第二种方案还需要加条件表达式，但如果开发模式和生产模式相关的配置区别特别大，一处一处判断就有点麻烦了，所以这种情况就可以设置不同的配置文件，具体的实现可以通过查看文档。
+
+---
+
+## 四、方案三
+
 [方案](https://webpack.docschina.org/guides/production/)[3](https://webpack.docschina.org/guides/production/)：配置不同的 webpack.config.js （适用多种模式差异性较大情况）
 
-3. 主要使用方案 2 尝试，其他方案可以结合点击跳转的官方文档查看尝试
+主要使用方案 2 尝试，其他方案可以结合点击跳转的官方文档查看尝试
 
-4. 步骤：
 
-   1.下载 cross-env 软件包到当前项目
 
-   ```js
-   npm i cross-env --save-dev
-   ```
-
-   2.在`package.json`中配置自定义命令，传入参数名和值（会绑定到 process.env 对象下）
-
-   ![image-20230518104016802](./assets/image-20230518104016802.png)
-
-   3.在 webpack.config.js 区分不同环境使用不同配置
-
-   ```js
-   module: {
-       rules: [
-         {
-           test: /\.css$/i,
-           // use: ['style-loader', "css-loader"],
-           use: [process.env.NODE_ENV === 'development' ? 'style-loader' : MiniCssExtractPlugin.loader, "css-loader"]
-         },
-         {
-           test: /\.less$/i,
-           use: [
-             // compiles Less to CSS
-             process.env.NODE_ENV === 'development' ? 'style-loader' : MiniCssExtractPlugin.loader,
-             'css-loader',
-             'less-loader',
-           ],
-         }
-       ],
-     },
-   ```
-   
-   
-
-   4.重新打包观察两种配置区别
+---
 
 # 111.Webpack 前端注入环境变量
 

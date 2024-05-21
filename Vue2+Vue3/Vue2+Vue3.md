@@ -17380,13 +17380,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->                
+>                   
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->                
+>                   
 >    <style scoped>
 >    </style>
 >    ~~~

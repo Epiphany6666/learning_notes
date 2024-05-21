@@ -31,7 +31,7 @@ module.exports = {
             {
                 test: /\.css$/i, // 匹配 .css 结尾的文件
                 // use: ['style-loader', 'css-loader'], // 使用从后到前的加载器来解析 css 代码和插入到 DOM
-                use: [MiniCssExtractPlugin.loader, "css-loader"],
+                use: [process.env.NODE_ENV === 'development' ? 'style-loader' : MiniCssExtractPlugin.loader, "css-loader"],
             },
             {
               test: /\.less$/i,
@@ -41,7 +41,7 @@ module.exports = {
               use: [
                   // 'style-loader',
                   // 由于前面已经使用过了MiniCssExtractPlugin，所以我们这里同样也需要进行使用
-                  MiniCssExtractPlugin.loader, 
+                  process.env.NODE_ENV === 'development' ? 'style-loader' : MiniCssExtractPlugin.loader, 
                   "css-loader", 
                   "less-loader"]
             },
