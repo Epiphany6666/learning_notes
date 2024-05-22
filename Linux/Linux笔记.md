@@ -1,5 +1,80 @@
 Linux笔记
 
+VMWare的挂起功能：下次开启电脑的时候点击直接运行虚拟机就行了，这样就省去了开启电脑的时间。
+
+不管外面电脑是什么形式，Ubuntu里面都是有线连接的形式。
+
+`192.168.88.128`：前面三位是VMWare自定义的，`88` 是自定义的，一旦定义完，虚拟机都必须使用 `88` 这个地址，才能跟Windows正常连通，`128` 是随机分配的。
+
+由于Ubuntu是专注于图形化界面，跟centos不太一样，远程连接的时候是无法使用的，Ubuntu本身是不支持的，需要先下载一下相关的依赖，由于我们是在清华大学镜像网站上下载的镜像，因此它在下载的时候会去清华大学源上下载这个软件，我们不需要进行任何设置。
+
+~~~ts
+sudo apt update
+sodo apt install -y ssh
+~~~
+
+
+
+~~~ts
+一、开启root用户登录
+
+1.设置root密码
+
+sudo passwd root
+
+验证当前账户密码后设置root账户密码
+
+2.切换命令行至root
+
+su - root
+
+3.注释以下文件内容
+
+vim /etc/pam.d/gdm-autologin
+
+#auth required pam_succeed_if.so user != root quiet_succes
+
+vim /etc/pam.d/gdm-password
+
+# auth required pam_succeed_if.so user != root quiet_success
+
+4.重启计算机后就能使用root用户登录了
+
+ 
+
+二、配置远程登录
+
+1.检查openssh-server服务
+
+2.安装ssh服务：apt-get install openssh-server
+
+3.修改ssh配置文件
+
+vi /etc/ssh/sshd_config
+
+Port 22 #取消该行注释
+
+LoginGraceTime 2m # 取消该行注释
+
+PermitRootLogin yes #取消该行注释，将prohibit-password修改为yes
+
+StrictModes yes # 取消该行注释
+
+MaxAuthTries 6 #取消该行注释
+
+MaxSessions 10 # 取消该行注释
+
+3.启动或重启服务
+
+systemctl restart ssh
+
+systemctl enable ssh
+
+4.配置完成后就可以使用工具进行远程连接了。
+~~~
+
+
+
 1. 修改root密码：`sudo passwd root`
 
 2. whereis 查找Linux系统里是否含有该工具
