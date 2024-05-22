@@ -248,40 +248,96 @@ Redis诞生于2009年全称是 **Re**mote  **D**ictionary **S**erver （远程�
 
 <img src="./assets/image-20240522132609491.png" alt="image-20240522132609491" style="zoom:67%;" />
 
-**特征**：
+redis服务器开发出来后，具有了一些**特征**：
 
-- 键值（key-value）型，value支持多种不同数据结构，功能丰富
-- 单线程，每个命令具备原子性，安全的
+- 键值（key-value）型，操作起来简单。value支持多种不同数据结构（字符串、集合等），功能丰富
 
-  > Redis6.0的多线程仅仅是在网咯请求的处理上。核心命令的执行依旧是单线程的。
-- 低延迟，速度快（基于内存（最重要的是内存！）.IO多路复用.良好的编码）。
-- 支持数据持久化
+- 单线程，因此线程是安全的，每个命令具备原子性，安全的，不会出现一个命令执行了一半，其他命令就突然插进来的情况
+
+  > Redis6.0的多线程仅仅是在网络请求的处理上，而核心命令的执行依旧是单线程的。
+  
+- 低延迟，速度快
+
+  它明明是一个单线程，性能却这么好呢？
+
+  1. 基于内存，内存的读写速度相对于磁盘来讲非常的高，高出了很多很多倍。
+  2. 它尽管单线程，但是它却基于了 `IO多路复用` 的方式，大大的提高了整个服务的吞吐能力
+  3. 良好的编码。redis是基于C语言编写的，并且开源在网络上，那么这个redis整体编码，无论从编码的风格上、还是从代码的习惯上来讲，可以说得到了业界的公认好评。
+
+  因此基于这三个原因，redis尽管单线程，但是性能却非常优异。
+
+  最重要的是内存！因为无论是IO多路复用，还是编码也好，这样的一些功能MySQL也能满足。
+
+- 支持数据持久化，内存查询性能是高，但是它存在数据不安全的情况，即一旦断电，内存数据就消失了，所以为了解决这个问题，redis的作者就给它加了持久化的功能，它会定期将数据从内存持久化到词频，从而确保数据的安全性
+
 - 支持主从集群.分片集群（把数据拆分）
-- 支持多语言客户端
 
-**作者**：Antirez
+  主从集群MySQL也有，指的是：从节点可以去备份主节点的数据，也是一种安全性的考虑，这样依赖一旦有节点宕机，数据在其他从节点上也能找到。同时主从可以做读写分离，从而大大的提高了查询读写的效率。
+
+  分片集群：做数据的拆分，即将数据拆成n份存到不同结点上去，这样一来我用很多台机器一起来存，存储的上限就提高了，即水平的一种扩展。
+
+- 支持多语言客户端。Java、python、C等各种各样的语言基本上都能操作reids。
+
+功能丰富、性能还好、还支持数据持久化、安全，还能做各种集群，轻易的去做水平扩展，并且任何语言都能用，所以它不火谁火？
+
+## 
+
+---
+
+# 5.安装Redis
+
+大多数企业都是基于Linux服务器来部署项目，而且Redis官方也没有提供Windows版本的安装包，因此你在网上找的Windows的redis都不是由redis官方提供的，而是由微软自己编译出来的。因此课程中我们会基于Linux系统来安装Redis.
+
+此处选择的Linux版本为CentOS 7
+
+---
+
+## 一、官网安装
 
 Redis的官方网站地址：https://redis.io/
 
-## 5.安装Redis
+![image-20240522165117983](./assets/image-20240522165117983.png)
 
-# Redis安装说明
+点进来后会发现它有三个下载的版本
 
-大多数企业都是基于Linux服务器来部署项目，而且Redis官方也没有提供Windows版本的安装包。因此课程中我们会基于Linux系统来安装Redis.
+- `Redis Enterprise Software (Redis ES)`：**Redis Enterprise Software** 是一个为企业设计的 Redis 版本，提供了额外的合规性、可靠性和可扩展性功能。
+- `Redis OSS (Redis Open Source Software)`：**Redis OSS** 是 Redis 的开源版本，是一个高性能的内存数据存储，被广泛用于缓存、会话管理、消息代理等场景。这个也是我们待会会下载的版本。
+- `Redis Stack`：**Redis Stack** 是 Redis 的扩展，包含了 Redis OSS 的所有功能，并增加了一些额外的模块，提供更多的数据结构和处理能力。
+- `Redis Insight`：**Redis Insight** 是一个图形化工具，用于可视化和优化 Redis 数据。
 
-此处选择的Linux版本为CentOS 7.
+![image-20240522170152758](./assets/image-20240522170152758.png)
 
-Redis的官方网站地址：https://redis.io/
+找到 `Redis OSS`，然后点击红框
 
+<img src="./assets/image-20240522170700217.png" alt="image-20240522170700217" style="zoom:67%;" />
 
+选择安装在Linux系统上
 
+![image-20240522171410371](./assets/image-20240522171410371.png)
 
+虽然按照它的步骤来安装即可。
 
-# 1.单机安装Redis
+![image-20240522171450677](./assets/image-20240522171450677.png)
 
->  Redis是基于C语言写的
+----
 
-## 1.1.安装Redis依赖
+点击 `Commands`，即redis的相关命令
+
+![image-20240522164507739](./assets/image-20240522164507739.png)
+
+进来后，这里就包含了redis所有的命令，如果忘记了，就可以到官网查看帮助文档，每个命令是干什么的都有。
+
+![image-20240522164658770](./assets/image-20240522164658770.png)
+
+另外 `Clients` 是redis官方提供的一些各种语言的客户端。
+
+![image-20240522164852765](./assets/image-20240522164852765.png)
+
+---
+
+## 二、CentOS安装Redis
+
+### 1）安装Redis依赖
 
 Redis是基于C语言编写的，因此首先需要安装Redis所需要的gcc依赖：
 
@@ -289,9 +345,9 @@ Redis是基于C语言编写的，因此首先需要安装Redis所需要的gcc依
 yum install -y gcc tcl
 ```
 
+---
 
-
-## 1.2.上传安装包并解压
+### 2）上传安装包并解压
 
 然后将课前资料提供的Redis安装包上传到虚拟机的任意目录：
 
@@ -337,13 +393,17 @@ make && make install
 
 ![image-20211211080603710](.\assets\image-20211211080603710.png)
 
-该目录以及默认配置到环境变量，因此可以在任意目录下运行这些命令。其中：
+该目录以及默认配置到环境变量，因此可以在任意目录下运行这些命令。
 
 - redis-cli：是redis提供的命令行客户端
 - redis-server：是redis的服务端启动脚本
 - redis-sentinel：是redis的哨兵启动脚本
 
-## 1.3.启动
+---
+
+## 三、启动
+
+安装完成后，redis就已经加入到环境变量了，可以在任意目录下运行
 
 redis的启动方式有很多种，例如：
 
@@ -353,7 +413,7 @@ redis的启动方式有很多种，例如：
 
 > cd -：回到刚才的目录
 
-### 1.3.1.默认启动
+### 1）默认启动
 
 安装完成后，在任意目录输入redis-server命令即可启动Redis：
 
@@ -361,23 +421,27 @@ redis的启动方式有很多种，例如：
 redis-server
 ```
 
-如图：
+运行后就会弹出如下图的界面，这个就是redis的运行日志界面了，版本是6.2.6，端口是6379，进程ID，官方网站，logo
 
 ![image-20211211081716167](.\assets\image-20211211081716167.png)
 
+这种启动属于`前台启动`，会阻塞整个会话窗口，如果你想要和redis建立连接，那就需要重新打开一个窗口，创建建立连接，如果关闭当前窗口，那么redis也就被停止了。
 
+因此这种方式是一种不友好的方式，窗口关闭或者按下 `CTRL + C` 则Redis停止。不推荐使用。
 
-这种启动属于`前台启动`，会阻塞整个会话窗口，窗口关闭或者按下`CTRL + C`则Redis停止。不推荐使用。
+----
 
+### 2）指定配置启动
 
+#### ① 配置配置文件
 
-### 1.3.2.指定配置启动
+如果要让Redis以`后台`方式启动，则必须修改Redis配置文件，并且指定配置文件启动。
 
-如果要让Redis以`后台`方式启动，则必须修改Redis配置文件，就在我们之前解压的redis安装包下（`/usr/local/src/redis-6.2.6`），名字叫redis.conf：
+配置文件就在我们之前解压的redis安装包下（`/usr/local/src/redis-6.2.6`），名字叫redis.conf：
 
 ![image-20211211082225509](.\assets\image-20211211082225509.png)
 
-我们先将这个配置文件备份一份：
+修改配置文件前，最好先做一个备份，备份完，将来修改错了，还能有一个文件让你去恢复。
 
 ```
 cp redis.conf redis.conf.bck
@@ -388,11 +452,11 @@ cp redis.conf redis.conf.bck
 然后修改redis.conf文件中的一些配置：
 
 ```properties
-# 允许访问的地址，默认是127.0.0.1，会导致只能在本地访问。修改为0.0.0.0则可以在任意IP访问，生产环境不要设置为0.0.0.0
+# 监听的地址，默认是127.0.0.1，会导致只能在本地访问，从外面访问就会拒绝。修改为0.0.0.0则可以在任意IP访问，但是生产环境不要设置为0.0.0.0，还是默认
 bind 0.0.0.0
 # 守护进程，修改为yes后即可后台运行
 daemonize yes 
-# 密码，设置后访问Redis必须输入密码
+# 密码，设置后访问Redis必须输入密码。如果任何人都能访问你的redis其实是有风险的，别人有可能会在你的电脑上执行一些脚本。
 requirepass 123321
 ```
 
@@ -400,37 +464,51 @@ requirepass 123321
 
 ![image-20231009162642979](.\assets\image-20231009162642979.png)
 
-Redis的其它常见配置：
+Redis的其它常见配置，可配可不配：
 
 ```properties
-# 监听的端口
+# 监听的端口，默认的就行了，除非被占用
 port 6379
-# 工作目录，默认是当前目录，也就是运行redis-server时的命令，日志、持久化等文件会保存在这个目录
+# 工作目录，默认是当前目录，也就是运行redis-server时的命令，日志、持久化等文件会保存在这个目录。
+# 大白话：你在哪里启动redis，那么哪个目录就是你的工作目录
 dir .
 # 数据库数量，设置为1，代表只使用1个库，默认有16个库，编号0~15
-databases 1
+# 这也是与MySQL不一样的地方，MySQL的库是可以随便创建的，但是redis的库是固定的，是提前创建好的，但是reids库的数量是可以控制的
+databases 1 
 # 设置redis能够使用的最大内存
 maxmemory 512mb
 # 日志文件，默认为空，不记录日志，可以指定日志文件名，它默认产生在上面的dir .
 logfile "redis.log"
 ```
 
+---
 
-
-启动Redis：
+#### ② 启动Redis
 
 ```sh
 # 进入redis安装目录 
 cd /usr/local/src/redis-6.2.6
-# 启动
+# 启动并指定配置文件
 redis-server redis.conf
 ```
 
-> 通过ps -ef | grep redis可以看见redis有没有成功运行
+执行完命令后可以发现没有任何日志输出，因为它已经变成后台运行了
 
-停止服务：
+通过 `ps -ef | grep redis` 可以看见redis有没有成功运行
 
-> kill命令杀死即可
+![image-20240522174948952](./assets/image-20240522174948952.png)
+
+----
+
+#### ③ 停止服务
+
+方法一：直接杀死进程
+
+~~~ts
+kill -9 62214
+~~~
+
+方法二
 
 ```sh
 # 利用redis-cli来执行 shutdown 命令，即可停止 Redis 服务，
@@ -438,11 +516,11 @@ redis-server redis.conf
 redis-cli -u 123321 shutdown
 ```
 
+---
 
+### 3）开机自启
 
-### 1.3.3.开机自启
-
-我们也可以通过配置来实现开机自启。
+上面两种方式启动redis都比较麻烦，我们也可以通过配置来实现开机自启。
 
 首先，新建一个系统服务文件：
 
@@ -452,14 +530,14 @@ vi /etc/systemd/system/redis.service
 
 内容如下：
 
-```conf
+```service
 [Unit]
 Description=redis-server
 After=network.target
 
 [Service]
 Type=forking
-# 前面是安装位置，后面是配置文件的目录，复制粘贴时记得把我删掉！
+# 前面是安装位置，后面是配置文件的目录，此时它就会使用前面命令启动，然后指定后面的配置文件，复制粘贴时记得把我删掉！
 ExecStart=/usr/local/bin/redis-server /usr/local/src/redis-6.2.6/redis.conf
 PrivateTmp=true
 
@@ -471,13 +549,11 @@ WantedBy=multi-user.target
 
 然后重载系统服务：
 
-> 此时并没有开机自启，它只是被系统管理了
-
 ```sh
 systemctl daemon-reload
 ```
 
-
+有了这个服务后，此时并没有开机自启，它只是被系统管理了，因此需要通过 `systemctl start redis` 来启动redis
 
 现在，我们可以用下面这组命令来操作redis了：
 
@@ -490,6 +566,8 @@ systemctl stop redis
 systemctl restart redis
 # 查看状态
 systemctl status redis
+# 让redis开机自启
+systemctl enable redis
 ```
 
 > sudo fuser -k 80/tcp 
@@ -498,35 +576,114 @@ systemctl status redis
 >
 > -k：杀死访问指定文件的所有进程；
 
-执行下面的命令，可以让redis开机自启：
+通过 `ps -ef | grep redis` 看redis有没有成功运行，如下图，可以发现已经成功启动，启动的时候是使用 `redis-server` 命令启动的，监听的端口是 `6379`
 
-```sh
-systemctl enable redis
+![image-20240522180139334](./assets/image-20240522180139334.png)
+
+---
+
+## 四、卸载
+
+首先，通过下面的命令查看redis服务是否在运行
+
+~~~ts
+[root@localhost ~]# ps aux|grep redis
+root      2553  0.2  0.1  41964  1916 ?        Ssl  09:38   0:00 redis-server 127.0.0.1:6379
+root      2565  0.0  0.0   6048   780 pts/0    S+   09:39   0:00 grep redis
+[root@localhost ~]#
+~~~
+
+可以看到，在6379端口，有redis-server的监听
+
+　　通过下面的命令停止redis服务器。
+
+```
+[root@localhost ~]# redis-cli shutdown
+[root@localhost ~]# ps aux|grep redis
+root      2575  0.0  0.0   6048   780 pts/0    S+   09:41   0:00 grep redis
+[root@localhost ~]#
 ```
 
+　　可以看到，已经停止了redis服务了。
+
+　　需要注意的是，由于我的redis命令都安装到/usr/local/bin目录下面了，并且添加到环境变量PATH里面了，所以可以直接运行。
+
+2、删除make的时候生成的几个redisXXX的文件
+
+```
+[root@localhost local]# ll /usr/local/bin
+总用量 30908
+-rwxr-xr-x. 1 root root 4985307 9月   2 21:13 redis-benchmark
+-rwxr-xr-x. 1 root root 7185872 9月   2 21:13 redis-check-aof
+-rwxr-xr-x. 1 root root 7185872 9月   2 21:13 redis-check-rdb
+-rwxr-xr-x. 1 root root 5092475 9月   2 21:13 redis-cli
+lrwxrwxrwx. 1 root root      12 9月   2 21:13 redis-sentinel -> redis-server
+-rwxr-xr-x. 1 root root 7185872 9月   2 21:13 redis-server
+[root@localhost local]# rm -f /usr/local/bin/redis*
+[root@localhost local]# ll /usr/local/bin
+总用量 0
+[root@localhost local]#
+```
+
+3、顺便也删除掉解压后的文件目录和所以文件
+
+```
+[root@localhost local]# ll
+总用量 40
+drwxr-xr-x. 2 root root 4096 9月   3 09:43 bin
+drwxr-xr-x. 2 root root 4096 9月  23 2011 etc
+drwxr-xr-x. 2 root root 4096 9月  23 2011 games
+drwxr-xr-x. 2 root root 4096 9月  23 2011 include
+drwxr-xr-x. 2 root root 4096 9月  23 2011 lib
+drwxr-xr-x. 2 root root 4096 9月  23 2011 libexec
+drwxrwxr-x. 6 root root 4096 9月   2 21:11 redis
+drwxr-xr-x. 2 root root 4096 9月  23 2011 sbin
+drwxr-xr-x. 5 root root 4096 4月   1 04:48 share
+drwxr-xr-x. 2 root root 4096 9月  23 2011 src
+[root@localhost local]# rm -rf redis
+[root@localhost local]# ll
+总用量 36
+drwxr-xr-x. 2 root root 4096 9月   3 09:43 bin
+drwxr-xr-x. 2 root root 4096 9月  23 2011 etc
+drwxr-xr-x. 2 root root 4096 9月  23 2011 games
+drwxr-xr-x. 2 root root 4096 9月  23 2011 include
+drwxr-xr-x. 2 root root 4096 9月  23 2011 lib
+drwxr-xr-x. 2 root root 4096 9月  23 2011 libexec
+drwxr-xr-x. 2 root root 4096 9月  23 2011 sbin
+drwxr-xr-x. 5 root root 4096 4月   1 04:48 share
+drwxr-xr-x. 2 root root 4096 9月  23 2011 src
+[root@localhost local]#
+```
+
+这样，redis就卸载完成了。
 
 
-# 06.Redis客户端
+
+----
+
+# 6.Redis客户端
 
 安装完成Redis，我们就可以操作Redis，实现数据的CRUD了。这需要用到Redis客户端，包括：
 
 - 命令行客户端
 - 图形化桌面客户端
-- 编程客户端
+- 编程客户端（即不同语言的客户端）
 
+这里我们先来讲前两种，语言放最后。
 
+---
 
-## 2.1.Redis命令行客户端
+## 一、Redis命令行客户端
 
-> cd /usr/local/bin/ 这个目录下就有一个redis-cli
+`redis命令行客户端`在安装完redis后就已经安装好了，也就是 `redis-cli`
 
-Redis安装完成后就自带了命令行客户端：redis-cli，使用方式如下：
+Redis安装完成后就自带了命令行客户端：`redis-cli`，使用方式如下：
 
 ```sh
 redis-cli [options] [commonds]
 ```
 
-其中常见的options有：
+其中常见的options如下，这些选项可以不指定，不指定就是默认，如果你指定了，它就会按照你指定的去连接。
 
 - `-h 127.0.0.1`：指定要连接的redis节点的IP地址，默认是127.0.0.1，代表本机
 - `-p 6379`：指定要连接的redis节点的端口，默认是6379（这也是redis的默认端口）
@@ -536,13 +693,17 @@ redis-cli [options] [commonds]
 
 - `ping`：与redis服务端做心跳测试，服务端正常会返回`pong`
 
-不指定commond时，会进入`redis-cli`的交互控制台：
+但是一般情况下commonds我们都不用输入，因为我们希望的是先连上，如果不输入，连上后会进入一个持续的交互的控制台，这样比较方便。
 
 ![image-20211211110439353](.\assets\image-20211211110439353.png)
 
-> 由于通过-a指定密码会报警告，这是不安全的，我们可以先连上，然后通过 AUTH 指定用户名和密码，但由于我们没有用户名，所以直接写密码就可以
->
-> AUTH 123456
+但是由于通过 `-a` 指定密码会报警告，这是不安全的，我们可以先连上，然后通过 AUTH 指定用户名和密码，但由于我们没有用户名，所以直接写密码就可以
+
+~~~redis
+AUTH 123456
+~~~
+
+
 
 
 
