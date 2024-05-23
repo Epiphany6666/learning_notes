@@ -2677,7 +2677,7 @@ class RedisStringTests {
         User user = new User("虎哥", 21);
         // 手动序列化，这里可能会有异常，碰见异常直接往外面抛即可
         // mapper是JSON的工具，跟以前接触的fastjson是一样的，它的作用就是将对象转成JSON，这里当然也可以使用fastjson
-        // ObjectMapper是SpringMVC中默认使用的JSON处理工具，因此这里
+        // ObjectMapper是SpringMVC中默认使用的JSON处理工具，因此这里就用它了
         String json = mapper.writeValueAsString(user);
         // 写入数据
         stringRedisTemplate.opsForValue().set("user:200", json);
