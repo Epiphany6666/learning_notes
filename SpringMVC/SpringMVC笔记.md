@@ -75,7 +75,7 @@ c>引入依赖
 
 这里面就包含了spring所依赖的一些核心jar包
 
-![image-20240301214611042](O:\BaiduSyncdisk\other\StudyNote\SpringMVC\img\image-20240301214611042.png)
+![image-20240301214611042](.\img\image-20240301214611042.png)
 
 **javax.servlet-api**：学习servlet的时候肯定是要导入这个jar包的，但是tomcat是自带这两个jar包的，tomcat有了sun公司的参与，在最新的tomcat中都有servlet-api和jsp-api的jar包，这也是我们导入servlet-api后，依赖范围为provided
 

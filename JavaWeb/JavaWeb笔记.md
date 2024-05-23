@@ -7905,9 +7905,7 @@ Spring的官方提供了很多现成的starter(起步依赖)，我们在开发�
 
 > 举例：当我们开发中需要使用redis数据库时，只需要在SpringBoot项目中，引入：spring-boot-starter-redis ，即可导入redis开发所需要的依赖。
 
-
-
-
+----
 
 #### SpringBoot父工程
 

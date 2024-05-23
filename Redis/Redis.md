@@ -1343,7 +1343,7 @@ OK
 
 而Hash结构的key跟string没什么差异，但是value又分成了两部分：`field`（也有人称为hashKey），`value`，此时我们就不需要再使用JSON字符串来表示一个用户了，它可以将对象中的每个字段独立存储，此时针对单个字段做CRUD，并不会影响到其他字段。
 
-![1652942027719](./assets/1652942027719.png)
+<img src="./assets/1652942027719.png" alt="1652942027719" style="zoom:67%;" />
 
 ---
 
@@ -1864,38 +1864,63 @@ PS：返回的排名是从 `0` 开始的
 
 # 15.Redis的Java客户端-Jedis
 
-在Redis官网中提供了各种语言的客户端，地址：https://redis.io/docs/clients/
+经过前面的学习，我们已经基本了解了redis常见的五种数据结构，以及每种结构的常见命令和基本用法，不过最终我们实现业务，还是要用编码的方式来实现。
 
-![](https://i.imgur.com/9f68ivq.png)
+在Redis官网中提供了各种语言的客户端供我们使用，地址：https://redis.io/docs/clients/
 
-其中Java客户端也包含很多：
+![image-20240523122336455](./assets/image-20240523122336455.png)
+
+当然作为Java程序员，我们要关注的肯定是Java语言的客户端其中Java客户端也包含很多：
 
 ![image-20220609102817435](./assets/image-20220609102817435.png)
 
 标记为❤的就是推荐使用的java客户端，包括：
 
 - Jedis（java和redis组成的单词）和Lettuce：这两个主要是提供了Redis命令对应的API，方便我们操作Redis，而SpringDataRedis又对这两种做了抽象和封装，因此我们后期会直接以SpringDataRedis来学习。
-- 以Redis命令作为方法名称，学习成本低，简单实用。但是Jedis实例是线程不安全的，多线程环境下需要基于连接池来使用
-- Lettuce是基于Netty实现的，支持同步、异步和响应式编程方式，并且是线程安全的。支持Redis的哨兵模式、集群模式和管道模式。
-- Redisson是一个基于Redis实现的分布式、可伸缩的Java数据结构集合。包含了诸如Map、Queue、Lock、 Semaphore、AtomicLong等强大功能
-- Redisson：是在Redis基础上实现了分布式的可伸缩的java数据结构，例如Map.Queue等，而且支持跨进程的同步机制：Lock.Semaphore等待，比较适合用来实现特殊的功能需求。
+
+  并且它以Redis命令作为方法名称，例如SET命令对应的方法就是set，GET命令对应的方法就叫get，MSET命令对应的方法就叫mset，因此学习成本低，简单实用。
+
+  但是Jedis实例是线程不安全的，也就是说你创建一个线程实例，多线程并发运行的时候是有线程安全问题的，因此多线程使用时必须为每一个线程创建独立的Jedis连接，那么就必须使用连接池的方式来使用了。
+
+- Lettuce是基于Netty实现的，Netty是高性能的网络编程框架，支持同步、异步和响应式编程方式，并且是线程安全的。支持Redis的哨兵模式、集群模式和管道模式。所以这种模式跟Spring的编程模式结合的比较好，并且响应式编程、异步编程的吞吐能力也高一点。因此spring官方默认兼容的就是Lettuce客户端。
+
+- Redisson的特点不在于对redis的基本操作，而是在于它底层是一个基于Redis实现了一系列的工具，例如分布式、可伸缩的Java数据结构集合。包含了诸如Map、Queue、Lock、 Semaphore（信号量）、AtomicLong（原子整形）等这些类，这些类可以保证我们平常使用的时候做数据存储、线程控制都非常方便。
+
+  但是这些东西它们都有一个特点：它们都是单机的，如果是在分布式环境下，它们往往就失去作用了。
+
+- 而Redission就是基于Redis重新实现了这一系列的东西，以至于它们可以在分布式环境下同样能够使用。因此如果你有在分布式环境下使用的需求，就不需要重新造轮子了，而是直接使用Redission。
+
+  Redisson：是在Redis基础上实现了分布式的可伸缩的java数据结构，例如Map.Queue等，而且支持跨进程的同步机制：Lock.Semaphore等待，比较适合用来实现特殊的功能需求。
+
 - Spring Data Redis：兼容了jedis和lettuce
 
+一般作为普通Redis来实现业务逻辑，用Jedis、Lettuce这两种会相对来讲比较方便一些，因此这两种应该都掌握。
+
+但是spring最擅长的就是整合，因此后面会学习 `Spring Data Redis`，它底层可以兼容 `Jedis` 和 `lettuce`，即既可以用 `Jedis` 实现，也可以用 `lettuce` 实现，未来学完了它，就等于这两个客户端都会了。
+
+但是有些企业还是喜欢使用旧的Jedis，因为它的命令就是方法名，学习成本低，因此我们会把Jedis的原生API也会讲一下，然后再学习Spring Data Redis。
 
 
-## 16.Jedis快速入门
 
-**入门案例详细步骤**
+---
 
-案例分析：
+# 16.Jedis快速入门
 
-0）创建工程：
+Jedis使用起来非常简单，官网地址： https://github.com/redis/jedis，官网给出了一个快速入门的demo，这里就先来演示一下这个demo。
+
+## 一、步骤
+
+### 0）创建工程
 
 ![1652959239813](.\assets\1652959239813.png)
 
+---
 
+### 1）引入依赖
 
-1）引入依赖：
+官网上是可以直接找到这个依赖的
+
+![image-20240523153507731](./assets/image-20240523153507731.png)
 
 ```xml
 <!--jedis-->
@@ -1913,9 +1938,9 @@ PS：返回的排名是从 `0` 开始的
 </dependency>
 ```
 
+---
 
-
-2）建立连接
+### 2）建立连接
 
 新建一个单元测试类，内容如下：
 
@@ -1924,76 +1949,115 @@ private Jedis jedis;
 
 @BeforeEach
 void setUp() {
-    // 1.建立连接
-    // jedis = new Jedis("192.168.150.101", 6379);
-    jedis = JedisConnectionFactory.getJedis();
+    // 1.建立连接，需要传入IP地址和端口号，相当于 -h 和 -p
+    jedis = new Jedis("192.168.150.101", 6379);
     // 2.设置密码
     jedis.auth("123321");
-    // 3.选择库
+    // 3.选择库，不选择的话默认就是0号库
     jedis.select(0);
 }
 ```
 
+---
 
-
-3）测试：
-
-```java
-@Test
-void testString() {
-    // 存入数据
-    String result = jedis.set("name", "虎哥");
-    System.out.println("result = " + result);
-    // 获取数据
-    String name = jedis.get("name");
-    System.out.println("name = " + name);
-}
-
-@Test
-void testHash() {
-    // 插入hash数据
-    jedis.hset("user:1", "name", "Jack");
-    jedis.hset("user:1", "age", "21");
-
-    // 获取
-    Map<String, String> map = jedis.hgetAll("user:1");
-    System.out.println(map);
-}
-```
-
-
-
-4）释放资源
+### 3）释放资源
 
 ```java
 @AfterEach
 void tearDown() {
+    // 做一个健壮性的判断，因为如果在上面建立连接的时候就抛异常了，直接走到释放资源的代码了，就会有风险
     if (jedis != null) {
         jedis.close();
     }
 }
 ```
 
+---
+
+## 4）测试
+
+```java
+@Test
+void testString() {
+    // 存入数据。之前说过，Jedis里面的方法名就是redis里面的命令名称
+    String result = jedis.set("name", "虎哥");
+    System.out.println("result = " + result); // result = OK
+    // 获取数据
+    String name = jedis.get("name");
+    System.out.println("name = " + name); // name = 虎哥
+}
+```
+
+上面报错是因为没有相关日志的依赖，不用管，主要看下面的结果。
+
+![image-20240523160425843](./assets/image-20240523160425843.png)
+
+---
+
+`hset` 就是传入一个键值对
+
+<img src="./assets/image-20240523160742049.png" alt="image-20240523160742049" style="zoom:67%;" />
+
+`hmset` 可以批量插入，在Java中传入的是一个Map集合
+
+<img src="./assets/image-20240523160903029.png" alt="image-20240523160903029" style="zoom:80%;" />
+
+~~~java
+@Test
+void testHash() {
+    // 插入hash数据
+    jedis.hset("user:1", "name", "Jack");
+    jedis.hset("user:1", "age", "21"); // 其value是字符串，虽然都是字符串，不过根据字符串的格式不同，又可以分为3类，因此它本质还是字符串，所以这里传字符串的21
+
+    // 获取
+    // 在命令行中hgetAll得到的是key-value形参的数组，但是这里为了方便，它帮我们组成了一个Map，因为getAll就是得到所有的键值对
+    Map<String, String> map = jedis.hgetAll("user:1");
+    System.out.println(map); // {name=Jack, age=21}
+}
+~~~
+
+来到图形化界面看一眼，发现都是正确插入了的
+
+![image-20240523161403921](./assets/image-20240523161403921.png)
+
+其他的命令就不演示了，因为方法名和命令是一样的。
+
+---
+
+## 二、总结
+
+Jedis使用的基本步骤：
+
+1.引入依赖
+
+2.创建Jedis对象，建立连接
+
+3.使用Jedis，方法名与Redis命令一致
+
+4.释放资源
 
 
 
+---
 
-## 17. Jedis连接池
+# 17. Jedis连接池
 
-Jedis本身是线程不安全的，并且频繁的创建和销毁连接会有性能损耗，因此我们推荐大家使用Jedis连接池代替Jedis的直连方式
+Jedis本身是线程不安全的，如果在多线程的环境下并发的去访问，大家都来使用Jedis的话，是有可能出现线程安全问题的，因此在并发的环境下Jedis一定要给每一个线程创建独立的Jedis对象，此时最好的方案是使用线程池，因为频繁的创建和销毁连接会有性能损耗，因此我们推荐大家使用Jedis连接池代替Jedis的直连方式。
+
+Jedis官方也基于 `apache的 commons pool` 来实现了连接池。
 
 有关池化思想，并不仅仅是这里会使用，很多地方都有，比如说我们的数据库连接池，比如我们tomcat中的线程池，这些都是池化思想的体现。
 
+---
 
+## 一、创建Jedis的连接池
 
-#### 5.2.1.创建Jedis的连接池
-
-- 
+其实连接池的使用并不复杂，这里定义了一个工具类 `JedisConnectionFacotry`，工具类中有一个静态变量 `jedisPool`，这个 `pool对象` 是通过静态代码块来初始化的
 
 ```java
-public class JedisConnectionFacotry {
+public class JedisConnectionFactory {
 
-    //JedisPool就是官方提供的Jedis对象
+     //JedisPool就是官方提供的Jedis对象
      private static final JedisPool jedisPool;
 
      static {
@@ -2003,16 +2067,19 @@ public class JedisConnectionFacotry {
          poolConfig.setMaxTotal(8);
          //最大空闲链接，即便没有人来访问池子，池子里也可以预备8个连接，这样的话有人来了就可以直接用，不用临时创建
          poolConfig.setMaxIdle(8);
-         //最小空闲连接，如果没有人用，就会被清理，知道它为0为止
+         //最小空闲连接。但是这些连接一直放那里也不太好，因此这些连接放置一段时间后如果没有人用，就会被清理，直到它为0为止
          poolConfig.setMinIdle(0);
-         //等待连接时长：没有人用的话等待多久，默认值为-1，即一直等，直到有新的空闲连接为止，过了1000毫秒，就会报错
+         //等待连接时长：当连接池中没有连接可用的时候，要不要等待？等多长时间？默认值为-1，即一直等，直到有新的空闲连接为止，过了1000毫秒，还没连接，就会报错
          poolConfig.setMaxWaitMillis(1000);
-         //创建连接池对象，第一个参数是它的连接池，IP地址，端口号，超时时间，密码
+         //创建连接池对象，第一个参数是它的连接池config对象，config显然是做配置的；然后是IP地址，端口号，超时时间，密码。
+         // 也就是说JedisPool传入的都是一些连接的参数，而前面config对象中传的是池的一些参数。
          jedisPool = new JedisPool(poolConfig,
-                 "192.168.150.101",6379,1000,"123321");
+                 "192.168.150.101",6379,
+                                   // timeout：连接和读取操作的超时时间，以毫秒为单位。
+                                   1000,"123321");
      }
 
-    //提供静态方法，方便我们去获取jedis对象
+    //提供静态方法，方便我们去获取jedis对象，每次都是从池子中获取，用完了就会还回去，这样就避免了频繁的创建和销毁这些对象了
      public static Jedis getJedis(){
           return jedisPool.getResource();
      }
@@ -2027,9 +2094,9 @@ public class JedisConnectionFacotry {
 
 - 3）最后提供返回连接池中连接的方法.
 
+---
 
-
-#### 5.2.2.改造原始代码
+## 二、改造原始代码
 
 **代码说明:**
 
@@ -2040,50 +2107,117 @@ public class JedisConnectionFacotry {
 2.当我们使用了连接池后，当我们关闭连接其实并不是关闭，而是将Jedis还回连接池的。
 
 ```java
-    @BeforeEach
-    void setUp(){
-        //建立连接
-        /*jedis = new Jedis("127.0.0.1",6379);*/
-        jedis = JedisConnectionFacotry.getJedis();
-         //选择库
-        jedis.select(0);
-    }
+@BeforeEach
+void setUp(){
+    //建立连接
+    /*jedis = new Jedis("127.0.0.1",6379);*/
+    jedis = JedisConnectionFacotry.getJedis();
+    //选择库
+    jedis.select(0);
+}
 
-   @AfterEach
-    void tearDown() {
-        if (jedis != null) {
-            //此时它的底层代码就是：pool.returnResource(this);
-            //这个操作的意思是归还，还到池子里去，而不是把它销毁
-            jedis.close();
-        }
+@AfterEach
+void tearDown() {
+    if (jedis != null) {
+        //这个操作的意思是归还，还到池子里去，而不是把它销毁
+        jedis.close();
     }
+}
 ```
 
+底层 `close()` 源码如下
+
+~~~java
+@Override
+public void close() {
+    // 检查连接池是否为 null
+    if (dataSource != null) {
+        // 临时保存dataSource并将其置为null，为了避免了重复关闭同一个资源。
+        JedisPoolAbstract pool = this.dataSource;
+        this.dataSource = null;
+        // 检查连接是否破损并相应地归还连接
+        if (isBroken()) {
+            // 如果连接破损，则调用pool.returnBrokenResource(this)方法将破损的连接归还到连接池，以便池能够处理它（通常是销毁这个连接）
+            pool.returnBrokenResource(this);
+        } else {
+            // 如果连接没有破损，则调用pool.returnResource(this)将正常的连接归还到连接池，以便可以被复用。
+            pool.returnResource(this);
+        }
+    } else {
+        // 如果当前实例的dataSource为null，说明该连接不是从连接池中获取的，调用父类的close方法
+        super.close();
+    }
+}
+~~~
 
 
-## 18.Redis的Java客户端-SpringDataRedis
 
-SpringData是Spring中数据操作的模块，包含是spring对各种数据库的集成，其中对Redis的集成模块就叫做SpringDataRedis，官网地址：https://spring.io/projects/spring-data-redis
+---
 
-* 提供了对不同Redis客户端的整合（Lettuce和Jedis）
-* 提供了RedisTemplate统一API来操作Redis
+# 18.Redis的Java客户端-SpringDataRedis
+
+SpringData是Spring中数据操作的模块，包含是spring对各种数据库操作的集成，其中对Redis的集成模块就叫做SpringDataRedis，官网地址：https://spring.io/projects/spring-data-redis。
+
+打开官网，可以发现在 `SpringData` 下就有各种各样的操作，这些常见的数据库操作全部都属于 `SpringData` 这个模块，`Spring Data Redis` 就是其中之一，它里面封装的当然就是对redis的各种各样的操作。
+
+![image-20240523171710364](./assets/image-20240523171710364.png)
+
+可以发现它的版本也已经迭代版本非常多了。
+
+- **Branch**：表示 Spring Data Redis 的分支版本，例如 3.2.x、3.1.x 等。
+- **Initial Release**：表示该分支版本的初始发布日期。
+- **End of Support**：表示该分支版本的支持结束日期，即社区或开源支持的结束日期。
+- **End Commercial Support ***：表示该分支版本的商业支持结束日期，通常是由提供商业支持服务的公司（例如 Pivotal 或 VMware）提供的。星号（*）可能表示有额外的注释或条件，具体解释可能会在页面底部或者文档的其他部分提供。
+
+但是整体使用上差异并不是很大。
+
+![image-20240523174443042](./assets/image-20240523174443042.png)
+
+那它具备什么特征呢？首先spring重来不会重复去造轮子，它都是集成，因此它其实是对其他redis客户端的整合（spring不能说抄袭）。
+
+* 提供了对不同Redis客户端的整合（Lettuce和Jedis），并且要整合，就应该提供一套统一的标准
+* 提供了RedisTemplate统一API来操作Redis，底层的实现就是由Lettuce和Jedis来实现的
+
+在封装的基础上，它还做了很多很多的支持
+
 * 支持Redis的发布订阅模型
+
 * 支持Redis哨兵和Redis集群
-* 支持基于Lettuce的响应式编程
-* 支持基于JDK.JSON.字符串.Spring对象的数据序列化及反序列化
+
+* 支持基于Lettuce的响应式编程（可以结合Spring的WebFlux）
+
+* 支持基于JDK、JSON、字符串、Spring对象的数据序列化及反序列化
+
+  - 序列化：将JDK、JSON、字符串、Spring对象这些变成字符串或字节。
+  - 反序列化：将redis中读到的字节再变成Java中的对象 / 字符串。
+
+  对比：在上节Jedis代码中，`set()方法` 中 key 和 value 类型都是字符串类型，要么是字节数组（之前讲过，Redis底层编码都是字节数组，无非就是编码格式不一样）。但假设我现在有一个Java对象需要存储，此时它就做不到了，除非你手动给它做序列化，变成字符串或字节。
+
 * 支持基于Redis的JDKCollection实现
 
-SpringDataRedis中提供了RedisTemplate工具类（Redis官方也对Redis命令做了分组），其中封装了各种对Redis的操作。并且将不同数据类型的操作API封装到了不同的类型中，这些API的名字都叫做opsFor，它的返回值都是Operations对象：
+  JDKCollection：JDK中各种各样的结合，它基于redis重新实现了一下这些集合（队列、链表等）。
+
+  为什么要重新实现呢？因为基于redis的实现是分布式的，即跨系统的。
+
+SpringDataRedis中提供了RedisTemplate工具类，其中封装了各种对Redis的API。
+
+Jedis中方法名就是命令名称，redis中有上百个命令，那么Jedis类中就封装了上百个方法，它的好处是学习成本低，但是类相对来讲就比较臃肿了，里面东西特别多。
+
+但是这些API的封装是有规律的，它跟Jedis不同。我们知道，Redis官方也对Redis命令做了分组，例如有通用命令、有专门操作字符串的命令、专门操作hash的命令...... 
+
+而我们的RedisTemplate它也做了这些事，它的内部提供了一系列的API，它也将不同数据类型的API封装到了不同的类型中，这些API的名字都叫做opsFor，它的返回值都是Operations对象，这些对象中就封装了各种操作：
+
+RedisTemplate 本身封装的就是一些通用的命令。
 
 ![1652976773295](.\assets\1652976773295.png)
 
 
 
-## 19.快速入门
+---
 
-SpringBoot已经提供了对SpringDataRedis的支持，使用非常简单：
+# 19.RedisTemplate快速入门
 
-因为SpringBoot默认整合了SpringDataRedis，并且做了自动装配
+这里会基于SpringBoot使用，因为SpringBoot已经默认整合了SpringDataRedis，并且做了自动装配，我们使用起来会及其的方便
 
 #### 6.1.1.导入pom坐标
 
