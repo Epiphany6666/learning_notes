@@ -2219,7 +2219,7 @@ RedisTemplate 本身封装的就是一些通用的命令。
 
 这里会基于SpringBoot使用，因为SpringBoot已经默认整合了SpringDataRedis，并且做了自动装配，我们使用起来会及其的方便
 
-#### 6.1.1.导入pom坐标
+## 一、导入pom坐标
 
 引入依赖
 
@@ -2229,19 +2229,14 @@ RedisTemplate 本身封装的就是一些通用的命令。
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-redis</artifactId>
 </dependency>
-<!--连接池common-pool，不管是Jedis也好，还是Lettuce，底层都会1基于commons-pool来实现连接池效果-->
+<!--连接池common-pool，因为不管是Jedis也好，还是Lettuce，底层都会基于commons-pool来实现连接池效果-->
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-pool2</artifactId>
 </dependency>
-<!--Jackson依赖-->
-<dependency>
-    <groupId>com.fasterxml.jackson.core</groupId>
-    <artifactId>jackson-databind</artifactId>
-</dependency>
 ```
 
-
+完整pom文件如下
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -2310,13 +2305,31 @@ RedisTemplate 本身封装的就是一些通用的命令。
 </project>
 ```
 
-#### 6.1.2 .配置文件
+----
 
-> 这里可以选择式Jedis连接池还是lettuce连接池，但如果使用jedis连接池的话还需要去配置jedis的相关依赖，因为spring默认使用的是lettuce
->
-> ![image-20231008212359249](.\assets\image-20231008212359249.png)
->
-> 但是一定要手动去配置lettucepool才会生效，否则它是不会生效的
+## 二、配置文件
+
+SpringBoot自动装配的好处就是：我们不用再写编码，上节课Jedis连接池代码其实还是有些复杂的，但是现在我们都不用管了，我们唯一要做的就是在yml文件中配置。
+
+如果你不记得了，没关系，直接 `spring.redis`，所有的提示都会出现
+
+<img src="./assets/image-20240523193230054.png" alt="image-20240523193230054" style="zoom:67%;" />
+
+如果你要选择数据库，这里也是可以选的，默认就是 `0号库`
+
+![image-20240523193346806](./assets/image-20240523193346806.png)
+
+配置连接池的时候有两套，一套Jedis连接池，另一套是Lettuce连接处，其实这里就是在选择你到底用的是哪种实现，如果你使用的是Jedis实现，那么还需要在pom文件中额外引入Jedis相关依赖，因为spring默认使用的是Lettuce。
+
+<img src="./assets/image-20240523193747666.png" alt="image-20240523193747666" style="zoom:67%;" />
+
+我们来看下maven，这里可以选择式Jedis连接池还是lettuce连接池，但如果使用jedis连接池的话还需要去配置jedis的相关依赖，因为spring默认使用的是lettuce。
+
+<img src=".\assets\image-20231008212359249.png" alt="image-20231008212359249" style="zoom:67%;" />
+
+因此这里的pool就选择Lettuce，虽然Lettuce pool都是有默认值的，但是一定要手动去配置lettucepool，连接池才会生效，否则它是不会生效的
+
+![image-20240523195623951](./assets/image-20240523195623951.png)
 
 ```yaml
 spring:
@@ -2332,7 +2345,21 @@ spring:
         max-wait: 100ms #连接等待时间
 ```
 
-#### 6.1.3.测试代码
+----
+
+## 三、测试代码
+
+依赖引好了，代码也配好了，直接 `@Autowired`，自动装配，直接类都不用我们创建了，拿来用就行了。
+
+`opsForValue()` 的返回值是 `ValueOperations`，即跟字符串有关的操作。
+
+![image-20240523195912313](./assets/image-20240523195912313.png)
+
+调用 `set()方法`，可以发现这里的 key-value 并没有要求你传字符串，也就是说你传字符串也要，传object也好它都可以接受，因为我们讲过它底层有一个自动的序列化机制，帮你去处理这件事情，这个功能还是非常强大的。
+
+因此RedisTemplate可以接收任意Object作为值写入Redis：
+
+<img src="./assets/OEMcbuu.png" style="zoom:50%;" />
 
 ```java
 @SpringBootTest
@@ -2352,6 +2379,14 @@ class RedisDemoApplicationTests {
 }
 ```
 
+运行代码，可以发现成功了
+
+<img src="./assets/image-20240523200753788.png" alt="image-20240523200753788" style="zoom:80%;" />
+
+---
+
+## 四、总结
+
 **贴心小提示：SpringDataJpa使用起来非常简单，记住如下几个步骤即可**
 
 SpringDataRedis的使用步骤：
@@ -2362,61 +2397,142 @@ SpringDataRedis的使用步骤：
 
 
 
-## 20 .数据序列化器
+---
 
-RedisTemplate可以接收任意Object作为值写入Redis：
+# 20 .数据序列化器
 
-![](./assets/OEMcbuu.png)
+## 一、引出问题
 
+如下图，可以很明显发现遇见了问题，我写进去的明明是虎哥，而取出来的却是Rose呢？
 
+![image-20240523202800736](./assets/image-20240523202800736.png)
 
-只不过写入前会把Object序列化为字节形式，默认是采用JDK序列化，得到的结果是这样的：
+通过 `keys *` 来查看一下，可以发现有一个叫 `name` 的key，还有一个叫 `"\xac\xed\x00\x05t\x00\x04name"` 的key，这个key最后有一个name。
+
+![image-20240523202934012](./assets/image-20240523202934012.png)
+
+我们来查询，发现得到了下面这串东西，可以发现看不懂。
+
+那我告诉你这就是虎哥，虎哥怎么变成这样了？
+
+![image-20240523203053022](./assets/image-20240523203053022.png)
+
+它被剁碎了，这就要说到序列化了。
+
+---
+
+## 二、默认JDK序列化器 + 源码查看
+
+可以看见，`RedisTemplate` 的key接收的并不是字符串，而是Object，这个是我们之前讲过的 `Spring Data` 的一个特殊功能，它可以接收任何类型的对象，然后帮我们转成redis可以处理的字节，因此我们存进去的 `"name"` 和 `"虎哥"` 都被当成Java对象了，而RedisTemplate底层默认对这些对象的处理方式就是利用JDK的序列化工具 `ObjectOutputStream`，我们可以来看看 `RedisTemplate` 的原码。
+
+在它里面有四个东西：`keySerializer`：key的序列化器；`valueSerializer`：value的序列化器；`hashKeySerializer、hashValueSerializer`：对哈希里面的字段的键值序列化器。
+
+由此可见，我们利用 `RedisTemplate` 存入的一切数据，最终都会利用这四个东西做序列化和反序列化。
+
+![image-20240523204042963](./assets/image-20240523204042963.png)
+
+这四个东西现在都是null，那么谁给它做初始化的呢？
+
+往下滑，在 `afterPropertiesSet()方法` 中会给它创建一个默认的序列化器，而默认的序列化器就是JDK的序列化器。
+
+在你没有给这几个值进行自定义的情况下，它就会走这个默认的JDK序列化器。
+
+<img src="./assets/image-20240523204343178.png" alt="image-20240523204343178" style="zoom:67%;" />
+
+你可以在这一行打上一个断点，然后debug运行一下，跟进 `set()方法`
+
+<img src="./assets/image-20240523204510107.png" alt="image-20240523204510107" style="zoom:67%;" />
+
+传进来的key-value会被 `rawValue()` 装饰（raw），跟进 `rawValue()方法`
+
+<img src="./assets/image-20240523204633688.png" alt="image-20240523204633688" style="zoom:67%;" />
+
+跟进来后往下走，它会尝试获取 `valueSerializer`，即我们刚刚看见的值序列化器，我们跟入 `serialize(value)方法`
+
+<img src="./assets/image-20240523204745721.png" alt="image-20240523204745721" style="zoom:67%;" />
+
+此时发现，直接进入到了JDK的 `Serialization`，就是我们刚刚看见的默认的JDK序列化工具。
+
+JDK的底层序列化用的是 `ObjectOutputStream`。往下，跟进`convert()方法`
+
+<img src="./assets/image-20240523205142203.png" alt="image-20240523205142203" style="zoom:60%;" />
+
+继续跟进 `serializeToByteArray(source)`
+
+![image-20240523205215988](./assets/image-20240523205215988.png)
+
+`serializeToByteArray(source)`：字节缓冲。继续跟进 `serialize()`
+
+<img src="./assets/image-20240523205316256.png" alt="image-20240523205316256" style="zoom:67%;" />
+
+此时看见了，底层就是使用 `ObjectOutputStream` 来写对象的，这个流的作用就是将Java对象转成字节，转成字节后再写入redis后就变成了 `\xac\xed\x00\x05t\x00\x06\xe8\x99\x8e\xe5\x93\xa5`，这就是默认的JDK序列化方式。
+
+![image-20240523205503512](./assets/image-20240523205503512.png)
+
+---
+
+## 三、解决问题
+
+这种方式的第一个问题就是：可读性差，如果我不说，你知道这是虎哥吗？
+
+而且还会出现一些Bug，我在代码中是 `set name`，我以为我把 `name` 改了，结果 `name` 没改，而是 `set` 一个新的东西进去了。
+
+并且内存占用空间也大，我明明就是一个 `name`，结果序列化后这么长。
 
 ![](./assets/5FjtWk5.png)
 
-> 我们储存的一切东西都会通过以下的进行序列化
+因此我们希望的是：我写的是什么，你就存什么，所见即所得多好。此时就必须去改变RedisTemplate的序列化方式了。
 
-![image-20231008215545515](.\assets\image-20231008215545515.png)
+选中 `RedisSerializer`，<kbd>ctrl + H</kbd> 可以查看它具体有哪些实现.
 
-如果没有给上面的值进行定义的话，它会给它创建一个默认的序列化器：
+`JdkSerializationRedisSerializer` 我们刚刚已经看过了，它是最不好用的一种方式。
 
-![image-20231008215354822](.\assets\image-20231008215354822.png)
+除了它以外，还有两个是我们可以使用的：`StringRedisSerializer`，它是专门用来处理字符串的，因为我们知道字符串想要转字节写入redis，只需要简单的 `getBytes()` 就行了，没必要利用JDK去转化，因此 `StringRedisSerializer` 做的事情就是 `getBytes()`，只不过底层编码你可以控制是 `UTF-8` 还是别的。
 
-![image-20231009123537411](.\assets\image-20231009123537411.png)
+使用场景：当key和hashKey都是字符串的情况可以用它，一般情况下key都是字符串，只有值可能是对象，因此 `key` 的序列化器就可以用它。
 
-缺点：
+如果value有可能是对象，建议使用 `GenericJackson2JsonRedisSerialzer`，也就是转JSON字符串的这样的序列化工具。
 
-- 可读性差
-- 内存占用较大
+![image-20240523210719241](./assets/image-20240523210719241.png)
 
-我们可以自定义RedisTemplate的序列化方式
+---
 
-> 1. Jdk是最不好用的一种方式
-> 2. StringRedisSerializer：专门用来处理字符串的，可以控制底层编码，如utf-8
->    当key和hashKey都是字符串的情况可以用它
-> 3. 如果value有可能是对象，建议使用GenericJackson2JsonRedisSerialzer
+## 四、代码实现
 
-![image-20231009123812762](.\assets\image-20231009123812762.png)
+引入 `Jackson依赖`。这个Jackson依赖我们平常在开发的时候是不需要自己引的，因为平时开发的时候使用的是SpringMVC，而SpringMVC中就会自带 `jackson-databind` 依赖。
 
-代码如下：
+~~~xml
+<!--Jackson依赖-->
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+</dependency>
+~~~
+
+修改序列化器代码如下：
+
+`RedisSerializer.string()` 返回值确实就是 `StringRedisSerializer` 的常量，然后编码格式是UTF-8，这样写就方便一些，不需要我们自己去 `new` 了。
+
+<img src="./assets/image-20240523212207927.png" alt="image-20240523212207927" style="zoom:67%;" />
 
 ```java
 @Configuration
 public class RedisConfig {
 
+    // 这里定义了一个Bean叫RedisTemplate，然后定义了一个泛型，key是String，值为Object，也就是默认key永远都是String
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory){
         // 创建RedisTemplate对象
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        // 设置连接工厂
+        // redis的构建需要连接工厂，连接工厂不需要我们创建，因为SpringBoot会帮我们自动创建，我们只需要注入进来即可
         template.setConnectionFactory(connectionFactory);
         // 创建JSON序列化工具
         GenericJackson2JsonRedisSerializer jsonRedisSerializer = 
             							new GenericJackson2JsonRedisSerializer();
-        // 设置Key的序列化
+        // 设置Key的序列化，使用String类型的序列化工具
         template.setKeySerializer(RedisSerializer.string());
         template.setHashKeySerializer(RedisSerializer.string());
-        // 设置Value的序列化
+        // 设置Value的序列化，使用JSON类型的序列化工具
         template.setValueSerializer(jsonRedisSerializer);
         template.setHashValueSerializer(jsonRedisSerializer);
         // 返回
@@ -2425,35 +2541,114 @@ public class RedisConfig {
 }
 ```
 
+修改测试代码，给注入进来的 `RedisTemplate` 加一个泛型，告诉它key的值一定是一个字符串，值是Object类型。
 
+~~~java
+@SpringBootTest(classes = Main.class)
+public class RedisDemoApplicationTests {
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
-这里采用了JSON序列化来代替默认的JDK序列化方式。最终结果如图：
+    @Test
+    void testString() {
+        // 写入一条String数据
+        redisTemplate.opsForValue().set("name", "虎哥");
+        // 获取string数据
+        Object name = redisTemplate.opsForValue().get("name");
+        System.out.println("name = " + name);
+    }
+}
+~~~
+
+---
+
+## 五、测试
+
+执行测试代码
+
+<img src="./assets/image-20240523213330576.png" alt="image-20240523213330576" style="zoom:67%;" />
+
+可以发现执行成功，点开 `name`，发现已经成功写入 `"虎哥"` 了。
+
+<img src="./assets/image-20240523213414081.png" alt="image-20240523213414081" style="zoom:67%;" />
+
+----
+
+接下来验证一下，如果我写了一个对象，那它能不能也去帮我做序列化呢？
+
+**新建实体类**
+
+~~~java
+package com.itheima.redis.pojo;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+    private String name;
+    private Integer age;
+}
+~~~
+
+新写一个单元测试，这次保存一个对象到redis中。
+
+~~~java
+@Test
+void testSavaUser() {
+    // 写入数据
+    redisTemplate.opsForValue().set("user:100", new User("虎哥", 21));
+    // 获取数据，返回的是一个Object，因为它不知道我们取出来的是什么类型的对象，但是由于我们自己知道，因此完全可以做一个强转
+    User user = (User) redisTemplate.opsForValue().get("user:100");
+    System.out.println("user = " + user);
+}
+~~~
+
+运行单元测试，可以发现成功打印出了用户的信息，那就表示强转没有问题
+
+<img src="./assets/image-20240523213925345.png" alt="image-20240523213925345" style="zoom:67%;" />
+
+接下来看一下图形化客户端，可以发现已经存入了一个User对象了，而且是JSON风格的，说明它自动化的将对象转为了JSON存入到了里面。并且最神奇的是，当我们去获取结果的时候，它还能自动的帮我们反序列化成了对象，它是怎么做到这个反序列化的呢？
+
+如下图，事实上在写入JSON的同时，还帮我们写出了一个class的属性，对应的就是User类的字节码名称，就是因为有这样的一条属性，所以它在反序列化的时候才能够读取到我们对应的字节码，即类的名称，然后再帮我们反序列化为对应的User写进来。
 
 ![](./assets/XOAq3cN.png)
 
-整体可读性有了很大提升，并且能将Java对象自动的序列化为JSON字符串，并且查询时能自动把JSON反序列化为Java对象。不过，其中记录了序列化时对应的class名称，目的是为了查询时实现自动反序列化。这会带来额外的内存开销。
+也就是说将来我们存储任何数据，不管是Java对象也好还是普通对象也好，都不用担心了，全部都交给了自动化的序列化工具去处理，我们要做的就是在 `Config类` 中定义好key和value的序列化工具就行了。
 
 
 
-## 22. StringRedisTemplate
+----
+
+# 22. StringRedisTemplate
+
+在上节我们已经学习了自定义 `RedisSerializer` 来实现全自动JSON的序列化和反序列化，这样依赖当我们向Redis中写入一个Java对象的时候就方便很多。
 
 尽管JSON的序列化方式可以满足我们的需求，但依然存在一些问题，如图：
 
 ![1653054602930](.\assets\1653054602930.png)
 
-为了在反序列化时知道对象的类型，JSON序列化器会将类的class类型写入json结果中，存入Redis，会带来额外的内存开销。
+为了在反序列化时知道对象的类型，JSON序列化器会将类的class类型写入json结果中，并且这个字节码本身甚至比我数据类型还要长，存入Redis就会带来额外的内存开销。
 
-为了减少内存的消耗，我们可以采用手动序列化的方式，换句话说，就是不借助默认的序列化器，而是我们自己来控制序列化的动作，同时，我们只采用String的序列化器，这样，在存储value时，我们就不需要在内存中就不用多存储数据，从而节约我们的内存空间
+但是也不能不写这个东西，序列化还好说，直接将对象转为字符串写就行了，但是反序列化的时候它怎么知道你这个JSON字符串要转成哪个类型的对象呢？因此这个东西是实现自动序列化必不可少的。
+
+因此如果你想减少内存的消耗，就不能使用JSON的序列化器来自动处理value，而是**统一使用String序列化器，要求只能存储String类型的key和value**。当需要存储Java对象时，手动完成对象的序列化和反序列化。
+
+如下图，有一个 `User类` 的对象需要往redis中存，此时可以手动序列化，我们手动在序列化的时候，就不需要将字节码写进去了，直接写类本身的属性就行了，然后再调用 `set()方法` 写入redis。
+
+当我们要读取数据的时候，读出来的就是一个JSON字符串，它里面没有字节码，没有字节码就没有人帮你自动处理，此时就需要手动来处理，因为程序员自己知道我取出来的是哪个类型，此时就可以转为对应的类型了。
+
+相当于是代码复杂了，加了两个手动处理的动作，但是就解决了刚刚内存占用的问题。
+
+不过还有一点要注意的就是：既然说了要统一使用string的序列化器，也就是说之前的RedisTemplate需要统一的定义成用StringSerializer才行，因此需要重新定义RedisTemplate。
 
 ![1653054744832](.\assets\1653054744832.png)
 
-这种用法比较普遍，因此SpringDataRedis就提供了RedisTemplate的子类：StringRedisTemplate，它的key和value的序列化方式默认就是String方式。
+这里告诉大家一个好消息，不需要你重新定义，因为SpringDataRedis就提供了RedisTemplate的子类：StringRedisTemplate，它的key和value的序列化方式默认就是String方式。
 
-![](https://i.imgur.com/zXH6Qn6.png)
-
-
-
-省去了我们自定义RedisTemplate的序列化方式的步骤，而是直接使用：
+省去了我们自定义RedisTemplate的序列化方式的步骤，而是直接使用StringRedisTemplate。
 
 ```java
 @SpringBootTest
@@ -2462,10 +2657,11 @@ class RedisStringTests {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
+    // 存字符串
     @Test
     void testString() {
         // 写入一条String数据
-        stringRedisTemplate.opsForValue().set("verify:phone:13600527634", "124143");
+        stringRedisTemplate.opsForValue().set("name", "虎哥");
         // 获取string数据
         Object name = stringRedisTemplate.opsForValue().get("name");
         System.out.println("name = " + name);
@@ -2474,22 +2670,24 @@ class RedisStringTests {
     //ObjectMapper是SpringMVC里默认使用的json处理工具
     private static final ObjectMapper mapper = new ObjectMapper();
 
+    // 存对象
     @Test
     void testSaveUser() throws JsonProcessingException {
         // 创建对象
         User user = new User("虎哥", 21);
         // 手动序列化，这里可能会有异常，碰见异常直接往外面抛即可
+        // mapper是JSON的工具，跟以前接触的fastjson是一样的，它的作用就是将对象转成JSON，这里当然也可以使用fastjson
+        // ObjectMapper是SpringMVC中默认使用的JSON处理工具，因此这里
         String json = mapper.writeValueAsString(user);
         // 写入数据
         stringRedisTemplate.opsForValue().set("user:200", json);
 
-        // 获取数据
+        // 获取数据的时候默认就是字符串
         String jsonUser = stringRedisTemplate.opsForValue().get("user:200");
         // 手动反序列化
         User user1 = mapper.readValue(jsonUser, User.class);
         System.out.println("user1 = " + user1);
     }
-
 }
 ```
 
