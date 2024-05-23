@@ -1051,29 +1051,33 @@ OK
 
 ----
 
-## .Redis命令-String命令
+# 10.Redis命令-String命令
+
+## 一、介绍
 
 String类型，也就是字符串类型，是Redis中最简单的存储类型。
 
-其value是字符串，不过根据字符串的格式不同，又可以分为3类：
+其value是字符串，虽然都是字符串，不过根据字符串的格式不同，又可以分为3类：
 
 * string：普通字符串
-* int：整数类型，可以做自增.自减操作
-* float：浮点类型，可以做自增.自减操作
-
-不管是哪种格式，底层都是**字节数组**形式存储，只不过是编码方式不同。字符串类型的最大空间不能超过512m.
-
-它会直接把数字直接转化为二进制的形式去存储，这样一来，一个字节就可以即表示一个很大的数字了，可以更节省空间
-
-字符串只能把字符转成字节码然后再去存储，相对来说占用内存更多一点
-
-> 甚至你可以把一张图片编译成字节存到String类型中
+* int：整数类型，可以做自增、自减操作
+* float：浮点类型，可以做自增、自减操作
 
 ![1652890121291](./assets/1652890121291.png)
 
+不管是哪种格式，都属于字符串，因此底层都是**字节数组**形式存储，只不过为了节省空间，**数值类型的字符串在编码的时候会不同**。
+
+**数值类型会直接把数字直接转化为二进制的形式去存储，这样一来，一个字节就可以即表示一个很大的数字了，可以更节省空间**
+
+字符串只能把字符转成字节码然后再去存储，相对来说占用内存更多一点。
+
+甚至你可以把一张图片编译成字节存到string类型中，但是字符串类型的最大空间不能超过512m，因此一般情况下也不会向一个key存储太多数据，因此一般也不会存图片，最多存图片的地址。
+
 String的常见命令有：
 
-* SET：添加或者修改已经存在的一个String类型的键值对
+增改查如下，删除是通用命令里面的。
+
+* SET：添加或者修改已经存在的一个String类型的键值对，如果key不存在则是新增，如果存在则是修改
 
 * GET：根据key获取String类型的value
 
@@ -1081,8 +1085,7 @@ String的常见命令有：
 
 * MGET：根据多个key获取多个String类型的value
 
-  返回值以数组的形式返回
-  ![image-20231008174525548](.\assets\image-20231008174525548.png)
+除了基本的存取以外，既然redis在存储数值类型的编码不同，因此对于数值类型就有一些特殊功能了。
 
 * INCR：让一个整型的key自增1
 
@@ -1091,21 +1094,25 @@ String的常见命令有：
 
 * DECR：自减1，但使用时一般都是使用INCR
 
-* INCRBYFLOAT：让一个浮点类型的数字自增并指定步长
+* INCRBYFLOAT：让一个浮点类型的数字自增并指定步长，但是浮点数没有默认增长，必须指定增长的步长
+
+以下两个是组合命令
 
 * SETNX：添加一个String类型的键值对，前提是这个key不存在，否则不执行
 
-  > SETNX是条组合命名，set和nx，nx是参数，跟在set后面
-  >
-  > setnx name lisi等价于set name lisi nx
+  `setnx name lisi` 等价于 `set name lisi nx`
 
 * SETEX：添加一个String类型的键值对，并且指定有效期
 
-  > 这也是条组合命名：setex name 10 jack 等价于：set name jack ex 10，ex就是expire
+  `setex name 10 jack` 等价于：`set name jack ex 10`，ex就是expire
 
 **贴心小提示**：以上命令除了INCRBYFLOAT 都是常用命令
 
-* SET 和GET: 如果key不存在则是新增，如果存在则是修改
+----
+
+## 二、代码实现
+
+### SET 和GET
 
 ```java
 127.0.0.1:6379> set name Rose  //原来不存在
@@ -1121,13 +1128,16 @@ OK
 "Jack"
 ```
 
-* MSET和MGET
+----
 
-```java
+### MSET和MGET
+
+```sh
 127.0.0.1:6379> MSET k1 v1 k2 v2 k3 v3
 OK
 
 127.0.0.1:6379> MGET name age k1 k2 k3
+# 返回值是多个值形成的数组，redis中数组就会以下面的形式进行返回
 1) "Jack" //之前存在的name
 2) "10"   //之前存在的age
 3) "v1"
@@ -1135,31 +1145,33 @@ OK
 5) "v3"
 ```
 
-* INCR和INCRBY和DECY
+---
 
-```java
+### INCR和INCRBY和DECY
+
+```sh
 127.0.0.1:6379> get age 
-"10"
+"10" # 这个10就是一个普通字符串，但是它是一个数值类型的，因此底层编码就是数字
 
-127.0.0.1:6379> incr age //增加1
+127.0.0.1:6379> incr age # 增加1
 (integer) 11
     
-127.0.0.1:6379> get age //获得age
+127.0.0.1:6379> get age # 获得age
 "11"
 
-127.0.0.1:6379> incrby age 2 //一次增加2
-(integer) 13 //返回目前的age的值
+127.0.0.1:6379> incrby age 2 # 一次增加2
+(integer) 13 # 返回目前的age的值
     
 127.0.0.1:6379> incrby age 2
 (integer) 15
     
-127.0.0.1:6379> incrby age -1 //也可以增加负数，相当于减
+127.0.0.1:6379> incrby age -1 # 也可以增加负数，相当于减
 (integer) 14
     
-127.0.0.1:6379> incrby age -2 //一次减少2个
+127.0.0.1:6379> incrby age -2 # 一次减少2个
 (integer) 12
     
-127.0.0.1:6379> DECR age //相当于 incr 负数，减少正常用法
+127.0.0.1:6379> DECR age # 相当于 incr 负数，但是一般在使用的时候一般都使用incr，只不过是给它正负而已
 (integer) 11
     
 127.0.0.1:6379> get age 
@@ -1167,29 +1179,65 @@ OK
 
 ```
 
-* SETNX
+---
 
-```java
+### INCRBYFLOAT
+
+浮点数没有默认增长，必须指定增长的步长
+
+~~~ts
+127.0.0.1:6379> set score 10.1
+OK
+127.0.0.1:6379> INCRBYFLOAT score 0.5
+"10.6"
+127.0.0.1:6379> INCRBYFLOAT score 0.5
+"11.1"
+127.0.0.1:6379> INCRBYFLOAT score 0.5
+~~~
+
+---
+
+### SETNX
+
+SETNX是条组合命名，`set` 和 `nx`，`nx` 是参数，跟在 `set` 后面
+
+我们在 `set` 的时候，其实后面可以跟很多很多参数，其中有一个参数就是 `nx`
+
+![image-20240523075904512](./assets/image-20240523075904512.png)
+
+因此 `setnx name lisi` 等价于 `set name lisi nx`
+
+```sh
 127.0.0.1:6379> help setnx
 
   SETNX key value
-  summary: Set the value of a key, only if the key does not exist
+  summary: Set the value of a key, only if the key does not exist # 如果key不存在才添加添加，存在就不添加。因此这个才是真正的新增功能，它只有新增效果
   since: 1.0.0
   group: string
 
-127.0.0.1:6379> set name Jack  //设置名称
+127.0.0.1:6379> set name Jack  # 设置名称
 OK
-127.0.0.1:6379> setnx name lisi //由于name已经存在，所以lisi的操作失败
-(integer) 0
+127.0.0.1:6379> setnx name lisi # 由于name已经存在，所以lisi的操作失败
+(integer) 0 # 返回值是0，表示没有数据改变
 127.0.0.1:6379> get name 
-"Jack"
-127.0.0.1:6379> setnx name2 lisi //name2 不存在，所以操作成功
-(integer) 1
+"Jack" # 重新查看name的值，依然是Jack
+127.0.0.1:6379> setnx name2 lisi
+(integer) 1 # name2 不存在，所以操作成功
 127.0.0.1:6379> get name2 
 "lisi"
 ```
 
-* SETEX
+---
+
+### SETEX
+
+EX：代表有效期。
+
+通用命令中有一个叫 `EXPIRE`，它的作用是设置一个key的有效期，通过 `ttl` 可以查看key的剩余有效期，但是 `EXPIRE` 是在key已经存在的情况下。
+
+`SETEX` 就表示：添加一个key，并且设置有效期。
+
+这也是条组合命名：`setex name 10 jack` 等价于：`set name jack ex 10`，ex就是expire
 
 ```sh
 127.0.0.1:6379> setex name 10 jack
@@ -1207,52 +1255,105 @@ OK
 
 
 
-## 11. Redis命令-Key的层级结构
+----
 
-Redis没有类似MySQL中的Table的概念，我们该如何区分不同类型的key呢？
+# 11. Redis命令-Key的层级结构
 
-例如，需要存储用户.商品信息到redis，有一个用户id是1，有一个商品id恰好也是1，此时如果使用id作为key，那就会冲突了，该怎么办？
+## 一、介绍
 
-我们可以通过给key添加前缀加以区分，不过这个前缀不是随便加的，有一定的规范：
+redis是键值型的数据库，因此它的键要求唯一，因此大多数情况下我们都会以数据的id来作为key，形成唯一标识。
 
-Redis的key允许有多个单词形成层级结构，多个单词之间用':'（冒号）隔开，格式如下：
+但是这里就会存在一个问题了：Redis没有类似MySQL中的Table的概念，没有表，所有数据都是存在一起的，那么我们该如何区分不同类型的key呢？
 
-![1652941631682](./assets/1652941631682.png)
+例如，需要存储用户、商品信息到redis，有一个用户id是1，有一个商品id恰好也是1，此时如果使用id作为key，那就会冲突了，该怎么办？
 
-这个格式并非固定，也可以根据自己的需求来删除或添加词条。
+此时我们可以通过给key添加前缀加以区分，不过这个前缀不是随便加的，有一定的规范：
 
-例如我们的项目名称叫 heima，有user和product两种不同类型的数据，我们可以这样定义key：
+Redis的key允许有多个单词形成层级结构，多个单词之间用 `':'（冒号）` 隔开，例如我们可以这样，这个格式并非固定，但是推荐大家这样写，除非你们公司有固定key的格式。
+
+<img src="./assets/1652941631682.png" alt="1652941631682" style="zoom:67%;" />
+
+例如我们的项目名称叫 `heima`，有 `user` 和 `product` 两种不同类型的数据，我们可以这样定义key：
 
 - user相关的key：**heima:user:1**（代表id为1的用户信息）
 
 - product相关的key：**heima:product:1**
 
-如果Value是一个Java对象，例如一个User对象，则可以将对象序列化为JSON字符串后存储：
+这样key就形成了一种层级关系，它们俩是一个项目的，只不过一个是 `user`，一个是 `product`。
+
+现在key定义好了，那值是什么呢？我们知道用户也好，商品也好，在我们的项目中往往都是一个java类或者java对象，这样的对象该如何存储到值的位置呢？
+
+上节将string类型的时候其实提到过，string是字符串，Java对象虽然不是字符串，但是它完全可以序列化成JSON的风格来存储。
+
+例如一个User / Product对象，则可以将对象序列化为JSON字符串后存储：
 
 | **KEY**         | **VALUE**                                 |
 | --------------- | ----------------------------------------- |
 | heima:user:1    | {"id":1, "name": "Jack", "age": 21}       |
 | heima:product:1 | {"id":1, "name": "小米11", "price": 4999} |
 
-一旦我们向redis采用这样的方式存储，那么在可视化界面中，redis会以层级结构来进行存储，形成类似于这样的结构，更加方便Redis获取数据
+---
 
-![1652941883537](./assets/1652941883537.png)
+## 二、代码实现
+
+存入两个user，两个product。
+
+PS：存入的时候JSON是一个字符串，需要加 `''`
+
+~~~sh
+127.0.0.1:6379> set heima:user:1 '{"id":1, "name":"Jack", "age": 21}'
+OK
+127.0.0.1:6379> set heima:user:2 '{"id":2, "name":"Rose", "age": 18}'
+OK
+127.0.0.1:6379> set heima:product:1 '{"id":1, "name":"小米11", "price": 4999}'
+OK
+127.0.0.1:6379> set heima:product:2 '{"id":2, "name":"荣耀6", "price": 2999}'
+OK
+~~~
+
+然后通过 `keys *` 来查看我们刚刚存入的数据，但是从这里并不能看见有什么特殊之处
+
+<img src="./assets/image-20240523082531777.png" alt="image-20240523082531777" style="zoom:67%;" />
+
+但是在可视化界面中，redis会以层级结构来进行存储，形成类似于这样的结构，更加方便Redis获取数据
+
+![image-20240523082614796](./assets/image-20240523082614796.png)
+
+这样就避免了id相同时的冲突，并且让我们的数据分离，看起来比较优雅。
+
+不仅仅是string类型可以将key按照这种方式设定，以后我们学的其他的数据类型，它的key都可以用这种方式去做成层级的模式
 
 
 
-## 12. Redis命令-Hash命令
+---
 
-Hash类型，也叫散列，其value是一个无序字典，类似于Java中的HashMap结构。
+# 12.Redis命令-Hash命令
 
-String结构是将对象序列化为JSON字符串后存储，当需要修改对象某个字段时很不方便：
+## 一、介绍
+
+之前我们一再强调，redis是键值型的数据库，它的值的类型多种多样，在string类型中，值就是普通字符串。
+
+但在Hash类型（也叫散列），其value是一个无序字典（其实就是一个hash表），类似于Java中的HashMap结构。
+
+也就是说redis本身是一个key-value，而哈希类型的value又是一个哈希表，即key-value结构。
+
+由于String结构是将对象序列化为JSON字符串后存储，当需要修改对象某个字段时很不方便，要么删除整个字符串，要么删掉重来
 
 ![1652941995945](./assets/1652941995945.png)
 
-Hash结构可以将对象中的每个字段独立存储，可以针对单个字段做CRUD：
+而Hash结构的key跟string没什么差异，但是value又分成了两部分：`field`（也有人称为hashKey），`value`，此时我们就不需要再使用JSON字符串来表示一个用户了，它可以将对象中的每个字段独立存储，此时针对单个字段做CRUD，并不会影响到其他字段。
 
 ![1652942027719](./assets/1652942027719.png)
 
-**Hash类型的常见命令**
+---
+
+## 二、Hash类型的常见命令
+
+这些命令可以对照着string类型进行学习，在它命令的基础上前面加上 `H` 就变成了Hash操作命令。
+
+由于多了一个 `field`，因此增改查的时候都需要告明是哪个 `key`、哪个 `field`。
+
+<img src="./assets/image-20240523085240462.png" alt="image-20240523085240462" style="zoom:50%;" />
 
 - HSET key field value：添加或者修改hash类型key的field的值
 
@@ -1264,19 +1365,27 @@ Hash结构可以将对象中的每个字段独立存储，可以针对单个字�
 
 - HGETALL：获取一个hash类型的key中的所有的field和value
 - HKEYS：获取一个hash类型的key中的所有的field
+- HVALS：获取一个hash类型的key中的所有的value
 - HINCRBY:让一个hash类型key的字段值自增并指定步长
 - HSETNX：添加一个hash类型的key的field值，前提是这个field不存在，否则不执行
 
-**贴心小提示**：哈希结构也是我们以后实际开发中常用的命令哟
+---
 
-* HSET和HGET
+## 三、代码实现
 
-```java
-127.0.0.1:6379> HSET heima:user:3 name Lucy//大key是 heima:user:3 小key是name，小value是Lucy
+### HSET和HGET
+
+存入到redis后，图形化界面如下，可以发现key里面存的value又是一个key-value结构，即hash结构
+
+![image-20240523085620048](./assets/image-20240523085620048.png)
+
+```sh
+127.0.0.1:6379> HSET heima:user:3 name Lucy # 大key是 heima:user:3 小key是name，小value是Lucy
 (integer) 1
-127.0.0.1:6379> HSET heima:user:3 age 21// 如果操作不存在的数据，则是新增
+127.0.0.1:6379> HSET heima:user:3 age 21 # 如果操作不存在的数据，则是新增
 (integer) 1
-127.0.0.1:6379> HSET heima:user:3 age 17 //如果操作存在的数据，则是修改
+# 修改某一个字段的值
+127.0.0.1:6379> HSET heima:user:3 age 17 # 如果操作存在的数据，则是修改
 (integer) 0
 127.0.0.1:6379> HGET heima:user:3 name 
 "Lucy"
@@ -1284,23 +1393,28 @@ Hash结构可以将对象中的每个字段独立存储，可以针对单个字�
 "17"
 ```
 
-* HMSET和HMGET
+----
 
-```java
+### HMSET和HMGET
+
+```sh
 127.0.0.1:6379> HMSET heima:user:4 name HanMeiMei
 OK
-127.0.0.1:6379> HMSET heima:user:4 name LiLei age 20 sex man
+127.0.0.1:6379> HMSET heima:user:4 name LiLei age 20 sex man # 存多组
 OK
-127.0.0.1:6379> HMGET heima:user:4 name age sex
+127.0.0.1:6379> HMGET heima:user:4 name age sex # 查多组
 1) "LiLei"
 2) "20"
 3) "man"
 ```
 
-* HGETALL
+---
 
-```java
+### HGETALL
+
+```sh
 127.0.0.1:6379> HGETALL heima:user:4
+# 返回格式是：一个key一个value
 1) "name"
 2) "LiLei"
 3) "age"
@@ -1309,7 +1423,9 @@ OK
 6) "man"
 ```
 
-* HKEYS和HVALS
+----
+
+### HKEYS和HVALS
 
 ```java
 127.0.0.1:6379> HKEYS heima:user:4
@@ -1322,20 +1438,28 @@ OK
 3) "man"
 ```
 
-* HINCRBY
+---
 
-```java
-127.0.0.1:6379> HINCRBY  heima:user:4 age 2
+### HINCRBY
+
+```sh
+127.0.0.1:6379> HINCRBY heima:user:4 age 2
 (integer) 22
+127.0.0.1:6379> HINCRBY heima:user:4 age 2
+(integer) 24
 127.0.0.1:6379> HVALS heima:user:4
 1) "LiLei"
-2) "22"
+2) "24"
 3) "man"
-127.0.0.1:6379> HINCRBY  heima:user:4 age -2
-(integer) 20
+127.0.0.1:6379> HINCRBY  heima:user:4 age -2 # 负数就是负增长
+(integer) 22
 ```
 
-* HSETNX
+---
+
+### HSETNX
+
+跟string类型的setnx一样，值不存在才执行，如果值已经存在，就不执行了。
 
 ```java
 127.0.0.1:6379> HSETNX heima:user4 sex woman
@@ -1356,129 +1480,216 @@ OK
 6) "woman"
 ```
 
-## 13. Redis命令-List命令
 
-Redis中的List类型与Java中的LinkedList类似，可以看做是一个双向链表结构。既可以支持正向检索和也可以支持反向检索。
+
+---
+
+# 13. Redis命令-List类型
+
+## 一、介绍
+
+与前面两种类似，不同数据类型的差异主要是在值的数据类型不同，`string类型` 的值就是普通字符串，`hash类型` 的值是一个哈希表，而这节我们要学习的 `List` 类型，它的值当然就是 `List集合` 了。
+
+Redis中的List类型与Java中的LinkedList类似，可以看做是一个双向链表结构。双向链表最大的特点就是：既可以支持正向检索和也可以支持反向检索。
 
 特征也与LinkedList类似：
 
-* 有序
-* 元素可以重复
-* 插入和删除快
-* 查询速度一般
+* 有序（跟插入的顺序是有关系的）
+* 元素可以重复（因为它不会去检查元素是否是一致的）
+* 插入和删除快（所有的链表插入和删除速度都会比较快）
+* 查询速度一般（相对于传统的数组来讲，稍微差一点，因为它只能通过逐个节点遍历的方式进行查询）
 
-常用来存储一个有序数据，例如：朋友圈点赞列表，评论列表等。
+使用场景：用来保存一些对顺序有要求的数据，例如：朋友圈点赞列表，评论列表等。
 
-**List的常见命令有：**
+---
 
-> L可以看成队首，R可以看成队尾
+## 二、List的常见命令
+
+`L(left)` 可以看成队首，`R(right)` 可以看成队尾，它其实是将一个链表看成了是一个队列，有头有尾的结构。
 
 - LPUSH key element ... ：向列表左侧插入一个或多个元素
-- LPOP key：移除并返回列表左侧的第一个元素，没有则返回nil
+- LPOP key：**移除并返回**列表左侧的第一个元素，没有则返回nil
 - RPUSH key element ... ：向列表右侧插入一个或多个元素
 - RPOP key：移除并返回列表右侧的第一个元素
 - LRANGE key star end：返回一段角标范围内的所有元素（左闭右闭，下标从0开始）
-- BLPOP和BRPOP：与LPOP和RPOP类似，只不过在没有元素时等待指定时间，而不是直接返回nil（block阻塞）
+- BLPOP和BRPOP：与LPOP和RPOP类似，但是 `LPOP和RPOP` 在没有元素的时候直接返回 `nil`。而 `B` 代表阻塞，在没有元素时等待指定时间，而不是直接返回nil
 
 ![1652943604992](.\assets\1652943604992.png)
 
-* LPUSH和RPUSH
+---
 
-```java
+## 三、代码实现
+
+### LPUSH和RPUSH
+
+`LPUSH` 效果如图，因为不管你推几个元素，它都是按顺序推的，`1` 是第一个，`2` 是第二个，`3` 是第三个
+
+![image-20240523093455402](./assets/image-20240523093455402.png)
+
+```sh
 127.0.0.1:6379> LPUSH users 1 2 3 # 可以插入多个元素，加入到左边
 (integer) 3
-127.0.0.1:6379> RPUSH users 4 5 6 # 加入到右边
-(integer) 6
 ```
 
-* LPOP和RPOP
+`RPUSH` 效果如下图
 
-```java
+![image-20240523093101585](./assets/image-20240523093101585.png)
+
+~~~sh
+127.0.0.1:6379> RPUSH users 4 5 6 # 加入到右边
+(integer) 6
+~~~
+
+---
+
+### LPOP和RPOP
+
+LPOP key：**移除并返回**列表左侧的第一个元素，没有则返回nil
+
+```sh
 127.0.0.1:6379> LPOP users
 "3"
 127.0.0.1:6379> RPOP users
 "6"
 ```
 
-* LRANGE
+---
 
-```java
+### LRANGE
+
+PS：大家不要看前面的编号，角标是从0开始的
+
+![image-20240523093251966](./assets/image-20240523093251966.png)
+
+```sh
 127.0.0.1:6379> LRANGE users 1 2
 1) "1"
 2) "4"
 ```
 
-> 如何利用List结构模拟一个阻塞队列?
->
-> •入口和出口在不同边
->
-> •出队时采用BLPOP或BRPOP
+---
 
-## 14. Redis命令-Set命令
+### BLPOP和BRPOP
 
-Redis的Set结构与Java中的HashSet类似，可以看做是一个value为null的HashMap。因为也是一个hash表，因此具备与HashSet类似的特征：
+`BLPOP和BRPOP` 需要传入等待多久的参数，否则报错，因为不可能无限等。单位是**秒**。
 
-* 无序
+测试的时候开两个终端，一个终端用来等待数据，另一个终端用来传入数据，然后查看效果，并且下面还告诉你花了 `42.21s` 才拿到，这就是所谓的阻塞式获取。
+
+![image-20240523094339507](./assets/image-20240523094339507.png)
+
+----
+
+## 四、思考
+
+**如何利用List结构模拟一个栈?**
+
+- 入口和出口在同一边
+
+**如何利用List结构模拟一个队列?**
+
+- 入口和出口在不同边
+
+**如何利用List结构模拟一个阻塞队列?**
+
+阻塞队列：首先是一个队列，然后再是阻塞
+
+- 入口和出口在不同边
+
+- 出队时采用BLPOP或BRPOP
+
+
+
+---
+
+# 14. Redis命令-Set命令
+
+## 一、介绍
+
+Redis的Set结构与Java中的HashSet类似，而HashSet底层其实是由HashMap来实现的，因此可以看做是一个value为null的HashMap。既然是HashMap，那底层肯定也是一个hash表，只不过这次我们不关心它的value了，而只关心它的key，此时它就变成了一个set了。
+
+因此它具备与HashSet类似的特征：
+
+* 无序（每一个元素都会使用hash算法来计算它插入的角标，因此数据的存储顺序和我们插入的顺序是无关的）
 * 元素不可重复
-* 查找快
-* 支持交集.并集.差集等功能
+* 查找快（根据哈希表做查找，时间复杂度是比较低的，因此速度是非常快的）
 
-**Set类型的常见命令**
+但是相比于Java中的HashSet，它多了一些功能
+
+* 支持交集、并集、差集等功能。
+
+这些功能它就可以非常方便的实现：好友列表、共同好友、关注等功能。因此在交友型的应用中使用还是非常广泛的。
+
+---
+
+## 二、Set类型的常见命令
+
+### 1）对单个集合增删改查的操作
+
+`参数key`：集合名称
+
+`参数member`：插入进去的元素
+
+`...`：省略号表示可以一次插入 / 移除多个
 
 * SADD key member ... ：向set中添加一个或多个元素
 * SREM key member ... : 移除set中的指定元素(remove)
 * SCARD key： 返回set中元素的个数
-* SISMEMBER key member：判断一个元素是否存在于set中(is menber)
+* SISMEMBER key member：判断一个元素是否存在于set中(is menber)，有点像Java中的contains
 * SMEMBERS：获取set中的所有元素
-* SINTER key1 key2 ... ：求key1与key2的交集
+
+---
+
+### 2）多个集合之间的交互操作
+
+* SINTER key1 key2 ... ：求key1与key2两个集合的交集
 * SDIFF key1 key2 ... ：求key1与key2的差集（key1有key2没有）
 * SUNION key1 key2 ..：求key1和key2的并集（由于set不能重复，所以重复元素只会记录一次）
 
-
-
-
-
 例如两个集合：s1和s2:
 
-![](./assets/ha8x86R.png)
+<img src="./assets/ha8x86R.png" style="zoom:67%;" />
 
 求交集：SINTER s1 s2
 
 求s1与s2的不同：SDIFF s1 s2
 
-![](./assets/L9vTv2X.png)
+<img src="./assets/L9vTv2X.png" style="zoom:67%;" />
 
+----
 
+## 三、代码实现
 
+### 1）对单个集合增删改查的操作
 
-
-**具体命令**
-
-```java
-127.0.0.1:6379> sadd s1 a b c
+```sh
+127.0.0.1:6379> sadd s1 a b c # 向集合s1中添加a、b、c
 (integer) 3
-127.0.0.1:6379> smembers s1
+127.0.0.1:6379> smembers s1 # 获取集合中所有元素
 1) "c"
 2) "b"
 3) "a"
-127.0.0.1:6379> srem s1 a
+127.0.0.1:6379> srem s1 a # 删除集合中的a元素
 (integer) 1
     
-127.0.0.1:6379> SISMEMBER s1 a
-(integer) 0
+127.0.0.1:6379> SISMEMBER s1 a # 判断集合中是否有a元素
+(integer) 0 # 没有
     
-127.0.0.1:6379> SISMEMBER s1 b
-(integer) 1
+127.0.0.1:6379> SISMEMBER s1 b # 判断集合中是否有b元素
+(integer) 1 # 有
     
 127.0.0.1:6379> SCARD s1
-(integer) 2
+(integer) 2 # 集合数量仅剩两个元素
 ```
+
+---
+
+### 2）多个集合之间的交互操作
 
 **案例**
 
 * 将下列数据用Redis的Set集合来存储：
-* 张三的好友有：李四.王五.赵六
-* 李四的好友有：王五.麻子.二狗
+* 张三的好友有：李四、王五、赵六
+* 李四的好友有：王五、麻子、二狗
 * 利用Set的命令实现下列功能：
 * 计算张三的好友有几人
 * 计算张三和李四有哪些共同好友
@@ -1488,37 +1699,37 @@ Redis的Set结构与Java中的HashSet类似，可以看做是一个value为null�
 * 判断张三是否是李四的好友
 * 将李四从张三的好友列表中移除
 
-```java
-127.0.0.1:6379> SADD zs lisi wangwu zhaoliu
+```sh
+127.0.0.1:6379> SADD zs lisi wangwu zhaoliu # 张三的好友有：李四、王五、赵六
 (integer) 3
     
-127.0.0.1:6379> SADD ls wangwu mazi ergou
+127.0.0.1:6379> SADD ls wangwu mazi ergou # 李四的好友有：王五、麻子、二狗
 (integer) 3
     
-127.0.0.1:6379> SCARD zs
+127.0.0.1:6379> SCARD zs # 计算张三的好友有几人
 (integer) 3
     
-127.0.0.1:6379> SINTER zs ls
+127.0.0.1:6379> SINTER zs ls # 计算张三和李四有哪些共同好友
 1) "wangwu"
     
-127.0.0.1:6379> SDIFF zs ls
+127.0.0.1:6379> SDIFF zs ls # 查询哪些人是张三的好友却不是李四的好友
 1) "zhaoliu"
 2) "lisi"
     
-127.0.0.1:6379> SUNION zs ls
+127.0.0.1:6379> SUNION zs ls # 查询张三和李四的好友总共有哪些人
 1) "wangwu"
 2) "zhaoliu"
 3) "lisi"
 4) "mazi"
 5) "ergou"
     
-127.0.0.1:6379> SISMEMBER zs lisi
+127.0.0.1:6379> SISMEMBER zs lisi # 判断李四是否是张三的好友
 (integer) 1
-    
-127.0.0.1:6379> SISMEMBER ls zhangsan
+     
+127.0.0.1:6379> SISMEMBER ls zhangsan # 判断张三是否是李四的好友
 (integer) 0
     
-127.0.0.1:6379> SREM zs lisi
+127.0.0.1:6379> SREM zs lisi # 将李四从张三的好友列表中移除
 (integer) 1
     
 127.0.0.1:6379> SMEMBERS zs
@@ -1526,43 +1737,132 @@ Redis的Set结构与Java中的HashSet类似，可以看做是一个value为null�
 2) "wangwu"
 ```
 
-## 15. Redis命令-SortedSet类型
 
-Redis的SortedSet是一个可排序的set集合，与Java中的TreeSet有些类似，但底层数据结构却差别很大。SortedSet中的每一个元素都带有一个score属性，可以基于score属性对元素排序，底层的实现是一个跳表（SkipList）加 hash表。
 
-> 跳表是用来做排序的，hash表就是最基本的结构了
+
+
+---
+
+# 15. Redis命令-SortedSet类型
+
+## 一、介绍
+
+`SortedSet` 从名字来看，首先它是一个 `set`，即集合。同时它是一个 `SortedSet`，也就是可排序的集合。
+
+Redis的SortedSet是一个可排序的set集合，与Java中的TreeSet从功能上来讲有些类似，但底层数据结构却差别很大。TreeSet底层是红黑树来实现的，需要定义排序方法；而 `SortedSet` 底层排序是根据一个固定的 `score值` 来排序的。
+
+即我们在 `SortedSet` 中存储元素时，需要带上一个 `score(得分)`，这样它就可以帮我们根据得分去排序了，底层的实现是一个跳表（SkipList）加 hash表。跳表是用来做排序的，hash表就是最基本的结构了，key是我们的元素，值是对应的score分数。
 
 SortedSet具备下列特性：
 
 - 可排序
 - 元素不重复（毕竟是个set）
-- 查询速度快（跳表也可以增加排序速度）
+- 查询速度快（因为有哈希表，所以查询速度是比价快的；并且跳表可以完成排序的功能，也可以增加查询速度）
 
-因为SortedSet的可排序特性，经常被用来实现排行榜这样的功能。
+因为 `SortedSet` 具备这样的排序功能，并且查询效率也非常高，所以它经常被用来实现像排行榜这样的功能（例如top 1等）。
 
+---
 
+## 二、SortedSet的常见命令
 
-SortedSet的常见命令有：
+这里命令比较多，但是有很多命令都是似曾相识的。
+
+上节将 `SADD` 的时候，代表新增一个元素到集合中，但是 `SortedSet` 因为带有排名，每一个元素都要带分数。
 
 - ZADD key score member：添加一个或多个元素到sorted set ，如果已经存在则更新其score值
 - ZREM key member：删除sorted set中的一个指定元素
 - ZSCORE key member : 获取sorted set中的指定元素的score值
 - ZRANK key member：获取sorted set 中的指定元素的排名（排名是从0开始的）
-- ZCARD key：获取sorted set中的元素个数
-- ZCOUNT key min max：统计score值在给定范围内的所有元素的个数（这里的最大值最小值是一个分数的范围）
-- ZINCRBY key increment member：让sorted set中的指定元素自增，步长为指定的increment值
-- ZRANGE key min max：按照score排序后，获取指定排名范围内的元素（这里的最大值最小值是一个排名的范围！）
+- ZCARD key：获取sorted set中的所有元素个数
+- ZCOUNT key min max：统计score值在给定范围内的所有元素的个数（根据分数值取范围，这里的最大值最小值是一个分数的范围）
+- ZINCRBY key increment member：让sorted set中的指定元素自增，步长为指定的 `increment值`，如果传入负数，那就是减分
+- ZRANGE key min max：按照score排序后，获取指定排名范围内的元素（根据名次取范围）
 - ZRANGEBYSCORE key min max：按照score排序后，获取指定score范围内的元素（这里的最大值最小值就是分数）
 - ZDIFF.ZINTER.ZUNION：求差集.交集.并集
+
+**PS：count是差个数，range是差具体元素。range又分为range和rangeByScore，range是查排序后范围的元素，rangeByScore是查指定score范围内的元素。**
 
 注意：所有的排名默认都是升序，如果要降序则在命令的Z后面添加REV（reverse反转）即可，例如：
 
 - **升序**获取sorted set 中的指定元素的排名：ZRANK key member
 - **降序**获取sorted set 中的指定元素的排名：ZREVRANK key memeber
 
-## 15.
+我们可以通过 `help @sorted_set` 在命令行查看一下
 
-## 5.Redis的Java客户端-Jedis
+`Determine the index of a member in a sorted set, with scores ordered from high to low`：确定排序集中成员的索引，分数从高到低排序，即降序。
+
+![image-20240523110045209](./assets/image-20240523110045209.png)
+
+---
+
+## 三、代码实现
+
+需求如下
+
+~~~
+将班级的下列学生得分存入Redis的SortedSet中：
+Jack 85, Lucy 89, Rose 82, Tom 95, Jerry 78, Amy 92, Miles 76
+并实现下列功能：
+删除Tom同学
+获取Amy同学的分数
+获取Rose同学的排名
+查询80分以下有几个学生
+给Amy同学加2分
+查出成绩前3名的同学
+查出成绩80分以下的所有同学
+~~~
+
+使用 `ZADD` 添加元素的时候，可以看见是分数在前，元素在后，并且后面有 `...` ，表示可以添加多组数据。
+
+![image-20240523110458037](./assets/image-20240523110458037.png)
+
+集合名字为 `stus`，表示学生。
+
+~~~sh
+ZADD stus 85 Jack 89 Lucy 82 Rose 95 Tom 78 Jerry 92 Amy 76 Miles
+~~~
+
+打开图形化客户端来看看，可以发现添加成功。并且可以发现，图形化客户端默认展示的就是升序的，即已经自动排序了。
+
+![image-20240523110805061](./assets/image-20240523110805061.png)
+
+~~~sh
+127.0.0.1:6379> ZREM stus Tom # 删除Tom同学
+(integer) 1
+127.0.0.1:6379> ZSCORE stus Amy # 获取Amy同学的分数
+"92"
+127.0.0.1:6379> ZRANK stus Rose # 获取Rose同学的排名（升序）
+(integer) 2
+127.0.0.1:6379> ZREVRANK stus Rose # 获取Rose同学的排名（降序）
+(integer) 3
+~~~
+
+PS：返回的排名是从 `0` 开始的
+
+![image-20240523111532100](./assets/image-20240523111532100.png)
+
+~~~sh
+127.0.0.1:6379> ZCOUNT stus 0 80 # 查询80分以下有几个学生
+(integer) 2
+
+127.0.0.1:6379> ZINCRBY stus 2 Amy # 给Amy同学加2分
+"94"
+
+127.0.0.1:6379> ZREVRANGE stus 0 2 # 查出成绩前3名的同学，ZRANGE是升序，这里应该使用ZREVRANGE降序
+1) "Amy"
+2) "Lucy"
+3) "Jack"
+
+127.0.0.1:6379> ZRANGEBYSCORE stus 0 80 # 查出成绩80分以下的所有同学
+1) "Miles"
+2) "Jerry"
+~~~
+
+
+
+----
+
+# 15.Redis的Java客户端-Jedis
 
 在Redis官网中提供了各种语言的客户端，地址：https://redis.io/docs/clients/
 
