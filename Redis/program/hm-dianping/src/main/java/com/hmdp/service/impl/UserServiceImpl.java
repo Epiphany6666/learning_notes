@@ -1,15 +1,19 @@
 package com.hmdp.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.dto.LoginFormDTO;
 import com.hmdp.dto.Result;
+import com.hmdp.dto.UserDTO;
 import com.hmdp.entity.User;
 import com.hmdp.mapper.UserMapper;
 import com.hmdp.service.IUserService;
 import com.hmdp.utils.RegexUtils;
 import com.hmdp.utils.SystemConstants;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -26,6 +30,8 @@ import java.util.Random;
 @Service
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
     public Result sendCode(String phone, HttpSession session) {
@@ -65,7 +71,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             user =  createUserWithPhone(phone);
         }
         //7.保存用户信息到session中
-        session.setAttribute("user",user);
+        session.setAttribute("user", BeanUtil.copyProperties(user, UserDTO.class));
 
         return Result.ok();
     }
@@ -73,7 +79,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private User createUserWithPhone(String phone) {
         // 创建用户
         User user = new User();
-        user.setPassword(phone);
+        user.setPhone(phone);
         // 这里用户名就随机生成，由于工具类随机生成的字符串会看起来很混乱，因此加一个前缀，这样用户名会看起来更统一一些
         // 这个前缀最好也定义成常量，在我们在自己定义的常量类SystemConstants中有一个USER_NICK_NAME_PREFIX，它的值就是user_，即前缀
         // 像京东那些，如果你第一次使用手机号登录，它都会给你生成一个有规律的用户名称

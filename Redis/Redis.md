@@ -3027,7 +3027,7 @@ public Result login(LoginFormDTO loginForm, HttpSession session) {
 private User createUserWithPhone(String phone) {
     // 创建用户
     User user = new User();
-    user.setPassword(phone);
+    user.setPhone(phone);
     // 这里用户名就随机生成，由于工具类随机生成的字符串会看起来很混乱，因此加一个前缀，这样用户名会看起来更统一一些
     // 这个前缀最好也定义成常量，在我们在自己定义的常量类SystemConstants中有一个USER_NICK_NAME_PREFIX，它的值就是user_，即前缀
     // 像京东那些，如果你第一次使用手机号登录，它都会给你生成一个有规律的用户名称
@@ -3045,7 +3045,27 @@ private User createUserWithPhone(String phone) {
 
 ---
 
-# 28.实现登录拦截功能
+# 29.实现登录拦截功能
+
+## 一、分析问题
+
+上节我们已经实现了基于短信验证码做登录的功能，不过可惜的是在页面上它依然认为我们没有做登录，其实就是因为登录校验的功能我们还没有做，这节我们就来做一个登录验证。
+
+事实上登录验证就是一个这样的一个请求 `/user/me`，它就是用来查询当前登录的用户信息，如果你能给它返回，那这个登录校验就算成功了。流程之前我们也分析过，用户请求都会带上cookie，因为登录凭证其实就是session的Id，就在Cookie中。
+
+Cookie带着JSESSIONID到达服务端，服务端只需要基于sessionId得到session，再从session中取出用户，判断一下这个用户是否存在，如果存在说明登录成功，将用户返回给前端即可。
+
+![image-20240524132144363](./assets/image-20240524132144363.png)
+
+听起来很简单，但事实上这么做有些问题：在黑马点评的项目中有很多很多的controller，其中我们讲到的 `/user/me` 登录校验，它是 `UserController` 中的，前端向 `UserController` 发请求，你在UserController的对应业务中，编写右图一堆的业务逻辑：获取SessionId、获取session、获取用户、判断等等，但是后续随着业务的开发，越来越多的业务都需要去校验用户的登录，难道说在每一个controller里都来写这一堆的业务逻辑吗？太麻烦了。
+
+在SpringMVC中有一个东西可以在所有的controller执行之前去做，即拦截器。有了拦截器后，用户的请求就不会直接访问到controller了，都必须先经过拦截器，再由拦截器判断该不该放行让你到达controller。
+
+有了它后，我们可以将用户校验的登录流程都扔到拦截器中做，这样一来所有的controller都可以不用写这种校验了。
+
+但是这里还存在一个问题：拦截器确实可以帮我们实现对用户的校验，但是校验完后，在后续的业务中却拿不到用户信息，因为只有在拦截器中根据session可以拿到用户信息。因此我们需要有一种方案需要将拦截器中拦截得到的用户信息传递到controller中去，而且在传递的过程中要注意线程的安全问题，此时就需要使用 `ThreadLocal` 来解决。
+
+![1653068874258](./assets/1653068874258-1716507223734-10.png)
 
 **温馨小贴士：tomcat的运行原理**
 
@@ -3053,49 +3073,115 @@ private User createUserWithPhone(String phone) {
 
 当用户发起请求时，会访问我们像tomcat注册的端口，任何程序想要运行，都需要有一个线程对当前端口号进行监听，tomcat也不例外，当监听线程知道用户想要和tomcat连接连接时，那会由监听线程创建socket连接，socket都是成对出现的，用户通过socket像互相传递数据，当tomcat端的socket接受到数据后，此时监听线程会从tomcat的线程池中取出一个线程执行用户请求，在我们的服务部署到tomcat后，线程会找到用户想要访问的工程，然后用这个线程转发到工程中的controller，service，dao中，并且访问对应的DB，在用户执行完请求后，再统一返回，再找到tomcat端的socket，再将数据写回到用户端的socket，完成请求和响应
 
-通过以上讲解，我们可以得知 每个用户其实对应都是去找tomcat线程池中的一个线程来完成工作的， 使用完成后再进行回收，既然每个请求都是独立的，所以在每个用户去访问我们的工程时，我们可以使用threadlocal来做到线程隔离，每个线程操作自己的一份数据
+通过以上讲解，我们可以得知 每个用户其实对应都是去找tomcat线程池中的一个线程来完成工作的， 使用完成后再进行回收，既然每个请求都是独立的，所以在每个用户去访问我们的工程时，我们可以使用threadlocal来做到线程隔离，每个线程操作自己的一份数据。
 
-
+总结：ThreadLocal是一个线程的对象，每一个进入Tomcat的请求都是一个独立的线程，将来ThreadLocal会在线程内为你开辟一个内存的空间去保存对应的用户，这样一来每个线程相互不干扰，因此不同用户访问同一个controller，都会有独立的线程，大家都有自己的用户信息互不干扰。因此我们会通过这个方式来实现整个校验流程。
 
 **温馨小贴士：关于threadlocal**
 
-如果小伙伴们看过threadLocal的源码，你会发现在threadLocal中，无论是他的put方法和他的get方法， 都是先从获得当前用户的线程，然后从线程中取出线程的成员变量map，只要线程不一样，map就不一样，所以可以通过这种方式来做到线程隔离
+如果小伙伴们看过threadLocal的源码，你会发现在threadLocal中，无论是他的put方法和他的get方法， 都是先从获得当前用户的线程，然后从线程中取出线程的成员变量map，只要线程不一样，map就不一样，所以可以通过这种方式来做到线程隔离。
 
+----
 
+## 二、代码实现
 
-![1653068874258](./assets/1653068874258-1716507223734-10.png)
+### 1）拦截器代码
 
-拦截器代码
+preHandle方法：目标资源方法（controller里的）执行前执行。 返回true：放行    返回false：不放行
+
+postHandle方法：目标资源方法执行后执行
+
+afterCompletion方法：视图渲染完毕后执行，最后执行
+
+这里要实现 `preHandle`、`afterCompletion`，因为在进入controller之前肯定要做登录校验，用户业务执行完毕，还需要去销毁用户信息，避免内存泄漏。
+
+并且ThreadLocal不需要大家写了，在Utils中定义了UserHolder类，ThreadLocal的泛型是User，也就是说只能存储User。
+
+**UserHolder.java**
+
+~~~java
+package com.hmdp.utils;
+import com.hmdp.dto.UserDTO;
+import com.hmdp.entity.User;
+
+public class UserHolder {
+    private static final ThreadLocal<User> tl = new ThreadLocal<>();
+
+    public static void saveUser(User user){
+        tl.set(user);
+    }
+
+    public static User getUser(){
+        return tl.get();
+    }
+
+    public static void removeUser(){
+        tl.remove();
+    }
+}
+~~~
+
+---
+
+### 2）自定义拦截器
+
+1. 实现HandlerInterceptor接口，并重写其所有方法
+
+> 这三个方法都有默认实现，根据需要重写
+>
+> 快捷键：ctrl + O
+
+2. 定义好后加上@Component，需要交给IOC容器管理
 
 ```Java
 public class LoginInterceptor implements HandlerInterceptor {
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-       //1.获取session
+        //1.获取session
         HttpSession session = request.getSession();
         //2.获取session中的用户
         Object user = session.getAttribute("user");
         //3.判断用户是否存在
         if(user == null){
-              //4.不存在，拦截，返回401状态码
-              response.setStatus(401);
-              return false;
+            //4.不存在，拦截，返回401状态码
+            response.setStatus(401);
+            return false;
         }
         //5.存在，保存用户信息到Threadlocal
+        // 由于前面获取到的是Object类型，因此这里需要强转
         UserHolder.saveUser((User)user);
         //6.放行
         return true;
     }
 }
+
+@Override
+public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    UserHolder.removeUser();
+}
 ```
 
-让拦截器生效
+---
+
+### 3）注册配置拦截器
+
+1. 实现WebMvcConfigurer接口
+2. 加上@Configuration来表示当前就是spring当中的配置类
+3. 重写addInterceptors方法，在里面指定并注册拦截器，并且指定拦截器的拦截路径
 
 ```java
+package com.hmdp.config;
+
+import com.hmdp.utils.LoginInterceptor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import javax.annotation.Resource;
+
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
-
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
@@ -3105,10 +3191,10 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(new LoginInterceptor())
                 .excludePathPatterns(
                         "/shop/**",
-                        "/voucher/**",
-                        "/shop-type/**",
-                        "/upload/**",
-                        "/blog/hot",
+                        "/voucher/**", // 优惠券信息
+                        "/shop-type/**", // 店铺类型
+                        "/upload/**", // 这里栏，但为了测试这里就不栏了
+                        "/blog/hot", // 查热点博客，跟登录用户无关
                         "/user/code",
                         "/user/login"
                 ).order(1);
@@ -3118,16 +3204,71 @@ public class MvcConfig implements WebMvcConfigurer {
 }
 ```
 
-### 1.5、隐藏用户敏感信息
 
-我们通过浏览器观察到此时用户的全部信息都在，这样极为不靠谱，所以我们应当在返回用户信息之前，将用户的敏感信息进行隐藏，采用的核心思路就是书写一个UserDto对象，这个UserDto对象就没有敏感信息了，我们在返回前，将有用户敏感信息的User对象转化成没有敏感信息的UserDto对象，那么就能够避免这个尴尬的问题了
+
+---
+
+# 30.隐藏用户敏感信息
+
+## 一、引出问题
+
+上节我们实现了登录校验的功能，但还是有一些小问题，登录校验的功能返回的信息有点多，但其实我们做登录用户的时候，其实只要返回用户的id、名称、头像等信息就够了，像时间、密码、电话这些敏感信息就没必要返回，因此这是有泄漏风险的。
+
+![image-20240524213119832](./assets/image-20240524213119832.png)
+
+返回这么多信息的原因是我们返回的是User对象
+
+<img src="./assets/image-20240524213417454.png" alt="image-20240524213417454" style="zoom:80%;" />
+
+那么UserHolder信息又从哪来？就是我们当时做的拦截器，从session中取出来后二话不说就扔进UserHolder中了，也就是说从session中取出来的就是完整的信息。
+
+session是tomcat的内存空间，你在这里面存的信息越多，对整个服务来讲压力也就越大，因此这里面存那么多不相关 / 不重要的信息没必要。
+
+![image-20240524213703751](./assets/image-20240524213703751.png)
+
+那么是谁存到session中的呢？是我们在做登录业务的时候，查询或者创建出来的对象二话不说直接就扔到session中了。
+
+因此，从一开始我们存入session的就不应该是完整的信息，而是部分信息。这其实就是一个存储力度的问题，存储的越完整，使用起来肯定更方便，但是带来的问题就是内存压力过大，还有一些敏感信息也返回给前端了。
+
+<img src="./assets/image-20240524214053451.png" alt="image-20240524214053451" style="zoom:67%;" />
+
+因此需要改正，那么怎么改正呢？
+
+----
+
+## 二、解决办法
+
+采用的核心思路就是书写一个UserDto对象，这个UserDto对象就没有敏感信息了，我们在返回前，将有用户敏感信息的User对象转化成没有敏感信息的UserDto对象，那么就能够避免这个尴尬的问题了
+
+**UserDTO.java**
+
+~~~java
+package com.hmdp.dto;
+
+import lombok.Data;
+
+@Data
+public class UserDTO {
+    private Long id;
+    private String nickName;
+    private String icon;
+}
+~~~
+
+---
 
 **在登录方法处修改**
 
+那么怎么转成UserDto呢？笨方法就是一个手动new一个Dto，然后手动存进去就行了。但是在这我们有一个工具类 `BeanUtil`，这个也是hutool里面的工具类，它里面有一个方法叫 `copyProperties`，意思就是拷贝属性，第一个参数是数据源，第二个参数是目标，目标可以给一个具体的对象，也可以给class字节码。这个方法就会自动的帮我们把User中所有的属性拷贝到UserDto中，而且要给你创建出对象，因此这个方法的返回值就是UserDto。
+
+PS：区分于spring提供的BeanUtils
+
 ```java
 //7.保存用户信息到session中
-session.setAttribute("user", BeanUtils.copyProperties(user,UserDTO.class));
+session.setAttribute("user", BeanUtil.copyProperties(user,UserDTO.class));
 ```
+
+---
 
 **在拦截器处：**
 
@@ -3135,6 +3276,8 @@ session.setAttribute("user", BeanUtils.copyProperties(user,UserDTO.class));
 //5.存在，保存用户信息到Threadlocal
 UserHolder.saveUser((UserDTO) user);
 ```
+
+---
 
 **在UserHolder处：将user对象换成UserDTO**
 
@@ -3156,7 +3299,25 @@ public class UserHolder {
 }
 ```
 
-### 1.6、session共享问题
+然后在用到 `getUser()` 的地方就需要全部修改了，选中方法，然后 <kbd>alt + F7</kbd> 可以看见方法在哪些地方用到了。
+
+用到了 `getUser()` 方法的地方都需要修改。
+
+![image-20240524215339738](./assets/image-20240524215339738.png)
+
+---
+
+## 三、测试
+
+重启项目，然后重新登陆，查看用户信息，可以发现只剩下三个字段了。
+
+<img src="./assets/image-20240524215835867.png" alt="image-20240524215835867" style="zoom:67%;" />
+
+
+
+----
+
+# 31.session共享问题
 
 **核心思路分析：**
 

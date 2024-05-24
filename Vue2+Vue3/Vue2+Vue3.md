@@ -9249,7 +9249,7 @@ this.$store.commit('addCount', {
 
 
 
-练习-mutations的减法功能
+# 练习-mutations的减法功能
 
 ![68321724875](./assets/1683217248752.png)
 
@@ -17380,13 +17380,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->                   
+>                      
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->                   
+>                      
 >    <style scoped>
 >    </style>
 >    ~~~
