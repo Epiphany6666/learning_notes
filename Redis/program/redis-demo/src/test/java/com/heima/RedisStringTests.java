@@ -1,12 +1,15 @@
 package com.heima;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itheima.Main;
 import com.itheima.redis.pojo.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
+
+import java.util.Map;
 
 @SpringBootTest(classes = Main.class)
 public class RedisStringTests {
@@ -21,6 +24,9 @@ public class RedisStringTests {
         Object name = stringRedisTemplate.opsForValue().get("name");
         System.out.println("name = " + name);
     }
+
+    // ObjectMapper是SpringMVC中默认使用的JSON处理工具，因此这里就用它了，跟以前接触的fastjson是一样的，它的作用就是将对象转成JSON，这里当然也可以使用fastjson
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     // 存对象
     @Test
@@ -38,5 +44,16 @@ public class RedisStringTests {
         // 手动反序列化
         User user1 = mapper.readValue(jsonUser, User.class);
         System.out.println("user1 = " + user1);
+    }
+
+    @Test
+    void testHash() {
+        stringRedisTemplate.opsForHash().put("user:400", "name", "虎哥");
+        stringRedisTemplate.opsForHash().put("user:400", "age", "21");
+
+        // 取一个字段是get方法，取好多字段是entries方法，Java是entrySet方法，也是类似的。
+        // values方法就是获取里面的值
+        Map<Object, Object> entries = stringRedisTemplate.opsForHash().entries("user:400");
+        System.out.println("entries = " + entries);
     }
 }
