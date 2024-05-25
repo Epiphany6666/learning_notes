@@ -3191,17 +3191,15 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // 登录拦截器
         registry.addInterceptor(new LoginInterceptor())
-                .excludePathPatterns(
-                        "/shop/**",
-                        "/voucher/**", // 优惠券信息
-                        "/shop-type/**", // 店铺类型
-                        "/upload/**", // 这里栏，但为了测试这里就不栏了
-                        "/blog/hot", // 查热点博客，跟登录用户无关
-                        "/user/code",
-                        "/user/login"
-                ).order(1);
-        // token刷新的拦截器
-        registry.addInterceptor(new RefreshTokenInterceptor(stringRedisTemplate)).addPathPatterns("/**").order(0);
+            .excludePathPatterns(
+            "/shop/**",
+            "/voucher/**", // 优惠券信息
+            "/shop-type/**", // 店铺类型
+            "/upload/**", // 这里栏，但为了测试这里就不栏了
+            "/blog/hot", // 查热点博客，跟登录用户无关
+            "/user/code",
+            "/user/login"
+        );
     }
 }
 ```
@@ -3375,7 +3373,9 @@ Redis代替session，这个替代不是简单的说你将数据存入redis就行
 
 ![image-20240525085341620](./assets/image-20240525085341620.png)
 
-先来回顾一下两种常用的数据结构：如果存入的数据比较简单，我们可以考虑使用String，或者是使用哈希，如下图，如果使用String，同学们注意他的value，会额外占用一点空间，将Java对象序列化为JSON字符串然后进行保存。如果使用哈希，则他的value中只会存储他数据本身，并且针对单个字段做CRUD更加灵活。
+先来回顾一下两种常用的数据结构：如果存入的数据比较简单，我们可以考虑使用String。但如果一些复杂的数据类型，如String，那么可以考虑使用哈希。
+
+如下图，如果使用String，同学们注意他的value，会额外占用一点空间，将Java对象序列化为JSON字符串然后进行保存。如果使用哈希，则他的value中只会存储他数据本身，**占据的空间更小**，并且针对单个字段做CRUD**更加灵活**。
 
 如果不是特别在意内存，其实使用String就可以啦。但是如果我们从优化的角度考虑，其实推荐大家使用哈希这种方式。
 
@@ -3385,9 +3385,9 @@ Redis代替session，这个替代不是简单的说你将数据存入redis就行
 
 接下来就是考虑用什么key进行存储了，key的存储应该满足以下几个条件
 
-1、key要具有唯一性
+**1、key要具有唯一性**
 
-2、key要方便携带
+**2、key要方便携带**
 
 手机号这个的数据来存储当然是可以的，但是如果把这样的敏感数据存储到redis中并且从页面中带过来毕竟不太合适，所以我们在后台生成一个随机串token（例如UUID），然后让前端带来这个token就能完成我们的整体逻辑了。
 
@@ -3549,7 +3549,7 @@ public Result login(LoginFormDTO loginForm, HttpSession session) {
 
 ----
 
-# 解决状态登录刷新问题
+## 解决状态登录刷新问题
 
 我们所有的请求进来后都需要经过拦截器拦截校验，只要经过了校验，第一：证明它是登录的用户；第二：它在活跃着（在访问）。
 
@@ -3557,27 +3557,31 @@ public Result login(LoginFormDTO loginForm, HttpSession session) {
 
 只有当用户什么都不干，它就不会触发拦截器，那么这种情况下超过了30分钟，这个key才会被剔除。
 
-#### 初始方案思路总结：
+### 一、初始方案思路总结
 
 在这个方案中，他确实可以使用对应路径的拦截，同时刷新登录token令牌的存活时间，但是现在这个拦截器他只是拦截需要被拦截的路径，假设当前用户访问了一些不需要拦截的路径，那么这个拦截器就不会生效，所以此时令牌刷新的动作实际上就不会执行，所以这个方案他是存在问题的
 
 <img src="./assets/1653320822964-1716507223734-15.png" alt="1653320822964" style="zoom: 50%;" />
 
-####  1.9.2 优化方案
+---
+
+###  二、优化方案
 
 既然之前的拦截器无法对不需要拦截的路径生效，那么我们可以添加一个拦截器，在第一个拦截器中拦截所有的路径，把第二个拦截器做的事情放入到第一个拦截器中，同时刷新令牌，因为第一个拦截器有了threadLocal的数据，所以此时第二个拦截器只需要判断拦截器中的user对象是否存在即可，完成整体刷新功能。
 
 ![1653320764547](./assets/1653320764547-1716507223734-13.png)
 
-#### 1.9.3 代码 
+---
+
+### 三、代码 
 
 **RefreshTokenInterceptor**
 
 ```java
 public class RefreshTokenInterceptor implements HandlerInterceptor {
-
     private StringRedisTemplate stringRedisTemplate;
     // 这里只能使用构造函数，因为这个类的对象是我们手动new出来的，而不是通过Component一些注解构建的，即不是spring创建的，此时是没有人帮你自动做依赖注入的，因此不能再使用@Autowired或者@Resource之类的注解。
+    // 那么我们使用构造函数注入，谁来帮我们注入？那就看是谁使用了RefreshTokenInterceptor，即在MvcConfig拦截器中用到它了。在MvcConfig类上加了@Configuration，代表这个类将来是spring帮我们注入的，那么由spring来构建这个类的对象，它可以直接做依赖注入。
     public RefreshTokenInterceptor(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
     }
@@ -3586,17 +3590,20 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 1.获取请求头中的token
         String token = request.getHeader("authorization");
+        // 使用hutool中的StrUtil类
         if (StrUtil.isBlank(token)) {
             return true;
         }
         // 2.基于TOKEN获取redis中的用户
-        String key  = LOGIN_USER_KEY + token;
+        String key = LOGIN_USER_KEY + token;
+        // 注意取的时候不能用get方法，因为get方法只能取哈希中的一个键值。但我们现在想取的是哈希中所有的键值对，此时就应该使用entries()，它的返回值就是一个Map，一个key中整个哈希键值都会返回。
         Map<Object, Object> userMap = stringRedisTemplate.opsForHash().entries(key);
         // 3.判断用户是否存在
         if (userMap.isEmpty()) {
             return true;
         }
-        // 5.将查询到的hash数据转为UserDTO，由于存进去的时候是一个Map，因此取出来的时候肯定也是一个Map
+        // 5.将查询到的hash数据转为UserDTO，由于存进去的时候是一个Map，因此取出来的时候肯定也是一个Map。存进去的时候使用的是BeanUtil，因此取出来的时候应该也使用BeanUtil。
+        // 第三个参数：isIgnoreError，你要不要忽略转换中的错误。那肯定不忽略，因此写false
         UserDTO userDTO = BeanUtil.fillBeanWithMap(userMap, new UserDTO(), false);
         // 6.存在，保存用户信息到 ThreadLocal
         UserHolder.saveUser(userDTO);
@@ -3615,16 +3622,17 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
 	
 ```
 
+---
+
 **LoginInterceptor**
 
 ```java
 public class LoginInterceptor implements HandlerInterceptor {
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // 1.判断是否需要拦截（ThreadLocal中是否有用户）
+        // 1.判断是否需要拦截（依据：ThreadLocal中是否有用户）
         if (UserHolder.getUser() == null) {
-            // 没有，需要拦截，设置状态码
+            // 没有用户，需要拦截，设置状态码
             response.setStatus(401);
             // 拦截
             return false;
@@ -3635,11 +3643,164 @@ public class LoginInterceptor implements HandlerInterceptor {
 }
 ```
 
+---
+
+**MvcConfig.java**
+
+PS：我们希望 `RefreshTokenInterceptor拦截器` 先执行，因为只有它先执行了，拿到了用户保存到了ThreadLocal，那么 `LoginInterceptor拦截器` 才能做拦截的判断，那么控制拦截器的顺序呢？
+
+在添加拦截器的时候我们可以跟进去看一眼
+
+<img src="./assets/image-20240525140541807.png" alt="image-20240525140541807" style="zoom:67%;" />
+
+这个拦截器其实会被注册为 `InterceptorRegistration`
+
+<img src="./assets/image-20240525140634128.png" alt="image-20240525140634128" style="zoom:80%;" />
+
+继续跟进，这个注册器中有一个order，就是拦截器的执行顺序。默认情况下所有拦截器的执行顺序都是零，都是0的情况下就是按照添加顺序执行，因此简单来说我们只需要先添加 `RefreshTokenInterceptor拦截器`，但是如果想控制的严谨一些，就可以使用 `order()` 进行修改执行顺序，数字越小先执行。
+
+~~~java
+package com.hmdp.config;
+
+import com.hmdp.utils.LoginInterceptor;
+import com.hmdp.utils.RefreshTokenInterceptor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import javax.annotation.Resource;
+
+@Configuration
+public class MvcConfig implements WebMvcConfigurer {
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        // 登录拦截器
+        registry.addInterceptor(new LoginInterceptor())
+                .excludePathPatterns(
+                        "/shop/**",
+                        "/voucher/**",
+                        "/shop-type/**",
+                        "/upload/**",
+                        "/blog/hot",
+                        "/user/code",
+                        "/user/login"
+                ).order(1);
+        // token刷新的拦截器
+        registry.addInterceptor(new RefreshTokenInterceptor(stringRedisTemplate)).addPathPatterns("/**").order(0);
+    }
+}
+~~~
+
+重启服务器进行测试
+
+![image-20240525132113575](./assets/image-20240525132113575.png)
+
+回到redis图形化界面中查看，可以发现存储成功
+
+![image-20240525132334352](./assets/image-20240525132334352.png)
+
+---
+
+### 四、可能遇到的错误
+
+<img src="./assets/image-20240525131954187.png" alt="image-20240525131954187" style="zoom:80%;" />
+
+回到代码区查看报错：`class java.lang.Long cannot be cast to class java.lang.String` 不能将Long转化为String。
+
+UserMap来自UserDTO，UserDTO中只有id是Long，也就是说Long类型的id无法存储到redis中去，因此报错。往下看，这个错是StringRedisSerializer中报的错误。
+
+![image-20240525132558098](./assets/image-20240525132558098.png)
+
+那为什么会有这样的错误呢？我们使用的RedisTemplate是StringRedisTemplate，StringRedisTemplate要求你的key和value都是String。
+
+<img src="./assets/image-20240525132918736.png" alt="image-20240525132918736" style="zoom:70%;" />
+
+而我们把数据转成Map的时候，那个字段id是Long类型，因此就出现这个问题。
+
+因此存储到哈希结构中的Map的key和value都应该要为String结构。
+
+~~~java
+Map<String, Object> userMap = BeanUtil.beanToMap(userDTO);
+~~~
+
+有两种解决办法：
+
+- 不用工具类了，我们直接自己new一个Map，然后将对象里面的字段名作为key，值作为value，value不为字符串的需要改为字符串。
+- 还是用这个工具，这个工具是可以自定义的，默认情况下你的值是什么数据类型，这里就用什么数据类型。但它也允许你做自定义，`copyOptions` 参数。
+
+做法：首先传对象，再传一个Map，这里直接new一个空的HashMap，`copyOptions`就是数据拷贝时的一个选项。
+
+<img src="./assets/image-20240525133610001.png" alt="image-20240525133610001" style="zoom:80%;" />
+
+通过 `CopyOptions.create()` 就创建出来了一个 `CopyOptions`，但是这个地方创建出来的是默认的，但我们要自定义，它后面允许你有各种各样的set。
+
+<img src="./assets/image-20240525133815874.png" alt="image-20240525133815874" style="zoom:60%;" />
+
+例如：
+
+`setIgnoreNullValue` —— 忽略一些空的值；
+
+`setFieldValueEditor` —— 对字段值的一个修改器，它允许你修改字段值，参数需要传入一个函数：`BiFunction`，这个函数有两个参数：字段名和字段值，返回值是你修改后的字段值
+
+![image-20240525134057536](./assets/image-20240525134057536.png)
+
+完整代码
+
+~~~java
+Map<String, Object> userMap = BeanUtil.beanToMap(userDTO, new HashMap<>(),
+                CopyOptions.create()
+                        .setIgnoreNullValue(true)
+                        .setFieldValueEditor((fieldName, fieldValue) -> fieldValue.toString()));
+~~~
+
+因此，当我们碰到一个错误的时候不要着急，而是自己分析，产生问题的原因在哪。
+
+此时重启代码，然后登陆，可以发现登陆成功。
+
+<img src="./assets/image-20240525134716207.png" alt="image-20240525134716207" style="zoom:67%;" />
+
+回到redis客户端，可以发现也存储成功，存储用户的时候就是用哈希进行存储的。
+
+并且右上角也能看见有效期的时间。
+
+我们也可以重新请求，看看有效期会不会刷新。
+
+![image-20240525141059229](./assets/image-20240525141059229.png)
+
+查看 `/user/me` 请求头，会发现携带了 `Authorization`，这样一来后台才能验证我们是否登录。
+
+![image-20240525141213195](./assets/image-20240525141213195.png)
+
+此时这个登录流程完全按照我们所期待的方式运行了。
+
+---
+
+## 总结
+
+Redis代替session需要考虑的问题：
+
+- 选择合适的数据结构
+
+- 选择合适的key
+
+- 选择合适的存储粒度。
+
+  我们在存储的时候并没有存完整的用户信息，而是将敏感信息去掉了，并且还节约了内存空间。
 
 
-## 2、商户查询缓存
 
-### 2.1 什么是缓存?
+----
+
+# ------------------------
+
+# 商户查询缓存
+
+# 35.什么是缓存?
 
 **前言**:**什么是缓存?**
 
