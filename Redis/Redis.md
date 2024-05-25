@@ -2732,7 +2732,9 @@ RedisTemplate的两种序列化实践方案：
 
 PS：在spring中并不是以命令作为方法名，方法名类似于Java的HashMap的方法名。
 
-`putAll()` 相当于 `hmset`。
+hashKey和value就是对应字段和字段值，事实上value中可能会有多个字段，一个 `put()` 只能存一个字段，如果有多个字段，`put()` 就需要执行多次，这样其实就不太好了，等于你是与服务器做多次交互。
+
+因此推荐大家的方案是使用 `putAll()`， `putAll()` 相当于 `hmset`，里面可以存好几个键值对。
 
 ![image-20240524072528015](./assets/image-20240524072528015.png)
 
@@ -3319,7 +3321,11 @@ public class UserHolder {
 
 # 31.session共享问题
 
+**session共享问题**：多台Tomcat并不共享session存储空间，当请求切换到不同tomcat服务时导致数据丢失的问题。
+
 **核心思路分析：**
+
+虽然我们的项目是一个单体式的项目，但是我们的tomcat将来为了应对并发，肯定还是要水平扩展，部署多个，形成多个负载均衡的集群，一旦形成负载均衡的集群，这个时候当请求进入nginx，此时它会做一个负载均衡，在多态nginx间做一个轮询。
 
 每个tomcat中都有一份属于自己的session,假设用户第一次访问第一台tomcat，并且把自己的信息存放到第一台服务器的session中，但是第二次这个用户访问到了第二台tomcat，那么在第二台服务器上，肯定没有第一台服务器存放的session，所以此时 整个登录拦截功能就会出现问题，我们能如何解决这个问题呢？早期的方案是session拷贝，就是说虽然每个tomcat上都有不同的session，但是每当任意一台服务器的session修改时，都会同步给其他的Tomcat服务器的session，这样的话，就可以实现session的共享了
 
@@ -3327,45 +3333,167 @@ public class UserHolder {
 
 1、每台服务器中都有完整的一份session数据，服务器压力过大。
 
-2、session拷贝数据时，可能会出现延迟
+2、session拷贝数据时，是需要时间的，可能会出现延迟，如果在延迟之内有人来访问，依然会有数据不一致的情况
 
-所以咱们后来采用的方案都是基于redis来完成，我们把session换成redis，redis数据本身就是共享的，就可以避免session共享的问题了
+因此这种方案推出以后，并没有得到广泛的使用和认可，这种方案就pass了。此时我们就必须找出一种能替代session的东西，而且这个能替代session的东西，它必须满足一下三个特点
+
+- **数据共享**。这是最重要的，就是因为数据不共享才导致了刚刚带来的问题）
+
+- **内存存储**。因为redis是基于内存的，因此读写效率比较高，像这种登录校验之类的，它的访问频率是非常高的，如果你的读写性能比较差，是难以满足高并发的需求。
+
+- **key、value结构**
+
+所以咱们后来采用的方案都是基于redis来完成，因为redis首先是在tomcat以外的存储方案，因此任何一台tomcat都能访问到redis，因此就能实现数据共享了。而且redis性能非常强，读写性能延迟基本上是在微妙级别的，非常的快。并且也是key-value。可以发现redis正好就满足上面的要求。因此我们把session换成redis，就可以避免session共享的问题了
 
 ![1653069893050](./assets/1653069893050-1716507223734-11.png)
 
-### 1.7 Redis代替session的业务流程
 
-#### 1.7.1、设计key的结构
 
-首先我们要思考一下利用redis来存储数据，那么到底使用哪种结构呢？由于存入的数据比较简单，我们可以考虑使用String，或者是使用哈希，如下图，如果使用String，同学们注意他的value，用多占用一点空间，如果使用哈希，则他的value中只会存储他数据本身，如果不是特别在意内存，其实使用String就可以啦。
+----
 
-![1653319261433](./assets/1653319261433-1716507223734-12.png)
+# 32.Redis代替session的业务流程（设计key的结构）
 
-#### 1.7.2、设计key的具体细节
+Redis代替session，这个替代不是简单的说你将数据存入redis就行了，在业务流程上会有比较多的一些变化，这节就一起来分析一下基于redis代替session之后业务上有哪些变化。
 
-所以我们可以使用String结构，就是一个简单的key，value键值对的方式，但是关于key的处理，session他是每个用户都有自己的session，但是redis的key是共享的，咱们就不能使用code了
+## 一、发送短信验证码
 
-在设计这个key的时候，我们之前讲过需要满足两点
+先来看发送短信验证码，整体来讲这个流程没什么大的变化，但是在保存的时候，以前是保存在session，现在就是保存到redis中了。
+
+<img src="./assets/image-20240525085558035.png" alt="image-20240525085558035" style="zoom:80%;" />
+
+但是这里有一个问题，redis是一个键值型的数据结构，但是它的value类型有很多种，那么到底使用哪种结构呢？
+
+所以我们可以使用String结构，就是一个简单的key，value键值对的方式，但是关于key的处理，session他是每个用户都有自己的session，但是redis的key是共享的，如果每个session发生的请求存储的key都为code，就会覆盖，因此咱们就不能使用code了。
+
+既然手机号是唯一的，如果我们采用phone不就好了吗？是这样的，用户在提交的时候刚好也是提交手机号和验证码，这也为我们的存储带来了方便。
+
+---
+
+## 二、登录
+
+但是在登录的时候，保存进redis的是一个用户的对象，那value应该使用哪种数据类型来存储呢？
+
+![image-20240525085341620](./assets/image-20240525085341620.png)
+
+先来回顾一下两种常用的数据结构：如果存入的数据比较简单，我们可以考虑使用String，或者是使用哈希，如下图，如果使用String，同学们注意他的value，会额外占用一点空间，将Java对象序列化为JSON字符串然后进行保存。如果使用哈希，则他的value中只会存储他数据本身，并且针对单个字段做CRUD更加灵活。
+
+如果不是特别在意内存，其实使用String就可以啦。但是如果我们从优化的角度考虑，其实推荐大家使用哈希这种方式。
+
+在这个案例中，我们会选择哈希结构来保存用户信息。
+
+<img src="./assets/1653319261433-1716507223734-12.png" alt="1653319261433" style="zoom:67%;" />
+
+接下来就是考虑用什么key进行存储了，key的存储应该满足以下几个条件
 
 1、key要具有唯一性
 
 2、key要方便携带
 
-如果我们采用phone：手机号这个的数据来存储当然是可以的，但是如果把这样的敏感数据存储到redis中并且从页面中带过来毕竟不太合适，所以我们在后台生成一个随机串token，然后让前端带来这个token就能完成我们的整体逻辑了
+手机号这个的数据来存储当然是可以的，但是如果把这样的敏感数据存储到redis中并且从页面中带过来毕竟不太合适，所以我们在后台生成一个随机串token（例如UUID），然后让前端带来这个token就能完成我们的整体逻辑了。
 
-#### 1.7.3、整体访问流程
+----
+
+## 三、整体访问流程
 
 当注册完成后，用户去登录会去校验用户提交的手机号和验证码，是否一致，如果一致，则根据手机号查询用户信息，不存在则新建，最后将用户数据保存到redis，并且生成token作为redis的key，当我们校验用户是否登录时，会去携带着token进行访问，从redis中取出token对应的value，判断是否存在这个数据，如果没有则拦截，如果存在则将其保存到threadLocal中，并且放行。
 
+但是问题来了，这个token，tomcat并不会帮我们自动写到浏览器上，因此我们只能手动将token返回给客户端，然后客户端把这个信息保存下来，以后每次请求它都能携带这个token了，服务器看到它拿到的这个token后，就可以基于token从redis获取用户信息了。
+
 ![1653319474181](./assets/1653319474181-1716507223734-14.png)
 
+---
+
+## 四、扩展
+
+前端每次请求都需要携带token到服务器，那它是怎么做到这一点的呢？我们一起来看一下前端的代码。
+
+前端会将token保存到sessionStorage，sessionStorage是浏览器的一种存储方式。
+
+<img src="./assets/image-20240525091029507.png" alt="image-20240525091029507" style="zoom:67%;" />
+
+`axios.interceptors.response.use` 是axios的请求拦截器，它会在每次请求的时候都执行这段逻辑。
+
+这里是将token放入到请求头中，这个请求头的名字叫 `authorization`，这样就可以确保以后，凡是有axios发起的这种请求，也就是所有的AJAX请求，都会携带 `authorization` 头，将来在服务端就可以获取 `authorization` 请求头，从而拿到token，从而去实现对于登录功能的验证了。
+
+<img src="./assets/image-20240525091728797.png" alt="image-20240525091728797" style="zoom:67%;" />
+
+因此登录凭证其实是保存在前端浏览器的。
 
 
-### 1.8 基于Redis实现短信登录
 
-这里具体逻辑就不分析了，之前咱们已经重点分析过这个逻辑啦。
+---
 
-**UserServiceImpl代码**
+# 33.基于Redis实现短信登录
+
+发送短信验证码的流程中，只有一个地方发生了变化，就是保存验证码的时候，不再是保存到session，而是保存到redis。
+
+而且保存到redis时，key不再是code了，而是以手机号为key。
+
+## RedisConstants.java
+
+PS：阅读的时候这个类先不用管，先看下面代码
+
+~~~java
+public class RedisConstants {
+    public static final String LOGIN_CODE_KEY = "login:code:";
+    public static final Long LOGIN_CODE_TTL = 2L; // 有效期
+    public static final String LOGIN_USER_KEY = "login:token:";
+    public static final Long LOGIN_USER_TTL = 30L;
+}
+~~~
+
+----
+
+## UserServiceImpl.java
+
+### 短信登录
+
+~~~java
+@Resource
+private StringRedisTemplate stringRedisTemplate;
+
+@Override
+public Result sendCode(String phone, HttpSession session) {
+    // 1.校验手机号
+    if (RegexUtils.isPhoneInvalid(phone)) {
+        // 2.如果不符合，返回错误信息
+        return Result.fail("手机号格式错误！");
+    }
+    // 3.符合，生成验证码
+    String code = RandomUtil.randomNumbers(6);
+
+    // 4.保存验证码到redis
+    // 4.1 跟之前保存到session的代码差不多，不过要注意的是，这个key需要加一个业务前缀，形成层次。因为之前也分析过了，redis是大家都来存的一个空间，如果大家都直接将手机号作为key，很有可能其他业务也是这么做的，就产生冲突了
+    // 这里是做login业务，然后这个业务是做code验证的
+    // 4.2 这里的key最好设置一个有效期，例如：验证码五分钟内有效。如果有人没事干，一直在这里狂点，redis中就存了无数条数据，而且还不删除，终有一天redis就会被占满。因此为了避免这样的问题发生，我们存入redis的key一定要设置一个有效期
+    // set方法参数列表中就可以传入有效期，ctrl + p可以查看参数。第一种方式：时间(long) + 单位(TimeUnit)；第二种方式：Duration
+    // 这里就设置为2分钟。这个有点类似于redis中的 set key value ex
+
+    // 4.3 但是需要注意的是：login:code 和 2 尽量都给它定义为常量。这样写看起来有点漏，万一取的时候key写错了怎么办。
+    // stringRedisTemplate.opsForValue().set("login:code:" + phone, code, 2, TimeUnit.MINUTES);
+    // 因此我们就可以将常量定义在在utils.RedisConstants
+    stringRedisTemplate.opsForValue().set(LOGIN_CODE_KEY + phone, code, LOGIN_CODE_TTL, TimeUnit.MINUTES);
+    log.debug("发送短信验证码成功，验证码：{}", code);
+
+    return Result.ok();
+}
+~~~
+
+---
+
+### 登录注册
+
+PS：存储value的时候
+
+`opsForValue()` 拿到的是对字符串的操作，`opsForHash()` 拿到的就是跟哈希有关的操作。
+
+PS：在spring中并不是以命令作为方法名，方法名类似于Java的HashMap的方法名。
+
+hashKey和value就是对应字段和字段值，事实上value中可能会有多个字段，一个 `put()` 只能存一个字段，如果有多个字段，`put()` 就需要执行多次，这样其实就不太好了，等于你是与服务器做多次交互。
+
+因此推荐大家的方案是使用 `putAll()`， `putAll()` 相当于 `hmset`，里面可以存好几个键值对，上面的 `UserDTO` 中有多个属性，就可以一次性的将属性全部存进去了。
+
+![image-20240524072528015](./assets/image-20240524072528015.png)
 
 ```java
 @Override
@@ -3394,18 +3522,22 @@ public Result login(LoginFormDTO loginForm, HttpSession session) {
     }
 
     // 7.保存用户信息到 redis中
-    // 7.1.随机生成token，作为登录令牌
+    // 7.1.随机生成token，这里使用的是UUID，作为登录令牌
+    // UUID有两：一个Java自带的，一个Hutool提供的。toString()有两个重载方法，toString(true)表示不带下划线，参数名叫isSimple。如果是toString()，那就是带下划线。
     String token = UUID.randomUUID().toString(true);
-    // 7.2.将User对象转为HashMap存储
+    // 7.2.以token为key，将User对象转为HashMap存储
     UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
+    // 使用BeanUtil（hutool提供的），它里面有个方法叫beanToMap，它的作用就是将一个bean转为Map
+    // 随着时间增长，用户会越来越多
     Map<String, Object> userMap = BeanUtil.beanToMap(userDTO, new HashMap<>(),
             CopyOptions.create()
                     .setIgnoreNullValue(true)
                     .setFieldValueEditor((fieldName, fieldValue) -> fieldValue.toString()));
     // 7.3.存储
+    // token最好也加一个前缀
     String tokenKey = LOGIN_USER_KEY + token;
     stringRedisTemplate.opsForHash().putAll(tokenKey, userMap);
-    // 7.4.设置token有效期
+    // 7.4.设置token有效期，那这个有效期设置多久呢？可以参考session，以前基于session登录，有效期是30分钟，因此我们也可以给token设置30分钟的有效期，但是这里和string类型的set方法不一样，不能存的时候同时设置有效期，只能先存，然后再来设置有效期
     stringRedisTemplate.expire(tokenKey, LOGIN_USER_TTL, TimeUnit.MINUTES);
 
     // 8.返回token
@@ -3413,13 +3545,23 @@ public Result login(LoginFormDTO loginForm, HttpSession session) {
 }
 ```
 
-### 1.9 解决状态登录刷新问题
+但是session登录不是到了30分钟就结束了，只要你不停的访问，有效期就一直是30分钟，只有你超过30分钟不访问我，我才会将登录状态剔除。但是我们这个有效期是只要过了30分钟，redis就会把你剔除。那我们该如何解决这个问题呢？
 
-#### 1.9.1 初始方案思路总结：
+----
+
+# 解决状态登录刷新问题
+
+我们所有的请求进来后都需要经过拦截器拦截校验，只要经过了校验，第一：证明它是登录的用户；第二：它在活跃着（在访问）。
+
+既然满足了这两个条件，就可以去更新一下redis的有效期。这样redis的token就不会过期了。
+
+只有当用户什么都不干，它就不会触发拦截器，那么这种情况下超过了30分钟，这个key才会被剔除。
+
+#### 初始方案思路总结：
 
 在这个方案中，他确实可以使用对应路径的拦截，同时刷新登录token令牌的存活时间，但是现在这个拦截器他只是拦截需要被拦截的路径，假设当前用户访问了一些不需要拦截的路径，那么这个拦截器就不会生效，所以此时令牌刷新的动作实际上就不会执行，所以这个方案他是存在问题的
 
-![1653320822964](./assets/1653320822964-1716507223734-15.png)
+<img src="./assets/1653320822964-1716507223734-15.png" alt="1653320822964" style="zoom: 50%;" />
 
 ####  1.9.2 优化方案
 
@@ -3435,7 +3577,7 @@ public Result login(LoginFormDTO loginForm, HttpSession session) {
 public class RefreshTokenInterceptor implements HandlerInterceptor {
 
     private StringRedisTemplate stringRedisTemplate;
-
+    // 这里只能使用构造函数，因为这个类的对象是我们手动new出来的，而不是通过Component一些注解构建的，即不是spring创建的，此时是没有人帮你自动做依赖注入的，因此不能再使用@Autowired或者@Resource之类的注解。
     public RefreshTokenInterceptor(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
     }
@@ -3454,7 +3596,7 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
         if (userMap.isEmpty()) {
             return true;
         }
-        // 5.将查询到的hash数据转为UserDTO
+        // 5.将查询到的hash数据转为UserDTO，由于存进去的时候是一个Map，因此取出来的时候肯定也是一个Map
         UserDTO userDTO = BeanUtil.fillBeanWithMap(userMap, new UserDTO(), false);
         // 6.存在，保存用户信息到 ThreadLocal
         UserHolder.saveUser(userDTO);
