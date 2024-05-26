@@ -16401,8 +16401,9 @@ public class MyThread extends Thread{
                 //  }
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            } finally {
+                lock.unlock();
             }
-            lock.unlock();
         }
     }
 }
@@ -17764,13 +17765,13 @@ public static void main(String[] args) throws ExecutionException, InterruptedExc
 
 代码步骤其实也非常简单
 
-1、创建线程池
+**1、创建线程池**
 
-2、提交任务
+**2、提交任务**
 
 PS：当我们提交任务的时候，线程池的底层会去创建线程，或者去复用已经存在的线程，这些代码是不需要我们自己写的，是线程池的底层会去自动完成。我们要做的就是给它提交任务。
 
-3、当所有的任务全部执行完毕，就可以关闭线程池。
+**3、当所有的任务全部执行完毕，就可以关闭线程池**
 
 但是在我们实际开发中，线程池一般是不会关闭的。因为服务器是24小时运行的，服务器一旦不关闭，那就是随时随地都有可能有新的任务要执行，那么线程池也就不会关闭。
 
@@ -17786,7 +17787,9 @@ static ExecutorService newCachedThreadPool()   创建一个默认的线程池
 
 再往下，还会有第二种方式，它可以创建一个有上线的线程池。
 
-	static newFixedThreadPool(int nThreads)	    创建一个指定最多线程数量的线程池
+```java
+static ExecutorService newFixedThreadPool(int nThreads)	    创建一个指定最多线程数量的线程池
+```
 
 ---
 
