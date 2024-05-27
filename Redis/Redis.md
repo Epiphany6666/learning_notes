@@ -5327,49 +5327,16 @@ public class CacheClient {
         this.set(key, r, time, unit);
         return r;
     }
-    
 }
 ```
 
 ----
 
-### 2）修改原来的代码
-
-此时在ShopServiceImpl 中，我们就不用自己写逻辑了，只需要使用我们刚刚写好的工具类里面的方法了
-
-```java
-@Resource // 注入
-private CacheClient cacheClient;
-
- @Override
-    public Result queryById(Long id) {
-        // 解决缓存穿透
-        // this::getById：传入的应该是一个查询数据库的函数，并且这个函数的参数，id是Long类型的，返回值是你要查询的结果，这里即Shop，如果用Lambda表达式可以写成这样：id2 -> getById(id2)，但是像这样的Lambda表达式是可以简写的：this::getById
-        // 也就是说我们以后在做缓存穿透的时候，这一行代码就搞定了，因为我们已经有工具类了，而且以后任意的对象都能使用这个工具类
-        Shop shop = cacheClient
-                .queryWithPassThrough(CACHE_SHOP_KEY, id, Shop.class, this::getById, CACHE_SHOP_TTL, TimeUnit.MINUTES);
-
-        // 互斥锁解决缓存击穿
-        // Shop shop = cacheClient
-        //         .queryWithMutex(CACHE_SHOP_KEY, id, Shop.class, this::getById, CACHE_SHOP_TTL, TimeUnit.MINUTES);
-
-        // 逻辑过期解决缓存击穿
-        // Shop shop = cacheClient
-        //         .queryWithLogicalExpire(CACHE_SHOP_KEY, id, Shop.class, this::getById, 20L, TimeUnit.SECONDS);
-
-        if (shop == null) {
-            return Result.fail("店铺不存在！");
-        }
-        // 7.返回
-        return Result.ok(shop);
-    }
-```
-
----
-
-### 3）解决缓存击穿
+### 2）解决缓存击穿
 
 **CacheClient.java**
+
+参数一定是用到了再添加，不是一上来就写这么多
 
 ~~~java
 public <R, ID> R queryWithLogicalExpire(
@@ -5476,22 +5443,104 @@ private void unlock(String key) {
 }
 ~~~
 
+----
+
+### 3）修改原来的代码
+
+#### ShopServiceImpl.java
+
+此时在ShopServiceImpl 中，我们就不用自己写逻辑了，只需要使用我们刚刚写好的工具类里面的方法了
+
+```java
+@Resource // 注入
+private CacheClient cacheClient;
+
+@Override
+public Result queryById(Long id) {
+    // 解决缓存穿透
+    // this::getById：传入的应该是一个查询数据库的函数，并且这个函数的参数，id是Long类型的，返回值是你要查询的结果，这里即Shop，如果用Lambda表达式可以写成这样：id2 -> getById(id2)，但是像这样的Lambda表达式是可以简写的：this::getById
+    // 也就是说我们以后在做缓存穿透的时候，这一行代码就搞定了，因为我们已经有工具类了，而且以后任意的对象都能使用这个工具类
+    Shop shop = cacheClient
+        .queryWithPassThrough(CACHE_SHOP_KEY, id, Shop.class, this::getById, CACHE_SHOP_TTL, TimeUnit.MINUTES);
+
+    // 互斥锁解决缓存击穿
+    // Shop shop = cacheClient
+    //         .queryWithMutex(CACHE_SHOP_KEY, id, Shop.class, this::getById, CACHE_SHOP_TTL, TimeUnit.MINUTES);
+
+    // 逻辑过期解决缓存击穿，为了测试缓存击穿，时间就设置为20s。但是要注意测试逻辑过期需要先通过单元测试进行缓存预热
+    // Shop shop = cacheClient
+    //         .queryWithLogicalExpire(CACHE_SHOP_KEY, id, Shop.class, this::getById, 20L, TimeUnit.SECONDS);
+
+    if (shop == null) {
+        return Result.fail("店铺不存在！");
+    }
+    // 7.返回
+    return Result.ok(shop);
+}
+```
+
+---
+
+#### HmDianPingApplicationTests.java
+
+~~~java
+@Resource
+private CacheClient cacheClient;
+
+@Test
+void testSaveShop() throws InterruptedException {
+    Shop shop = shopService.getById(1L);
+    // 过期时间设置为10s，这样很方便我们测试缓存重建
+    cacheClient.setWithLogicalExpire(CACHE_SHOP_KEY + 1L, shop, 10L, TimeUnit.MINUTES);
+}
+~~~
+
+测试的话跟之前是一样的。
 
 
 
+----
 
-## 3、优惠卷秒杀
+# 47.缓存总结
 
-### 3.1 -全局唯一ID
+----
+
+# ---------------------------
+
+# 优惠卷秒杀
+
+聊电商一定离不来秒杀，而redis在秒杀中扮演了非常重要的角色
+
+---
+
+# 48.全局唯一ID
+
+## 一、引入
 
 每个店铺都可以发布优惠券：
 
-![1653362612286](./assets/1653362612286-1716507223734-37.png)
+<img src="./assets/1653362612286-1716507223734-37.png" alt="1653362612286" style="zoom:80%;" />
 
-当用户抢购时，就会生成订单并保存到tb_voucher_order这张表中，而订单表如果使用数据库自增ID就存在一些问题：
+当用户抢购时，就会生成订单并保存到`tb_voucher(优惠券)_order(订单)`这张表中，先到数据库中看一看，可以发现id并没有设置为自增长
 
-* id的规律性太明显
+![image-20240527081607177](./assets/image-20240527081607177.png)
+
+订单表id如果使用数据库自增长就存在一些问题：
+
+* id的规律性太明显，订单编号id将来会发送给用户的，因为用户在 `我的订单` 中可以看见每个详细的订单编号，因此这个id会暴露给用户，但如果你id规律性太明显了，那么用户就可以根据id去猜测到一些信息。
+
+  例如今天下单查看订单id为10，第二天同一时刻下单的id竟然是100，此时我就知道了在昨天的一天内你们商场总共才下了90单，此时就暴露信息给用户了。
+
 * 受单表数据量的限制
+
+  订单的特点就是：数据量比较大，因为用户只要在产生购买的行为，就会不停的产生新的订单，你想想看，如果网站达到一定规模，用户量达到了数百万，这时候每天都能产生数十万数百万的订单，这时候一年下来可能会达到数千万订单，此时单张表就不能保存如此多的数据了，如果无法保存，你就需要将它分到多张表，那如果每张表都出现自增长会出现什么问题？你要知道MySQL自增长每张表都是计算自己的自增长，大家都从1开始增，如果多张表，这个自增的id一定会出现重复，而我们订单id还有个特点就是不应该重复，因为从业务的角度考虑，将来我们一些售后的服务，用户往往会拿着订单去售后，如果id重复，那就会出现问题。
+
+  因此这就是我们订单的两个特点
+
+  - 数据量大
+  - 订单id需要唯一性
+
+  但是当我们将表做了拆分，出现分布式这种存储时，那么它就会违背唯一性，此时就必然要用到我们今天全局ID生成器了
 
 场景分析：如果我们的id具有太明显的规则，用户或者说商业对手很容易猜测出来我们的一些敏感信息，比如商城在一天时间内，卖出了多少单，这明显不合适。
 
@@ -5499,23 +5548,79 @@ private void unlock(String key) {
 
 **全局ID生成器**，是一种在分布式系统下用来生成全局唯一ID的工具，一般要满足下列特性：
 
-![1653363100502](./assets/1653363100502-1716507223734-38.png)
+全局：在同一个业务下，不管你这个分布式系统将来有多少个服务、多少个节点，业务下又分成了多少个不同的表，最终只要你用这个ID生成器，得到的ID一定是当前业务内唯一的，不会出现冲突。
+
+当然不同业务，你即便冲突了，也没啥关系。
+
+全局唯一ID经常是用在分布式系统下的，所以也被称为分布式唯一ID。
+
+虽然我们是一个单体项目，但因为我们数据量可能也会很大，因此用到它也是没问题的。
+
+---
+
+## 二、全局唯一ID需要满足的特性
+
+这个全局唯一ID需要满足的特性有以下五个
+
+- 唯一性：很多很多业务必须要求你唯一，例如订单id冲突，将来就会产生冲突
+- 高可用：你作为一个ID的生成器，你必须确保任何时候来找你，你都能给我生成一个正确的ID，不能说我来找你，然后你挂了
+- 高性能：你不仅仅能正常的生成ID，还能保证生成ID的速度足够快，你不能说你生成一个ID要几秒钟，这样一来就会导致别的业务被你拖慢了，整体性能下降了
+- 递增性：因为我们这个ID是用来替代数据库自增ID的，虽然我们不能保证像数据库那样1234挨着自增长，但是一定要确保整体的逐渐变大的特点，因为这样有利于数据库创建索引，提高查询时的速度
+- 安全性：数据库的自增是1234这样简单的自增，这种自增确实比较简单比较快捷，但是它会存在安全问题，即容易让用户猜测到一些信息。
+
+<img src="./assets/1653363100502-1716507223734-38.png" alt="1653363100502" style="zoom:67%;" />
+
+---
+
+## 三、那我们能不能利用redis去满足这五个特性呢？
+
+之前提到过，redis的string数据结构里面是有一种自增特性的(`incr命令`)，这个命令首先它可以确保唯一，因为redis是独立于数据库之外的，不管你数据库有几张表，或者说你有几个不同的数据库，但是redis只有一个，此时当所有人都来访问redis的时候，它的自增一定是唯一的，不会存在多个自增的情况，因此唯一性一定能保证好。
+
+高可用：redis将来会去讲集群方案、主从方案、哨兵方案，这些方案可以确保它的高可用。
+
+高性能：更不用提了，redis就是以性能著称的，它比数据库的性能好太多太多了。
+
+递增：redis也是采用自增方案的
+
+安全性：如果redis递增方案采用的是和数据库一样，此时它就不存在安全性了，因为太容易猜测规律了。所以我们在利用redis的 `incr` 实现全局唯一id时，我们不能直接把redis的自增数值来当做id。
 
 为了增加ID的安全性，我们可以不直接使用Redis自增的数值，而是拼接一些其它信息：
 
-![1653363172079](./assets/1653363172079-1716507223734-39.png)ID的组成部分：符号位：1bit，永远为0
+为了提高数据库的性能，我们这个id会采用数值类型，说直白点就是Java中的Long，然后直接插入数据库，因为数值类型在数据库中占用空间更小，建立索引更方便，速度更快。
 
-时间戳：31bit，以秒为单位，可以使用69年
+因此这里采用的是Long型，因此它占用的是八个字节，也就是64个比特位
+
+![image-20240527095413650](./assets/image-20240527095413650.png)
+
+符号位：1bit，永远为0，为整数
+
+时间戳：31bit，这个时间戳为什么是31位呢？因为将来我们会以秒为单位，我们会定义一个初始的时间，例如从2000年1月1日开始，然后我会计算从下单这一刻开始，与定义的初始时间的时间差是多少秒，然后记录下来。
+
+31位大概是21亿多，算下来的秒数大概可以使用69年，这个时间戳就是用来增加id复杂性的。
+
+但如果一秒钟下了多个单，那这个时间戳不就重复了，没关系时间戳冲突的情况下，我们后续的这一部分32位序列号，它里面就是redis中自增长的值了。
 
 序列号：32bit，秒内的计数器，支持每秒产生2^32个不同ID
 
-### 3.2 -Redis实现全局唯一Id
+当然redis不是全局唯一id的唯一实现方案，还有其他方案，这里我们就是讲解基于redis的方案。
+
+
+
+---
+
+# 49.Redis实现全局唯一Id
+
+## 一、代码实现
 
 ```java
-@Component
+package com.hmdp.utils;
+@Component // 定义成spring中的一个bean，方便我们后续使用
 public class RedisIdWorker {
     /**
-     * 开始时间戳
+     * 开始时间戳，这个是使用main方法测试出来的
+      	LocalDateTime now = LocalDateTime.of(2022, 1, 1, 0, 0 ,0);
+        long second = now.toEpochSecond(ZoneOffset.UTC);
+        System.out.println("second = " + second);
      */
     private static final long BEGIN_TIMESTAMP = 1640995200L;
     /**
@@ -5529,25 +5634,35 @@ public class RedisIdWorker {
         this.stringRedisTemplate = stringRedisTemplate;
     }
 
+    // 方法的返回值是Long，因为按照之前的策略，我们最终的id是一个64位的数字就是对应了Java的Long
+    // 参数keyPrefix：生成策略是基于redis的自增长，redis的自增肯定是需要有一个key，然后值不断自增。不同的业务肯定有不同的key，大家不能都去用同一个自增长，因此这里需要有前缀去区分不同的业务，例如订单业务可以传order过来
     public long nextId(String keyPrefix) {
-        // 1.生成时间戳
+        // 1.生成时间戳，时间戳是一个31位的数字，单位是秒，它的值需要有一个基础的日期作为开始时间，时间戳的值就是用基础时间减去当前时间得到的秒数
         LocalDateTime now = LocalDateTime.now();
         long nowSecond = now.toEpochSecond(ZoneOffset.UTC);
         long timestamp = nowSecond - BEGIN_TIMESTAMP;
 
         // 2.生成序列号
-        // 2.1.获取当前日期，精确到天
+        // 2.1.获取当前日期，精确到天yyyyMMdd。这里用冒号分开，因为在redis中如果你的key用冒号分隔，这样在redis中就是分层级的
+        // 当我要统计某天、某月、某年的订单量的时候，就可以很方便的利用前缀统计，例如统计一个月就可以使用yyyy:MM作为前缀
         String date = now.format(DateTimeFormatter.ofPattern("yyyy:MM:dd"));
         // 2.2.自增长
+        // icr表示自增长，然后拼上业务(keyPrefix)，但是到这key还不能结束。
+        // 假设keyPrefix传进来的是order，就意味着整个订单业务它永远采用的是一个key来做自增长。也就是说不管你这个业务是经历了1年、2年，那么永远都是同一个key，但随着我们的业务逐渐发展，订单越来越多，那么自增的值也会越来越大。而redis单个key的自增长对应的数值是有一个上限的，2的64次方。虽然这个值已经非常非常大了，但是它也是有一个上限的，万一超过了这个上限怎么办？
+        // 而且你不要忘了，我们的key的策略里面，真正用来记录序列号的只有32个比特位，而reids是64比特位，超过64位很难，但是超过32位还是有可能的
+        // 所以尽管是同一个业务，也不能使用同一个key，否则就很有可能会超过上限。办法：在业务前缀的后面，拼上一个时间戳，这个时间戳精确到天。这样的好处是将来如果想统计这一天一共下了多少单，那么直接看key的日期对应的值就行了，因此它还有一个统计效果
+        // PS：这里可能会报黄，说你这里拆箱可能会有空指针。但实际上这个方法并不会导致空指针，因为如果这个key不存在，它就会自动取给你创建一个key，并且从0开始，第一次自增长之后就是1了，所以你根本不用管这个警告
         long count = stringRedisTemplate.opsForValue().increment("icr:" + keyPrefix + ":" + date);
 
-        // 3.拼接并返回
+        // 3.拼接并返回，这个移动的位数COUNT_BITS最好别写死，定义为一个变量，因为现在是移动32位，但万一以后算法有变。因此可以定义为常量COUNT_BITS
         return timestamp << COUNT_BITS | count;
     }
 }
 ```
 
-测试类
+---
+
+## 二、测试
 
 知识小贴士：关于countdownlatch
 
@@ -5563,11 +5678,17 @@ CountDownLatch 中有两个最重要的方法
 
 await 方法 是阻塞方法，我们担心分线程没有执行完时，main线程就先执行，所以使用await可以让main线程阻塞，那么什么时候main线程不再阻塞呢？当CountDownLatch  内部维护的 变量变为0时，就不再阻塞，直接放行，那么什么时候CountDownLatch   维护的变量变为0 呢，我们只需要调用一次countDown ，内部变量就减少1，我们让分线程和变量绑定， 执行完一个分线程就减少一个变量，当分线程全部走完，CountDownLatch 维护的变量就是0，此时await就不再阻塞，统计出来的时间也就是所有分线程执行完后的时间。
 
+由于这里我们需要测试一下并发情况下它生成id的性能，因此这里会准备一个线程池
+
 ```java
+@Resource
+private RedisIdWorker redisIdWorker;
+
 @Test
 void testIdWorker() throws InterruptedException {
     CountDownLatch latch = new CountDownLatch(300);
 
+    // 任务
     Runnable task = () -> {
         for (int i = 0; i < 100; i++) {
             long id = redisIdWorker.nextId("order");
@@ -5577,15 +5698,63 @@ void testIdWorker() throws InterruptedException {
     };
     long begin = System.currentTimeMillis();
     for (int i = 0; i < 300; i++) {
-        es.submit(task);
+        es.submit(task); // 提交300次，每个任务生成100个自增长id，因此一共3000个
     }
     latch.await();
-    long end = System.currentTimeMillis();
+    long end = System.currentTimeMillis(); // 由于线程池是异步的，因此这里计时其实是没有意义的，因此这里会借助于CountDownLatch
     System.out.println("time = " + (end - begin));
 }
 ```
 
-### 3.3 添加优惠卷
+执行单元测试，可以看见成功生成了，并且查看前缀只有一个，也就是说大概只花费了一秒钟左右。
+
+这里之所以显示三秒应该是是因为还有打印、计算还有其他时间的花费。
+
+<img src="./assets/image-20240527111921904.png" alt="image-20240527111921904" style="zoom:67%;" />
+
+生成了多少个id呢？到redis中看看，可以发现生成了30000个id
+
+<img src="./assets/image-20240527112053979.png" alt="image-20240527112053979" style="zoom:80%;" />
+
+---
+
+## 三、总结
+
+全局唯一ID生成策略：
+
+- UUID
+
+  这个直接利用JDK自带的工具类UUID工具类就能生成了。这种生成策略生成的其实是16进制的一长串的数值，因为这一长串是十六进制，因此它返回的结果其实是字符串结构，并且也不是单调递增的一种特性。因此虽然可以做唯一ID，但是并不够友好，没有满足之前我们所说的哪些特性，因此这种用的比较少。
+
+- Redis自增
+
+  这种方法相对来讲各种特性都能满足，而且整体是单调递增的，数值的长度也不大，总共也不超过long，而且它是一个数字类型它存储的数据库里占用的空间相对来讲也比较小，比较有好一些
+
+- snowflake算法
+
+  雪花算法，这种算法也是世界知名的全局唯一id的生成策略，它也是采用的是一种long类型的64位的数字。原理跟我们今天学的redis自增的原理是有点接近的，只不过它的自增采用的是当前机器的自增，内部维护的，因此它需要维护一个机器ID，因为我们用的是redis，不管你是任何的分布式系统，它都是用redis作为字段，所以它并不需要维护机器id，相对来将redis自增更简单一点。
+
+  雪花算法也是一个非常不错的算法，它不依赖redis，所以它的性能来讲理论上会比redis更好一点，但它也有缺点，就是对时钟依赖比较高，如果时间不准确，可能会出现异常问题。
+
+- 数据库自增
+
+  这里并不是说在新增订单表的时候将用户的id设置为自增，而是单独整张表，这张表单独来做自增，这样一来你订单表不管是十张表还是八张表，它们的ID其实不是自动的，而是从专门用来做自动的那张表中获取，等于是这N张表用的是同一个表的自动ID，这样的话就可以实现唯一的效果了。原理跟redis自增很像，但是从性能上考虑，数据库自增肯定不如redis自增性能好。
+
+  因此企业中使用数据库自增的时候往往会采取一些方案：例如批量获取id，然后在内存中缓存起来，这样可以一定程度上提高他的性能。
+
+后面三种方案企业都有应用，大家可以百度一下，研究一下不同点。
+
+Redis自增ID策略：
+
+每天一个key，方便统计订单量，并且它还可以限定key的值不会让它太大，以至于让它超出存储的上限。
+
+ID构造是 时间戳 + 计数器
+
+
+
+----
+
+# 50.添加优惠卷
 
 每个店铺都可以发布优惠券，分为平价券和特价券。平价券可以任意购买，而特价券需要秒杀抢购：
 
