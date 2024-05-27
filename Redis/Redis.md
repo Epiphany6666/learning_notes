@@ -6086,29 +6086,72 @@ return var5;
 
 # 53.乐观锁解决超卖问题
 
-### 修改代码方案一
+## 修改代码方案一
 
 VoucherOrderServiceImpl 在扣减库存时，改为：
 
 ```java
 boolean success = seckillVoucherService.update()
             .setSql("stock= stock -1") //set stock = stock -1
-            .eq("voucher_id", voucherId).eq("stock",voucher.getStock()).update(); //where id = ？ and stock = ?
+            .eq("voucher_id", voucherId).eq("stock", voucher.getStock()).update(); //where id = ？and stock = ? 
 ```
 
-以上逻辑的核心含义是：只要我扣减库存时的库存和之前我查询到的库存是一样的，就意味着没有人在中间修改过库存，那么此时就是安全的，但是以上这种方式通过测试发现会有很多失败的情况，失败的原因在于：在使用乐观锁过程中假设100个线程同时都拿到了100的库存，然后大家一起去进行扣减，但是100个人中只有1个人能扣减成功，其他的人在处理时，他们在扣减时，库存已经被修改过了，所以此时其他线程都会失败
+以上逻辑的核心含义是：只要我扣减库存时的库存和之前我查询到的库存是一样的，就意味着没有人在中间修改过库存，那么此时就是安全的，但是以上这种方式通过测试发现会有很多失败的情况，失败的原因就跟乐观锁的缺点有关了：在使用乐观锁过程中假设100个线程同时都拿到了100的库存，然后大家一起去进行扣减，但是100个人中只有1个人能扣减成功，其他的人在处理时，他们在扣减时，库存已经被修改过了，所以此时其他线程都会失败。
 
-**修改代码方案二、**
+但是从业务角度来分析，这99个人完全可以成功，那为什么失败了？因为乐观锁太小心了，它觉得只要有人改了就有安全问题，其实没有。这里是产生了并发修改，但是没有业务上的安全问题，因为对于库存来讲，只要大于0。
 
-之前的方式要修改前后都保持一致，但是这样我们分析过，成功的概率太低，所以我们的乐观锁需要变一下，改成stock大于0 即可
+---
+
+## 修改代码方案二
+
+之前的方式要修改前后都保持一致，但是这样我们分析过，成功的概率太低，所以我们的乐观锁需要变一下，改成 `stock大于0` 即可
 
 ```java
 boolean success = seckillVoucherService.update()
-            .setSql("stock= stock -1")
-            .eq("voucher_id", voucherId).update().gt("stock",0); //where id = ? and stock > 0
+                .setSql("stock = stock - 1")
+                .eq("voucher_id", voucherId).gt("stock", 0) //where id = ? and stock > 0
+                .update();
 ```
 
-**知识小扩展：**
+---
+
+## 测试
+
+重启程序，修改数据库，库存改为100，同时清除订单
+
+![image-20240527193223058](./assets/image-20240527193223058.png)
+
+最后执行JeMeter的200条线程，异常情况为 `50%`，并且查看数据库，库存没有超卖，而且订单也恰好是100个
+
+<img src="./assets/image-20240527195012026.png" alt="image-20240527195012026" style="zoom:67%;" />
+
+----
+
+## 总结
+
+超卖这样的线程安全问题，解决方案有哪些？
+
+1.悲观锁：添加同步锁，让线程串行执行
+
+- 优点：简单粗暴
+
+- 缺点：性能一般
+
+2.乐观锁：不加锁，在更新时判断是否有其它线程在修改
+
+- 优点：性能好
+
+- 缺点：存在成功率低的问题
+
+有些业务中不是库存，它只能通过数据有没有变化来去判断是否安全，这种情况下想要提高成功率，我们还可以采用分批加锁的方案，即分段锁，即我可以将数据的资源分成几份，例如库存总共是100，我可以将100库存分到十张表中，每张表中库存量是10，然后抢的时候就可以去多张表中分别抢，这样一来成功率相当于提高了十倍。
+
+这种分段锁的方案相当于每次锁定的资源少，不再是将100个资源全锁定了。这种思想在HashMap中其实有用到，它就可以解决成功低的问题。
+
+虽然我们最终选择了乐观锁，但并不是说乐观锁就是完美的了，它毕竟还要去访问数据库，对数据库的压力还是非常大的，因此在真正的秒杀场景下，特别是像淘宝、京东这样的高并发的场景，仅仅使用乐观锁还是不够的，所以我们接下来继续要去对秒杀的这种方案进行优化，进一步的提高它的性能。
+
+---
+
+## 知识小扩展
 
 针对cas中的自旋压力过大，我们可以使用Longaddr这个类去解决
 
@@ -6122,9 +6165,17 @@ Java8 提供的一个对AtomicLong改进后的一个类，LongAdder
 
 ![1653370271627](./assets/1653370271627-1716507223734-46.png)
 
-### 3.6 优惠券秒杀-一人一单
 
-需求：修改秒杀业务，要求同一个优惠券，一个用户只能下一单
+
+---
+
+# 54.优惠券秒杀  ——  一人一单
+
+## 一、业务分析
+
+需求：修改秒杀业务，要求同一个优惠券，一个用户只能下一单。
+
+为什么要有这样的需求呢？思考一下，像这种秒杀券(特有券)，它的优惠力度非常大，商家可能会赔本，那这种券的目的是什么？它的目的只有一个，就是利用这样的券吸引更多的用户来我们店中体验，体验了后如果口碑好，那就可以传播出去，吸引更多的用户来。
 
 **现在的问题在于：**
 
@@ -6132,7 +6183,7 @@ Java8 提供的一个对AtomicLong改进后的一个类，LongAdder
 
 具体操作逻辑如下：比如时间是否充足，如果时间充足，则进一步判断库存是否足够，然后再根据优惠卷id和用户id查询是否已经下过这个订单，如果下过这个订单，则不再下单，否则进行下单
 
-![1653371854389](./assets/1653371854389-1716507223734-47.png)
+![image-20240527201135771](./assets/image-20240527201135771.png)
 
 VoucherOrderServiceImpl  
 
@@ -6140,6 +6191,7 @@ VoucherOrderServiceImpl
 
 ```java
 @Override
+@Transactional
 public Result seckillVoucher(Long voucherId) {
     // 1.查询优惠券
     SeckillVoucher voucher = seckillVoucherService.getById(voucherId);
@@ -6161,6 +6213,7 @@ public Result seckillVoucher(Long voucherId) {
     // 5.一人一单逻辑
     // 5.1.用户id
     Long userId = UserHolder.getUser().getId();
+    // 这里不需要查具体数据了，只需要查count值
     int count = query().eq("user_id", userId).eq("voucher_id", voucherId).count();
     // 5.2.判断是否存在
     if (count > 0) {
@@ -6188,61 +6241,51 @@ public Result seckillVoucher(Long voucherId) {
     save(voucherOrder);
 
     return Result.ok(orderId);
-
 }
 ```
 
-**存在问题：**现在的问题还是和之前一样，并发过来，查询数据库，都不存在订单，所以我们还是需要加锁，但是乐观锁比较适合更新数据，而现在是插入数据，所以我们需要使用悲观锁操作
+**存在问题：**现在的问题还是和之前一样，并发过来，查询数据库，都不存在订单，所以我们还是需要加锁，否则一个用户还是有可能会下多个单。但是乐观锁比较适合更新数据，因为可以判断某个字段是否修改。而现在是插入数据，没法判断某个字段是否修改，所以我们需要使用悲观锁操作
 
-**注意：**在这里提到了非常多的问题，我们需要慢慢的来思考，首先我们的初始方案是封装了一个createVoucherOrder方法，同时为了确保他线程安全，在方法上添加了一把synchronized 锁
+其中我们应该给 `判断订单` 到 `新增订单` 这整段加上悲观锁
 
-```java
-@Transactional
-public synchronized Result createVoucherOrder(Long voucherId) {
+---
 
-	Long userId = UserHolder.getUser().getId();
-         // 5.1.查询订单
-        int count = query().eq("user_id", userId).eq("voucher_id", voucherId).count();
-        // 5.2.判断是否存在
-        if (count > 0) {
-            // 用户已经购买过了
-            return Result.fail("用户已经购买过一次！");
-        }
+## 二、代码实现
 
-        // 6.扣减库存
-        boolean success = seckillVoucherService.update()
-                .setSql("stock = stock - 1") // set stock = stock - 1
-                .eq("voucher_id", voucherId).gt("stock", 0) // where id = ? and stock > 0
-                .update();
-        if (!success) {
-            // 扣减失败
-            return Result.fail("库存不足！");
-        }
+### 1）优化一
 
-        // 7.创建订单
-        VoucherOrder voucherOrder = new VoucherOrder();
-        // 7.1.订单id
-        long orderId = redisIdWorker.nextId("order");
-        voucherOrder.setId(orderId);
-        // 7.2.用户id
-        voucherOrder.setUserId(userId);
-        // 7.3.代金券id
-        voucherOrder.setVoucherId(voucherId);
-        save(voucherOrder);
+<img src="./assets/image-20240527202638041.png" style="zoom:50%;" />
 
-        // 7.返回订单id
-        return Result.ok(orderId);
-}
-```
+因此可以 <kbd>ctrl + alt + M</kbd> 将其封装成一个函数
 
-，但是这样添加锁，锁的粒度太粗了，在使用锁过程中，控制**锁粒度** 是一个非常重要的事情，因为如果锁的粒度太大，会导致每个线程进来都会锁住，所以我们需要去控制锁的粒度，以下这段代码需要修改为：
-intern() 这个方法是从常量池中拿到数据，如果我们直接使用userId.toString() 他拿到的对象实际上是不同的对象，new出来的对象，我们使用锁必须保证锁必须是同一把，所以我们需要使用intern()方法
+<img src="./assets/image-20240527202821782.png" alt="image-20240527202821782" style="zoom:50%;" />
+
+由于我们是要在 `createVoucherOrder` 整个方法上都需要加上锁，直接使用同步方法就行了，此时的同步锁就是 `this`，即当前对象，因此肯定是线程安全的，因为当前对象肯定是唯一的。
+
+另外我们事务的范围其实是更新数据库的服务，也就是做减库的操作和创建订单的操作，而不是整个方法，因为前面是查询，不用加事务，所以 `seckillVoucher方法` 上的事物也去掉，而是给下面的方法加上事务
+
+<img src="./assets/image-20240527203718743.png" alt="image-20240527203718743" style="zoom:67%;" />
+
+---
+
+### 2）优化二
+
+但是需要注意的是，不建议将 `synchronized` 直接加在方法上，因为你加在方法上锁的范围就变成了整个方法，而且锁的对象是this，也就意味着不管是任何一个用户来了，都要加这个锁，而且大家是同一把锁，也就意味着整个方法就是串行执行了，性能就很差了。
+
+但是大家思考下：所谓的一人一单，我们是同一个用户来了，我们才去判断他的并发安全问题。但如果不是同一个用户，一个张三、一个李四，就不需要加同一把锁了，各做各的就行了。
+
+因此我认为这个地方加的锁不应该是这个 `service`，即 `this`，而是当前用户。
+
+我们可以以用户 `id` 加锁，这样的话我们就可以将锁的范围缩小了，也就是说同一个用户加一把锁，不同用户加不同锁。
+
+专业一点说：但是这样添加锁，锁的粒度太粗了，在使用锁过程中，控制 **锁粒度** 是一个非常重要的事情，因为如果锁的粒度太大，会导致每个线程进来都会锁住，所以我们需要去控制锁的粒度，以下这段代码需要修改为：
+`intern()` 这个方法是从常量池中拿到数据，如果我们直接使用userId.toString() 他拿到的对象实际上是不同的对象，new出来的对象，我们使用锁必须保证锁必须是同一把，所以我们需要使用intern()方法
 
 ```java
 @Transactional
 public  Result createVoucherOrder(Long voucherId) {
 	Long userId = UserHolder.getUser().getId();
-	synchronized(userId.toString().intern()){
+	synchronized(userId.toString()){
          // 5.1.查询订单
         int count = query().eq("user_id", userId).eq("voucher_id", voucherId).count();
         // 5.2.判断是否存在
@@ -6278,19 +6321,104 @@ public  Result createVoucherOrder(Long voucherId) {
 }
 ```
 
-但是以上代码还是存在问题，问题的原因在于当前方法被spring的事务控制，如果你在方法内部加锁，可能会导致当前方法事务还没有提交，但是锁已经释放也会导致问题，所以我们选择将当前方法整体包裹起来，确保事务不会出现问题：如下：
+但是这里还要跟大家强调一点：`userId.toString()` 我们期望的是id值一样的作为一把锁，但你要知道，每一个请求来这个id对象都是一个全新的id对象，因此这个对象变了锁就变了，但是我们要求的是值一样，所以在这里用了 `toString()`，但是 `toString()` 就能保证它是按照值来加锁的吗？
+
+我们看一下toString底层，可以发现在底层调用的是long的一个静态的特征函数，在它的内部其实是 `new` 了一个字符串。
+
+<img src="./assets/image-20240527205530520.png" alt="image-20240527205530520" style="zoom:67%;" />
+
+那也就是说，我们刚才的代码中，每调一次 `toString()` 也是一个全新的字符串对象，也就是说你这个锁的对象还是在变，哪怕你id是一样的，它每次也是new，因此还是一个全新的对象。
+
+此时就需要调用字符串的 `intern()` 方法，这个方法的作用是返回字符串的规范表示，即去字符串常量池中寻找跟你值一样的那个字符串的地址返回给你，即你的值给你。
+
+因此无论你这里new了多少个字符串，只要你的值是一样的，那最终的返回结果也就是一样的，这样就可以确保：当用户id一样时，锁就一样。
+
+<img src="./assets/image-20240527205830754.png" alt="image-20240527205830754" style="zoom:67%;" />
+
+而不同用户就不会被锁定，此时我们整体的锁定范围变小了，性能就会得到很大的提升了。
+
+---
+
+### 3）优化三
+
+但是以上代码还是存在问题，问题的原因在于当前方法被spring的事务控制，如果你在方法内部加锁，可能会导致当前方法事务还没有提交，但是锁已经释放也会导致问题，因此当方法结束后，锁其实就已经释放了，锁释放了就意味着其他线程可以进来了，而此时因为事务尚未提交，如果有其他线程进来去查询订单的话，那我们刚刚新增的这个订单还没有写入数据库，因为你还没提交事务，因此这个线程查询的时候依然不存在，就有可能出现并发安全问题。
+
+因此我们这个锁锁定的范围有点小
+
+所以我们选择将当前方法整体包裹起来，确保事务不会出现问题：如下：
 
 在seckillVoucher 方法中，添加以下逻辑，这样就能保证事务的特性，同时也控制了锁的粒度
 
-![1653373434815](./assets/1653373434815-1716507223734-48.png)
+<img src="./assets/1653373434815-1716507223734-48.png" alt="1653373434815" style="zoom:67%;" />
 
-但是以上做法依然有问题，因为你调用的方法，其实是this.的方式调用的，事务想要生效，还得利用代理来生效，所以这个地方，我们需要获得原始的事务对象， 来操作事务
+此时等 `createVoucherOrder函数` 执行完，就说明一定是写入数据库了，因为事务已经提交了，等我这块事务提交完，再来释放锁，也就是说锁所释放的这一刻，就可以确保数据库中是有订单了，此时再有其他线程来，你再去完成这个业务的时候，去查询订单的时候，订单肯定存在了，就不会重复下单了。
 
-![1653383810643](./assets/1653383810643-1716507223734-49.png)
+----
+
+### 4）优化四
+
+但是以上做法依然有问题，因为你调用的方法，其实是this.的方式调用的，`this` 拿到的事当前的 `VoucherOrderServiceImpl对象`，而不是它的代理对象。
+
+<img src="./assets/image-20240527210819240.png" alt="image-20240527210819240" style="zoom:67%;" />
+
+事务想要生效，其实是因为spring对当前这个类做了动态代理，拿到了它的代理对象，用它来做的事务处理。而这里的 `this` 其实是非代理对象，也就是目标对象，因此它是没有事务功能的，这就是spring事务失效的几种可能性之一，这就是一种可能性。
+
+所以这个地方，我们需要获得原始的事务对象， 来操作事务，借助API：`AopContext`，它里面的 `currentProxy()方法` 就可以拿到当前对象的代理对象了
+
+~~~java
+Object proxy = AopContext.currentProxy();
+~~~
+
+这个对象是 `VoucherOrderService` 的代理对象，因此使用 `VoucherOrderService` 来接收就行了，然后做个强转。
+
+它返回的时候是Object，但我们知道肯定是 `VoucherOrderService`。
+
+~~~java
+IVoucherOrderService proxy = (IVoucherOrderService) AopContext.currentProxy();
+~~~
+
+最后上使用代理对象来调用 `createVoucherOrder方法`，而不是使用this，这样的话就会被spring进行管理了，因为这个代理对象是由spring创建的，它是带有事务的函数，这个不存在的原因是因为 `VoucherOrderService` 接口中是不存在这个函数的，因此我们也将这个函数在 `VoucherOrderService` 中创建一下。
+
+<img src="./assets/image-20240527211420360.png" alt="image-20240527211420360" style="zoom:70%;" />
+
+现在事务就能够生效了
+
+<img src="./assets/1653383810643-1716507223734-49.png" alt="1653383810643" style="zoom:67%;" />
+
+当然你要这么去做还需要做两件事：
+
+1、添加一个依赖，因为这么做后底层会使用aspectj的依赖，是一种动态代理的模式
+
+~~~xml
+<dependency>
+    <groupId>org.aspectj</groupId>
+    <artifactId>aspectjweaver</artifactId>
+</dependency>
+~~~
+
+2、在启动类上添加 `@` 注解，去暴露这个代理对象
+
+可以发现这个值默认是false，默认是不暴露的，这个值需要将它改为true就能暴露
+
+<img src="./assets/image-20240527211725194.png" alt="image-20240527211725194" style="zoom:67%;" />
+
+一旦暴露后，在 `VoucherOrderServiceImpl` 实现类中就可以拿到这个代理对象了
+
+<img src="./assets/image-20240527211839937.png" alt="image-20240527211839937" style="zoom:67%;" />
+
+此时我们就能确保这个事务生效了，并且是先去获取锁，最后才创建事务，事务提交后才会释放锁，这样才会避免我们刚才说的因为事务没提交就释放锁的这种安全问题。
+
+此时重新使用JeMeter测试即可，然后查看数据库，发现库存确实是只减少了一个，而且一人一单的问题。
+
+![image-20240527212534783](./assets/image-20240527212534783.png)
+
+这样我们就解决了一人一单的问题，解决方案同样是加锁，这次我们使用的是悲观锁。只不过我们这次采用了一种特殊的锁对象，即用户ID，减少了锁定资源的范围，从而一定程度上提高了它的性能。
 
 
 
-### 3.7 集群环境下的并发问题
+----
+
+# 55.集群环境下的并发问题
 
 通过加锁可以解决在单机情况下的一人一单安全问题，但是在集群模式下就不行了。
 
