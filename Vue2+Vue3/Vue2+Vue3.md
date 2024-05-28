@@ -17357,7 +17357,7 @@ Pinia 是 Vue 的专属的最新状态管理库 ，是 Vuex 状态管理工具�
 
 4. 配合 TypeScript 更加友好，提供可靠的类型推断
 
-![image.png](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day12-Pinia/assets/31.png)
+![image.png](./assets/31.png)
 
 # 155.手动添加Pinia到Vue项目
 
@@ -17380,13 +17380,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->                      
+>                         
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->                      
+>                         
 >    <style scoped>
 >    </style>
 >    ~~~
@@ -17424,7 +17424,7 @@ app.mount('#app') // 视图的挂载
 1. 定义store
 2. 组件使用store
 
-![image.png](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day12-Pinia/assets/32.png)
+![image.png](./assets/32.png)
 
 查询官网
 
@@ -17595,7 +17595,7 @@ export const useCounterStore = defineStore('counter', () => {
 
 Pinia中的 getters 直接使用 computed函数 进行模拟, 组件中需要使用需要把 getters return出去
 
-![image.png](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day12-Pinia/assets/33.png)
+![image.png](./assets/33.png)
 
 store/counter.js
 
@@ -17643,10 +17643,10 @@ const counterStore = userCounterStore()
 
 - 请求参数：无
 
-![image.png](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day12-Pinia/assets/34.png)
+![image.png](./assets/34.png)
 
 需求：在Pinia中获取频道列表数据并把数据渲染App组件的模板中
-![image.png](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day12-Pinia/assets/35.png)
+![image.png](./assets/35.png)
 
 步骤：
 
@@ -17715,12 +17715,12 @@ const { count, msg } = channelStore
 ~~~
 
 Vue官方的 dev-tools 调试工具 对 Pinia直接支持，可以直接进行调试
-![image.png](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day12-Pinia/assets/37.png)
+<img src="./assets/37.png" alt="image.png" style="zoom:50%;" />
 
 # 157.storeToRefs工具函数
 
 使用storeToRefs函数可以辅助保持数据（state + getter）的响应式解构
-![image.png](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day12-Pinia/assets/36.png)
+![image.png](./assets/36.png)
 
 直接解构不起作用的原因跟 `store 是一个用 `reactive` 包装的对象` 有关系，reactive实现响应式底层的原理其实是proxy，而这个proxy是针对对象进行监视的，可以理解成：它整个对数据的监听都是针对对象的，如果解构，那就是将原来的数据直接赋值到了新的变量，此时这个变量和原来的响应式数据就没有半毛钱关系了。
 

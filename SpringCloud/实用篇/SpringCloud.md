@@ -842,7 +842,9 @@ eureka:
 
 为了演示一个服务有多个实例的场景，我们添加一个SpringBoot的启动配置，再启动一个user-service。
 
-首先，复制原来的user-service启动配置：
+首先，复制原来的user-service启动配置，或者 <kbd>ctrl + D</kbd>：
+
+作用就是将新启动配置拷贝了一份，每创建一次新的启动配置，将来IDEA底层就会给我们创建两台tomcat，分别启动，就可以模拟两台机器了
 
 ![image-20240314103956899](assets/image-20240314103956899.png)
 
@@ -1190,7 +1192,7 @@ c.netflix.loadbalancer.BaseLoadBalancer  : Client: userservice instantiated a Lo
 
 
 
-而饥饿加载（饥不择食，饿的不行了，看见什么都往上啃）则会在项目启动时创建，降低第一次访问的耗时，通过下面配置开启饥饿加载：
+而饥饿加载（饥不择食，饿的不行了，看见什么都往上啃）则会在**项目启动时创建**，降低第一次访问的耗时，通过下面配置开启饥饿加载：
 
 ```yaml
 userservice:
