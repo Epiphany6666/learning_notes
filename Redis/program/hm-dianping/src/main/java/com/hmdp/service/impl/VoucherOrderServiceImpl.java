@@ -8,8 +8,10 @@ import com.hmdp.service.ISeckillVoucherService;
 import com.hmdp.service.IVoucherOrderService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.utils.RedisIdWorker;
+import com.hmdp.utils.SimpleRedisLock;
 import com.hmdp.utils.UserHolder;
 import org.springframework.aop.framework.AopContext;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,9 +32,10 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
     private ISeckillVoucherService seckillVoucherService;
     @Resource
     private RedisIdWorker redisIdWorker;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
-//    @Transactional
     public Result seckillVoucher(Long voucherId) {
         // 1.查询优惠券
         SeckillVoucher voucher = seckillVoucherService.getById(voucherId);
@@ -52,10 +55,25 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
             return Result.fail("库存不足！");
         }
         Long userId = UserHolder.getUser().getId();
-        synchronized (userId.toString().intern()) {
-            // 获取跟事务有关的代理对象
+        //创建锁对象(新增代码)
+        // 这里需要注意锁的范围，如果你这么写，那就表示：凡是来下单的业务都会被锁定。但事实上我们锁定的范围应该是用户，同一个用户我们才要加限制，不同用户无所谓
+        //  new SimpleRedisLock("order"
+        // 因此这里锁的范围应该是用户
+        SimpleRedisLock lock = new SimpleRedisLock("order:" + userId, stringRedisTemplate);
+        //获取锁对象，这里传入的锁超时时间跟业务执行的时间有关，例如我们这个下单业务耗时大概是500ms，那么这个地方的超时时间就可以设置为5s，如果你执行超时，再长也不可能超过5s，但是由于这里我们代码要做测试，断点什么的都耗费时间比较长，因此这里给个长一点的，例如1200秒
+        boolean isLock = lock.tryLock(1200); // 由于这里查到不一定成功，因此需要判断
+        //加锁失败
+        if (!isLock) {
+            // 获取锁失败，解决办法一般是返回错误信息或重试。但这里我们是为了一个用户避免重复下单，因此直接返回错误信息即可
+            return Result.fail("不允许重复下单");
+        }
+        try {
+            //获取代理对象(事务)
             IVoucherOrderService proxy = (IVoucherOrderService) AopContext.currentProxy();
             return proxy.createVoucherOrder(voucherId);
+        } finally {
+            // 由于上面代码不管会不会产生异常，都需要释放锁，因此放到finally中做
+            lock.unlock();
         }
     }
 
