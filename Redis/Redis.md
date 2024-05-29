@@ -7375,7 +7375,7 @@ public void unlock() {
 
 但是目前还剩下一个问题锁不住，什么是锁不住呢，你想一想，如果当过期时间到了之后，我们可以给他续期一下，比如续个30s，就好像是网吧上网， 网费到了之后，然后说，来，网管，再给我来10块的，是不是后边的问题都不会发生了，那么续期问题怎么解决呢，可以依赖于我们接下来要学习redission啦
 
-### 5.1 分布式锁-redission功能介绍
+## 一、基于setnx实现的分布式锁存在的问题
 
 基于setnx实现的分布式锁存在下面的问题：
 
@@ -7415,23 +7415,49 @@ public void unlock() {
 
 所以这些点都是功能上的扩展点，不是必须得实现，不实现我们也能用，在大多数情况下我们之前实现的那个锁就已经够用了。
 
+但如果说你对锁的要求很高，你有这样的需求，你就必须想办法去解决它们了，而要解决这几个问题可就麻烦了，所以这里不推荐大家亲自去实现，而是去找一找有没有成熟的框架来帮助我们，事实上就有这个东西，因此这节就是要去给大家介绍一个组件：Redission。
+
 ----
 
-
+## 二、Redission
 
 那么什么是Redission呢
 
-Redisson是一个在Redis的基础上实现的Java驻内存数据网格（In-Memory Data Grid）。它不仅提供了一系列的分布式的Java常用对象，还提供了许多分布式服务，其中就包含了各种分布式锁的实现。
+Redisson是一个在Redis的基础上实现的Java驻内存数据网格（In-Memory Data Grid）。
 
-Redission提供了分布式锁的多种多样的功能
+人话：它是一个在redis基础上实现的一个分布式工具的集合，也就是在分布式系统下用到的各种各样的工具它都有，包括分布式锁，因此分布式锁只是它的一个子级。
+
+它不仅提供了一系列的分布式的Java常用对象，还提供了许多分布式服务，其中就包含了各种分布式锁的实现。
+
+官网地址： [https://redisson.org](https://redisson.org/)
+
+GitHub地址： https://github.com/redisson/redisson
 
 ![1653546736063](./assets/1653546736063-1716507223735-67.png)
 
-### 5.2 分布式锁-Redission快速入门
+进入官方GitHub网址后，首先点开Wiki，即它的官方文档。它里面包含的东西非常非常多
+
+![image-20240529073502327](./assets/image-20240529073502327.png)
+
+其中在分布式锁里面又包含了各种各样不同的锁
+
+![image-20240529073728289](./assets/image-20240529073728289.png)
+
+因此在企业环境下其实没有必要自己去实现锁，我们之前的讲解只是为了让大家明白分布式锁的原理，因为有的时候面试还是会问到的。因此如果你懂了原理，不管是面试还是以后工作中出现问题，都有利于你去实现和调试。
+
+因此以后推荐大家使用分布式锁的时候直接使用这个开源的框架即可。
+
+
+
+---
+
+# 65.分布式锁-Redission快速入门
+
+## 一、步骤
 
 引入依赖：
 
-```java
+```xml
 <dependency>
 	<groupId>org.redisson</groupId>
 	<artifactId>redisson</artifactId>
@@ -7441,14 +7467,22 @@ Redission提供了分布式锁的多种多样的功能
 
 配置Redisson客户端：
 
+Redission的配置其实有两种方式，这是一种利用Java配置方式来实现，事实上它也可以利用yml文件跟SpringBoot去整合实现。
+
+并且官方还提供了一个Redission-springboot-starter，但这种方式并不推荐大家去使用，因为它会去替代spring官方提供的对于redis的这套配置和实现。
+
 ```java
 @Configuration
 public class RedissonConfig {
 
     @Bean
+    // 这个类就是Redission的工厂类了，从它里面可以拿到Redission中各种各样的工具，因此这里将RedissionClient定义成了一个Bean，方便我们后续去使用
     public RedissonClient redissonClient(){
         // 配置
         Config config = new Config();
+        // useSingleServer：表示我们这个Redission用的是单节点的redis，因为我们目前没有做集群
+        // 如果将来你是集群，也可以使用config.useClusterServers()添加集群地址，然后配置多个地址
+        // redis:/ 代表redis协议
         config.useSingleServer().setAddress("redis://192.168.150.101:6379")
             .setPassword("123321");
         // 创建RedissonClient对象
@@ -7458,33 +7492,9 @@ public class RedissonConfig {
 
 ```
 
-如何使用Redission的分布式锁
+----
 
-```java
-@Resource
-private RedissionClient redissonClient;
-
-@Test
-void testRedisson() throws Exception{
-    //获取锁(可重入)，指定锁的名称
-    RLock lock = redissonClient.getLock("anyLock");
-    //尝试获取锁，参数分别是：获取锁的最大等待时间(期间会重试)，锁自动释放时间，时间单位
-    boolean isLock = lock.tryLock(1,10,TimeUnit.SECONDS);
-    //判断获取锁成功
-    if(isLock){
-        try{
-            System.out.println("执行业务");          
-        }finally{
-            //释放锁
-            lock.unlock();
-        }
-        
-    }
-    
-    
-    
-}
-```
+## 二、代码实现
 
 在 VoucherOrderServiceImpl
 
@@ -7496,43 +7506,45 @@ private RedissonClient redissonClient;
 
 @Override
 public Result seckillVoucher(Long voucherId) {
-        // 1.查询优惠券
-        SeckillVoucher voucher = seckillVoucherService.getById(voucherId);
-        // 2.判断秒杀是否开始
-        if (voucher.getBeginTime().isAfter(LocalDateTime.now())) {
-            // 尚未开始
-            return Result.fail("秒杀尚未开始！");
-        }
-        // 3.判断秒杀是否已经结束
-        if (voucher.getEndTime().isBefore(LocalDateTime.now())) {
-            // 尚未开始
-            return Result.fail("秒杀已经结束！");
-        }
-        // 4.判断库存是否充足
-        if (voucher.getStock() < 1) {
-            // 库存不足
-            return Result.fail("库存不足！");
-        }
-        Long userId = UserHolder.getUser().getId();
-        //创建锁对象 这个代码不用了，因为我们现在要使用分布式锁
-        //SimpleRedisLock lock = new SimpleRedisLock("order:" + userId, stringRedisTemplate);
-        RLock lock = redissonClient.getLock("lock:order:" + userId);
-        //获取锁对象
-        boolean isLock = lock.tryLock();
-       
-		//加锁失败
-        if (!isLock) {
-            return Result.fail("不允许重复下单");
-        }
-        try {
-            //获取代理对象(事务)
-            IVoucherOrderService proxy = (IVoucherOrderService) AopContext.currentProxy();
-            return proxy.createVoucherOrder(voucherId);
-        } finally {
-            //释放锁
-            lock.unlock();
-        }
- }
+    // 1.查询优惠券
+    SeckillVoucher voucher = seckillVoucherService.getById(voucherId);
+    // 2.判断秒杀是否开始
+    if (voucher.getBeginTime().isAfter(LocalDateTime.now())) {
+        // 尚未开始
+        return Result.fail("秒杀尚未开始！");
+    }
+    // 3.判断秒杀是否已经结束
+    if (voucher.getEndTime().isBefore(LocalDateTime.now())) {
+        // 尚未开始
+        return Result.fail("秒杀已经结束！");
+    }
+    // 4.判断库存是否充足
+    if (voucher.getStock() < 1) {
+        // 库存不足
+        return Result.fail("库存不足！");
+    }
+    Long userId = UserHolder.getUser().getId();
+    //创建锁对象 这个代码不用了，因为我们现在要使用分布式锁
+    //SimpleRedisLock lock = new SimpleRedisLock("order:" + userId, stringRedisTemplate);
+    //我们可以采用"order:" + userId，但是万一order将来还有其他缓存，这里可以加上lock的标识，锁的范围就限定的稍微小一点
+    RLock lock = redissonClient.getLock("lock:order:" + userId);
+    //获取锁对象，这里面可以传参也可以不传参，不传参waitTime是有默认值的：-1，代表不等待，立即返回。leaseTime代表30s，也就是说如果30s还没有释放，它就自动释放了，所以这也是它一个默认值。
+    // 这里我们就选择无参了，因为我们这里刚好是失败不等待
+    boolean isLock = lock.tryLock();
+
+    //加锁失败
+    if (!isLock) {
+        return Result.fail("不允许重复下单");
+    }
+    try {
+        //获取代理对象(事务)
+        IVoucherOrderService proxy = (IVoucherOrderService) AopContext.currentProxy();
+        return proxy.createVoucherOrder(voucherId);
+    } finally {
+        //释放锁
+        lock.unlock();
+    }
+}
 ```
 
 ### 5.3 分布式锁-redission可重入锁原理
