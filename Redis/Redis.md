@@ -7496,7 +7496,7 @@ public class RedissonConfig {
 
 ## 二、代码实现
 
-在 VoucherOrderServiceImpl
+**VoucherOrderServiceImpl.java**
 
 注入RedissonClient
 
@@ -7547,7 +7547,11 @@ public Result seckillVoucher(Long voucherId) {
 }
 ```
 
-### 5.3 分布式锁-redission可重入锁原理
+
+
+----
+
+# 66.分布式锁-redission可重入锁原理
 
 在Lock锁中，他是借助于底层的一个voaltile的一个state变量来记录重入的状态的，比如当前没有人持有这把锁，那么state=0，假如有人持有这把锁，那么state=1，如果持有这把锁的人再次持有这把锁，那么state就会+1 ，如果是对于synchronized而言，他在c语言代码中会有一个count，原理和state类似，也是重入一次就加一，释放一次就-1 ，直到减少成0 时，表示当前这把锁没有被人持有。  
 

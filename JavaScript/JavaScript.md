@@ -3239,7 +3239,13 @@ document（这是DOM里面最大的对象）
 
 上述列举了 `document` 对象的部分属性和方法，我们先对 `document` 有一个整体的认识。
 
+
+
+----
+
 # 81.获取DOM对象
+
+## 一、根据CSS选择器来获取DOM元素
 
 > **CSS选择器中怎么写，这里面就怎么写**
 
@@ -3247,7 +3253,7 @@ document（这是DOM里面最大的对象）
 
    > 里面的CSS选择器必须加引号，不加引号就是当变量来看了
    >
-   > 1. 语法：
+   > 1. 语法：页面所有的元素都在document中存着
    >
    >    ![image-20231230195950455](.\assets\image-20231230195950455.png)
    >
@@ -3322,7 +3328,7 @@ document（这是DOM里面最大的对象）
    >
    > 返回值： 
    >
-   > CSS选择器匹配的NodeList 对象集合
+   > CSS选择器匹配的NodeList 对象(伪数组)集合
    >
    > 例如：
    >
@@ -3345,12 +3351,16 @@ document（这是DOM里面最大的对象）
 
    > querySelector( )可以直接操作修改
    >
-   > querySelector(  )不能直接修改，只能通过遍历的方式一次给里面的元素做修改
+   > querySelectorAll(  )不能直接修改，只能通过遍历的方式给里面的元素做修改
 
-3. 了解其他方式
+3. 其他获取DOM元素方法（了解）
 
    1. getElementById（里面的参数也是字符串，只是这里面的id不需要写#，直接写名字就行了）
-   2. getElementsByTagName（这里获取的也是伪数组
+   2. getElementsByTagName（这里获取的也是伪数组）
+   
+   这些获取方式我们慢慢不再使用了做一个了解即可
+   
+   <img src="./assets/image-20240529174415711.png" alt="image-20240529174415711" style="zoom:67%;" />
 
 总结：
 
