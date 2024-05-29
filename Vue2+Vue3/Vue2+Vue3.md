@@ -3124,7 +3124,7 @@ new Vue({
 
 ![68216913168](./assets/1682169131688.png)
 
-
+---
 
 **组件是由三部分构成**
 
@@ -3150,7 +3150,7 @@ new Vue({
 
   （1） style标签，lang="less" 开启less功能 
 
-  （2） 装包: yarn add less less-loader -D 或者npm i less less-loader -D
+  （2） 装包: `yarn add less less-loader -D` 或者 `npm i less less-loader -D`
 
 
 
@@ -3199,9 +3199,13 @@ export default {
 </style>
 ~~~
 
+
+
+----
+
 # 43.普通组件的注册使用-局部注册
 
-组件注册的两种方式
+## 一、组件注册的两种方式
 
 1. 局部注册：只能在注册的组件内使用
 
@@ -3213,7 +3217,9 @@ export default {
 
 2.  全局注册：所有组件内都能使用
 
+----
 
+## 二、使用步骤
 
 **步骤**
 
@@ -3255,9 +3261,9 @@ export default {  // 局部注册
 }
 ```
 
+----
 
-
-**练习**
+## 三、练习
 
 需要备份一份src直接在空白的地方粘贴即可
 
@@ -3395,6 +3401,8 @@ export default {
 </style>
 ```
 
+----
+
 # 配置Tab
 
 在设置里搜索
@@ -3411,7 +3419,13 @@ trigger on tab
 
 ![image-20240131141345743](.\assets\image-20240131141345743.png)![image-20240131141355165](.\assets\image-20240131141355165.png)
 
+
+
+----
+
 # 44.普通组件的注册使用-全局注册
+
+## 一、使用步骤
 
 **步骤**
 
@@ -3443,9 +3457,11 @@ import HmButton from './components/HmButton'
 Vue.component('HmButton', HmButton)
 ```
 
-**练习**
+----
 
-在以下3个局部组件中是展示一个通用按钮
+## 二、练习
+
+在以下3个局部组件中展示一个通用按钮
 
 <img src="./assets/1682263187344.png" alt="68226318734" style="zoom:50%;" />
 
@@ -3490,7 +3506,13 @@ Vue.config.productionTip = false
 Vue.component('HmButton', HmButton)
 ~~~
 
+
+
+---
+
 # 45.小兔鲜首页 - 拆分模块组件 - 局部注册
+
+## 一、分析
 
 小兔仙组件拆分示意图
 
@@ -3498,7 +3520,7 @@ Vue.component('HmButton', HmButton)
 
 
 
-开发思路
+**开发思路**
 
 1. 分析页面，按模块拆分组件，搭架子  (局部或全局注册)
 
@@ -3508,7 +3530,9 @@ Vue.component('HmButton', HmButton)
 
    将来 → 通过 js 动态渲染，实现功能
 
-看操作：
+---
+
+## 二、局部注册
 
 首先复制七个
 
@@ -3538,12 +3562,14 @@ Vue.component('HmButton', HmButton)
 
 ![image-20240131152358351](.\assets\image-20240131152358351.png)
 
-
-
 ~~~html
 <!-- 在脚手架里如果使用v-for而不加key是会报错的！ -->
 <BaseGoodsItem v-for="item in 5" :key="item"></BaseGoodsItem>
 ~~~
+
+
+
+---
 
 # 48.scoped解决样式冲突
 
@@ -3554,7 +3580,7 @@ Vue.component('HmButton', HmButton)
 
 2. **局部样式**: 可以给组件加上**scoped** 属性,可以**让样式只作用于当前组件**
 
-代码示例
+## 一、代码示例
 
 BaseOne.vue
 
@@ -3579,9 +3605,8 @@ export default {
   组件都应该有独立的样式，推荐加scoped（原理）
   -----------------------------------------------------
   scoped原理：
-  1.给当前组件模板的所有元素，都会添加上一个自定义属性
-  data-v-hash值
-  data-v-5f6a9d56  用于区分开不通的组件
+  1.给当前组件模板的所有元素，都会添加上一个自定义属性：data-v-hash值
+  data-v-5f6a9d56  用于区分开不同的组件
   2.css选择器后面，被自动处理，添加上了属性选择器
   div[data-v-5f6a9d56]
 */
@@ -3638,32 +3663,38 @@ export default {
 </script>
 ```
 
+----
 
-
-### scoped原理
+## 二、scoped原理
 
 1. 当前组件内标签都被添加**data-v-hash值** 的属性 
 2. css选择器都被添加 [**data-v-hash值**] 的属性选择器
 
 最终效果: **必须是当前组件的元素**, 才会有这个自定义属性, 才会被这个样式作用到 
 
-![68230651737](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682306517375.png)
+![68230651737](./assets/1682306517375.png)
+
+
+
+----
 
 # 49.data必须是一个函数
+
+## 一、介绍
 
 一个组件的 **data** 选项必须**是一个函数**。目的是为了：保证每个组件实例，维护**独立**的一份**数据**对象。
 
 每次创建新的组件实例，都会新**执行一次data 函数**，得到一个新对象。
 
-![68230695207](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682306952078.png)
+![68230695207](./assets/1682306952078.png)
 
 data不写成函数是会报错的
 
 ![image-20240131163113894](.\assets\image-20240131163113894.png)
 
+----
 
-
-代码示例
+## 二、代码示例
 
 BaseCount.vue
 
@@ -3724,6 +3755,10 @@ export default {
 </style>
 ```
 
+
+
+----
+
 # 50.组件通信
 
 组件通信，就是指**组件与组件**之间的**数据传递**
@@ -3731,39 +3766,43 @@ export default {
 - 组件的数据是独立的，无法直接访问其他组件的数据。
 - 想使用其他组件的数据，就需要组件通信
 
+---
 
+## 一、组件之间如何通信
 
-**组件之间如何通信**
-
-![68230890309](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682308903094.png)
+<img src="./assets/1682308903094.png" alt="68230890309" style="zoom:67%;" />
 
 思考：
 
 1. 组件之间有哪些关系？
 2. 对应的组件通信方案有哪几类？
 
+---
 
+## 二、组件关系分类
 
-**组件关系分类**
-
-1. 父子关系 （A与B）
+1. 父子关系 （A与B、A与C）
 2. 非父子关系 （B与C）
 
-![68231807380](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682318073803.png)
+<img src="./assets/1682318073803.png" alt="68231807380" style="zoom:67%;" />
 
+---
 
+## 三、通信解决方案
 
-**通信解决方案**
+<img src="./assets/1682318111090.png" alt="68231811109" style="zoom:67%;" />
 
-![68231811109](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682318111090.png)
+---
 
-
-
-### 父子通信流程
+## 四、父子通信流程
 
 1. 父组件通过 **props** 将数据传递给子组件
 
-   ① 父中给子添加自定义属性传值 ② 子props 接收 ③ 子组件使用
+   ① 父中给子添加自定义属性传值 
+
+   ② 子props 接收 
+
+   ③ 子组件使用
 
    > props用大白话将就是组件标签身上新增的一个一个自定义属性
 
@@ -3771,15 +3810,15 @@ export default {
 
    ① 子$emit 发送消息 ②父中给子添加消息监听 ③ 父中实现处理函数
 
-![68231844456](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682318444566.png)
+<img src="./assets/1682318444566.png" alt="68231844456" style="zoom:67%;" />
 
+---
 
-
-**父向子通信代码示例**
+## 五、父向子通信代码示例
 
 父组件通过**props**将数据传递给子组件
 
-父组件App.vue
+**父组件App.vue**
 
 ```vue
 <template>
@@ -3810,9 +3849,9 @@ export default {
 </style>
 ```
 
+---
 
-
-子组件Son.vue
+**子组件Son.vue**
 
 ```vue
 <template>
@@ -3835,7 +3874,7 @@ export default {
 </style>
 ```
 
-![68231871178](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682318711785.png)
+![68231871178](./assets/1682318711785.png)
 
 父向子传值步骤
 
@@ -3843,13 +3882,13 @@ export default {
 2. 子组件内部通过props接收
 3. 模板中直接使用 props接收的值
 
+---
 
-
-**子向父通信代码示例**
+## 六、子向父通信代码示例
 
 子组件利用 **$emit** 通知父组件，进行修改更新
 
-![68231896563](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682318965635.png)
+![68231896563](./assets/1682318965635.png)
 
 子向父传值步骤
 
@@ -3857,9 +3896,7 @@ export default {
 2. 父组件监听$emit触发的事件
 3. 提供处理函数，在函数的形参中获取传过来的参数
 
-
-
-Son.vue
+**Son.vue**
 
 ~~~vue
 <template>
@@ -3887,7 +3924,7 @@ export default {
 </style>
 ~~~
 
-App.vue
+**App.vue**
 
 ~~~vue
 <template>
@@ -3923,7 +3960,13 @@ export default {
 </style>
 ~~~
 
+
+
+---
+
 # 51.什么是props
+
+## 一、介绍
 
 **Props 定义**
 
@@ -3938,13 +3981,13 @@ export default {
 1. 可以 传递 **任意数量** 的prop
 2. 可以 传递 **任意类型** 的prop
 
-![68232015691](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682320156914.png)
+![68232015691](./assets/1682320156914.png)
 
+---
 
+## 二、代码示例
 
-**代码示例**
-
-父组件App.vue
+**父组件App.vue**
 
 ```vue
 <template>
@@ -3984,7 +4027,7 @@ export default {
 </style>
 ```
 
-子组件UserInfo.vue
+**子组件UserInfo.vue**
 
 ```vue
 <template>
@@ -4016,9 +4059,9 @@ export default {
 </style>
 ```
 
+---
 
-
-## props校验
+## 三、props校验
 
 组件的props可以乱传吗
 
@@ -4037,7 +4080,7 @@ export default {
 
 > 把props改成对象的写法，然后在里面写上键和值就行了
 
-![68232068405](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682320684053.png)
+<img src="./assets/1682320684053.png" alt="68232068405" style="zoom:67%;" />
 
 
 
@@ -4121,9 +4164,9 @@ export default {
 
 ![image-20240131175959191](.\assets\image-20240131175959191.png)
 
+---
 
-
-## props校验完整写法
+## 四、props校验完整写法
 
 **语法**
 
@@ -4134,7 +4177,7 @@ props: {
     type: 类型,  // Number String Boolean ...，这个可以写成一个数组的形式 type: [类型1，类型2]
     required: true, // 是否必填
     default: 默认值, // 默认值
-    // 对于对象类的，需要是个函数，在函数中的返回值就是它的默认值
+    // default后面如果是简单类型的值，可以直接写默认。如果是复杂类型的值，则需要以函数的形式return一个默认值
     default: () => {
       return {}
     },
@@ -4221,17 +4264,15 @@ export default {
 </style>
 ```
 
-
-
 **注意**
 
-1.default和required一般不同时写（因为当时必填项时，肯定是有值的）
+1.default和required一般不同时写（因为当为必填项时，肯定是有值的）
 
 2.default后面如果是简单类型的值，可以直接写默认。如果是复杂类型的值，则需要以函数的形式return一个默认值
 
+----
 
-
-## props&data、单向数据流
+## 五、props&data、单向数据流
 
 **共同点**
 
@@ -4242,7 +4283,7 @@ export default {
 - data 的数据是**自己**的  →   随便改  
 - prop 的数据是**外部**的  →   不能直接改，要遵循 **单向数据流**
 
-
+---
 
 **单向数据流**
 
@@ -4252,7 +4293,7 @@ export default {
 
 ![image-20240131183455668](.\assets\image-20240131183455668.png)
 
-
+---
 
 **代码示例**
 
@@ -4317,11 +4358,11 @@ export default {
 </style>
 ```
 
-![68232373422](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682323734228.png)
+<img src="./assets/1682323734228.png" alt="68232373422" style="zoom:67%;" />
 
+---
 
-
-解决办法：在要修改的地方提供对应的函数
+**解决办法：在要修改的地方提供对应的函数**
 
 BaseCount.vue
 
@@ -4344,7 +4385,7 @@ export default {
   // },
   // 2.外部（prop）传过来的数据 不能随便修改
     
-  // 单项数据流：父组件的prop更新，会会向下流动，影响子组件。这个数据流动是单向的
+  // 单项数据流：父组件的prop更新，会向下流动，影响子组件。这个数据流动是单向的
   props: {
     count: {
       type: Number,
@@ -4402,9 +4443,13 @@ export default {
 </style>
 ~~~
 
+
+
+---
+
 # 52.小黑记事本
 
-**需求说明**
+## 一、需求说明
 
 - 拆分基础组件
 - 渲染待办任务
@@ -4413,13 +4458,15 @@ export default {
 - 底部合计 和 清空功能
 - 持久化存储
 
+---
 
+## 二、思路分析
 
 **拆分基础组件**
 
 咱们可以把小黑记事本原有的结构拆成三部分内容：头部（TodoHeader）、列表(TodoMain)、底部(TodoFooter)
 
-![68232559841](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682325598418.png)
+![68232559841](./assets/1682325598418.png)
 
 
 
@@ -4448,7 +4495,7 @@ export default {
 
 思路分析：
 
-1. 监听时间（监听删除的点击）携带id
+1. 监听事件（监听删除的点击）携带id
 2. 子传父，将删除的id传递给父组件App.vue
 3. 进行删除 **filter**  (自己的数据自己负责)
 
@@ -4461,6 +4508,10 @@ export default {
 1. 底部合计：父组件传递list到底部组件  —>展示合计
 2. 清空功能：监听事件 —> **子组件**通知父组件 —>父组件清空
 3. 持久化存储：watch监听数据变化，持久化到本地
+
+---
+
+## 三、代码实现
 
 App.vue
 
@@ -4494,7 +4545,7 @@ import TodoFooter from "./components/TodoFooter.vue";
 
 // 删除功能
 // 1.监听事件（监听删除的点击） 携带id
-// 2.子传父，讲删除的id传递给父组件的App.vue
+// 2.子传父，将删除的id传递给父组件的App.vue
 // 3.进行删除filter（自己的数据 自己负责）
 
 // 底部合计：父传子  传list 渲染
@@ -4652,11 +4703,15 @@ export default {
 </style>
 ~~~
 
+
+
+---
+
 # 55.非父子通信-event bus 事件总线
 
 作用：非父子组件之间，进行简易消息传递。(复杂场景→ Vuex)
 
-**步骤**
+## 一、实现步骤
 
 1. 创建一个都能访问的事件总线 （空Vue实例） → utils/EventBus.js
 
@@ -4685,11 +4740,11 @@ export default {
    Bus.$emit('sendMsg', '这是一个消息')
    ```
 
-   ![68232839240](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682328392400.png)
+   ![68232839240](./assets/1682328392400.png)
 
+---
 
-
-**代码示例**
+## 二、代码示例
 
 EventBus.js
 
@@ -4769,6 +4824,44 @@ export default {
 </style>
 ```
 
+BaseC.vue（接收方）
+
+~~~vue
+<template>
+  <div class="base-c">
+    我是C组件（接受方）
+    <p>{{msg}}</p>  
+  </div>
+</template>
+
+<script>
+import Bus from '../utils/EventBus'
+export default {
+  data() {
+    return {
+      msg: '',
+    }
+  },
+  created() {
+    Bus.$on('sendMsg', (msg) => {
+      // console.log(msg)
+      this.msg = msg
+    })
+  },
+}
+</script>
+
+<style scoped>
+.base-c {
+  width: 200px;
+  height: 200px;
+  border: 3px solid #000;
+  border-radius: 3px;
+  margin: 10px;
+}
+</style>
+~~~
+
 App.vue
 
 ```vue
@@ -4798,13 +4891,17 @@ export default {
 </style>
 ```
 
+
+
+----
+
 # 56.非父子通信-provide&inject
 
 作用：跨层级共享数据
 
 **场景**
 
-![68232950551](O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682329516878.png)
+![68232950551](./assets/1682329516878.png)
 
 **语法**
 
@@ -4973,26 +5070,32 @@ export default {
 </style>
 ~~~
 
+
+
+---
+
 # 57.v-model原理
 
-**原理**
+## 一、原理
 
 > v-model不仅可以用在表单上面，还可以用在组件上面完成组件通信
 
-v-model本质上是一个语法糖。例如应用在输入框上，就是value属性 和 input事件 的合写。
+v-model本质上是一个语法糖。例如应用在输入框上，就是`value属性` 和 `input事件` 的合写。
+
+语法糖：即一种语法的简写
 
 不同的表单元素， v-model在底层的处理机制是不一样的。比如给checkbox使用v-model底层处理的是 checked属性和change事件。
 
 **不过咱们只需要掌握应用在文本框上的原理即可**
 
+---
 
-
-**作用**
+## 二、作用
 
 提供数据的双向绑定
 
-- 数据变，视图跟着变 :value
-- 视图变，数据跟着变 @input
+- 数据变，视图跟着变 `:value`
+- 视图变，数据跟着变 `@input`
 
 > 语法糖：即一种语法的简写
 
@@ -5011,13 +5114,11 @@ v-model本质上是一个语法糖。例如应用在输入框上，就是value�
 
 ```
 
+----
 
-
-## 表单类组件封装
+## 二、表单类组件封装
 
 > 在工作中会使用到大量的表单内容，通常来说会把它封装成组件，比如说下拉组件，一旦涉及到组件，就会涉及到组件通信，而这些组件通信就可以使用v-model来简化
-
-
 
 **需求目标**
 
@@ -5027,11 +5128,11 @@ v-model本质上是一个语法糖。例如应用在输入框上，就是value�
 
 > 因为只有将数据绑定在父组件上，将来才能拿这个数据进行表单提交
 
-> 由于v-model是双向绑定，所以它是不能直接和父组件的值绑定，而子组件是不能直接修改父组件的数据的，所以此时需要进行v-model的拆解，拆解成:value和@change
+> 由于v-model是双向绑定，所以它是不能直接和父组件的值绑定，因为子组件是不能直接修改父组件的数据的，所以此时需要进行v-model的拆解，拆解成:value和@change
 
 ② 子传父：监听输入，子传父传值给父组件修改
 
-
+---
 
 **代码实例**
 
@@ -5042,7 +5143,7 @@ App.vue
   <div class="app">
     <BaseSelect
       :selectId="selectId"
-      // 父组件直接使用$event获取形参
+      <!-- 父组件直接使用$event获取形参 -->
       @changeCity="selectId = $event"
     ></BaseSelect>
   </div>
@@ -5098,9 +5199,9 @@ export default {
 </style>
 ```
 
+---
 
-
-## v-model简化代码
+## 四、v-model简化代码
 
 **目标**
 
@@ -5142,7 +5243,11 @@ methods: {
 
 
 
+---
+
 # 58.sync修饰符
+
+## 一、介绍
 
 作用：可以实现 **子组件** 与 **父组件数据** 的 **双向绑定**，简化代码
 
@@ -5158,9 +5263,9 @@ methods: {
 
 **本质** .sync修饰符 就是 **:属性名** 和 **@update:属性名** 合写
 
+---
 
-
-**语法**
+## 二、语法
 
 父组件
 
@@ -5185,9 +5290,9 @@ props: {
 this.$emit('update:visible', false)
 ```
 
+---
 
-
-**代码示例**
+## 三、代码示例
 
 App.vue
 
@@ -5300,7 +5405,13 @@ export default {
 </style>
 ```
 
+
+
+----
+
 # 59.获取 dom 元素 或 组件实例
+
+## 一、介绍
 
 作用：利用ref 和 $refs 可以用于 获取 dom 元素 或 组件实例
 
@@ -5308,9 +5419,9 @@ export default {
 
 注意：之前只用document.querySelect('.box') 获取的是整个页面中的盒子，而ref 和 $refs 查找的范围是当前组件内
 
+---
 
-
-**获取 dom **
+## 二、获取 dom 
 
 1.给要获取的盒子添加ref属性
 
@@ -5327,9 +5438,9 @@ mounted () {
 }
 ```
 
+----
 
-
-**获取 组件**
+## 三、获取组件
 
 1.给要获取的盒子添加ref属性
 
@@ -5343,11 +5454,9 @@ mounted () {
 this.$refs.baseForm.组件方法()
 ```
 
+---
 
-
-
-
-**代码示例**（获取组件元素）
+## 四、代码示例（获取组件元素）
 
 App.vue
 
@@ -5419,9 +5528,9 @@ export default {
 </style>
 ```
 
+----
 
-
-**代码实例**（获取表单元素）
+## 五、代码实例（获取表单元素）
 
 App.vue
 
@@ -5451,7 +5560,13 @@ export default {
 </style>
 ~~~
 
+
+
+---
+
 # 60.异步更新 & $nextTick
+
+## 一、引出问题
 
 **需求**
 
@@ -5460,7 +5575,11 @@ export default {
 1. 点击编辑，显示编辑框
 2. 让编辑框，立刻获取焦点
 
+即下图上面结构隐藏，下面结构显示，并且显示的时候让它自动聚焦。
 
+代码如下
+
+<img src="./assets/image-20240529214324490.png" alt="image-20240529214324490" style="zoom:67%;" />
 
 **问题**
 
@@ -5468,13 +5587,13 @@ export default {
 
 原因：Vue 是异步更新DOM  (提升性能)
 
-> 由于每更新一次就去执行更新，效率是非常低的，应该一起更新
+我们设想的是 `this.isShowEdit = true` 执行完后再去执行 `focus()`，但其实 `this.isShowEdit = true` 执行完的时候，当前DOM并不会立即更新，而是上面所有代码执行完，DOM才会更新，这是由于每更新一次就去执行更新，效率是非常低的，应该一起更新
 
-<img src="O:/BaiduSyncdisk/other/课/黑马/Vue2+Vue3/02-MD笔记/day04/assets/1682394495346.png" alt="68239449534" style="zoom:50%;" />
+<img src="./assets/1682394495346.png" alt="68239449534" style="zoom:50%;" />
 
+----
 
-
-**解决方案**
+## 二、解决方案
 
 $nextTick：**等 DOM更新后**,才会触发执行此方法里的函数体
 
@@ -5490,9 +5609,9 @@ this.$nextTick(() => {
 
 **注意：**$nextTick 内的函数体 一定是**箭头函数**，这样才能让函数内部的this指向Vue实例
 
+---
 
-
-**代码实现**
+## 三、代码实现
 
 ```vue
 <template>
@@ -5532,11 +5651,15 @@ export default {
 </script> 
 ```
 
+----
+
+# -------------------------------------
+
 # day05
 
 # 62.自定义指令
 
-**指令介绍**
+## 一、介绍
 
 - 内置指令：**v-html、v-if、v-bind、v-on**... 这都是Vue给咱们内置的一些指令，可以直接使用
 
@@ -5544,9 +5667,9 @@ export default {
 
   每个指令都有自己各自独立的功能
 
+---
 
-
-**自定义指令**
+## 二、自定义指令
 
 概念：自己定义的指令，可以**封装一些DOM操作**，扩展额外的功能
 
@@ -5573,11 +5696,11 @@ export default {
 >
 > 此时就可以把这一段跟 dom 相关的内容封装到指令中
 
+---
 
+## 三、自定义指令语法
 
-**自定义指令语法**
-
-inserted:被绑定元素插入父节点时调用的钩子函数
+inserted：被绑定元素插入父节点时调用的钩子函数
 
 el：使用指令的那个DOM元素
 
@@ -5620,9 +5743,9 @@ el：使用指令的那个DOM元素
 
   **注册**指令时**不用**加**v-前缀**，但**使用时**一定要**加v-前缀**
 
+---
 
-
-**代码示例**
+## 四、代码示例
 
 需求：当页面加载时，让元素获取焦点
 
@@ -5679,13 +5802,11 @@ export default {
 </style>
 ~~~
 
+---
 
-
-## 自定义指令-指令的值
+## 五、自定义指令-指令的值
 
 **需求** 实现一个 color 指令 - 传入不同的颜色, 给标签设置文字颜色
-
-
 
 **语法**
 
@@ -5700,7 +5821,7 @@ export default {
 ```js
 directives: {
   color: {
-    // inserted 提供的是元素被添加到页面中时的逻辑
+    // inserted 就是指令的生命周期钩子，它表示的是当前指令所绑定的元素被添加到页面里去的时候会自动调用
     inserted (el, binding) {
       el.style.color = binding.value
     },
@@ -5712,9 +5833,9 @@ directives: {
 }
 ```
 
+---
 
-
-**代码示例**
+## 六、指令的值代码示例
 
 > Vue是响应式的，数据变化的时候，视图也是需要更新的。
 >
@@ -5725,13 +5846,8 @@ App.vue
 ```vue
 <template>
   <div>
-     <!--显示红色--> 
-    <h2 v-color="color1">指令的值1测试</h2>
-     <!--显示蓝色--> 
-    <h2 v-color="color2">指令的值2测试</h2>
-     <button>
-        改变第一个h1的颜色
-    </button>
+    <h1 v-color="color1">指令的值1测试</h1>
+    <h1 v-color="color2">指令的值2测试</h1>
   </div>
 </template>
 
@@ -5740,7 +5856,22 @@ export default {
   data () {
     return {
       color1: 'red',
-      color2: 'blue'
+      color2: 'orange'
+    }
+  },
+  directives: {
+    color: {
+      // 1. inserted 提供的是元素被添加到页面中时的逻辑
+      inserted (el, binding) {
+        // console.log(el, binding.value);
+        // binding.value 就是指令的值
+        el.style.color = binding.value
+      },
+      // 2. update 指令的值修改的时候触发，提供值变化后，dom更新的逻辑
+      update (el, binding) {
+        console.log('指令的值修改了');
+        el.style.color = binding.value
+      }
     }
   }
 }
@@ -5750,6 +5881,10 @@ export default {
 
 </style>
 ```
+
+
+
+---
 
 # 63.自定义指令-v-loading指令的封装
 
