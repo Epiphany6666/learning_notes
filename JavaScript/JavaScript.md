@@ -673,7 +673,7 @@ NaN 是粘性的。任何对 NaN 的操作都会返回NaN
 ![image-20231228191807756](.\assets\image-20231228191807756.png)
 
 ```js
-alert(NaN == NaN) //返回false，它自己也不等于自己，一些未知的结果都统称NaN
+alert(NaN === NaN) //返回false，它自己也不等于自己，一些未知的结果都统称NaN
 ```
 
 
@@ -4616,7 +4616,7 @@ Web APIs - 第3天
 
 事件流指的是事件完整执行过程中的流动路径，了解事件的执行过程有助于加深对事件的理解，提升开发实践中对事件运用的灵活度。
 
-![event](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第三天/02-笔记/assets/event.png)
+![event](./assets/event.png)
 
 如上图所示，任意事件被触发时总会经历两个阶段：【捕获阶段】和【冒泡阶段】。
 
@@ -4997,7 +4997,7 @@ ul.addEventListener('click' , function(){}) 执行父级点击事件
 
 我们的最终目的是保证只有点击 button 子元素才去执行事件的回调函数，如何判断用户点击是哪一个子元素呢？
 
-![event](O:/BaiduSyncdisk/other/课/黑马/JavaScript/2.web APIs/资料/web APIs第三天/02-笔记/assets/event.png)
+![event](./assets/event.png)
 
 事件对象中的属性 `target` 或 `srcElement`属性表示真正触发事件的元素，它是一个元素类型的节点。
 
