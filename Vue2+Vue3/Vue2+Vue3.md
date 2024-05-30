@@ -10369,6 +10369,10 @@ computed: {
 
 ![68344213391](./assets/1683442133911.png)
 
+
+
+----
+
 # 98.核心概念 - module
 
 **目标**
@@ -10385,7 +10389,7 @@ computed: {
 
 ![68342575835](./assets/1683425758358.png)
 
-
+---
 
 **模块定义** - 准备 state
 
@@ -10463,6 +10467,10 @@ const store = new Vuex.Store({
 
 也可以通过 mapState 映射
 
+
+
+----
+
 # 99.获取模块内的state数据
 
 **目标：**
@@ -10473,7 +10481,7 @@ const store = new Vuex.Store({
 
 ![68342784166](./assets/1683427841660.png)
 
-
+---
 
 **使用模块中的数据**
 
@@ -10523,7 +10531,7 @@ export default {
 }
 ```
 
-
+---
 
 **代码示例**
 
@@ -10550,7 +10558,7 @@ mapState辅助函数访问
 <div>{{ setting.theme }}</div>
 ~~~
 
-
+----
 
 # 获取模块内的getters数据
 
@@ -10577,7 +10585,7 @@ mapState辅助函数访问
    1. 默认根级别的映射  `mapGetters([ 'xxx' ]) `
    2. 子模块的映射  `mapGetters('模块名', ['xxx'])` -  需要开启命名空间
 
-
+---
 
 **代码示例**
 
@@ -10606,6 +10614,10 @@ computed:{
   ...mapGetters('user', ['UpperCaseName'])
 }
 ```
+
+
+
+---
 
 # 获取模块内的mutations方法
 
@@ -10670,7 +10682,7 @@ export default {
 </script>
 ```
 
-
+----
 
 Son2.vue
 
@@ -10686,6 +10698,10 @@ methods:{
 }
 </script>
 ```
+
+
+
+----
 
 # 获取模块内的actions方法
 
@@ -10756,7 +10772,11 @@ methods:{
 </script>
 ```
 
-# **Vuex模块化的使用小结**
+
+
+----
+
+# Vuex模块化的使用小结
 
 **1.直接使用**
 
@@ -10782,6 +10802,10 @@ computed、methods: {
 }
 
 2.组件中直接使用 属性 `{{ age }}` 或 方法 `@click="updateAge(2)"`
+
+
+
+----
 
 # 100.购物车案例-构建项目
 
@@ -10810,6 +10834,10 @@ vue create vue-cart-demo
 1. 发请求动态渲染购物车，数据存vuex （存cart模块， 将来还会有user模块，article模块...）
 2. 数字框可以修改数据
 3. 动态计算总价和总数量
+
+
+
+----
 
 # 101.构建vuex-cart模块
 
@@ -10874,6 +10902,10 @@ yarn global add json-server 或 npm i json-server  -g
 ```
 json-server  --watch  index.json
 ```
+
+
+
+---
 
 # 102.请求动态渲染数据
 
