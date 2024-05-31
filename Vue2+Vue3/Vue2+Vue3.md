@@ -8354,7 +8354,7 @@ this.$router.push({
 
 ---
 
-## 六、编程式导航，如何跳转传参总结
+## 六、总结
 
 路径长，使用name，路径多，使用动态路由传参
 
@@ -9048,7 +9048,7 @@ Vue CLI v5.0.8
 
 + 选择eslint的风格 （eslint 代码规范的检验工具，检验代码是否符合规范）
 
-+ 比如：const age = 18;   =>  报错！多加了分号！后面有工具，一保存，全部格式化成最规范的样子
+  比如：const age = 18;   =>  报错！多加了分号！后面有工具，一保存，全部格式化成最规范的样子
 
   第三个为无分号规范（标准化），目前最流行的一个规范
 
@@ -10867,6 +10867,8 @@ export default new Vuex.Store({
 
 ## 准备后端接口服务环境(了解)
 
+其实在以后我们的开发过程中，当后端接口还没有准备就绪的时候，我们是可以利用一些工具快速的帮我们生成一套增删改查的接口的，这个工具就是json-server
+
 1. 安装全局工具 json-server （全局工具仅需要安装一次）
 
    官网：[json-server](https://www.npmjs.com/package/json-server)
@@ -10875,7 +10877,7 @@ export default new Vuex.Store({
 yarn global add json-server 或 npm i json-server  -g
 ```
 
-2. 代码**根目录**新建一个 db 目录
+2. 代码**根目录(src)**新建一个 db 目录
 
    > 叫什么目录名字不重要，重要的是index.json文件
 
@@ -10885,15 +10887,15 @@ yarn global add json-server 或 npm i json-server  -g
    >
    > ~~~json
    > {
-   >   "cart": [
-   >     {
-   >       "id": 100001,
-   >       "name": "低帮城市休闲户外鞋天然牛皮COOLMAX纤维",
-   >       "price": 128,
-   >       "count": 1,
-   >       "thumb": "https://yanxuan-item.nosdn.127.net/3a56a913e687dc2279473e325ea770a9.jpg"
-   >     }
-   >   ]
+   >       "cart": [
+   >            {
+   >                "id": 100001,
+   >                "name": "低帮城市休闲户外鞋天然牛皮COOLMAX纤维",
+   >                "price": 128,
+   >                "count": 1,
+   >                "thumb": "https://yanxuan-item.nosdn.127.net/3a56a913e687dc2279473e325ea770a9.jpg"
+   >            }
+   >       ]
    > }
    > ~~~
 
@@ -10932,6 +10934,10 @@ yarn add axios
 4. 动态渲染
 
 `cart-item.vue`
+
+
+
+---
 
 # 103.修改数量
 
@@ -11262,6 +11268,8 @@ export default {
 
 
 
+---
+
 # 智慧商城
 
 步骤一般都是：
@@ -11287,6 +11295,10 @@ export default {
 **2.项目收获**
 
 ![image-20230616163440573](./assets/image-20230616163440573.png)
+
+
+
+---
 
 # 106.项目创建目录初始化
 
@@ -11334,7 +11346,10 @@ Vue CLI v5.0.8
 ![image-20220629175133593](./assets/1682941900018.png)
 
 + 选择eslint的风格 （eslint 代码规范的检验工具，检验代码是否符合规范）
-+ 比如：const age = 18;   =>  报错！多加了分号！后面有工具，一保存，全部格式化成最规范的样子
+
+  比如：const age = 18;   =>  报错！多加了分号！后面有工具，一保存，全部格式化成最规范的样子
+
+  第三个为无分号规范（标准化），目前最流行的一个规范
 
 ![68294191856](./assets/1682941918562.png)
 
@@ -11360,7 +11375,7 @@ Vue CLI v5.0.8
 npm run serve
 ```
 
-
+----
 
 ## 调整初始化目录结构
 
@@ -11427,6 +11442,10 @@ export default router
 
 ![image-20230616184644176](./assets/image-20230616184644176.png)
 
+
+
+----
+
 # 107.vant组件库及Vue周边的其他组件库
 
 > 组件库：第三方封装好了很多很多的组件，整合到一起就是一个组件库。
@@ -11467,7 +11486,7 @@ pc:  [element-ui](https://element.eleme.cn/#/zh-CN)（vue2）    [element-plus](
 
 
 
-## 全部导入
+## 一、全部导入
 
 + 安装vant-ui
 
@@ -11506,15 +11525,15 @@ Vue.use(Vant)
 
 vant-ui提供了很多的组件，全部导入，会导致项目打包变得很大。
 
+---
 
-
-## 按需导入
+## 二、按需导入
 
 推荐自动按需引入，不推荐手动按需引入，因为手动按需引入还需要手动导入css样式
 
-![image-20240205223506807](.\assets\image-20240205223506807.png)
+<img src=".\assets\image-20240205223506807.png" alt="image-20240205223506807" style="zoom:67%;" />
 
-![image-20240205223523058](.\assets\image-20240205223523058.png)
+<img src=".\assets\image-20240205223523058.png" alt="image-20240205223523058" style="zoom:67%;" />
 
 而且插件也说了，插件会自动将代码转化为方式二中的按需引入形式
 
@@ -11592,6 +11611,10 @@ main.js中进行导入
 import '@/utils/vant-ui'
 ```
 
+
+
+---
+
 # 108.项目中的vw适配
 
 这种关于浏览器的适配属于进阶用法
@@ -11632,6 +11655,10 @@ viewportWidth:设计稿的视口宽度
 
 ![image-20240206115726233](.\assets\image-20240206115726233.png)
 
+
+
+---
+
 # 109.路由配置 - 一级路由
 
 **但凡是单个页面，独立展示的，都是一级路由**
@@ -11654,7 +11681,7 @@ viewportWidth:设计稿的视口宽度
 >
 > 然后每个文件夹中新建一个核心文件：index.vue
 >
-> <img src=".\assets\image-20240206121518727.png" alt="image-20240206121518727" style="zoom:50%;" />
+> <img src="./assets/image-20240531110840168.png" alt="image-20240531110840168" style="zoom:67%;" />
 
 `router/index.js` 配置一级路由，新建对应的页面文件
 
@@ -11711,7 +11738,9 @@ export default router
 
 
 
-# 路由配置-tabbar标签页
+----
+
+# 由配置-tabbar标签页
 
 目标：阅读vant组件库文档，实现底部导航 tabbar
 
@@ -11764,6 +11793,10 @@ Vue.use(TabbarItem)
   </div>
 </template>
 ```
+
+
+
+---
 
 # 路由配置 - 二级路由
 
@@ -11867,6 +11900,8 @@ export default router
 
 
 
+---
+
 # 110.登录页静态布局
 
 **(1) 准备工作**
@@ -11914,7 +11949,7 @@ import '@/styles/common.less'
 >
 > ![image-20240206134900707](.\assets\image-20240206134900707.png)
 
-`vant-ui.js` 注册
+`utils/vant-ui.js` 注册
 
 ```jsx
 import { NavBar } from 'vant'
@@ -12039,6 +12074,10 @@ export default {
 }
 ```
 
+
+
+----
+
 # request模块 - axios封装
 
 接口文档：https://apifox.com/apidoc/shared-12ab6b18-adc2-444c-ad11-0e60f5693f66/doc-2221080
@@ -12053,7 +12092,7 @@ export default {
 
 一般项目开发中, 都会对 axios 进行基本的**二次封装**, 单独封装到一个模块中, 便于使用
 
-
+---
 
 **目标：将 axios 请求方法，封装到 request 模块**
 
@@ -12118,6 +12157,10 @@ export default {
 
 ![image-20230617161654856](./assets/image-20230617161654856.png)                                 
 
+
+
+---
+
 # 图形验证码功能
 
 说明：
@@ -12165,6 +12208,10 @@ methods: {
 <!-- v-if="picUrl"：有图片的时候才渲染，或者可以给个默认的图片加载失败的图片 -->
 <img v-if="picUrl" :src="picUrl" @click="getPicCode">
 ```
+
+
+
+----
 
 # 111.封装api接口 - 图片验证码接口
 
@@ -18058,13 +18105,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->                                  
+>                                        
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->                                  
+>                                        
 >    <style scoped>
 >    </style>
 >    ~~~
