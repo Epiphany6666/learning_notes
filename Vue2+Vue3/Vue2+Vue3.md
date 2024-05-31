@@ -3716,6 +3716,7 @@ export default {
   //     count: 100,
   //   }
   // },
+  // 一个组件的 data 选项必须是一个函数。目的是为了：保证每个组件实例，维护独立的一份数据对象。
   data: function () {
     return {
       count: 100,
@@ -12227,7 +12228,8 @@ methods: {
 
 - **相同的请求没有复用请求没有统一管理**
 
-  
+
+----
 
 **3.期望：**
 
@@ -12237,7 +12239,7 @@ methods: {
 - 相同的请求可以直接复用请求
 - 进行了统一管理
 
-
+----
 
 **4.具体实现**
 
@@ -12267,6 +12269,10 @@ async getPicCode () {
 },
 ```
 
+
+
+----
+
 # 112.toast 轻提示
 
 https://vant-contrib.gitee.io/vant/v2/#/zh-CN/toast
@@ -12293,7 +12299,7 @@ Toast('提示内容');
 
 2. 通过this直接调用 ( **组件内 **)（更方便）
 
-main.js 注册绑定到原型
+`main.js` 注册绑定到原型
 
 本质：将方法，注册挂载到了Vue原型上 Vue.prototype.$toast = xxx
 
@@ -12305,11 +12311,15 @@ main.js 注册绑定到原型
 this.$toast('提示内容')
 ```
 
+
+
+----
+
 # 113.短信验证倒计时功能
 
 ![image-20230617165906943](./assets/image-20230617165906943.png)
 
-**(1) 倒计时基础效果**
+## 一、倒计时基础效果
 
 1. 准备 data 数据
 
@@ -12364,9 +12374,9 @@ destroyed () {
 }
 ```
 
+----
 
-
-**(2) 验证码请求校验处理**
+## 二、验证码请求校验处理
 
 1. 输入框 v-model 绑定变量
 
@@ -12411,9 +12421,9 @@ async getCode () {
 }
 ```
 
+---
 
-
-**(3) 封装接口，请求获取验证码**
+## 三、封装接口，请求获取验证码
 
 1. 封装接口 `api/login.js`
 
@@ -12449,6 +12459,10 @@ async getCode () {
   }
 }
 ```
+
+
+
+----
 
 # 114.封装api接口 - 登录功能
 
@@ -12500,6 +12514,10 @@ methods: {
 </script>
 ```
 
+
+
+----
+
 # 115. 响应拦截器统一处理错误提示
 
 响应拦截器是咱们拿到数据的 **第一个** “数据流转站”，可以在里面统一处理错误，只要不是 200 默认给提示，抛出错误
@@ -12527,6 +12545,10 @@ request.interceptors.response.use(function (response) {
   return Promise.reject(error)
 })
 ```
+
+
+
+----
 
 # 116.将登录权证信息存入 vuex
 
@@ -12572,7 +12594,7 @@ export default new Vuex.Store({
 
 3. 提供 mutations
 
-```jsx
+```js
 mutations: {
   setUserInfo (state, obj) {
     state.userInfo = obj
@@ -12595,6 +12617,10 @@ async login () {
   this.$toast('登录成功')
 }
 ```
+
+
+
+----
 
 # 117.vuex持久化处理
 
@@ -12645,6 +12671,10 @@ export default {
 }
 ```
 
+
+
+----
+
 # 118. 优化：添加请求 loading 效果
 
 目标：统一在每次请求后台时，添加 loading 效果
@@ -12660,32 +12690,36 @@ export default {
 
 1. 请求拦截器中，每次请求，打开 loading
 
-   ![image-20240211085520751](.\assets\image-20240211085520751.png)
+   ~~~js
+   // 自定义配置 - 请求/响应 拦截器
+   // 添加请求拦截器
+   instance.interceptors.request.use(function (config) {
+     // 在发送请求之前做些什么
+     // 开启loading，禁止背景点击 (节流处理，防止多次无效触发)
+     Toast.loading({
+       message: '加载中...',
+       forbidClick: true, // 禁止背景点击
+       loadingType: 'spinner', // 配置loading图标
+       duration: 0 // 不会自动消失
+     })
+   
+     // 只要有token，就在请求时携带，便于请求需要授权的接口
+     const token = store.getters.token
+     if (token) {
+       config.headers['Access-Token'] = token
+       config.headers.platform = 'H5'
+     }
+   
+     return config
+   }, function (error) {
+     // 对请求错误做些什么
+     return Promise.reject(error)
+   })
+   ~~~
 
 2. 响应拦截器中，每次响应，关闭 loading
 
 1. 请求时，打开 loading
-
-```jsx
-// 自定义配置 - 请求/响应 拦截器
-// 添加请求拦截器
-instance.interceptors.request.use(function (config) {
-  // 在发送请求之前做些什么
-  // 开启loading，禁止背景点击 (节流处理，防止多次无效触发)
-  Toast.loading({
-    message: '加载中...',
-    forbidClick: true, // 禁止背景点击
-    loadingType: 'spinner', // 配置loading图标
-    duration: 0 // 不会自动消失
-  })
-  returnz config
-}, function (error) {
-  // 对请求错误做些什么
-  return Promise.reject(error)
-})
-```
-
-2. 响应时，关闭 loading
 
 ```jsx
 // 添加响应拦截器
@@ -12714,6 +12748,10 @@ instance.interceptors.response.use(function (response) {
 如果需要多个Toast，则需要配置，但一般不用
 
 ![image-20240211085720864](.\assets\image-20240211085720864.png)
+
+
+
+---
 
 # 119.登录访问拦截 - 路由前置守卫
 
@@ -12805,6 +12843,10 @@ router.beforeEach((to, from, next) => {
   }
 })
 ```
+
+
+
+----
 
 # 120.首页 - 静态结构准备
 
@@ -13010,6 +13052,8 @@ export default {
 
 3. 组件按需引入
 
+utils/vant-ui.js
+
 ```jsx
 import { Search, Swipe, SwipeItem, Grid, GridItem } from 'vant'
 
@@ -13022,11 +13066,13 @@ Vue.use(Grid)
 
 
 
+----
+
 # 首页 - 动态渲染
 
 grid自定义图标
 
-![image-20240211141047227](.\assets\image-20240211141047227.png)
+<img src=".\assets\image-20240211141047227.png" alt="image-20240211141047227" style="zoom:47%;" />
 
 grid自定义内容
 
@@ -13145,6 +13191,10 @@ export default {
 </script>
 ```
 
+
+
+----
+
 # 121. 搜索 - 静态布局准备
 
 需求：
@@ -13259,6 +13309,10 @@ import { Icon } from 'vant'
 Vue.use(Icon)
 ```
 
+
+
+----
+
 # 搜索 - 历史记录 - 基本管理
 
 1. data 中提供数据，和搜索框双向绑定 (实时获取用户内容)
@@ -13337,9 +13391,15 @@ clear () {
 }
 ```
 
+
+
+----
+
 # 搜索 - 历史记录 - 持久化
 
 1. 持久化到本地 - 封装方法
+
+`utils\storage.js`
 
 ```jsx
 const HISTORY_KEY = 'hm_history_list'
@@ -13378,6 +13438,10 @@ methods: {
   }
 }
 ```
+
+
+
+----
 
 # 122. 搜索列表 - 静态布局
 
@@ -13457,11 +13521,13 @@ export default {
 </style>
 ```
 
+----
+
 # 搜索列表 - 动态渲染
 
 接口文档的意思就是，该接口即可以根据分类id进行搜索，也可以根据商品名字进行搜索
 
-![image-20240211165011697](.\assets\image-20240211165011697.png)
+<img src=".\assets\image-20240211165011697.png" alt="image-20240211165011697" style="zoom:47%;" />
 
 ## (1) 搜索关键字搜索
 
@@ -13530,7 +13596,7 @@ async created () {
 </div>
 ```
 
-
+----
 
 ## (2) 分类id搜索
 
@@ -13688,6 +13754,10 @@ async created () {
   this.proList = list.data
 }
 ```
+
+
+
+---
 
 # 123. 商品详情 - 静态布局
 
@@ -13958,6 +14028,10 @@ import { Lazyload } from 'vant'
 Vue.use(Lazyload)
 ```
 
+
+
+----
+
 # 商品详情 - 动态渲染介绍
 
 1. 动态路由参数，获取商品 id
@@ -14057,6 +14131,10 @@ methods: {
 <div class="desc" v-html="detail.content"></div>
 ```
 
+
+
+----
+
 # 商品详情 - 动态渲染评价
 
 1. 封装接口 `api/product.js`
@@ -14112,7 +14190,7 @@ async getComments () {
       <div class="top">
         <img :src="item.user.avatar_url || defaultImg" alt="">
         <div class="name">{{ item.user.nick_name }}</div>
-        <!-- 这里分数是10分置，需要除以2 -->
+        <!-- 这里分数是10分制，需要除以2 -->
         <van-rate :size="16" :value="item.score / 2" color="#ffd21e" void-icon="star" void-color="#eee"/>
       </div>
       <div class="content">
@@ -14125,6 +14203,10 @@ async getComments () {
   </div>
 </div>
 ```
+
+
+
+---
 
 # 124. 加入购物车 - 唤起弹窗
 
@@ -14304,6 +14386,10 @@ buyFn () {
 </van-action-sheet>
 ```
 
+
+
+----
+
 # 125. 加入购物车 - 封装数字框组件
 
 ![image-20230621195126291](./assets/image-20230621195126291.png)
@@ -14406,6 +14492,10 @@ export default {
 </div>
 ```
 
+
+
+----
+
 # 126. 加入购物车 - 判断 token 登录提示
 
 说明：加入购物车，是一个登录后的用户才能进行的操作，所以需要进行鉴权判断，判断用户 token 是否存在
@@ -14470,6 +14560,10 @@ async addCart () {
 const url = this.$route.query.backUrl || '/'
 this.$router.replace(url)
 ```
+
+
+
+----
 
 #  加入购物车 - 封装接口进行请求
 
@@ -14581,6 +14675,10 @@ instance.interceptors.request.use(function (config) {
     <span>购物车</span>
 </div>
 ~~~
+
+
+
+---
 
 # 127. 购物车 - 静态布局
 
@@ -14810,8 +14908,6 @@ Vue.use(Checkbox)
 
 ![image-20230624161704931](./assets/image-20230624161704931.png)
 
-
-
 1. 新建 `modules/cart.js` 模块
 
 ```jsx
@@ -14898,6 +14994,10 @@ created () {
 },
 ```
 
+
+
+----
+
 # 129. 购物车 - mapState - 渲染购物车列表
 
 1. 将数据映射到页面
@@ -14931,6 +15031,10 @@ computed: {
   </div>
 </div>
 ```
+
+
+
+-----
 
 # 130. 购物车 - 封装 getters - 动态计算展示
 
@@ -15001,6 +15105,10 @@ computed: {
 </div>
 ```
 
+
+
+----
+
 # 131. 购物车 - 全选反选功能
 
 1. 点击小选，修改状态
@@ -15011,21 +15119,29 @@ computed: {
 >
 > toggleCheck：切换，并且告诉它切换的是哪个商品
 
+src\views\layout\cart.vue
+
 ```jsx
 <van-checkbox @click="toggleCheck(item.goods_id)" ...></van-checkbox>
-    
-toggleCheck (goodsId) {
-  this.$store.commit('cart/toggleCheck', goodsId)
-},
-    
-mutations: {
-  toggleCheck (state, goodsId) {
-    // 让对应的 id 的项 状态取反
-    const goods = state.cartList.find(item => item.goods_id === goodsId)
-    goods.isChecked = !goods.isChecked
-  },
+
+methods: {
+    toggleCheck (goodsId) {
+        this.$store.commit('cart/toggleCheck', goodsId)
+    },
 }
 ```
+
+src\store\modules\cart.js
+
+~~~js
+mutations: {
+    toggleCheck (state, goodsId) {
+        // 让对应的 id 的项 状态取反
+        const goods = state.cartList.find(item => item.goods_id === goodsId)
+        goods.isChecked = !goods.isChecked
+    },
+}
+~~~
 
 2. 全选 getters
 
@@ -15066,6 +15182,10 @@ mutations: {
   },
 }
 ```
+
+
+
+----
 
 # 132. 购物车 - 数字框修改数量
 
@@ -15125,6 +15245,10 @@ actions: {
 },
 ```
 
+
+
+----
+
 # 133. 购物车 - 编辑切换状态
 
 1. data 提供数据, 定义是否在编辑删除的状态
@@ -15168,6 +15292,10 @@ watch: {
   }
 }
 ```
+
+
+
+----
 
 #  购物车 - 删除功能完成
 
@@ -15215,6 +15343,10 @@ actions: {
     }
 },
 ```
+
+
+
+----
 
 # 购物车 - 空购物车处理
 
@@ -15273,6 +15405,10 @@ actions: {
   }
 }
 ```
+
+
+
+----
 
 # 134. 订单结算台
 
@@ -15606,6 +15742,10 @@ computed: {
 </div>
 ```
 
+
+
+---
+
 # 135.(3) 订单结算 - 封装通用接口
 
 **思路分析：**这里的订单结算，有两种情况：
@@ -15650,6 +15790,8 @@ export const checkOrder = (mode, obj) => {
 ```
 
 
+
+----
 
 ### (4) 订单结算 - 购物车结算
 
