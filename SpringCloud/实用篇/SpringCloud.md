@@ -3875,7 +3875,7 @@ yum-config-manager \
     
 sed -i 's/download.docker.com/mirrors.aliyun.com\/docker-ce/g' /etc/yum.repos.d/docker-ce.repo
 
-yum makecache fast
+yum makecache
 ```
 
 
