@@ -5658,6 +5658,8 @@ export default {
 </script> 
 ```
 
+
+
 ----
 
 # -------------------------------------
@@ -6921,6 +6923,8 @@ export default {
 优点：按需更新性能高，开发效率高，用户体验好
 
 缺点：学习成本，首屏加载慢，不利于SEO
+
+
 
 ---
 
@@ -18357,13 +18361,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->                                                 
+>                                                    
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->                                                 
+>                                                    
 >    <style scoped>
 >    </style>
 >    ~~~
