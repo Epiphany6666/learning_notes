@@ -8079,6 +8079,10 @@ const router = new VueRouter({
 })
 ```
 
+
+
+----
+
 # 81.编程式导航-两种路由跳转方式
 
 **问题**
@@ -8450,6 +8454,10 @@ this.$router.push({
 
 ![68256025535](./assets/1682560255356.png)
 
+
+
+---
+
 # 83.面经基础版-一级路由配置
 
 1.把文档中准备的素材拷贝到项目中
@@ -8607,9 +8615,11 @@ Layout.vue
 </template>
 ```
 
+
+
 ----
 
-## 面经基础版-二级导航高亮
+# 面经基础版-二级导航高亮
 
 **实现思路**
 
@@ -18361,13 +18371,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->                                                    
+>                                                       
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->                                                    
+>                                                       
 >    <style scoped>
 >    </style>
 >    ~~~
