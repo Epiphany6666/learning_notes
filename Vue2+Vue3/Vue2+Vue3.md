@@ -9236,7 +9236,9 @@ ESLint插件并不是说可以将所有的错误帮我们解决，有一些是�
 
 ----
 
-# 91.[Vuex](https://vuex.vuejs.org/zh/) 概述 
+# 91.Vuex概述 
+
+官网：https://vuex.vuejs.org/zh/
 
 Vuex 是一个 Vue 的 状态管理工具，状态就是数据。
 
@@ -18371,13 +18373,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->                                                       
+>                                                          
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->                                                       
+>                                                          
 >    <style scoped>
 >    </style>
 >    ~~~
