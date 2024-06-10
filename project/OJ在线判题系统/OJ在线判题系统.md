@@ -218,13 +218,423 @@ Arco Design（https://arco.design/）是字节跳动开源的对标阿里Ant Des
 
 # 项目通用模板
 
-## 项目通用布局
+## 一、项目通用布局
+
+### 全局
+
+首先建一个专门存放布局的文件layouts，然后复制一个vue文件直接粘贴到layouts中，叫 `BasicLayout.vue`。
+
+将除 `<router-view />` 以外的内容都删掉，因为对于一个布局来说，肯定要能动态的展示不同的页面，只不过导航栏、底部信息、中间的内容可能是有固定区域的。这个才叫同样的布局。
+
+![image-20240610202127282](./assets/image-20240610202127282.png)
+
+然后在 `App.vue` 中，直接留一个 `<BasicLayout>` 即可，建议外层包一层 `<div id="app">`，个人习惯，这样会方便有一些
+
+那这里为什么要引布局呢？其实如果你以后还有一个别的布局，此时你就可以在 `App.vue` 中进行多套布局的切换
+
+~~~vue
+<template>
+  <div id="app">
+    <BasicLayout />
+  </div>
+</template>
+
+<style>
+#app {
+}
+</style>
+<script>
+import BasicLayout from "@/layouts/BasicLayout";
+
+export default {
+  components: { BasicLayout },
+};
+</script>
+~~~
+
+---
+
+来想一下，一个常见的网站布局应该是怎么样的？
+
+导航栏、中间的内容、底部的footer版权信息
+
+那怎么做呢？有现成的就不要自己写，首先找到布局，可以发现第一个布局就是我们想要的，那我们直接使用第一个布局的示例代码。
+
+![image-20240610203324240](./assets/image-20240610203324240.png)
+
+~~~vue
+<template>
+  <a-layout style="height: 400px">
+    <a-layout-header>导航栏</a-layout-header>
+    <a-layout-content>
+      <router-view />
+    </a-layout-content>
+    <a-layout-footer>
+      <a href="" target="_blank"> by 小奉 </a>
+    </a-layout-footer>
+  </a-layout>
+</template>
+
+<style></style>
+~~~
+
+然后打开浏览器查看，可以发现布局出来了
+
+<img src="./assets/image-20240610204034251.png" alt="image-20240610204034251" style="zoom:70%;" />
+
+---
+
+可以发现有点丑，接下来给每个布局加一个样式
+
+~~~vue
+<template>
+  <div id="basicLayout">
+    <a-layout style="height: 400px">
+      <a-layout-header class="header">导航栏</a-layout-header>
+      <a-layout-content class="content">
+        <router-view />
+      </a-layout-content>
+      <a-layout-footer class="footer">
+        <a href="" target="_blank"> by 小奉 </a>
+      </a-layout-footer>
+    </a-layout>
+  </div>
+</template>
+
+<style scoped>
+#basicLayout {
+}
+
+#basicLayout .header {
+  background: red;
+  margin-bottom: 16px;
+}
+
+#basicLayout .content {
+  /* 渐变背景色 */
+  background: linear-gradient(to right, #bbb, #fff);
+  margin-bottom: 16px;
+}
+
+#basicLayout .footer {
+  background: #efefef; /* 浅灰色 */
+}
+</style>
+~~~
+
+![image-20240610204605369](./assets/image-20240610204605369.png)
+
+---
+
+接下来将footer绝对定位到底部
+
+~~~css
+#basicLayout .footer {
+  background: #efefef; /* 浅灰色 */
+  padding: 16px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0; /*left 和 right 都设为0，让它占满*/
+  text-align: center;
+}
+~~~
 
 
 
+---
 
+### 导航栏
 
+直接使用现成的组件即可
 
+![image-20240610205945087](./assets/image-20240610205945087.png)
+
+这里考虑到导航菜单可能会比较复杂，因此这里会将它抽离成公共的组件 `components/GlobalHeader`
+
+![image-20240610210121317](./assets/image-20240610210121317.png)
+
+我们来搞一个动态的导航栏，可以根据路由来生成导航菜单，这里先将复制来的vue文件中多余的东西全删掉，然后引入刚刚复制粘贴的菜单
+
+~~~vue
+<template>
+  <div id="globleHeader">
+    <a-menu mode="horizontal" :default-selected-keys="['1']">
+      <a-menu-item
+        key="0"
+        :style="{ padding: 0, marginRight: '38px' }"
+        disabled
+      >
+        <div
+          :style="{
+            width: '80px',
+            height: '30px',
+            borderRadius: '2px',
+            background: 'var(--color-fill-3)',
+            cursor: 'text',
+          }"
+        />
+      </a-menu-item>
+      <a-menu-item key="1">Home</a-menu-item>
+      <a-menu-item key="2">Solution</a-menu-item>
+      <a-menu-item key="3">Cloud Service</a-menu-item>
+      <a-menu-item key="4">Cooperation</a-menu-item>
+    </a-menu>
+  </div>
+</template>
+
+<script setup lang="ts"></script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped></style>
+~~~
+
+最后在 `BasicLayout.vue` 中引入 `GloableHeader`。
+
+~~~vue
+<a-layout-header class="header">
+    <GlobalHeader />
+</a-layout-header>
+~~~
+
+如果报格式错误，到 `BasicLayout.vue` 中 <kbd>ctrl + alt + L</kbd> 格式化一下就好了。
+
+<img src="./assets/image-20240610211254522.png" alt="image-20240610211254522" style="zoom:67%;" />
+
+但导航栏我想整点花的，第一块搞个logo，这个OJ系统怎么说也是一个项目，来一个好一点的logo
+
+![image-20240610211536785](./assets/image-20240610211536785.png)
+
+注意img一定要给宽高，否则显示不出来
+
+~~~vue
+<template>
+  <div id="globleHeader">
+    <a-menu mode="horizontal" :default-selected-keys="['1']">
+      <a-menu-item
+        key="0"
+        :style="{ padding: 0, marginRight: '38px' }"
+        disabled
+      >
+        <div class="title-bar">
+          <img class="logo" src="../assets/oj-logo.svg" />
+        </div>
+      </a-menu-item>
+      <a-menu-item key="1">Home</a-menu-item>
+      <a-menu-item key="2">Solution</a-menu-item>
+      <a-menu-item key="3">Cloud Service</a-menu-item>
+      <a-menu-item key="4">Cooperation</a-menu-item>
+    </a-menu>
+  </div>
+</template>
+
+<script setup lang="ts"></script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+.title-bar {
+}
+
+.logo {
+  width: 48px;
+}
+</style>
+~~~
+
+可以发现图标出来了。但为什么选一个蛋呢？因为OJ系统是跟鸡有关系的，蛋是O的形状，然后它跟鸡又有关系，所以这个蛋简直太形象了。
+
+![image-20240610211838750](./assets/image-20240610211838750.png)
+
+然后再给一个标题，然后顺便将样式调一下，建议先在浏览器中调整样式会好一些
+
+![image-20240610212343624](./assets/image-20240610212343624.png)
+
+最后粘贴到webstorm中即可。
+
+~~~vue
+<template>
+  <div id="globleHeader">
+    <a-menu mode="horizontal" :default-selected-keys="['1']">
+      <a-menu-item
+        key="0"
+        :style="{ padding: 0, marginRight: '38px' }"
+        disabled
+      >
+        <div class="title-bar">
+          <img class="logo" src="../assets/oj-logo.svg" />
+          <div class="title">OJ</div>
+        </div>
+      </a-menu-item>
+    </a-menu>
+  </div>
+</template>
+
+<script setup lang="ts"></script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+.title-bar {
+  display: flex;
+  align-items: center;
+}
+
+.title {
+  color: #444;
+  margin-left: 16px; /*给一个左边距，让它与蛋拉开一定距离*/
+}
+</style>
+~~~
+
+---
+
+### 实现动态路由配置
+
+#### 1）提取通用路由文件
+
+脚手架会帮你自动生成router文件，但是routes路由，它是定义在index中的，它导出的是router整体，我们不好导出router的部分，因此我们完全可以把这一部分路由文件抽象出来，然后作为参数输入给菜单项。
+
+src/router/routes.ts
+
+~~~ts
+import { RouteRecordRaw } from "vue-router";
+import HomeView from "@/views/HomeView.vue";
+
+export const routes: Array<RouteRecordRaw> = [
+  {
+    path: "/",
+    name: "home",
+    component: HomeView,
+  },
+  {
+    path: "/about",
+    name: "about",
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
+  },
+];
+~~~
+
+src/router/routes.ts
+
+~~~ts
+import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import { routes } from "@/router/routes";
+
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
+  routes,
+});
+
+export default router;
+~~~
+
+---
+
+#### 2）编写路由菜单组件读取路由，动态渲染菜单项
+
+然后路由通用文件就可以喂给菜单项了，我们现在的菜单是写死的，但我们现在不能这么写，我们需要将它改为动态的。
+
+![image-20240610213606484](./assets/image-20240610213606484.png)
+
+~~~vue
+<template>
+  <div id="globleHeader">
+    <a-menu mode="horizontal" :default-selected-keys="['1']">
+      <a-menu-item
+        key="0"
+        :style="{ padding: 0, marginRight: '38px' }"
+        disabled
+      >
+        <div class="title-bar">
+          <img class="logo" src="../assets/oj-logo.svg" />
+          <div class="title">OJ</div>
+        </div>
+      </a-menu-item>
+      <a-menu-item v-for="item in routes" :key="item.path">
+        {{ item.name }}
+      </a-menu-item>
+    </a-menu>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { routes } from "../router/routes";
+</script>
+~~~
+
+可以发现成功了，点击后会高亮，但是它并没有跳转
+
+<img src="./assets/image-20240610214016868.png" alt="image-20240610214016868" style="zoom:67%;" />
+
+---
+
+#### 3）绑定跳转事件
+
+所以接下来我们应该实现跳转，绑定什么事件需要看官网，它获得的参数是key，表示要跳转到哪个路由，因此我们就使用这个事件。
+
+![image-20240610214207627](./assets/image-20240610214207627.png)
+
+GlobalHeader.vue
+
+~~~vue
+<template>
+  <div id="globleHeader">
+    <a-menu
+      mode="horizontal"
+      :default-selected-keys="['1']"
+      @menu-item-click="doMenuClick"
+    >
+      <a-menu-item
+        key="0"
+        :style="{ padding: 0, marginRight: '38px' }"
+        disabled
+      >
+        <div class="title-bar">
+          <img class="logo" src="../assets/oj-logo.svg" />
+          <div class="title">OJ</div>
+        </div>
+      </a-menu-item>
+      <a-menu-item v-for="item in routes" :key="item.path">
+        {{ item.name }}
+      </a-menu-item>
+    </a-menu>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { routes } from "../router/routes";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+const doMenuClick = (key: string) => {
+  router.push({
+    path: key,
+  });
+};
+</script>
+~~~
+
+---
+
+#### 4）同步路由到菜单项
+
+接下来还有一个细节，就是当我刷新的时候，可以发现菜单并没有保留记录状态
+
+![image-20240610215508541](./assets/image-20240610215508541.png)
+
+我们现在要做的是：根据当前的页面地址去激活当前菜单对应的状态。
+
+我们首先来看一下导航组件是从哪一个判断哪一个菜单项的
+
+```
+selectedKeys：当前选中的菜单项，它是一个数组
+```
+
+现在我们要做的是：怎么样才能当用户刷新页面时将路由信息同步到菜单项上。
 
 
 

@@ -18383,13 +18383,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->                                                             
+>                                                                
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->                                                             
+>                                                                
 >    <style scoped>
 >    </style>
 >    ~~~
@@ -19298,6 +19298,10 @@ export default defineConfig({
 如下图，router里面都含有相关的函数，route里面就含有参数对象
 
 ![image-20240217225136525](.\assets\image-20240217225136525.png)
+
+打印的route如下
+
+<img src="./assets/image-20240610215106099.png" alt="image-20240610215106099" style="zoom:70%;" />
 
 App.vue
 
