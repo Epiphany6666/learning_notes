@@ -10581,6 +10581,8 @@ mapState辅助函数访问
 <div>{{ setting.theme }}</div>
 ~~~
 
+
+
 ----
 
 # 获取模块内的getters数据
@@ -10888,7 +10890,9 @@ export default new Vuex.Store({
 
 
 
-## 准备后端接口服务环境(了解)
+---
+
+# 使用 `json-server` 准备后端接口服务环境(了解)
 
 其实在以后我们的开发过程中，当后端接口还没有准备就绪的时候，我们是可以利用一些工具快速的帮我们生成一套增删改查的接口的，这个工具就是json-server
 
@@ -10976,7 +10980,7 @@ yarn add axios
 
 4. 提供mutation处理函数
 
-
+---
 
 ## 底部总价展示
 
@@ -10984,7 +10988,9 @@ yarn add axios
 
 2. 动态渲染
 
-# 完整代码
+---
+
+## 完整代码
 
 main.js
 
@@ -11325,7 +11331,7 @@ export default {
 
 # 106.项目创建目录初始化
 
-**vue-cli 建项目** 
+## vue-cli 建项目 
 
 1.安装脚手架 (已安装)
 
@@ -11492,6 +11498,10 @@ pc:  [element-ui](https://element.eleme.cn/#/zh-CN)（vue2）    [element-plus](
 常用的就是以下两个版本
 
 ![image-20240205221406142](.\assets\image-20240205221406142.png)
+
+
+
+---
 
 # 全部导入和按需导入的区别
 
@@ -18373,13 +18383,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->                                                          
+>                                                             
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->                                                          
+>                                                             
 >    <style scoped>
 >    </style>
 >    ~~~
