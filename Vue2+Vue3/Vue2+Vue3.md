@@ -11773,7 +11773,7 @@ export default router
 
 ----
 
-# 由配置-tabbar标签页
+# 路由配置-tabbar标签页
 
 目标：阅读vant组件库文档，实现底部导航 tabbar
 
@@ -11937,7 +11937,7 @@ export default router
 
 # 110.登录页静态布局
 
-**(1) 准备工作**
+## 一、准备工作
 
 1. 在根目录新建  `styles/common.less` 重置默认样式
 
@@ -12089,7 +12089,9 @@ export default {
 </style>
 ```
 
-**添加通用样式**
+---
+
+二、添加通用样式
 
 `styles/common.less` 设置导航条，返回箭头颜色
 
@@ -18383,13 +18385,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->                                                                
+>                                                                   
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->                                                                
+>                                                                   
 >    <style scoped>
 >    </style>
 >    ~~~

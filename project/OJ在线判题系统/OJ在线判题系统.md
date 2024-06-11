@@ -487,9 +487,9 @@ export default {
 
 ---
 
-### 实现动态路由配置
+## 二、实现动态路由配置
 
-#### 1）提取通用路由文件
+### 1）提取通用路由文件
 
 脚手架会帮你自动生成router文件，但是routes路由，它是定义在index中的，它导出的是router整体，我们不好导出router的部分，因此我们完全可以把这一部分路由文件抽象出来，然后作为参数输入给菜单项。
 
@@ -533,7 +533,7 @@ export default router;
 
 ---
 
-#### 2）编写路由菜单组件读取路由，动态渲染菜单项
+### 2）编写路由菜单组件读取路由，动态渲染菜单项
 
 然后路由通用文件就可以喂给菜单项了，我们现在的菜单是写死的，但我们现在不能这么写，我们需要将它改为动态的。
 
@@ -571,7 +571,7 @@ import { routes } from "../router/routes";
 
 ---
 
-#### 3）绑定跳转事件
+### 3）绑定跳转事件
 
 所以接下来我们应该实现跳转，绑定什么事件需要看官网，它获得的参数是key，表示要跳转到哪个路由，因此我们就使用这个事件。
 
@@ -620,7 +620,7 @@ const doMenuClick = (key: string) => {
 
 ---
 
-#### 4）同步路由到菜单项
+### 4）同步路由到菜单项
 
 接下来还有一个细节，就是当我刷新的时候，可以发现菜单并没有保留记录状态
 
@@ -635,6 +635,590 @@ selectedKeys：当前选中的菜单项，它是一个数组
 ```
 
 现在我们要做的是：怎么样才能当用户刷新页面时将路由信息同步到菜单项上。
+
+我们使用监听路由的方式，因为我们每次点击都会改变路由地址，那我们在改变路由地址的时候去改变菜单的高亮，这也是可以的。
+
+首先点击菜单项 => 跳转更新路由 => 更新路由后，同步去更新菜单栏的高亮状态
+
+~~~vue
+<template>
+  <div id="globleHeader">
+    <a-menu
+      mode="horizontal"
+      :selected-keys="selectedKeys"
+      @menu-item-click="doMenuClick"
+    >
+    </a-menu>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { routes } from "../router/routes";
+import { useRoute, useRouter } from "vue-router";
+import { ref } from "vue";
+
+const router = useRouter();
+const route = useRoute();
+
+// 默认主页
+const selectedKeys = ref(["/"]);
+
+// 路由跳转后，更新选中的菜单项
+router.afterEach((to, from, failure) => {
+  selectedKeys.value = [to.path];
+});
+</script>
+~~~
+
+
+
+---
+
+## 三、全局状态管理
+
+vuex：https://vuex.vuejs.org/zh/
+
+本人更喜欢使用pinia，这里使用vuex纯粹是为了方便
+
+所有页面全局共享的变量，而不是局限在某一个页面中
+
+适合作为全局状态的数据：已登录用户信息
+
+本质上：给你提供了一套增删改查全局变量的API，只不过可能多了一些功能（比如时间旅行）
+
+下图是从官网截来的
+
+<img src="./assets/image-20240611084107069.png" alt="image-20240611084107069" style="zoom:50%;" />
+
+可以直接参考购物车示例：https://github.com/vuejs/vuex/tree/main/examples/classic/shopping-cart
+
+![image-20240611084506093](./assets/image-20240611084506093.png)
+
+---
+
+state：存储的状态信息，比如用户信息
+
+mutation（尽量同步）：定义了对变量进行增删改（更新）的方法
+
+actions（支持异步）：执行异步操作，并且触发mutation的更改（actions 调用 mutation）
+
+**src/store/user.ts**
+
+~~~ts
+import shop from "../../api/shop";
+
+// initial state
+const state = () => ({
+  loginUser: {
+    userName: "未登录",
+  },
+});
+
+// getters
+const getters = {};
+
+// actions
+const actions = {
+  getLoginUser({ commit, state }, payload) {
+    commit("updateUser", { userName: "小奉" });
+  },
+};
+
+// mutations
+const mutations = {
+  updateUser(state, payload) {
+    state.loginUser = payload;
+  },
+};
+
+export default {
+  namespaced: true,
+  state,
+  getters,
+  actions,
+  mutations,
+};
+~~~
+
+---
+
+state变量最重要肯定是给前端用的，给前端去展示的。
+
+将已登录用户跟菜单栏放在一行，这里需要使用一个布局组件，这里需要用到Flex，因为右侧用户信息其实是固定的，但左侧的菜单以及屏幕是不固定宽度的。
+
+![image-20240611090846443](./assets/image-20240611090846443.png)
+
+**GlobalHeader.vue**
+
+~~~vue
+<template>
+  <a-row id="globalHeader" class="grid-demo" style="margin-bottom: 16px">
+    <a-col flex="auto">
+      <a-menu
+        mode="horizontal"
+        :selected-keys="selectedKeys"
+        @menu-item-click="doMenuClick"
+      >
+        <a-menu-item
+          key="0"
+          :style="{ padding: 0, marginRight: '38px' }"
+          disabled
+        >
+          <div class="title-bar">
+            <img class="logo" src="../assets/oj-logo.svg" />
+            <div class="title">OJ</div>
+          </div>
+        </a-menu-item>
+        <a-menu-item v-for="item in routes" :key="item.path">
+          {{ item.name }}
+        </a-menu-item>
+      </a-menu>
+    </a-col>
+    <a-col flex="100px">
+      <div>小奉</div>
+    </a-col>
+  </a-row>
+</template>
+~~~
+
+出现的效果如下图所示
+
+![image-20240611091825666](./assets/image-20240611091825666.png)
+
+如果我们想要让它和菜单栏在同一行，需要加一个属性
+
+![image-20240611091938521](./assets/image-20240611091938521.png)
+
+![image-20240611091950709](./assets/image-20240611091950709.png)
+
+GlobalHead.vue
+
+~~~html
+<a-row id="globalHeader" align="center" style="margin-bottom: 16px">
+~~~
+
+顺便给头部加个阴影，BasicLayout.vue
+
+~~~css
+#basicLayout .header {
+  /*background: red;*/
+  margin-bottom: 16px;
+  box-shadow: #eee 1px 1px 5px;
+}
+~~~
+
+效果如下图
+
+![image-20240611093828125](./assets/image-20240611093828125.png)
+
+定义user模块，src/store/user.ts
+
+~~~ts
+// initial state
+import { StoreOptions } from "vuex";
+
+export default {
+  namespaced: true,
+  state: () => ({
+    loginUser: {
+      userName: "未登录",
+    },
+  }),
+  getters: {},
+  actions: {
+    getLoginUser({ commit, state }, payload) {
+      commit("updateUser", { userName: "小奉" });
+    },
+  },
+  mutations: {
+    updateUser(state, payload) {
+      state.loginUser = payload;
+    },
+  },
+} as StoreOptions<any>;
+~~~
+
+src/store/index.ts
+
+~~~ts
+import { createStore } from "vuex";
+import user from "./user";
+
+export default createStore({
+  state: () => ({
+    all: [],
+  }),
+  getters: {},
+  mutations: {},
+  actions: {},
+  modules: {
+    user,
+  },
+});
+~~~
+
+---
+
+接下来就可以直接在页面中渲染了，在渲染的时候推荐加一些可选项操作符
+
+GlobalHeader.vue
+
+~~~vue
+<div>{{ store.state.user?.loginUser?.userName ?? "未登录" }}</div>
+
+<script setup lang="ts">
+const store = useStore();
+console.log(store.state.user.loginUser); // 可以先打印一下，然后再在页面中渲染
+</script>
+~~~
+
+---
+
+修改状态变量
+
+我们可以先在GlobalHeader.vue中加一个setTimeout，看看它是否可以及时更新
+
+~~~js
+setTimeout(() => {
+  store.dispatch("user/getLoginUser", { userName: "小奉" });
+}, 3000);
+~~~
+
+保存，查看效果，可以发现三秒后登录状态已经改变了
+
+<img src="./assets/image-20240611194252117.png" alt="image-20240611194252117" style="zoom:70%;" />
+
+现在前端用户的状态管理就已经好了，只不过当我们真正要实现登录的时候，需要将user.ts中改成远程登录
+
+~~~ts
+actions: {
+    getLoginUser({ commit, state }, payload) {
+      // todo 改为从远程请求获取登录信息
+      commit("updateUser", payload);
+    },
+},
+~~~
+
+---
+
+## 四、权限管理
+
+我能够直接以一套通用的机制，去定义哪个页面需要哪些权限。
+
+我们的菜单是根据路由配置实现的，那我们既然要控制用户访问不同页面的时候，去看看它是否有对应的权限，那我们就可以直接在路由中去定义每个页面需要什么权限就好了。
+
+---
+
+### 1）在路由配置文件，定义某个路由的访问权限
+
+我们直接在routes.ts中加一个meta，这个是 `vue-router` 提供的一个附带元信息的功能
+
+~~~ts
+{
+    path: "/admin",
+    name: "仅管理员可见",
+    component: AdminView,
+    meta: {
+      access: "canAdmin",
+    },
+}
+~~~
+
+在 `src/views` 下新增 `AdminView.vue页面` 
+
+~~~vue
+<template>
+  <div class="home">
+    管理员可见
+    <img alt="Vue logo" src="../assets/logo.png" />
+    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
+
+export default defineComponent({
+  name: "HomeView",
+  components: {
+    HelloWorld,
+  },
+});
+</script>
+~~~
+
+---
+
+### 2）在全局页面组件中，绑定一个全局路由监听
+
+然后我们可以来一个全局的机制，用户每次访问一个页面的时候，我们来判断一下，它是否有这个页面路由对应的admin权限，如果有则允许访问，如果没有则跳转到一个401 / 403，即没有权限的页面。
+
+App.vue
+
+~~~vue
+<template>
+  <div id="app">
+    <BasicLayout />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+router.beforeEach((to) => {
+  console.log(to);
+});
+</script>
+~~~
+
+打印结果如下，可以发现我们可以从to变量中拿到权限定义的逻辑
+
+<img src="./assets/image-20240611201348066.png" alt="image-20240611201348066" style="zoom:67%;" />
+
+那这就简单了
+
+App.vue
+
+~~~vue
+<script setup lang="ts">
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+
+const router = useRouter();
+const store = useStore();
+
+router.beforeEach((to) => {
+  // 仅管理员可见，判断当前用户是否有权限
+  if (to.meta?.access == "canAdmin") {
+    if (store.state.user.loginUser?.role !== "admin") {
+      return "/noAuth";
+    }
+  }
+  console.log(to);
+});
+</script>
+~~~
+
+---
+
+src/router/routes.ts
+
+~~~ts
+{
+    path: "/noAuth",
+    name: "无权限",
+    component: NoAuthView,
+}
+~~~
+
+---
+
+## 五、优化页面布局
+
+### 1）底部footer布局优化
+
+当页面缩小的时候，底部的footer并没有一直处于底部
+
+![image-20240611210023427](./assets/image-20240611210023427.png)
+
+这个其实很简单，我们修改一下定位 `stiky(粘性)`，滑动滚动条，这样当高度如果已经比上面的内容还要小的时候，底下的footer会固定住
+
+![image-20240611210254909](./assets/image-20240611210254909.png)
+
+但是当界面放大的时候，又出现问题了
+
+![image-20240611210359287](./assets/image-20240611210359287.png)
+
+此时我们只需要让父节点元素加一个最小高度限制，万一它超过了当前屏幕的高度，还可以再扩展。
+
+vh就是屏幕可视区域的高度。
+
+![image-20240611210702211](./assets/image-20240611210702211.png)
+
+现在调试完成了，回到代码中
+
+BasicLayout.vue
+
+~~~vue
+<template>
+  <div id="basicLayout">
+    <a-layout style="min-height: 100vh">
+    </a-layout>
+  </div>
+</template>
+
+<style scoped>
+#basicLayout .footer {
+  position: sticky;
+}
+</style>
+~~~
+
+---
+
+### 2）优化导航栏用户名称的换行
+
+还有个问题，当缩小的时候，`"未登录"` 放到下一行去了
+
+<img src="./assets/image-20240611211050248.png" alt="image-20240611211050248" style="zoom:67%;" />
+
+目的：我们应该让 `"未登录"` 即使在屏幕很小的时候也不会被挤压到第二行
+
+BasicLayout.vue
+
+~~~html
+<a-layout style="min-height: 100vh" :wrap="false">
+~~~
+
+---
+
+### 3）优化 content、GlobalHeader的样式
+
+可以发现它多了一个底部的间距，去掉就会好多了
+
+![image-20240611211707611](./assets/image-20240611211707611.png)
+
+然后内容区域和边上感觉又有点挤，这里加一个padding
+
+![image-20240611211818143](./assets/image-20240611211818143.png)
+
+调式完成后修改代码
+
+BasicLayout.vue
+
+~~~css
+#basicLayout .content {
+  padding: 20px;
+}
+~~~
+
+GlobalHeader.vue
+
+![image-20240611212049330](./assets/image-20240611212049330.png)
+
+---
+
+## 六、通用导航栏组件优化 —— 根据配置控制菜单的显隐
+
+### 1）给路由新增一个标志位，用于判断路由是否显隐
+
+src/router/routes.ts
+
+~~~ts
+{
+    path: "/hide",
+    name: "隐藏页面",
+    component: HomeView,
+    meta: {
+      hideInMenu: true,
+    },
+},
+~~~
+
+---
+
+### 2）不要用 v-for + v-if 去条件渲染元素
+
+GlobalHeader.vue
+
+处理办法：在外层加一层div
+
+~~~html
+<div v-for="item in routes" :key="item.path">
+    <a-menu-item :key="item.path" v-if="!item.meta?.hideInMenu">
+        {{ item.name }}
+    </a-menu-item>
+</div>
+~~~
+
+PS：这样写会导致无限循环报错，But `v-for` 和 `v-if` 不要同时用，因为 `v-for` 会先执行，如果你的 `v-for` 先执行，如果你有1000个路由，只有1个要显示，剩下999个都要隐藏，如果你先用 `v-for` 那就需要先渲染1000遍，然后再到里面判断 `v-if`，再把剩下的 `999` 个隐藏。
+
+因此比较推荐的做法是，先到JS中过滤，先去判断到底哪些路由你要显示，然后保留出一个比较经典的数组。这样就可以减少 `v-for` 渲染的次数，并且也不会出现刚刚的死循环报错的问题了。
+
+**GlobalHeader.vue**
+
+这个语句可以简写，但这里不简写，因为估计后面还需要改造
+
+~~~ts
+// 展示在菜单的路由数组
+const visibleRoutes = routes.filter((item) => {
+  if (item.meta?.hideInMenu) {
+    return false;
+  }
+  return true;
+});
+~~~
+
+保存代码查看效果，可以发现成功隐藏
+
+![image-20240611214023915](./assets/image-20240611214023915.png)
+
+---
+
+## 七、根据权限控制菜单
+
+需求：只有具有权限的菜单，才对用户可见。
+
+原理：类似上面的控制路由显示隐藏，只要判断用户没有这个权限，就直接过滤掉
+
+
+
+
+
+
+
+---
+
+## 全局权限管理
+
+### 1）定义权限
+
+在src目录下新建access目录，然后新建 `accessEnum.ts`
+
+~~~ts
+/**
+ * 权限定义
+ */
+const ACCESS_ENUM = {
+  NOT_LOGIN: "notLogin",
+  USER: "user",
+  ADMIN: "admin",
+};
+
+export default ACCESS_ENUM;
+~~~
+
+---
+
+### 2）定义一个公用的权限校验方法
+
+想法：能不能将判断它是否有权限的功能从之前的APP.vue文件中抽出来，我们专门去写一个判断权限的方法，这样其他的地方要用到判断权限的方法，例如菜单、路由全局拦截，就都可以去共用这个方法。
+
+src/access/checkAccess.ts
+
+~~~ts
+~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
