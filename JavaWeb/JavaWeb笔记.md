@@ -12014,7 +12014,7 @@ public interface EmpMapper {
 
 代码开发完成后，重启服务器，打开Postman发送 POST 请求，请求路径：http://localhost:8080/emps
 
-![image-20221216181017910](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day11-SpringBootWeb案例/讲义/assets/image-20221216181017910.png)
+![image-20221216181017910](./assets/image-20221216181017910.png)
 
 
 
@@ -12022,9 +12022,9 @@ public interface EmpMapper {
 
 功能测试通过后，我们再进行通过打开浏览器，测试后端功能接口：
 
-![image-20221216181511401](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day11-SpringBootWeb案例/讲义/assets/image-20221216181511401.png)
+![image-20221216181511401](./assets/image-20221216181511401.png)
 
-![image-20221216181628331](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day11-SpringBootWeb案例/讲义/assets/image-20221216181628331.png)
+![image-20221216181628331](./assets/image-20221216181628331.png)
 
 # 146. 文件上传
 
@@ -12418,7 +12418,7 @@ spring.servlet.multipart.max-request-size=100MB
 
 （1）打开https://www.aliyun.com/ ，申请阿里云账号并完成实名认证。
 
-![image-20221128012526497](O:\BaiduSyncdisk\other\课\黑马\JAVAWeb\day11-SpringBootWeb案例\资料\04. 阿里云oss\assets\image-20221128012526497.png)  
+![image-20221128012526497](.\assets\image-20221128012526497.png)  
 
 
 
@@ -12430,21 +12430,21 @@ spring.servlet.multipart.max-request-size=100MB
 
 登录阿里云官网。 点击右上角的控制台。
 
-![image-20221129214250389](O:\BaiduSyncdisk\other\课\黑马\JAVAWeb\day11-SpringBootWeb案例\资料\04. 阿里云oss\assets\image-20221129214250389.png) 
+![image-20221129214250389](.\assets\image-20221129214250389.png) 
 
 将鼠标移至产品，找到并单击对象存储OSS，打开OSS产品详情页面。在OSS产品详情页中的单击立即开通。
 
-<img src="O:\BaiduSyncdisk\other\课\黑马\JAVAWeb\day11-SpringBootWeb案例\资料\04. 阿里云oss\assets\image-20221129214332892.png" alt="image-20221129214332892" style="zoom:67%;" /> 
+<img src=".\assets\image-20221129214332892.png" alt="image-20221129214332892" style="zoom:67%;" /> 
 
-<img src="O:\BaiduSyncdisk\other\课\黑马\JAVAWeb\day11-SpringBootWeb案例\资料\04. 阿里云oss\assets\image-20221129214403131.png" alt="image-20221129214403131" style="zoom:80%;" /> 
+<img src=".\assets\image-20221129214403131.png" alt="image-20221129214403131" style="zoom:80%;" /> 
 
-![image-20221128012258544](O:\BaiduSyncdisk\other\课\黑马\JAVAWeb\day11-SpringBootWeb案例\资料\04. 阿里云oss\assets\image-20221128012258544.png) 
+![image-20221128012258544](.\assets\image-20221128012258544.png) 
 
 
 
 开通服务后，在OSS产品详情页面单击管理控制台直接进入OSS管理控制台界面。您也可以单击位于官网首页右上方菜单栏的控制台，进入阿里云管理控制台首页，然后单击左侧的对象存储OSS菜单进入[OSS管理控制台界面](https://oss.console.aliyun.com/overview)。
 
-![image-20201126234535040](O:\BaiduSyncdisk\other\课\黑马\JAVAWeb\day11-SpringBootWeb案例\资料\04. 阿里云oss\assets\image-20201126234535040.png)
+![image-20201126234535040](.\assets\image-20201126234535040.png)
 
 
 
@@ -12452,7 +12452,7 @@ spring.servlet.multipart.max-request-size=100MB
 
 新建Bucket，命名为 hmleadnews ，读写权限为 **==公共读==**
 
-<img src="O:\BaiduSyncdisk\other\课\黑马\JAVAWeb\day11-SpringBootWeb案例\资料\04. 阿里云oss\assets\image-20221128014414947.png" alt="image-20221128014414947" style="zoom:67%;" />  
+<img src=".\assets\image-20221128014414947.png" alt="image-20221128014414947" style="zoom:67%;" />  
 
 
 
@@ -12556,7 +12556,7 @@ public class AliOssTest {
 
 ### 4. 获取AccessKeyId
 
-![image-20221128020105943](O:\BaiduSyncdisk\other\课\黑马\JAVAWeb\day11-SpringBootWeb案例\资料\04. 阿里云oss\assets\image-20221128020105943.png) 
+![image-20221128020105943](.\assets\image-20221128020105943.png) 
 
 
 
@@ -12576,15 +12576,15 @@ public class AliOssTest {
 
 首先我们需要来打开阿里云OSS的官方文档，在官方文档中找到 SDK 的示例代码：
 
-![image-20221229121848524](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day11-SpringBootWeb案例/讲义/assets/image-20221229121848524.png)
+![image-20221229121848524](./assets/image-20221229121848524.png)
 
-![image-20221229122046597](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day11-SpringBootWeb案例/讲义/assets/image-20221229122046597.png)
+![image-20221229122046597](./assets/image-20221229122046597.png)
 
 > 如果是在实际开发当中，我们是需要从前往后仔细的去阅读这一份文档的，但是由于现在是教学，我们就只挑重点的去看。有兴趣的同学大家下来也可以自己去看一下这份官方文档。
 
-![image-20221229144342148](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day11-SpringBootWeb案例/讲义/assets/image-20221229144342148.png)
+![image-20221229144342148](./assets/image-20221229144342148.png)
 
-![image-20221229160827124](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day11-SpringBootWeb案例/讲义/assets/image-20221229160827124.png)
+![image-20221229160827124](./assets/image-20221229160827124.png)
 
 参照官方提供的SDK，改造一下，即可实现文件上传功能：
 
@@ -12819,7 +12819,7 @@ public class UploadController {
 
 使用postman测试：
 
-![image-20230102175353270](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day11-SpringBootWeb案例/讲义/assets/image-20230102175353270.png)
+![image-20230102175353270](./assets/image-20230102175353270.png)
 
 # 151. 修改员工
 
@@ -13205,13 +13205,13 @@ public class EmpController {
 
 3.2.4 postman测试
 
-![image-20220904221941144](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day11-SpringBootWeb案例/讲义/assets/image-20220904221941144.png) 
+![image-20220904221941144](./assets/image-20220904221941144.png) 
 
 
 
 3.2.5 前后端联调测试
 
-![image-20220904222028501](O:/BaiduSyncdisk/other/课/黑马/JAVAWeb/day11-SpringBootWeb案例/讲义/assets/image-20220904222028501.png) 
+![image-20220904222028501](./assets/image-20220904222028501.png) 
 
 # 153. 配置文件
 

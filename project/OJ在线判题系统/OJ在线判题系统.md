@@ -1,3 +1,5 @@
+# 第一期
+
 # 项目简介
 
 OJ = Online Judge 在线判题评测系统
@@ -1197,26 +1199,954 @@ export default ACCESS_ENUM;
 
 想法：能不能将判断它是否有权限的功能从之前的APP.vue文件中抽出来，我们专门去写一个判断权限的方法，这样其他的地方要用到判断权限的方法，例如菜单、路由全局拦截，就都可以去共用这个方法。
 
-src/access/checkAccess.ts
+创建 `src/access/checkAccess.ts`，专门定义检测权限的函数
 
 ~~~ts
+/**
+ * 检查权限（判断当前登录用户是否具有某个权限）
+ * @param loginUser 当前登录用户
+ * @param needAcess 需要有的权限
+ * @return boolean 有误权限
+ */
+import ACCESS_ENUM from "@/access/accessEnum";
+
+const checkAccess = (loginUser: any, needAcess = ACCESS_ENUM.NOT_LOGIN) => {
+  // 获取当前登录用户具有的权限（如果没有 loginUser. 则表示未登录）
+  const loginUserAccess = loginUser?.userRole ?? ACCESS_ENUM.NOT_LOGIN;
+  if (needAcess === ACCESS_ENUM.NOT_LOGIN) {
+    return true;
+  }
+  // 如果需要用户登录才能访问
+  if (needAcess === ACCESS_ENUM.USER) {
+    // 如果用户没登录，那么就表示无权限
+    if (loginUserAccess === ACCESS_ENUM.NOT_LOGIN) {
+      return false;
+    }
+  }
+  // 如果需要管理员权限
+  if (needAcess === ACCESS_ENUM.ADMIN) {
+    // 如果不为管理员，就表示无权限
+    if (loginUserAccess !== ACCESS_ENUM.ADMIN) {
+      return false;
+    }
+  }
+  //否则如果为其他条件，就为 true
+  return true;
+};
+
+export default checkAccess;
+~~~
+
+---
+
+### 3）修改GlobalHeader动态菜单组件，根据权限来过滤菜单
+
+路由需要的权限
+
+~~~js
+{
+    path: "/admin",
+    name: "仅管理员可见",
+    component: AdminView,
+    meta: {
+      access: ACCESS_ENUM.ADMIN,
+    },
+  },
+~~~
+
+**GlobalHeader.vue**
+
+注意这里使用计算属性，是为了当用户信息发生变更时，触发菜单栏的重新渲染，展示新增权限的菜单项
+
+`store.state.user.loginUser` 不能写在计算属性外面
+
+~~~js
+// 展示在菜单的路由数组
+const visibleRoutes = computed(() => {
+  return routes.filter((item) => {
+    if (item.meta?.hideInMenu) {
+      return false;
+    }
+    //todo 根据权限过滤菜单
+    if (!checkAccess(store.state.user.loginUser, item.meta?.access as string)) {
+      return false;
+    }
+    return true;
+  });
+});
+~~~
+
+---
+
+## 全局项目入口
+
+除了我们编写一个全局权限管理之外，如果你是用一些现成的第三方框架，像Ant Designed Pro，可能还会有一个功能叫 `全局项目入口`，就是如果你想要给项目做一些全局的配置，或者做一些初始化，
+
+在 `App.vue` 中预留一个可以编写全局初始化逻辑的代码
+
+<img src="./assets/image-20240612083142559.png" alt="image-20240612083142559" style="zoom:67%;" />
+
+这段代码后续可能会用到，但现在没啥用。
+
+有些人喜欢在这里藏一个佛祖，保佑代码不出Bug，也是程序员的浪漫。
+
+----
+
+# 后端项目初始化
+
+IDEA版本：2021.2
+
+目的：先把通用框架跑起来
+
+## 一、改模块名
+
+拷贝一份 `后端万用项目模板` ，然后改名为 `YanOJ-backend`
+
+<img src="./assets/image-20240612084231534.png" alt="image-20240612084231534" style="zoom:67%;" />
+
+然后拿后端的开发工具IDEA打开
+
+可以发现它的模块名还叫做 `springboot-init`
+
+![image-20240612084512664](./assets/image-20240612084512664.png)
+
+包括点右侧的maven，它的模块名还叫做springboot-init
+
+<img src="./assets/image-20240612090006379.png" alt="image-20240612090006379" style="zoom:67%;" />
+
+所以第一件事情，按 <kbd>ctrl + shift + F</kbd> 全局搜索 `springboot-init`，然后 <kbd>ctrl + shift + R</kbd> 全局替换为 `YanOJ-backend`
+
+<img src="./assets/image-20240612090225879.png" alt="image-20240612090225879" style="zoom:70%;" />
+
+---
+
+## 二、改包名
+
+如下图，包名还是叫做 `springbootinit`
+
+<img src="./assets/image-20240612090328969.png" alt="image-20240612090328969" style="zoom:67%;" />
+
+按 <kbd>ctrl + shift + F</kbd> 全局搜索 `springbootinit`，然后 <kbd>ctrl + shift + R</kbd> 全局替换为 `yanoj`
+
+<img src="./assets/image-20240612090452301.png" alt="image-20240612090452301" style="zoom:67%;" />
+
+然后 <kbd>shift + F5</kbd> 修改包名，跟刚刚我们全局替换的名称一样
+
+<img src="./assets/image-20240612090627685.png" alt="image-20240612090627685" style="zoom:70%;" />
+
+---
+
+## 三、本地新建数据库
+
+将数据库名改为新项目名称
+
+<img src="./assets/image-20240612094025057.png" alt="image-20240612094025057" style="zoom:67%;" />
+
+然后直接执行 `sql/create_table.sql脚本`
+
+----
+
+## 四、改 `application.yml` 配置
+
+<img src="./assets/image-20240612094222136.png" alt="image-20240612094222136" style="zoom:67%;" />
+
+---
+
+## 五、跑起项目
+
+刷新Maven，可以发现模块名已经变成 `YanOJ-backend` 了
+
+<img src="./assets/image-20240612090711306.png" alt="image-20240612090711306" style="zoom:67%;" />
+
+找到 `application.yml`，修改数据库和端口号
+
+![image-20240612091152793](./assets/image-20240612091152793.png)
+
+然后直接运行程序
+
+<img src="./assets/image-20240612091227772.png" alt="image-20240612091227772" style="zoom:67%;" />
+
+启动成功后，我们就可以访问启动的成果了
+
+这里访问上下文是 `/api`
+
+![image-20240612091340443](./assets/image-20240612091340443.png)
+
+访问 `localhost:8121/api/doc.html`，已经写好了基本的增删改查
+
+我们来测试下能不能用
+
+![image-20240612093658805](./assets/image-20240612093658805.png)
+
+---
+
+# 初始化模板讲解
+
+1）先阅读 README.md
+
+2）sql/create table.sql 定义了数据库的初始化建库建表语句3）sql/post es mapping.json 帖子表在 ES 中的建表语句
+
+4）aop：用于全局权限校验、全局日志记录
+
+5）common：万用的类，比如通用响应类
+
+6）config：用于接收 application.ym| 中的参数，初始化一些客户端的配置类（比如对象存储客户端）
+
+7）constant：定义常量
+
+8）controller：接受请求
+
+9）esdao：类似 mybatis 的 mapper，用于操作 ES
+
+10）exception：异常处理相关
+
+11）job：任务相关(定时任务、单次任务）
+
+12）manager：服务层(一般是定义一些公用的服务、对接第三方 API等）13）mapper：mybatis 的数据访问层，用于操作数据库14）model：数据
+
+模型、实体类、包装类、枚举值
+
+15）service：服务层，用于编写业务逻辑
+
+16）utils：工具类，各种各样公用的方法
+
+17）wxmp：公众号相关的包
+
+18）test：单元测试
+
+19）MainApplication：项目启动入
+
+20）Dockerfile：用于构建 Docker 镜像
+
+---
+
+# 前后端联调
+
+问：前端和后端是怎么连接起来的？接口 / 请求
+
+答：前端发送请求调用后端接口
+
+## 一、安装请求工具类Axios
+
+官网：https://axios-http.com/docs/intro
+
+<img src="./assets/image-20240612102025552.png" alt="image-20240612102025552" style="zoom:67%;" />
+
+---
+
+## 二、编写调用后端的代码
+
+传统情况下，每个请求都要单独编写代码，至少得写一个请求工具
+
+一键生成请求方法的工具 —— OpenAPI Typescript Codegen
+
+### 用法
+
+首先下载axios
+
+~~~shell
+npm install axios
+~~~
+
+官网：https://github.com/ferdikoomen/openapi-typescript-codegen
+
+首先安装：
+
+```shell
+npm install openapi-typescript-codegen --save-dev
+```
+
+`--input`：指定接口文档的路径、url 或字符串内容（必填）
+
+`--output`：代码生成的目录
+
+`--client`：生成的代码所需要使用的请求库
+
+~~~shell
+openapi --input ./spec.json --output ./generated --client xhr
+~~~
+
+![image-20240225133608737](./assets/202402251502053.png)
+
+首先复制接口文档的路径
+
+![image-20240225133912618](./assets/202402251625649.png)
+
+完整路径：http://localhost:8121/api/v2/api-docs，访问可以发现这里面就是一大堆接口的信息
+
+<img src="./assets/image-20240612102711145.png" alt="image-20240612102711145" style="zoom:67%;" />
+
+实例代码
+
+~~~shell
+openapi --input http://localhost:8121/api/v2/api-docs --output ./generated --client axios
+~~~
+
+执行完成后，在项目根目录中会出现下图目录，可以看见，它直接给我们生成了向后端发请求的函数，当需要使用时，只需要直接调用就好了。
+
+后端把代码写到哪个文件里，生成的请求方法也就会生成到哪个文件里。
+
+![image-20240225144417848](./assets/202402251502211.png)
+
+如果后端接口文档发生了变化，只需要再次执行一次上述指令，就可以重新生成了，非常的方便！
+
+---
+
+### 自定义请求参数的方法
+
+#### 1）使用代码生成器提供的全局参数修改对象
+
+https://github.com/ferdikoomen/openapi-typescript-codegen/wiki/OpenAPI-object
+
+按如下图寻找
+
+![image-20240225160144294](./assets/202402251601529.png)
+
+![image-20240225160309555](./assets/202402251603593.png)
+
+![image-20240225160327610](./assets/202402251603713.png)
+
+这个配置对象在generated/core里。其中BASE可以修改请求地址
+
+![image-20240225160623676](./assets/202402251606750.png)
+
+---
+
+#### 2）直接定义 axios 请求库的全局参数，比如：全局请求响应拦截器
+
+https://www.axios-http.cn/docs/interceptors
+
+<img src="./assets/image-20240612105956105.png" alt="image-20240612105956105" style="zoom:50%;" />
+
+src/plugins/axios.ts
+
+~~~ts
+import axios from 'axios'
+
+// 添加请求拦截器
+axios.interceptors.request.use(
+  function (config) {
+    // 在发送请求之前做些什么
+    return config
+  },
+  function (error) {
+    // 对请求错误做些什么
+    return Promise.reject(error)
+  }
+)
+
+// 添加响应拦截器
+axios.interceptors.response.use(
+  function (response) {
+    console.log('响应', responses)
+
+    // 2xx 范围内的状态码都会触发该函数。
+    // 对响应数据做点什么
+    return response
+  },
+  function (error) {
+    // 超出 2xx 范围的状态码都会触发该函数。
+    // 对响应错误做点什么
+    return Promise.reject(error)
+  }
+)
+~~~
+
+在main.ts中引入
+
+~~~ts
+import '@/plugins/axios'
+~~~
+
+---
+
+### 报错解决
+
+明明已经执行了安装命令，却还是报错
+
+![image-20240225143742140](./assets/202402251502624.png)
+
+**解决办法**
+
+法1：执行以下命令
+
+> `npx` 是一个 Node.js 工具，用于执行安装在项目依赖中的可执行文件。它的作用是在不全局安装的情况下，临时运行项目依赖中的命令。
+>
+> 使用 `npx` 命令可以避免在全局安装可执行文件时可能出现的版本冲突问题，并且可以确保项目依赖的命令始终是最新版本。
+
+~~~shell
+npx openapi-typescript-codegen --input http://localhost:8121/api/v2/api-docs --output ./generated --client axios
+~~~
+
+法2：全局安装
+
+~~~shell
+npm install openapi-typescript-codegen -g
+~~~
+
+法3：将目录中的 node_modules/.bin 配置到环境变量中去
+
+---
+
+### 测试
+
+**src/store/user.ts**
+
+让一开始的用户信息没有权限，然后如果再次登录，但是登录失败了，就给它加一个未登录的权限，这样就可以区分出它到底是未登录还是登录失败了
+
+~~~ts
+state: () => ({
+  loginUser: {
+    userName: "未登录",
+  },
+}),
+actions: {
+  async getLoginUser({ commit, state }, payload) {
+    const res = await UserControllerService.getLoginUserUsingGet();
+    if (res.code === 0) {
+      commit("updateUser", res.data);
+    } else {
+      commit("updateUser", {
+        ...this.state.loginUser,
+        userRole: ACCESS_ENUM.NOT_LOGIN,
+      });
+    }
+    // todo 改为从远程请求获取登录信息
+    commit("updateUser", payload);
+  },
+}
+~~~
+
+如下图，可以发现前后端对接成功。
+
+![image-20240612105721573](./assets/image-20240612105721573.png)
+
+---
+
+# 用户登录
+
+首先要实现自动登录，不能用户在刷新的时候又让它重新登陆。
+
+思路：在刚进入页面的时候就去让它触发登录。
+
+那在哪里去触发 `getLoginUser` 函数的执行？应当在一个全局的位置
+
+其实有很多选择：路由拦截、全局页面入口App.vue、全局通用布局、所有页面都共享的一个组件（例如请求体导航栏）等
+
+---
+
+## 一、新建 `assets\index.ts` 文件，把原有的路由拦截、权限校验逻辑放在独立的文件中
+
+这里我们选择在权限管理里获取登录状态，之前我们将用户校验是否有权限放在了App.vue中，但是这个通用的前端模板为了让各权限各模块更加的隔离，我们直接在 `access目录` 下写一个 `index.ts`，我们将所有和权限相关的所有逻辑全部写在 `access包` 中，这样的话如果你的项目不需要开启权限，你直接把access包删了就好了，你不用到App.vue多个文件中处理。
+
+![image-20240612135023390](./assets/image-20240612135023390.png)
+
+**main.ts**
+
+优势：只要不引入，就不会开启，不会对项目有影响
+
+~~~ts
+import "@/access/index";
+~~~
+
+此时它会直接报错，报错的原因就是 `useRouter、useStore` 不能在 `index.ts` 中直接使用
+
+![image-20240612135746615](./assets/image-20240612135746615.png)
+
+我们只需要如下引入即可
+
+**@/src/access/index.ts**
+
+~~~ts
+import router from "@/router";
+import store from "@/store";
+
+router.beforeEach((to) => {
+  console.log("登录用户信息：", store.state.user.loginUser);
+  // 仅管理员可见，判断当前用户是否有权限
+  if (to.meta?.access == "canAdmin") {
+    if (store.state.user.loginUser?.role !== "admin") {
+      return "/noAuth";
+    }
+  }
+  console.log(to);
+});
+~~~
+
+---
+
+## 二、编写权限管理和自动登录逻辑
+
+但是我们在路由拦截中校验权限，无需再写一遍
+
+之前的代码中，如果执行过登录，那它一定会有一个 `userRole`。如果是默认状态没有触发登录，那我们就可以去请求一下后端让它登录，因此我们可以把userRole是否存在，看做是否首次执行登录。
+
+
+
+如果没登录，则自动登录：`src/access/index.ts`
+
+~~~ts
+const loginUser = store.state.user.loginUser;
+
+// 如果之前没登录过，自动登录
+if (!loginUser || !loginUser.userRole) {
+  // 加await是为了等用户登录成功之后，再执行后续的代码
+  await store.dispatch("user/getLoginUser");
+}
+~~~
+
+
+
+如果用户访问的页面不需要登录，是否需要强制跳转到登录页？
+
+答案是不需要，因此这里我们需要区分
+
+access\index.ts 
+
+~~~ts
+import router from "@/router";
+import store from "@/store";
+import ACCESS_ENUM from "@/access/accessEnum";
+import checkAccess from "@/access/checkAccess";
+
+router.beforeEach(async (to) => {
+  console.log("登录用户信息：", store.state.user.loginUser);
+  const loginUser = store.state.user.loginUser;
+
+  // 如果之前没登录过，自动登录
+  if (!loginUser || !loginUser.userRole) {
+    // 加await是为了等用户登录成功之后，再执行后续的代码
+    await store.dispatch("user/getLoginUser");
+  }
+
+  const needAccess = to.meta?.access ?? ACCESS_ENUM.NOT_LOGIN;
+  // 要跳转的页面必须登录
+  if (needAccess !== ACCESS_ENUM.NOT_LOGIN) {
+    // 如果没登录，
+    if (!loginUser) {
+      // 如果没登录，跳转到登录页面
+      return `/user/login?redirect=${to.fullPath}`;
+    }
+    if (!checkAccess(loginUser, needAccess as string)) {
+      return "/noAuth";
+    }
+  }
+});
+~~~
+
+---
+
+# 支持多套布局
+
+登录页面需要导航栏吗？很明显不需要。
+
+于是乎就出现了问题：新的页面又不想复用之前的那套布局了怎么办？
+
+## 一、在 routes 路由文件中新建一套用户路由，使用 vue-router 自带的子路由机制，实现布局和嵌套路由
+
+把这些路由放在 `UserLayout` 子路由中，当访问到 `/user` 页面的时候，它就可以直接使用UserLayout布局
+
+@/router/routes.ts
+
+~~~ts
+export const routes: Array<RouteRecordRaw> = [
+  {
+    path: "/user",
+    name: "用户",
+    component: UserLayout,
+    children: [
+      {
+        path: "/user/login",
+        name: "用户登录",
+        component: UserLoginView,
+      },
+      {
+        path: "/registry",
+        name: "用户注册",
+        component: UserRegisterView,
+      },
+    ],
+  }
+  ....
+];
+~~~
+
+---
+
+## 二、新建一套UserLayout、UserLoginView、UserRegisterView，并且在routes.ts中引入
+
+复制BasicLayout到Layouts文件夹中改名为UserLayout，然后 <kbd>ctrl + R</kbd> basicLayout 全局替换成UserLayout
+
+新建 layouts/UserLayout.vue
+
+~~~vue
+<template>
+  <div id="userLayou">
+    <a-layout style="min-height: 100vh" :wrap="false">
+      <a-layout-header class="header"> 用户布局 </a-layout-header>
+      <a-layout-content class="content">
+        <router-view />
+      </a-layout-content>
+      <a-layout-footer class="footer">
+        <a href="" target="_blank"> by 洛言 </a>
+      </a-layout-footer>
+    </a-layout>
+  </div>
+</template>
+
+<style scoped>
+#userLayou {
+}
+
+#userLayou .header {
+  /*background: red;*/
+  margin-bottom: 16px;
+  box-shadow: #eee 1px 1px 5px;
+}
+
+#userLayou .content {
+  /* 渐变背景色 */
+  background: linear-gradient(to right, #bbb, #fff);
+  margin-bottom: 16px;
+  padding: 20px;
+}
+
+#userLayou .footer {
+  background: #efefef; /* 浅灰色 */
+  padding: 16px;
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0; /*left 和 right 都设为0，让它占满*/
+  text-align: center;
+}
+</style>
+<script></script>
+~~~
+
+---
+
+views/user/userLoginView.vue
+
+~~~vue
+<template>
+  <div class="about">
+    <h1>用户登录页</h1>
+  </div>
+</template>
+~~~
+
+---
+
+views/user/userRegisterView.vue
+
+~~~vue
+<template>
+  <div class="about">
+    <h1>用户注册页</h1>
+  </div>
+</template>
+~~~
+
+---
+
+## 三、在App.vue根页面文件，根据路由区分多套布局
+
+运行代码，会发现导航栏还在，也就是说该布局还是套在BasicLayout通用布局下面的
+
+![image-20240612173048329](./assets/image-20240612173048329.png)
+
+这是因为我们在App.vue中全局引入的是BasicLayout，所以这里我们需要改一下
+
+~~~vue
+<template>
+  <div id="app">
+    <template v-if="route.path.startsWith('/user')">
+      <router-view />
+    </template>
+    <template v-else>
+      <BasicLayout />
+    </template>
+  </div>
+</template>
+~~~
+
+刷新，现在发现用户登录页就已经是新的布局了，没有受到以前的干扰。
+
+<img src="./assets/image-20240612173442181.png" alt="image-20240612173442181" style="zoom:67%;" />
+
+---
+
+PS：这种不是唯一一个生成多套布局的方式，甚至可以说这种方式不是绝对更好的，更好的方式是：不应该在App.vue中这样去区分，而是直接在路由里面定义BasicLayout，在路由里面自动区分。那为什么我们现在这样写呢？是因为我们的菜单它是根据路由文件生成的。因为这是一种便捷的方式，而不是理想方式。
+
+
+
+小扩展：你可以尝试实现上面的思路，并且根据嵌套路由生成嵌套的子菜单。如下图：
+
+<img src="./assets/image-20240612174437421.png" alt="image-20240612174437421" style="zoom:50%;" />
+
+---
+
+## 四、隐藏用户页面
+
+~~~ts
+{
+  path: "/user",
+  name: "用户",
+  component: UserLayout,
+  children: [
+    {
+      path: "/user/login",
+      name: "用户登录",
+      component: UserLoginView,
+    },
+    {
+      path: "/registry",
+      name: "用户注册",
+      component: UserRegisterView,
+    },
+  ],
+  meta: {
+    hideInMenu: true,
+  },
+},
 ~~~
 
 
 
 
 
+---
 
+# 登录页面开发
 
+直接找到表单组件，直接复制粘贴
 
+![image-20240612181128885](./assets/image-20240612181128885.png)
 
+views/user/UserLoginView.vue
 
+~~~vue
+<template>
+  <div id="userLogin">
+    <a-form :model="form" :style="{ width: '600px' }" @submit="handleSubmit">
+      <a-form-item
+        field="name"
+        tooltip="Please enter username"
+        label="Username"
+      >
+        <a-input
+          v-model="form.name"
+          placeholder="please enter your username..."
+        />
+      </a-form-item>
+      <a-form-item field="post" label="Post">
+        <a-input v-model="form.post" placeholder="please enter your post..." />
+      </a-form-item>
+      <a-form-item field="isRead">
+        <a-checkbox v-model="form.isRead"> I have read the manual</a-checkbox>
+      </a-form-item>
+      <a-form-item>
+        <a-button html-type="submit">Submit</a-button>
+      </a-form-item>
+    </a-form>
+  </div>
+</template>
 
+<script setup lang="ts">
+import { reactive } from "vue";
 
+const form = reactive({
+  name: "",
+  post: "",
+  isRead: false,
+});
+const handleSubmit = (data: any) => {
+  console.log(data);
+};
+</script>
+~~~
 
+测试
 
+<img src="./assets/image-20240612181351624.png" alt="image-20240612181351624" style="zoom:67%;" />
 
+然后再去找 `Arco Design` 的密码输入框
 
+![image-20240612194250869](./assets/image-20240612194250869.png)
+
+消息组件
+
+![image-20240612195538534](./assets/image-20240612195538534.png)
+
+~~~vue
+<template>
+  <div id="userLogin">
+    <a-form :model="form" :style="{ width: '600px' }" @submit="handleSubmit">
+      <a-form-item field="name" label="账号">
+        <a-input v-model="form.userAccount" placeholder="请输入账号" />
+      </a-form-item>
+      <a-form-item field="post" label="Post" tooltip="密码不少于8位">
+        <a-input-password
+          v-model="form.userPassword"
+          placeholder="请输入密码"
+        />
+      </a-form-item>
+      <a-form-item>
+        <a-button html-type="submit">提交</a-button>
+      </a-form-item>
+    </a-form>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { reactive } from "vue";
+import { UserControllerService, UserLoginRequest } from "../../../generated";
+import message from "@arco-design/web-vue/es/message";
+
+/**
+ * 表单信息
+ */
+const form = reactive({
+  userAccount: "",
+  userPassword: "",
+} as UserLoginRequest); // 这里加上类型，会有一个格式的校验
+
+/**
+ * 提交表单
+ * @param data
+ */
+const handleSubmit = async () => {
+  const res = await UserControllerService.userLoginUsingPost(form);
+  if (res.code === 0) {
+    alert("登陆成功" + JSON.stringify(res.data));
+  } else {
+    message.error("登录失败" + res.message);
+  }
+};
+</script>
+~~~
+
+---
+
+## 解决Bug
+
+登录页登录后发现，登录成功后，用户名没有改。查看登录接口后发现，根本没cookie，没有cookie就说明前端和后端根本没有联系
+
+![image-20240612201839152](./assets/image-20240612201839152.png)
+
+让请求中携带cookie
+
+<img src="./assets/image-20240612201553312.png" alt="image-20240612201553312" style="zoom:67%;" />
+
+---
+
+## 修改页面状态
+
+view/UserLoginView.vue
+
+~~~ts
+/**
+ * 提交表单
+ * @param data
+ */
+const handleSubmit = async () => {
+  // 获取到用户信息后
+  const res = await UserControllerService.userLoginUsingPost(form);
+  console.log(res);
+  if (res.code === 0) {
+    // 更新完用户信息后再跳转到对应页面
+    await store.dispatch("user/getLoginUser");
+    router.push({
+      path: "/",
+      replace: true,
+    });
+  } else {
+    message.error("登录失败" + res.message);
+  }
+};
+~~~
+
+---
+
+## 优化登录页面
+
+如果是要修改组件，一定要查看官方文档
+
+![image-20240612204255920](./assets/image-20240612204255920.png)
+
+给子元素加上居中对齐即可
+
+![image-20240612204553286](./assets/image-20240612204553286.png)
+
+---
+
+# ---------------------------
+
+# 第二期
+
+# 库表设计
+
+如果你不知道这个题目表要有哪些字段，那就去看别人写的，例如北京大学的POJ：http://poj.org/problem?id=1000
+
+![image-20240612211439331](./assets/image-20240612211439331.png)
+
+~~~sql
+-- 题目表
+create table if not exists question
+(
+    id          bigint auto_increment comment 'id' primary key,
+    title       varchar(512)                       null comment '标题',
+    content     text                               null comment '内容',
+    tags        varchar(1024)                      null comment '标签列表（json 数组）',
+    answer      text                               null comment '题目答案',
+    submitNum   int      default 0                 not null comment '题目提交数',
+    acceptedNum int      default 0                 not null comment '题目通过数',
+    judgeCase   text     default 0                 not null comment '判题用例（json数据）',
+    judgeConfig text     default 0                 not null comment '判题配置（json数据）',
+    thumbNum    int      default 0                 not null comment '点赞数',
+    favourNum   int      default 0                 not null comment '收藏数',
+    userId      bigint                             not null comment '创建用户 id',
+    createTime  datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime  datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete    tinyint  default 0                 not null comment '是否删除',
+    index idx_userId (userId)
+) comment '帖子' collate = utf8mb4_unicode_ci;
+~~~
+
+危险操作：往你的系统中写文件
+
+系统错误：做系统人的问题
+
+## 小知识-数据库索引
+
+什么情况下适合加索引?如何选择给哪个字段加索引？
+
+答:首先从业务出发，无论是单个索引、还是联合索引，都要从你实际的查询语句、字段枚举值的区分度、字段的类型考虑(where 条件指定的字段)
+
+比如:where userld=1and questionld =2
+
+可以选择根据 userld 和 questiond 分别建立索引(需要分别根据这两个字段单独查询);也可以选择给这两个字段建立联合索引(所查询的字段是绑定在一起的)
+
+原则上:能不用索引就不用索引;能用单个索引就别用联合/多个索引;不要给没区分度的字段加索引(比如性别，就男/女)。因为索引也是要占用空间的。
+
+---
+
+## 后端接口开发
+
+CURD大家都写烂了，其实很简单，这里演示一下如何更快的将这几张表的增删改查搞完
+
+### 后端开发流程
+
+1）根据功能设计库表
+
+2）自动生成对数据库基本的增删改查（mapper 和 service 层的基本功能）
+
+3）编写 Controller 层，实现基本的增删改查和权限校验
+
+4）去根据业务定制开发新的功能 / 编写新的代码
+
+因此除了第四步外，前三步全部都是可以自动化，或者说第二步第三步没必要占用你太多时间，能写出来一次就够了，能复制粘贴就复制粘贴 / 编写新的代码
 
 
 

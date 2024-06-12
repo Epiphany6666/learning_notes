@@ -9526,7 +9526,7 @@ created(){
 
 ---
 
-# 94.如何提供&访问vuex的数据
+# 94.如何提供 &      访问vuex的数据
 
 ## 一、提供数据
 
@@ -12755,7 +12755,7 @@ export default {
 
 1. 请求时，打开 loading
 
-```jsx
+```js
 // 添加响应拦截器
 instance.interceptors.response.use(function (response) {
   // 2xx 范围内的状态码都会触发该函数。
@@ -13555,6 +13555,8 @@ export default {
 </style>
 ```
 
+
+
 ----
 
 # 搜索列表 - 动态渲染
@@ -13563,7 +13565,7 @@ export default {
 
 <img src=".\assets\image-20240211165011697.png" alt="image-20240211165011697" style="zoom:47%;" />
 
-## (1) 搜索关键字搜索
+## 一、搜索关键字搜索
 
 <img src="./assets/image-20230621155728973.png" alt="image-20230621155728973" style="zoom:80%;" />
 
@@ -13632,7 +13634,7 @@ async created () {
 
 ----
 
-## (2) 分类id搜索
+## 二、分类id搜索
 
 <img src="./assets/image-20230624231331980.png" alt="image-20230624231331980" style="zoom:67%;" />
 
@@ -17158,7 +17160,7 @@ npm install / npm i
 >       resolve: {
 >            // 别名
 >            alias: {
->                // 这句话的意思就是允许在项目当中支持@去访问目录，这个在脚手架里是自带的，但是vite里面需要进行配置
+>                // 这句话的意思就是允许在项目当中支持@去访问目录，这个在vue-cli脚手架里是自带的，但是vite里面需要进行配置
 >                '@': fileURLToPath(new URL('./src', import.meta.url))
 >            }
 >       }
@@ -18385,13 +18387,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->                                                                   
+>                                                                      
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->                                                                   
+>                                                                      
 >    <style scoped>
 >    </style>
 >    ~~~
