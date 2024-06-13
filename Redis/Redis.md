@@ -6285,7 +6285,7 @@ public Result seckillVoucher(Long voucherId) {
 @Transactional
 public  Result createVoucherOrder(Long voucherId) {
 	Long userId = UserHolder.getUser().getId();
-	synchronized(userId.toString()){
+	synchronized(userId.toString().intern()){
          // 5.1.查询订单
         int count = query().eq("user_id", userId).eq("voucher_id", voucherId).count();
         // 5.2.判断是否存在
