@@ -2420,6 +2420,68 @@ private UserVO userVO;
 
 
 
+---
+
+# -------------------------------------
+
+
+
+# 接入要用到的组件
+
+先接入可能用到的组件，再去写页面，避免因为后续依赖冲突、整合组件失败带来的返工。
+
+## 一、Markdown 编辑器
+
+为什么用 Markdown？
+
+一套通用的文本编辑语法，可以在各大网站
+
+这里使用的Markdown编辑器在GIthub上是开源的，我也不建议大家去使用非开源的文档编辑器，因为像这种编辑器出了Bug，你想自己改，很难改的。
+
+https://github.com/bytedance/bytemd
+
+安装的时候一定要看官方文档进行安装，它这里有很多个版本，Vanilla JS是原生JS，就是最简单的JS，只不过用了一个看上去很牛逼的词而已。
+
+<img src="./assets/image-20240614213854838.png" alt="image-20240614213854838" style="zoom:67%;" />
+
+官方文档中没有写如何安装，但是也很简单，我们直接安装 `@bytemd/vue-next`
+
+<img src="./assets/image-20240614214942327.png" alt="image-20240614214942327" style="zoom:67%;" />
+
+---
+
+底下会有用法，无论使用那哪种，都需要先引入css样式
+
+<img src="./assets/image-20240614213925333.png" alt="image-20240614213925333" style="zoom: 67%;" />
+
+**main.ts**
+
+~~~ts
+import "bytemd/dist/index.css";
+~~~
+
+---
+
+然后找到Vue对应引入组件的方法
+
+![image-20240614215251556](./assets/image-20240614215251556.png)
+
+一般我们引入组件，就不要直接把它写到你的某一个现成的页面里面的，而是新建一个组件页面文件
+
+<img src="./assets/image-20240614215641186.png" alt="image-20240614215641186" style="zoom:67%;" />
+
+这个需要安装 `IntelliVue插件`，它可以帮你快速去建组件
+
+<img src="./assets/image-20240614215746364.png" alt="image-20240614215746364" style="zoom:67%;" />
+
+但是它建立出来的也不一定满足我们的要求
+
+
+
+
+
+
+
 
 
 

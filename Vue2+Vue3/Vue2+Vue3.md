@@ -16533,6 +16533,8 @@ export default {
 </script>
 ```
 
+
+
 -----
 
 # 个人中心 - 基本渲染
@@ -16839,9 +16841,11 @@ export default {
 </style>
 ```
 
+
+
 ----
 
-## 个人中心 - 退出功能
+# 个人中心 - 退出功能
 
 1 注册点击事件
 
@@ -16958,7 +16962,11 @@ module.exports = {
 
 ![image-20240213172938729](.\assets\image-20240213172938729.png)
 
-### (3) 路由懒加载
+
+
+---
+
+# 路由懒加载
 
 路由懒加载 & 异步组件， 不会一上来就将所有的组件都加载，而是访问到对应的路由了，才加载解析这个路由对应的所有组件
 
@@ -17033,6 +17041,8 @@ const Layout = () => import('@/views/layout')
 > Vue3底层采用了ES7的Proxy进行了底层的代理，用Proxy进行代理的好处就是，它是针对于对象进行的代理，将来无论这个对象里新增了属性还是减少了属性，都不会影响数据的整个劫持，而Vue2中对于对象中的新增属性，减少属性是劫持不到的，它还需要通过额外的语法来进行处理
 
 ![image.png](./assets/01.png)
+
+
 
 ---
 
@@ -17141,8 +17151,6 @@ npm install / npm i
 ----
 
 # 142.熟悉项目和关键文件
-
-## 一、不同点
 
 ## vite.config.js
 
@@ -18393,13 +18401,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->                                                                         
+>                                                                            
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->                                                                         
+>                                                                            
 >    <style scoped>
 >    </style>
 >    ~~~
