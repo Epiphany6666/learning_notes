@@ -18358,8 +18358,6 @@ const modelValue = defineModel()
 
 # 154.Vue3 状态管理 - Pinia
 
-## 一、什么是Pinia
-
 Pinia 是 Vue 的专属的最新状态管理库 ，是 Vuex 状态管理工具的替代品
 
 > Vuex和Pinia都可以在Vue3中进行状态管理，但是官方更加推荐Pinia
@@ -18401,13 +18399,13 @@ npm init vue@latest
 >    ~~~vue
 >    <script setup>
 >    </script>
->                                                                            
+>                                                                                                 
 >    <template>
 >      <div>
 >        App.vue根组件
 >      </div>
 >    </template>
->                                                                            
+>                                                                                                 
 >    <style scoped>
 >    </style>
 >    ~~~
@@ -18742,6 +18740,8 @@ const counterStore = userCounterStore()
    
    </style>
    ~~~
+   
+   
 
 ----
 
@@ -19992,7 +19992,7 @@ const rules = {
 
 ---
 
-## 自定义校验
+# 自定义校验
 
 官网
 
@@ -20090,9 +20090,11 @@ const register = async () => {
 }
 ```
 
+
+
 ----
 
-### 封装 api 实现注册功能
+# 封装 api 实现注册功能
 
 需求：封装注册api，进行注册，注册成功切换到登录
 
@@ -20224,6 +20226,8 @@ watch(isRegister, () => {
 这些是在校验中产生的提示消息，在正式上线的时候会去掉，不用担心
 
 ![image-20240218203304195](.\assets\image-20240218203304195.png)
+
+
 
 ---
 
@@ -20460,6 +20464,8 @@ import avatar from '@/assets/default.png'
 
 ```
 
+
+
 ----
 
 # 登录访问拦截
@@ -20544,7 +20550,7 @@ onMounted(() => {
 
 -----
 
-## 退出功能 [Dripdown下拉菜单、ElMessageBox确认框]
+# 退出功能 [Dripdown下拉菜单、ElMessageBox确认框]
 
 1. 注册点击事件
 
@@ -20760,6 +20766,10 @@ const getChannelList = async () => {
 getChannelList()
 ```
 
+
+
+---
+
 # el-table 表格动态渲染
 
 查询官网可发现，可以通过`:data`注入数据，data里是数组里包对象的格式。
@@ -20779,6 +20789,8 @@ getChannelList()
 ![image-20240219004152190](.\assets\image-20240219004152190.png)
 
 
+
+---
 
 # eltable-自定义插槽
 
@@ -20901,6 +20913,10 @@ element-plus里还提供了el-empty组件
 </el-table>
 ~~~
 
+
+
+---
+
 # 176.文章分类添加编辑 [element-plus 弹层]
 
 **点击显示弹层**
@@ -20941,7 +20957,9 @@ const onAddChannel = () => {
 
 
 
-### 封装弹层组件 ChannelEdit
+---
+
+# 封装弹层组件 ChannelEdit
 
 添加 和 编辑，可以共用一个弹层，所以可以将弹层封装成一个组件
 
@@ -21011,6 +21029,10 @@ const onEditChannel = (row) => {
   dialog.value.open(row)
 }
 ```
+
+
+
+---
 
 # 177.准备弹层表单【编辑回显，表单提交】
 
@@ -21161,6 +21183,10 @@ const onSuccess = () => {
 }
 ```
 
+
+
+---
+
 # 178.文章分类删除
 
 1. `api/article.js`封装接口 api
@@ -21188,7 +21214,9 @@ const onDelChannel = async (row) => {
 }
 ```
 
-# 
+
+
+---
 
 # 文章管理页面 - [element-plus 强化]
 
@@ -21256,7 +21284,9 @@ const articleList = ref([
 
 
 
-### el-link
+---
+
+# el-link
 
 显示链接的效果
 
@@ -21305,6 +21335,10 @@ const onDeleteArticle = (row) => {
 }
 ```
 
+
+
+---
+
 # 180.中英国际化处理
 
 elment UI Vue2中默认是中文包，但Vue3中默认是英文的语言包，由于这里不涉及切换， 所以在 App.vue 中直接导入设置成中文即可
@@ -21335,7 +21369,9 @@ import zh from 'element-plus/es/locale/lang/zh-cn.mjs'
 
 
 
-### 文章分类选择
+---
+
+# 文章分类选择
 
 > 发布状态是写死的，就两个状态，无需发请求问后台
 
@@ -21431,6 +21467,10 @@ const params = ref({
 </el-select>
 ```
 
+
+
+---
+
 # 181.文章列表 - 封装 API 接口，请求渲染
 
 **没有数据，可以登录已完成的系统，添加几条数据**
@@ -21461,7 +21501,9 @@ getArticleList()
 
 
 
-### 格式化日期函数
+---
+
+# 格式化日期函数
 
 > Element插件里内置了dayjs，所以这里不需要导
 
@@ -21485,6 +21527,10 @@ import { formatTime } from '@/utils/format'
   </template>
 </el-table-column>
 ```
+
+
+
+---
 
 # 182.分页渲染 [element-plus 分页]
 
@@ -21576,6 +21622,10 @@ const onCurrentChange = (page) => {
 }
 ```
 
+
+
+---
+
 # 183.添加 loading 处理
 
 1. 准备数据
@@ -21605,7 +21655,9 @@ getArticleList()
 
 
 
-### 搜索 和 重置功能
+---
+
+# 搜索 和 重置功能
 
 1. 注册事件
 
@@ -21634,7 +21686,9 @@ const onReset = () => {
 }
 ```
 
-# 
+
+
+---
 
 # 文章发布
 
@@ -21760,6 +21814,10 @@ const onEditArticle = (row) => {
 }
 ```
 
+
+
+---
+
 # 185.完善抽屉表单结构
 
 1. 准备数据
@@ -21877,6 +21935,10 @@ defineProps({
  :style="{ width }"
 >
 ```
+
+
+
+---
 
 # 186.上传文件 [element-plus - 文件预览]
 
@@ -22006,6 +22068,10 @@ const onSelectFile = (uploadFile) => {
 }
 ```
 
+
+
+---
+
 # 187.富文本编辑器 [ vue-quill ]
 
 这是Vue3的文本编辑器
@@ -22059,6 +22125,10 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css'
   }
 }
 ```
+
+
+
+---
 
 # 188.添加文章功能
 
@@ -22153,6 +22223,10 @@ const open = async (row) => {
 }
 ```
 
+
+
+---
+
 # 189.编辑文章完成
 
 ### 编辑文章回显
@@ -22241,6 +22315,10 @@ const onPublish = async (state) => {
 }
 ```
 
+
+
+---
+
 # 文章删除
 
 1. 封装删除接口
@@ -22265,7 +22343,9 @@ const onDeleteArticle = async (row) => {
 }
 ```
 
-# 
+
+
+---
 
 # ChatGPT & Copilot
 
@@ -22291,7 +22371,13 @@ const onDeleteArticle = async (row) => {
 
 2. 工具 Github Copilot 智能生成代码
 
+
+
+---
+
 # 191.ChatGPT 的基本使用 - Prompt 优化
+
+## 介绍
 
 AI 互动的过程中，容易出现的问题：
 
@@ -22324,9 +22410,9 @@ AI 互动的过程中，容易出现的问题：
 
 ​	...
 
+---
 
-
-### 案例 - 前端简历
+## 案例 - 前端简历
 
 #### Prompt 优化前：
 
@@ -22361,9 +22447,13 @@ Prompt3：
 请注意：每个项目3个技术亮点，3个业务解决方案。
 ```
 
+
+
+---
+
 # 192.工具 Github Copilot 智能生成代码的使用
 
-### 安装步骤
+## 安装步骤
 
 - 登录 github，试用 Copilot
 
@@ -22371,7 +22461,9 @@ Prompt3：
 
   ![image-20240220134838783](.\assets\image-20240220134838783.png)
 
-### 使用说明
+---
+
+## 使用说明
 
 > 它会去分析上下文，什么样的风格习惯等等，它都会去借鉴，借鉴完后自然而然按照你想要的方式帮你生成代码
 
@@ -22383,9 +22475,13 @@ Prompt3：
 
 ![image-20240220140003035](.\assets\image-20240220140003035.png)
 
+
+
+---
+
 # 193.个人中心项目实战 - 基本资料
 
-**静态结构 + 校验处理**
+## 静态结构 + 校验处理
 
 chatgpt prompt 提示词参考：
 
@@ -22470,7 +22566,9 @@ const rules = {
 </template>
 ```
 
-### 封装接口，更新个人信息
+---
+
+## 封装接口，更新个人信息
 
 1. 封装接口
 
@@ -22495,6 +22593,10 @@ const submitForm = async () => {
   ElMessage.success('修改成功')
 }
 ```
+
+
+
+---
 
 # 194.个人中心 - 更换头像
 
@@ -22571,6 +22673,10 @@ const onUploadFile = (file) => {
 </style>
 ```
 
+
+
+---
+
 # 195.选择预览图片
 
 ```jsx
@@ -22599,7 +22705,9 @@ const onSelectFile = (uploadFile) => {
 
 
 
-### 上传头像
+---
+
+# 上传头像
 
 1. 封装接口
 
@@ -22617,6 +22725,10 @@ const onUpdateAvatar = async () => {
   ElMessage.success('头像更新成功')
 }
 ```
+
+
+
+---
 
 # 196.个人中心项目实战 - 重置密码
 
@@ -22647,7 +22759,7 @@ const pwdForm = ref({
 
 
 
-### 静态结构 + 校验处理
+## 静态结构 + 校验处理
 
 ```jsx
 <script setup>
@@ -22737,9 +22849,9 @@ const rules = {
 </template>
 ```
 
+----
 
-
-### 封装接口，更新密码信息
+## 封装接口，更新密码信息
 
 1. 封装接口
 

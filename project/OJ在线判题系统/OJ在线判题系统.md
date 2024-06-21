@@ -2476,15 +2476,31 @@ import "bytemd/dist/index.css";
 
 但是它建立出来的也不一定满足我们的要求
 
+<img src="./assets/image-20240614220001244.png" alt="image-20240614220001244" style="zoom:67%;" />
 
+然后将刚刚复制好的代码粘贴过来
 
+其中它引入了一个东西叫插件
 
+```ts
+import gfm from '@bytemd/plugin-gfm'
+```
 
+我们可以往下翻
 
+![image-20240615171709913](./assets/image-20240615171709913.png)
 
+我们其实用不到特别多的，唯一能用到的就是GFM，它其实就是说支持tables表格组件、支持任务列表、删除线(`strikethrough`)
 
+因此我们也安装一下 `@bytemd/plugin-gfm插件`、`@bytemd/plugin-highlight`
 
+使用插件的时候，直接从我们刚刚下载的包里面引入即可
 
+~~~ts
+import gfm from '@bytemd/plugin-gfm'
+~~~
+
+然后定义一个插件的数组，在这个插件数组中去执行引入的变量，就能够完成这个插件的引入了。
 
 
 
