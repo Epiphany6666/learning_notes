@@ -4622,6 +4622,18 @@ print(z) # True
 
 注意：函数调用时，如果有位置参数时，位置参数必须在关键字参数的前面，但关键字参数之间不存在先后顺序
 
+~~~python
+def user_info(name, age, gender):
+    print(f"姓名是:{name}, 年龄是:{age}, 性别是:{gender}")
+# 位置参数 - 默认使用形式
+user_info('小明', 20, '男')
+
+# 关键字参数
+user_info(name='小王', age=11, gender='女')
+user_info(age=10, gender='女', name='潇潇')    # 可以不按照参数的定义顺序传参
+user_info('甜甜', gender='女', age=9)
+~~~
+
 
 
 
