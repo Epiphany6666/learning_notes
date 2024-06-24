@@ -5000,7 +5000,7 @@ print(type(f)) # <class '_io.TextIOWrapper'>
 文件对象.read(num)
 ~~~
 
-num表示要从文件中读取的数据的长度（单位是字节），如果没有传入num，那么就表示读取文件中所有的数据。
+num表示要从文件中读取的数据的长度（单位是字节），**如果没有传入num，那么就表示读取文件中所有的数据**。
 
 在读取的时候，当前程序会记录读取的位置，当下一次调用 `read()` 的时候会从后面继续读
 
@@ -5861,6 +5861,7 @@ def test(a, b):
     print(a + b)
 
 # 只在当前文件中调用该函数，其他导入的文件内不符合该条件，则不执行test函数调用
+# if __name__ == '__main__' 表明当前代码文件是直接运行的，那如果不等于的话，那就表明它是被导入进去的
 if __name__ == '__main__':
     test (1, 1)
 ~~~
@@ -6063,6 +6064,14 @@ PyCharm也提供了安装第三方包的功能：
 
 ![image-20240623215932179](./assets/image-20240623215932179.png)
 
+由于PyCharm中它也是使用官方，即国外的网站下载的，如果你觉得比较慢，你可以将 `Options选项` 选上，同样写上 `-i`，后面加网址即可。
+
+![image-20240624124950543](./assets/image-20240624124950543.png)
+
+安装后底下会有一个进度条，打开可以看见都是后台执行的任务。
+
+<img src="./assets/image-20240624125145206.png" alt="image-20240624125145206" style="zoom:67%;" />
+
 ---
 
 ## 五、总结
@@ -6075,10 +6084,393 @@ PyCharm也提供了安装第三方包的功能：
 
 - 在命令提示符内：
 - **pip install** **包名称**
-- `pip install -i **https://pypi.tuna.tsinghua.edu.cn/simple 包名称`
+- `pip install -i https://pypi.tuna.tsinghua.edu.cn/simple 包名称`
 - 在PyCharm中安装
 
 
 
 ---
+
+# 98.异常-模块-包-综合案例讲解：自定义工具包
+
+## 一、需求
+
+创建一个自定义包，名称为：my_utils (我的工具）
+
+在包内提供2个模块
+
+`str_util.py` （字符串相关工具，内含：）
+
+- 函数：`str_reverse(s)`，接受传入字符串，将字符串反转返回
+- 函数：`substr(s, x, y)`，按照下标x和y，对字符串进行切片
+
+file_util.py（文件处理相关工具，内含：）
+
+- 函数：print_file_info(file_name)**，**接收传入文件的路径，打印文件的全部内容，如文件不存在则捕获异常，输出提示信息，通过finally关闭文件对象
+- 函数：append_to_file(file_name**, **data)，接收文件路径以及传入数据，将数据追加写入到文件中
+
+构建出包后，尝试着用一用自己编写的工具包。
+
+---
+
+## 二、代码示例
+
+`my_utils/file_util.py`
+
+~~~python
+"""
+字符串相关的工具模块
+"""
+
+def str_reverse(s):
+    """
+    功能是将字符串完成反转
+    :param s: 将被反转的字符串
+    :return: 反转后的字符串
+    """
+    return s[::-1]
+
+
+def substr(s, x, y):
+    """
+    功能是按照给定的下标完成给定字符串的切片
+    :param s: 即将被切片的字符串
+    :param x: 切片的开始下标
+    :param y: 切片的结束下标
+    :return: 切片完成后的字符串
+    """
+    return s[x:y]
+
+if __name__ == '__main__':
+    print(str_reverse("黑马程序员"))
+    print(substr("黑马程序员", 1, 3))
+~~~
+
+---
+
+`my_utils/file_util.py`
+
+~~~python
+"""
+文件处理相关的工具模块
+"""
+
+def print_file_info(file_name):
+    """
+    功能是：将给定路径的文件内容输出到控制台中
+    :param file_name: 即将读取的文件路径
+    :return: None
+    """
+    f = None
+    try:
+        f = open(file_name, "r", encoding="UTF-8")
+        content = f.read()
+        print("文件的全部内容如下：")
+        print(content)
+    except Exception as e:
+        print(f"程序出现异常了，原因是：{e}")
+    finally:
+        if f:       # 如果变量是None（在open方法的时候就报异常），表示False，如果有任何内容，就是True
+            f.close()
+
+
+def append_to_file(file_name, data):
+    """
+    功能：将指定的数据追加到指定的文件中
+    :param file_name: 指定的文件的路径
+    :param data: 指定的数据
+    :return: None
+    """
+    f = open(file_name, "a", encoding="UTF-8")
+    f.write(data)
+    f.write("\n")
+    f.close()
+
+
+if __name__ == '__main__':
+    # print_file_info("D:/bill.txtxxx")
+    append_to_file("D:/test_append.txt", "传智教育")
+~~~
+
+测试
+
+~~~python
+"""
+演示异常、模块、包的综合案例练习
+"""
+# 创建my_utils 包， 在包内创建：str_util.py 和 file_util.py 2个模块，并提供相应的函数
+
+import my_utils.str_util
+from my_utils import file_util
+
+print(my_utils.str_util.str_reverse("黑马程序员"))
+print(my_utils.str_util.substr("itheima", 0, 4))
+
+
+file_util.append_to_file("D:/test_append.txt", "itheima")
+file_util.print_file_info("D:/test_append.txt")
+~~~
+
+
+
+---
+
+# 99.数据可视化 —— 案例介绍
+
+## **效果一：****2020****年印美日新冠累计确诊人数**
+
+2020年是新冠疫情爆发的一年, 随着疫情的爆发, 国内外确诊人数成了大家关心的热点, 
+
+相信大家都有看过类似的疫情报告. 本案例对印度美国日本三个国家确诊人数的进行了
+
+可视化处理, 形成了可视化的疫情确诊人数报告.
+
+![image-20240624131816155](./assets/image-20240624131816155.png)
+
+---
+
+**效果二：全国疫情地图可视化**
+
+![image-20240624131833566](./assets/image-20240624131833566.png)
+
+---
+
+## **效果三：动态****GDP****增长图**
+
+![image-20240624131855281](./assets/image-20240624131855281.png)
+
+---
+
+## 数据来源
+
+l**本案例数据全部来自** **<<****百度疫情实时大数据报告****>>****，及公开的全球各国****GDP****数据**
+
+<img src="./assets/image-20240624131922637.png" alt="image-20240624131922637" style="zoom:80%;" />
+
+l**使用的技术**
+
+**Echarts** 是个由百度开源的数据可视化，凭借着良好的交互性，精巧的图表设计，得到了众多开发者的认可. 而 **Python** 是门富有表达力的语言，很适合用于数据处理. 当数据分析遇上数据可视化时 `pyecharts` 诞生了.
+
+<img src="./assets/image-20240624131940402.png" alt="image-20240624131940402" style="zoom:80%;" />
+
+
+
+---
+
+# 100.JSON数据格式的转换
+
+## 一、 什么是json
+
+- JSON是一种轻量级的数据交互格式。可以按照JSON指定的格式去组织和封装数据
+- JSON本质上是一个带有特定格式的字符串
+
+
+
+**主要功能**：json就是一种在各个编程语言中流通的数据格式，负责不同编程语言中的数据传递和交互. 类似于：
+
+- 国际通用语言-**英语**
+- 中国56个民族不同地区的通用语言-**普通话**
+
+---
+
+## 二、 json有什么用
+
+l各种编程语言存储数据的容器不尽相同,在Python中有字典dict这样的数据类型, 而其它语言可能没有对应的字典。
+
+为了让不同的语言都能够相互通用的互相传递数据，JSON就是一种非常良好的中转数据格式。如下图，以Python和C语言互传数据为例：
+
+<img src="./assets/image-20240624132151938.png" alt="image-20240624132151938" style="zoom:57%;" />
+
+---
+
+## 三、 json格式数据转化
+
+json格式的数据要求很严格，下面我们看一下他的要求
+
+~~~python
+# json数据的格式可以是： 
+{"name":"admin", "age":18}  # 这个格式就是python中使用的字典，他是字典，同样也是JSON
+
+# 也可以是：  
+[{"name":"admin","age":18},{"name":"root","age":16},{"name":"张三","age":20}] # 它是列表，也是JSON，里面嵌套字典
+~~~
+
+可以发现python是有优势的，因为python和JSON格式是无缝切换的，JSON说白了其实就是一个Python的列表 / 字典，只不过如果是列表，里面需要嵌套字典；如果是子带你本身的话，就没有什么特殊的，和Python的字典完全一样。
+
+所以你可以认为我们所谓的JSON就是把Python中字典转换为字符串，或者将Python中内嵌字典的列表转为字符串，此时这两种类型就直接变成JSON数据了。
+
+了解了JSON长什么样之后，我们其实对它的语法就不用去强求太多了，你正常的在代码中定义出来字典、或者内嵌字典的列表就可以无缝的和JSON进行转换，或者反过来将JSON转为字典或者列表。
+
+---
+
+## 四、Python数据和Json数据的相互转化
+
+~~~python
+# 导入json模块 
+import json 
+
+# 准备符合格式json格式要求的python数据 
+data = [{"name": "老王", "age": 16}, {"name": "张三", "age": 20}]
+ 
+# 通过 json.dumps(data) 方法把python数据转化为了 json数据 
+data = json.dumps(data) 
+
+# 通过 json.loads(data) 方法把json数据转化为了 python数据 
+data = json.loads(data)
+~~~
+
+---
+
+## 五、代码示例
+
+~~~python
+"""
+演示JSON数据和Python字典的相互转换
+"""
+import json
+# 准备列表，列表内每一个元素都是字典，将其转换为JSON
+data = [{"name": "张大山", "age": 11}, {"name": "王大锤", "age": 13}, {"name": "赵小虎", "age": 16}]
+json_str = json.dumps(data, ensure_ascii=False) # 第二个参数用于中文编码问题，如果我们不写中文，那就可以不写这个参数，设置成False表示我不使用ASCII码去转换它，而是将它的内容直接输出出去，如果为True，中文就会转换为Unicode的字符了。
+print(type(json_str)) # <class 'str'>
+print(json_str) # [{"name": "张大山", "age": 11}, {"name": "王大锤", "age": 13}, {"name": "赵小虎", "age": 16}]
+# 准备字典，将字典转换为JSON
+d = {"name":"周杰轮", "addr":"台北"}
+json_str = json.dumps(d, ensure_ascii=False)
+print(type(json_str)) # <class 'str'>
+print(json_str) # {"name": "周杰轮", "addr": "台北"}
+# 将JSON字符串转换为Python数据类型[{k: v, k: v}, {k: v, k: v}]
+s = '[{"name": "张大山", "age": 11}, {"name": "王大锤", "age": 13}, {"name": "赵小虎", "age": 16}]'
+l = json.loads(s)
+print(type(l)) # <class 'list'>
+print(l) # [{'name': '张大山', 'age': 11}, {'name': '王大锤', 'age': 13}, {'name': '赵小虎', 'age': 16}]
+# 将JSON字符串转换为Python数据类型{k: v, k: v}
+s = '{"name": "周杰轮", "addr": "台北"}'
+d = json.loads(s)
+print(type(d)) # <class 'dict'>
+print(d) # {'name': '周杰轮', 'addr': '台北'}
+~~~
+
+---
+
+## 六、总结
+
+1. json：是一种轻量级的数据交互格式，采用完全独立于编程语言的文本格式来存储和表示数据（就是字符串）
+
+Python语言使用JSON有很大优势，因为：JSON无非就是一个单独的字典或一个内部元素都是字典的列表，所以JSON可以直接和Python的字典或列表进行无缝转换。
+
+2. json格式数据转化
+
+通过 `json.dumps(data)` 方法把python数据转化为了 json数据
+
+`data = json.dumps(data)`
+
+如果有中文可以带上：`ensure_ascii=False`参数来确保中文正常转换
+
+通过 `json.loads(data)` 方法把josn数据转化为了 python列表或字典
+
+`data = json.loads(data)`
+
+
+
+---
+
+# 101.pyecharts模块简介
+
+## 一、pyecharts模块
+
+如果想要做出数据可视化效果图, 可以借助pyecharts模块来完成
+
+**概况** ：**Echarts** 是个由百度开源的数据可视化，凭借着良好的交互性，精巧的图表设计，得到了众多开发者的认可。 而 **Python** 是门富有表达力的语言，很适合用于数据处理。 当数据分析遇上数据可视化时pyecharts 诞生了.
+
+官网：pyecharts.org
+
+在右上角可以切换语言为中文，直接就可以进入到它的相关中文文档中了。
+
+<img src="./assets/image-20240624143922172.png" alt="image-20240624143922172" style="zoom:50%;" />
+
+这个框架 / 模块它的内容还是非常多的，我们在本次的案例中只是简单的使用它的一些基本的图标。
+
+![image-20240624144236640](./assets/image-20240624144236640.png)
+
+对于pyecharts这个模块来说，它还有一个叫做画廊的功能，官网：gallery.pyecharts.org。
+
+因为我们这是一个可视化框架，它的主要功能就是产生各种各样的图标
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
