@@ -6394,39 +6394,178 @@ Python语言使用JSON有很大优势，因为：JSON无非就是一个单独的
 
 对于pyecharts这个模块来说，它还有一个叫做画廊的功能，官网：gallery.pyecharts.org。
 
-因为我们这是一个可视化框架，它的主要功能就是产生各种各样的图标
+因为我们这是一个可视化框架，它的主要功能就是产生各种各样的图标。
+
+---
+
+## 二、pyecharts模块安装
+
+使用在前面学过的pip命令即可快速安装PyEcharts模块
+
+~~~python
+pip install pyecharts
+~~~
+
+![image-20240625132022105](./assets/image-20240625132022105.png)
+
+输入 `python` 进入python环境，然后输入 `import pyecharts`，如果没有出现任何问题，那就表示可以正常使用了。
+
+![image-20240625132135759](./assets/image-20240625132135759.png)
+
+---
+
+## 三、总结
+
+1. 开发可视化图表使用的技术栈是：
+
+Echarts框架的Python版本：PyEcharts包
+
+2. 如何安装PyEcharts包：
+
+pip install pyecharts
+
+3. 如何查看官方示例
+
+打开官方画廊：https://gallery.pyecharts.org/#/README
 
 
 
+---
+
+# 102.pyecharts的入门使用
+
+## 一、pyechars入门
+
+**基础折线图**
+
+天极爱y轴数据和天极爱x轴数据是一一对应的。
+
+![image-20240625132321496](./assets/image-20240625132321496.png)
+
+~~~python
+"""
+演示pyecharts的基础入门
+"""
+# 导包
+from pyecharts.charts import Line
+from pyecharts.options import TitleOpts, LegendOpts, ToolboxOpts, VisualMapOpts
+# 创建一个折线图对象
+line = Line()
+# 给折线图对象添加x轴的数据
+line.add_xaxis(["中国", "美国", "英国"])
+# 给折线图对象添加y轴的数据
+line.add_yaxis("GDP", [30, 20, 10])
+
+# 通过render方法，将代码生成为图像
+line.render()
+~~~
+
+运行完代码会发现什么都没有出现，这是因为图像已经变成一个文件了，
+
+<img src="./assets/image-20240625132913963.png" alt="image-20240625132913963" style="zoom:80%;" />
+
+这个文件是一个网页文件，它里面记录的是html网页代码，将文件通过浏览器打开
+
+![image-20240625133000567](./assets/image-20240625133000567.png)
+
+![image-20240625133408518](./assets/image-20240625133408518.png)
+
+---
+
+## 二、 pyecharts有哪些配置选项
+
+pyecharts模块中有很多的配置选项, 常用到2个类别的选项:
+
+- 全局配置选项
+
+  针对整个图像进行配置，例如图像的标题、图像的图例、工具箱
+
+- 系列配置选项
+
+  针对具体的轴数据进行配置
+
+系列配置我们在后面的个性化会讲解，我们先来看看全局配置
+
+---
+
+## 三、`set_global_opts`方法
+
+这里**全局配置选项**可以通过**set_global_opts**方法来进行配置, 相应的选项和选项的功能如下:
+
+标题、图例、工具箱....
+
+这些基础的元素跟图标类型没有关系，你这里面不管是饼图还是柱状图，还是折线图，标题、图例、工具箱这些总归是要有的，因此全局配置项就是针对这些通用的配置去进行设置的。
+
+<img src="./assets/image-20240625141413697.png" alt="image-20240625141413697" style="zoom:67%;" />
+
+给我们得到一个折线图对象的时候，就可以调用 `set_global_opts方法` 设置相关的全局配置项了
+
+~~~python
+"""
+演示pyecharts的基础入门
+"""
+# 导包
+from pyecharts.charts import Line
+# pyecharts里面有options，里面有一系列可配置的选项
+from pyecharts.options import TitleOpts, LegendOpts, ToolboxOpts, VisualMapOpts
+# 创建一个折线图对象
+line = Line()
+# 给折线图对象添加x轴的数据
+line.add_xaxis(["中国", "美国", "英国"])
+# 给折线图对象添加y轴的数据
+line.add_yaxis("GDP", [30, 20, 10])
+
+# 设置全局配置项set_global_opts来设置,
+line.set_global_opts(
+    # 拿到TitleOpts后，就可以在方法中传入对应的参数来控制行为了
+    # pos_bottom="1%"：距离底部1%的距离
+    title_opts=TitleOpts(title="GDP展示", pos_left="center", pos_bottom="1%"),
+    # is_show：是否展示
+    legend_opts=LegendOpts(is_show=True), # 图例是否展示，默认是展示
+    toolbox_opts=ToolboxOpts(is_show=True),
+    # visualmap_opts：视觉映射选项
+    visualmap_opts=VisualMapOpts(is_show=True),
+)
+
+# 通过render方法，将代码生成为图像
+line.render()
+~~~
+
+<kbd>ctrl + p</kbd> 可以看见方法所有的参数，传参的时候可以通过位置传参，也可以通过关键字传参。
+
+![image-20240625143316719](./assets/image-20240625143316719.png)
+
+剩余的全局配置项可以在 https://pyecharts.org/#/zh-cn/global_options 上查找
+
+![image-20240625144022163](./assets/image-20240625144022163.png)
+
+效果图如下
+
+![image-20240625144140765](./assets/image-20240625144140765.png)
+
+---
+
+## 四、总结
+
+1. pyecharts模块中有很多的配置选项, 常用到三个类别的选项:
+
+全局配置选项
+
+系列配置选项
+
+2. 全局配置项能做什么？
+
+- 配置图表的标题
+- 配置图例
+- 配置鼠标移动效果
+- 配置工具栏
+- 等整体配置项
 
 
 
+---
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# 103.
 
 
 
