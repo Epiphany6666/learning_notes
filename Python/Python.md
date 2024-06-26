@@ -6581,22 +6581,332 @@ line.render()
 
 对于JSON数据我们可以通过一些第三方的工具去快速查看它的格式，我们复制中间标准的JSON数据
 
+懒人工具：https://www.ab173.com/gongju/json/jsonviewernew.php
+
+![image-20240626195112219](./assets/image-20240626195112219.png)
+
+在这个里面将JSON粘贴进来，然后点击格式化
+
+<img src="./assets/image-20240626195201027.png" alt="image-20240626195201027" style="zoom:87%;" />
+
+此时格式看起来已经比较清爽了，但是还是有点长，然后点击左上角的视图，可以发现已经可以缩放了
+
+![image-20240626195447495](./assets/image-20240626195447495.png)
+
+![image-20240626195803580](./assets/image-20240626195803580.png)
+
+数据如下图所示，虽然只展示了部分数据，但是层次很清楚。
+
+<img src="./assets/image-20240626195857769.png" alt="image-20240626195857769" style="zoom:67%;" />
+
+导入模块：
+
+<img src="./assets/image-20240626201226614.png" alt="image-20240626201226614" style="zoom:67%;" />
+
+对数据进行整理，让数据符合json格式：
+
+~~~python
+# 把不符合json数据格式的 "jsonp_1629350871167_29498(" 去掉 
+data = data.replace("jsonp_1629350871167_29498(", "") 
+# 把不符合json数据格式的 ");" 去掉 
+data = data[:-2] 
+# 数据格式符合json格式后,对数据进行转化 
+data = json.loads(data) 
+# 获取日本的疫情数据 
+data = data["data"][0]['trend’] 
+# x1_data存放日期数据 
+x1_data = data['updateDate’] 
+# y1_data存放人数数据 
+y1_data = data['list'][0]["data"] 
+# 获取2020年的数据 
+x1_data = data['updateDate'][:314] 
+# 获取2020年的数据 
+y1_data = data['list'][0]["data"][:314]
+~~~
 
 
 
+---
+
+# 104.生成折线图
+
+## 一、导入模块
+
+<img src="./assets/image-20240626202948000.png" alt="image-20240626202948000" style="zoom:67%;" />
+
+---
+
+## 二、折线图相关配置项
+
+| **配置项** | **作用**               | **代码实例**                                             |
+| ---------- | ---------------------- | -------------------------------------------------------- |
+| init_opts  | 对折线图初始化设置宽高 | init_opts=opts.InitOpts(width="1600px",  height="800px") |
+| .add_xaxis | 添加x轴数据            | .add_xaxis(列表)                                         |
+| .add_yaxis | 添加y轴数据            |                                                          |
+
+---
+
+**创建折线图**
+
+<img src="./assets/image-20240626203503717.png" alt="image-20240626203503717" style="zoom:67%;" />
+
+- 这里的Line()是构建类对象，我们先不必理解是什么意思，后续在Python高阶中进行详细讲解。
+- 目前我们简单的会用即可
+
+**添加数据**
+
+<img src="./assets/image-20240626203612741.png" alt="image-20240626203612741" style="zoom:67%;" />
+
+---
+
+## 三、`add_yaxis` 相关配置选项
+
+| **配置项**     | **作用**               | **代码实例**                               |
+| -------------- | ---------------------- | ------------------------------------------ |
+| series_name    | 设置图例名称           | series_name="美国确诊人数"                 |
+| y_axis         | 输入y轴数据            | y_axis=["列表"]                            |
+| symbol_size    | 设置点的大小           | symbol_size=10                             |
+| label_opts     | 标签设置项：不显示标签 | label_opts=opts.LabelOpts(is_show=False)   |
+| linestyle_opts | 线条宽度和样式         | linestyle_opts=opts.LineStyleOpts(width=2) |
+
+<img src="./assets/image-20240626204200422.png" alt="image-20240626204200422" style="zoom:67%;" />
+
+![image-20240626204206618](./assets/image-20240626204206618.png)
+
+---
+
+## 四、`.set_global_opts` 全局配置选项
+
+| **配置项**  | **作用**         | **代码实例**                                                |
+| ----------- | ---------------- | ----------------------------------------------------------- |
+| title_opts  | 设置图标题和位置 | title_opts=opts.TitleOpts(title="标题",  pos_left="center") |
+| yaxis_opts  | y轴配置项        | yaxis_opts=opts.AxisOpts(name="累计确诊人数")               |
+| xaxis_opts  | x轴配置项        | xaxis_opts=opts.AxisOpts(name="时间")                       |
+| legend_opts | 图例配置项       | legend_opts=opts.LegendOpts(pos_left='70%')                 |
+
+~~~python
+.set_global_opts(
+	# 设置图标题和位置 
+	title_opts=opts.TitleOpts(title="2020年 印🇮🇳美🇺🇸日🇯🇵 累计确诊人数对比图",pos_left="center"), 
+	# x轴配置项 
+	xaxis_opts=opts.AxisOpts(name=“时间”),    # 轴标题 
+	# y轴配置项 
+	yaxis_opts=opts.AxisOpts(name=“累计确诊人数”),    # 轴标题 
+	# 图例配置项 
+	legend_opts=opts.LegendOpts(pos_left=‘70%‘),    # 图例的位置 
+)
+~~~
+
+![image-20240626204328068](./assets/image-20240626204328068.png)
+
+---
+
+## 五、完整代码
+
+~~~python
+"""
+演示可视化需求1：折线图开发
+"""
+import json
+from pyecharts.charts import Line
+from pyecharts.options import TitleOpts, LabelOpts
+
+# 处理数据
+f_us = open("D:/美国.txt", "r", encoding="UTF-8")
+us_data = f_us.read()   # 美国的全部内容
+
+f_jp = open("D:/日本.txt", "r", encoding="UTF-8")
+jp_data = f_jp.read()   # 日本的全部内容
+
+f_in = open("D:/印度.txt", "r", encoding="UTF-8")
+in_data = f_in.read()   # 印度的全部内容
+
+# 去掉不合JSON规范的开头
+us_data = us_data.replace("jsonp_1629344292311_69436(", "")
+jp_data = jp_data.replace("jsonp_1629350871167_29498(", "")
+in_data = in_data.replace("jsonp_1629350745930_63180(", "")
+
+# 去掉不合JSON规范的结尾
+us_data = us_data[:-2] # 取到倒数第2个结束，但是不包含倒数第2个
+jp_data = jp_data[:-2]
+in_data = in_data[:-2]
+
+# JSON转Python字典
+us_dict = json.loads(us_data)
+jp_dict = json.loads(jp_data)
+in_dict = json.loads(in_data)
+
+# 获取trend key
+us_trend_data = us_dict['data'][0]['trend']
+jp_trend_data = jp_dict['data'][0]['trend']
+in_trend_data = in_dict['data'][0]['trend']
+
+# 获取日期数据，用于x轴，取2020年（到314下标结束）
+us_x_data = us_trend_data['updateDate'][:314]
+jp_x_data = jp_trend_data['updateDate'][:314]
+in_x_data = in_trend_data['updateDate'][:314]
+
+# 获取确认数据，用于y轴，取2020年（到314下标结束）
+us_y_data = us_trend_data['list'][0]['data'][:314]
+jp_y_data = jp_trend_data['list'][0]['data'][:314]
+in_y_data = in_trend_data['list'][0]['data'][:314]
+~~~
 
 
 
+---
+
+# 105.地图-基础地图使用
+
+## 一、基础地图演示
+
+![image-20240626212520407](./assets/image-20240626212520407.png)
+
+~~~python
+"""
+演示地图可视化的基本使用
+"""
+from pyecharts.charts import Map
+from pyecharts.options import VisualMapOpts
+
+# 准备地图对象
+map = Map()
+# 准备数据
+data = [
+    ("北京", 99),
+    ("上海", 199),
+    ("湖南", 299),
+    ("台湾", 399),
+    ("广东", 499)
+]
+# 添加数据，参数一：名称、参数二：数据、参数三：地图的类型
+map.add("测试地图", data, "china")
+
+# 绘图
+map.render()
+~~~
 
 
 
+---
+
+## 二、基础地图演示 - 视觉映射器
+
+![image-20240626213715105](./assets/image-20240626213715105.png)
+
+~~~python
+# 设置全局选项
+map.set_global_opts(
+    visualmap_opts=VisualMapOpts(
+        is_show=True,
+        is_piecewise=True, # 开启手动校准范围
+        pieces=[ # 设置具体的范围
+            {"min": 1, "max": 9, "label": "1-9", "color": "#CCFFFF"},
+            {"min": 10, "max": 99, "label": "10-99", "color": "#FF6666"},
+            {"min": 100, "max": 500, "label": "100-500", "color": "#990033"}
+        ]
+    )
+)
+~~~
 
 
 
+----
+
+# 106.全国疫情地图构建
+
+## 一、案例效果
+
+<img src="./assets/image-20240626214710781.png" alt="image-20240626214710781" style="zoom:67%;" />
+
+---
+
+## 二、数据整理
+
+**获取数据** 
+
+<img src="./assets/image-20240626214746842.png" alt="image-20240626214746842" style="zoom:67%;" />
+
+**数据整体结构（全国）**
+
+![image-20240626214758329](./assets/image-20240626214758329.png)
+
+**省数据结构**
+
+![image-20240626214808240](./assets/image-20240626214808240.png)
+
+**获取每个省份的确诊数据**
+
+<img src="./assets/image-20240626214824229.png" alt="image-20240626214824229" style="zoom:67%;" />
+
+**上述代码执行后输出，每个省的确诊数据**:
+
+![image-20240626214843374](./assets/image-20240626214843374.png)
+
+**创建地图并添加数据**
+
+**导入模块**:
+
+<img src="./assets/image-20240626214902413.png" alt="image-20240626214902413" style="zoom:67%;" />
+
+**创建地图**
+
+<img src="./assets/image-20240626215011885.png" alt="image-20240626215011885" style="zoom:67%;" />
+
+---
+
+## 三、创建地图并添加数据
+
+**导入模块**:
+
+<img src="./assets/image-20240626215704631.png" alt="image-20240626215704631" style="zoom:67%;" />
+
+**创建地图**:
+
+<img src="./assets/image-20240626215716741.png" alt="image-20240626215716741" style="zoom:80%;" />
+
+**添加数据**
+
+<img src="./assets/image-20240626215825116.png" alt="image-20240626215825116" style="zoom:67%;" />
+
+<img src="./assets/image-20240626215829882.png" alt="image-20240626215829882" style="zoom:67%;" />
+
+<img src="./assets/image-20240626215835499.png" alt="image-20240626215835499" style="zoom:67%;" />
+
+<img src="./assets/image-20240626215839766.png" alt="image-20240626215839766" style="zoom:60%;" />
+
+**添加数据**:
+
+![image-20240626215941390](./assets/image-20240626215941390.png)
+
+**设置全局配置选项**
+
+![image-20240626220022556](./assets/image-20240626220022556.png)
+
+**设置全局配置选项**
+
+~~~python
+# is_piecewise : 是否为分段型 
+# pieces : 自定义的每一段的范围，以及每一段的文字，以及每一段的特别的样式 
+virus_map = virus_map.set_global_opts(visualmap_opts=opts.VisualMapOpts( 
+				is_piecewise=True, 
+				pieces=[ 
+					{"min": 1, "max": 9, "label": "1-9人", "color": "#CCFFFF"}, 
+					{"min": 10, "max": 99, "label": "10-99人", "color": "#FFFF99"}, 
+					{"min": 100, "max": 499, "label": "99-499人", "color": "#FF9966"}, 
+					{"min": 500, "max": 999, "label": "499-999人", "color": "#FF6666"}, 
+					{"min": 1000, "max": 9999, "label": "1000-9999人", "color": "#CC3333"},
+					{"min": 10000, "label": "10000以上", "color": "#990033"} 
+				               ] ))
+~~~
+
+![image-20240626220130549](./assets/image-20240626220130549.png)
 
 
 
+---
 
+# 107.
 
 
 
