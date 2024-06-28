@@ -6902,11 +6902,496 @@ virus_map = virus_map.set_global_opts(visualmap_opts=opts.VisualMapOpts(
 
 ![image-20240626220130549](./assets/image-20240626220130549.png)
 
+---
+
+## 四、代码示例
+
+~~~python
+"""
+演示全国疫情可视化地图开发
+"""
+import json
+from pyecharts.charts import Map
+from pyecharts.options import *
+
+# 读取数据文件
+f = open("D:/疫情.txt", "r", encoding="UTF-8")
+data = f.read()     # 全部数据
+# 关闭文件
+f.close()
+# 取到各省数据
+# 将字符串json转换为python的字典
+data_dict = json.loads(data)        # 基础数据字典
+# 从字典中取出省份的数据
+province_data_list = data_dict["areaTree"][0]["children"]
+# 组装每个省份和确诊人数为元组，并各个省的数据都封装入列表内
+data_list = []      # 绘图需要用的数据列表
+for province_data in province_data_list:
+    province_name = province_data["name"]                   # 省份名称
+    province_confirm = province_data["total"]["confirm"]    # 确诊人数
+    data_list.append((province_name, province_confirm))
+
+
+# 创建地图对象
+map = Map()
+# 添加数据
+map.add("各省份确诊人数", data_list, "china")
+# 设置全局配置，定制分段的视觉映射
+map.set_global_opts(
+    title_opts=TitleOpts(title="全国疫情地图"),
+    visualmap_opts=VisualMapOpts(
+        is_show=True,           # 是否显示
+        is_piecewise=True,      # 是否分段
+        pieces=[
+            {"min": 1, "max": 99, "lable": "1~99人", "color": "#CCFFFF"},
+            {"min": 100, "max": 999, "lable": "100~9999人", "color": "#FFFF99"}, # 浅黄色
+            {"min": 1000, "max": 4999, "lable": "1000~4999人", "color": "#FF9966"},
+            {"min": 5000, "max": 9999, "lable": "5000~99999人", "color": "#FF6666"},
+            {"min": 10000, "max": 99999, "lable": "10000~99999人", "color": "#CC3333"},
+            {"min": 100000, "lable": "100000+", "color": "#990033"}, # 不写max表示最大无限制
+        ]
+    )
+)
+# 绘图
+map.render("全国疫情地图.html")
+~~~
+
 
 
 ---
 
-# 107.
+# 107.河南省疫情地图绘制
+
+## 一、效果展示
+
+<img src="./assets/image-20240628211145857.png" alt="image-20240628211145857" style="zoom:67%;" />
+
+---
+
+## 二、获取河南省各市数据
+
+<img src="./assets/image-20240628211218933.png" alt="image-20240628211218933" style="zoom:67%;" />
+
+---
+
+## 三、省数据结构
+
+![image-20240628211236678](./assets/image-20240628211236678.png)
+
+---
+
+## 四、把各市数据汇总到一个列表中
+
+<img src="./assets/image-20240628211257172.png" alt="image-20240628211257172" style="zoom:80%;" />
+
+![image-20240628211303775](./assets/image-20240628211303775.png)
+
+---
+
+## 五、参考国内疫情地图生成河南省疫情地图
+
+![image-20240628211337086](./assets/image-20240628211337086.png)
+
+---
+
+## 六、完整代码
+
+~~~python
+"""
+演示河南省疫情地图开发
+"""
+import json
+from pyecharts.charts import Map
+from pyecharts.options import *
+
+# 读取文件
+f = open("D:/疫情.txt", "r", encoding="UTF-8")
+data = f.read()
+# 关闭文件
+f.close()
+# 获取河南省数据
+# json数据转换为python字典
+data_dict = json.loads(data)
+# 取到河南省数据
+cities_data = data_dict["areaTree"][0]["children"][3]["children"]
+
+# 准备数据为元组并放入list
+data_list = []
+for city_data in cities_data:
+    city_name = city_data["name"] + "市"
+    city_confirm = city_data["total"]["confirm"]
+    data_list.append((city_name, city_confirm))
+
+# 手动添加济源市的数据
+data_list.append(("济源市", 5))
+
+# 构建地图
+map = Map()
+map.add("河南省疫情分布", data_list, "河南") # 这里类型不写china，写 `河南`,pyecharts这个模块会自动识别，就能把我们地图自动的变成河南省的行政规范了
+# 设置全局选项
+map.set_global_opts(
+    title_opts=TitleOpts(title="河南省疫情地图"),
+    visualmap_opts=VisualMapOpts(
+        is_show=True,           # 是否显示
+        is_piecewise=True,      # 是否分段
+        pieces=[
+            {"min": 1, "max": 99, "lable": "1~99人", "color": "#CCFFFF"},
+            {"min": 100, "max": 999, "lable": "100~9999人", "color": "#FFFF99"},
+            {"min": 1000, "max": 4999, "lable": "1000~4999人", "color": "#FF9966"},
+            {"min": 5000, "max": 9999, "lable": "5000~99999人", "color": "#FF6666"},
+            {"min": 10000, "max": 99999, "lable": "10000~99999人", "color": "#CC3333"},
+            {"min": 100000, "lable": "100000+", "color": "#990033"},
+        ]
+    )
+)
+
+# 绘图
+map.render("河南省疫情地图.html")
+~~~
+
+
+
+---
+
+# 108.基础柱状图构建
+
+## 一、案例效果
+
+通过pyechars可以实现数据的动态显示, 直观的感受1960~2019年全世界各国GDP的变化趋势
+
+<img src="./assets/image-20240628211853606.png" alt="image-20240628211853606" style="zoom:67%;" />
+
+---
+
+## 二、通过Bar构建基础柱状图
+
+![image-20240628211947500](./assets/image-20240628211947500.png)
+
+---
+
+## 三、反转x和y轴
+
+![image-20240628212032498](./assets/image-20240628212032498.png)
+
+---
+
+## 四、数值标签在右侧
+
+![image-20240628212123754](./assets/image-20240628212123754.png)
+
+---
+
+## 五、完整代码
+
+~~~python
+"""
+演示基础柱状图的开发
+"""
+from pyecharts.charts import Bar
+from pyecharts.options import LabelOpts
+# 使用Bar构建基础柱状图
+bar = Bar()
+# 添加x轴的数据
+bar.add_xaxis(["中国", "美国", "英国"])
+# 添加y轴数据
+bar.add_yaxis("GDP", [30, 20, 10], label_opts=LabelOpts(position="right"))# 设置数值标签在右侧
+# 反转x和y轴
+bar.reversal_axis()
+# 绘图
+bar.render("基础柱状图.html")
+~~~
+
+---
+
+## 六、总结
+
+1. 通过Bar()构建一个柱状图对象
+2. 和折线图一样，通过 `add_xaxis()` 和 `add_yaxis()` 添加x和y轴数据
+3. 通过柱状图对象的：`reversal_axis()`，反转 x 和 y轴
+4. 通过 `label_opts=LabelOpts(position="right")` 设置数值标签在右侧显示
+
+
+
+---
+
+# 109.基础时间线柱状图绘制
+
+## 一、时间线
+
+`Timeline()` - 时间线
+
+柱状图描述的是分类数据，回答的是每一个分类中『有多少？』这个问题. 这是柱状图的主要特点,同时柱状图很难动态的描述一个趋势性的数据. 这里pyecharts为我们提供了一种解决方案 - **时间线**
+
+如果说一个Bar、Line对象是一张图表的话，时间线就是创建一个
+
+一维的x轴，轴上每一个点就是一个图表对象
+
+<img src="./assets/image-20240628213133479.png" alt="image-20240628213133479" style="zoom:67%;" />
+
+---
+
+## 二、创建时间线
+
+![image-20240628213210670](./assets/image-20240628213210670.png)
+
+---
+
+## 三、自动播放
+
+![image-20240628213239764](./assets/image-20240628213239764.png)
+
+---
+
+## 四、时间线设置主题
+
+![image-20240628213305563](./assets/image-20240628213305563.png)
+
+---
+
+## 五、完整代码
+
+~~~python
+"""
+演示带有时间线的柱状图开发
+"""
+from pyecharts.charts import Bar, Timeline
+from pyecharts.options import LabelOpts
+from pyecharts.globals import ThemeType
+
+bar1 = Bar()
+bar1.add_xaxis(["中国", "美国", "英国"])
+bar1.add_yaxis("GDP", [30, 30, 20], label_opts=LabelOpts(position="right"))
+bar1.reversal_axis()
+
+bar2 = Bar()
+bar2.add_xaxis(["中国", "美国", "英国"])
+bar2.add_yaxis("GDP", [50, 50, 50], label_opts=LabelOpts(position="right"))
+bar2.reversal_axis()
+
+bar3 = Bar()
+bar3.add_xaxis(["中国", "美国", "英国"])
+bar3.add_yaxis("GDP", [70, 60, 60], label_opts=LabelOpts(position="right"))
+bar3.reversal_axis()
+
+# 构建时间线对象
+timeline = Timeline({"theme": ThemeType.LIGHT})
+# 在时间线内添加柱状图对象
+timeline.add(bar1, "点1")
+timeline.add(bar2, "点2")
+timeline.add(bar3, "点3")
+
+# 自动播放设置
+timeline.add_schema(
+    play_interval=1000,         # 自动播放的时间间隔，单位毫秒
+    is_timeline_show=True,      # 是否在自动播放的时候，显示时间戳
+    is_auto_play=True,          # 是否自动播放
+    is_loop_play=True           # 是否循环自动播放
+)
+
+# 绘图是用时间线对象绘图，而不是bar对象了
+timeline.render("基础时间线柱状图.html")
+~~~
+
+---
+
+## 六、总结
+
+1. 什么是时间线？
+
+![image-20240628213358046](./assets/image-20240628213358046.png)
+
+~~~python
+from pyecharts.charts import Timeline
+timeline = Timeline()
+~~~
+
+2. 自动播放
+
+~~~python
+# 自动播放设置
+timeline.add_schema(
+    play_interval=1000,         # 自动播放的时间间隔，单位毫秒
+    is_timeline_show=True,      # 是否在自动播放的时候，显示时间戳
+    is_auto_play=True,          # 是否自动播放
+    is_loop_play=True           # 是否循环自动播放
+)
+~~~
+
+3. 如何设置主题
+
+~~~python
+timeline = Timeline({"theme": ThemeType.LIGHT})
+~~~
+
+
+
+---
+
+# 110.动态GDP柱状图绘制
+
+## 一、需求分析
+
+![image-20240628213849179](./assets/image-20240628213849179.png)
+
+---
+
+## 二、列表的sort方法
+
+在前面我们学习过sorted函数，可以对数据容器进行排序。
+
+在后面的数据处理中，我们需要对列表进行排序，并指定排序规则，sorted函数就无法完成了。
+
+我们补充学习列表的sort方法。
+
+使用方式：
+
+`列表.sort(key=选择排序依据的函数, reverse=True|False)`
+
+- 参数key，是要求传入一个函数，表示将列表的每一个元素都传入函数中，返回排序的依据
+- 参数reverse，是否反转排序结果，True表示降序，False表示升序
+
+![image-20240628215019644](./assets/image-20240628215019644.png)
+
+~~~python
+"""
+扩展列表的sort方法
+在学习了将函数作为参数传递后，我们可以学习列表的sort方法来对列表进行自定义排序
+"""
+
+# 准备列表
+my_list = [["a", 33], ["b", 55], ["c", 11]]
+
+# 排序，基于带名函数
+# def choose_sort_key(element):
+#     return element[1]
+#
+# my_list.sort(key=choose_sort_key, reverse=True)
+# 排序，基于lambda匿名函数
+my_list.sort(key=lambda element: element[1], reverse=True) # reverse=True：从大到小
+print(my_list) # [['b', 55], ['a', 33], ['c', 11]]
+~~~
+
+---
+
+## 三、处理数据
+
+读取数据，删除第一条数据
+
+![image-20240628215633061](./assets/image-20240628215633061.png)
+
+将数据转换为字典存储，格式为：
+
+~~~python
+{ 年份: [ [国家, gdp], [国家,gdp], ...... ], 年份: [ [国家, gdp], [国家,gdp], ...... ], ...... }
+~~~
+
+![image-20240628215654258](./assets/image-20240628215654258.png)
+
+---
+
+## 四、准备时间线
+
+![image-20240628215713723](./assets/image-20240628215713723.png)
+
+---
+
+## 五、自动播放和绘图
+
+<img src="./assets/image-20240628215725864.png" alt="image-20240628215725864" style="zoom:67%;" />
+
+---
+
+## 六、最终结果
+
+<img src="./assets/image-20240628220021991.png" alt="image-20240628220021991" style="zoom:67%;" />
+
+---
+
+## 七、完整代码
+
+~~~python
+"""
+演示第三个图表：GDP动态柱状图开发
+"""
+from pyecharts.charts import Bar, Timeline
+from pyecharts.options import *
+from pyecharts.globals import ThemeType
+
+# 读取数据
+f = open("D:/1960-2019全球GDP数据.csv", "r", encoding="GB2312")
+data_lines = f.readlines()
+# 关闭文件
+f.close()
+# 删除第一条数据
+data_lines.pop(0)
+# 将数据转换为字典存储，格式为：
+# { 年份: [ [国家, gdp], [国家,gdp], ......  ], 年份: [ [国家, gdp], [国家,gdp], ......  ], ...... }
+# { 1960: [ [美国, 123], [中国,321], ......  ], 1961: [ [美国, 123], [中国,321], ......  ], ...... }
+# 先定义一个字典对象
+data_dict = {}
+for line in data_lines:
+    year = int(line.split(",")[0])      # 年份
+    country = line.split(",")[1]        # 国家
+    gdp = float(line.split(",")[2])     # gdp数据
+    # 如何判断字典里面有没有指定的key呢？
+    try:
+        data_dict[year].append([country, gdp])
+    except KeyError:
+        data_dict[year] = []
+        data_dict[year].append([country, gdp])
+
+# print(data_dict[1960])
+# 创建时间线对象
+timeline = Timeline({"theme": ThemeType.LIGHT})
+# 排序年份
+sorted_year_list = sorted(data_dict.keys())
+for year in sorted_year_list:
+    data_dict[year].sort(key=lambda element: element[1], reverse=True)
+    # 取出本年份前8名的国家
+    year_data = data_dict[year][0:8]
+    x_data = []
+    y_data = []
+    for country_gdp in year_data:
+        x_data.append(country_gdp[0])   # x轴添加国家
+        y_data.append(country_gdp[1] / 100000000)   # y轴添加gdp数据
+
+    # 构建柱状图
+    bar = Bar()
+    x_data.reverse()
+    y_data.reverse()
+    bar.add_xaxis(x_data)
+    bar.add_yaxis("GDP(亿)", y_data, label_opts=LabelOpts(position="right"))
+    # 反转x轴和y轴
+    bar.reversal_axis()
+    # 设置每一年的图表的标题
+    bar.set_global_opts(
+        title_opts=TitleOpts(title=f"{year}年全球前8GDP数据")
+    )
+    timeline.add(bar, str(year))
+
+
+# for循环每一年的数据，基于每一年的数据，创建每一年的bar对象
+# 在for中，将每一年的bar对象添加到时间线中
+
+# 设置时间线自动播放
+timeline.add_schema(
+    play_interval=1000,
+    is_timeline_show=True,
+    is_auto_play=True,
+    is_loop_play=False
+)
+# 绘图
+timeline.render("1960-2019全球GDP前8国家.html")
+~~~
+
+
+
+---
+
+# 111.
+
+
+
 
 
 

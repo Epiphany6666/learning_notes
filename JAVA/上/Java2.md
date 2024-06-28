@@ -8668,6 +8668,8 @@ System.out.println(Outer.this.变量名) // 这种方式可以直接获取到外
 
 # 142.静态内部类
 
+@[TOC]
+
 ## 一、介绍
 
 `静态内部类` 其实是 `成员内部类` 的一种特殊情况，当 `成员内部类` 的前面用 `static` 修饰的时候，里面的这个类我们就称之为：静态内部类。
@@ -8794,6 +8796,8 @@ Outer.Inner oi = new Outer.Inner();
 ----
 
 # 局部内部类
+
+@[TOC]
 
 ## 一、介绍
 
@@ -8976,6 +8980,8 @@ o.show();
 ---
 
 # 143.匿名内部类
+
+@[TOC]
 
 ## 一、介绍
 
@@ -9557,6 +9563,8 @@ new 类名/接口名(){
 
 # 144.项目介绍和界面搭建
 
+@[TOC]
+
 ## 一、游戏的最终效果呈现
 
 Hello，各位同学大家好。今天，我们要写一个非常有意思的小游戏 ---《拼图小游戏》
@@ -9717,9 +9725,13 @@ Java语言主要是做后台服务器开发的。
 
 接下来我们就到IDEA中去创建窗体。
 
+
+
 -----
 
 # 创建主页面1
+
+@[TOC]
 
 ## 一、需求
 
@@ -10142,6 +10154,8 @@ public class App {
 
 # 145.创建主页面2
 
+@[TOC]
+
 ## 一、问题一
 
 我们刚刚已经创建了三个主页面，并且用继承做了一个改写。
@@ -10433,9 +10447,13 @@ public class RegisterJFrame extends JFrame {
 
 ![image-20240419205300250](./assets/image-20240419205300250.png)
 
+
+
 ----
 
 # 菜单制作
+
+@[TOC]
 
 ## 一、介绍
 
@@ -10710,6 +10728,8 @@ public class GameJFrame extends JFrame {
 
 # 146.添加图片
 
+@[TOC]
+
 ## 一、介绍
 
 在刚刚我们已经在界面中添加了菜单，接下来就开始学习如何在界面中添加图片。
@@ -10905,6 +10925,8 @@ this.add(jLabel1);
 
 # 位置坐标
 
+@[TOC]
+
 ## 一、引入
 
 刚刚我们已经在页面中添加了图片了，代码并不是很难。
@@ -11079,9 +11101,13 @@ private void initImage() {
 
 所以我们在代码中，直接通过 `getContentPane()` 方法获取出来就行了。
 
+
+
 -----
 
 # 添加剩下的图片
+
+@[TOC]
 
 ## 一、引入
 
@@ -11337,6 +11363,8 @@ JLabel jLabel = new JLabel(new ImageIcon("E:\\learning_notes\\JAVA\\code\\basic-
 
 # 147.打乱图片
 
+@[TOC]
+
 ## 一、思路
 
 在刚刚我们已经将游戏用到的小的图片都加载到界面中了，现在我们就来打乱图片的顺序。
@@ -11561,6 +11589,8 @@ public class GameJFrame extends JFrame {
 -----
 
 # 148.事件
+
+@[TOC]
 
 ## 一、介绍
 
@@ -12281,6 +12311,8 @@ public void keyReleased(KeyEvent e) {
 
 # 149.美化界面
 
+@[TOC]
+
 ## 一、引入
 
 来和美化后的界面对比一下，会感觉我们之前写的界面太丑啦。
@@ -12633,6 +12665,8 @@ jLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
 ----
 
 # 150.移动图片
+
+@[TOC]
 
 ## 一、移动过程分析
 
@@ -13044,6 +13078,8 @@ public void keyReleased(KeyEvent e) {
 
 # 151.查看完整图片
 
+@[TOC]
+
 ## 一、引入
 
 先来看一下最终效果。游戏在刚开始启动的时候，图片是随机打乱的。
@@ -13232,6 +13268,8 @@ public void keyPressed(KeyEvent e) {
 -----
 
 # 作弊码
+
+@[TOC]
 
 ## 一、引入
 
